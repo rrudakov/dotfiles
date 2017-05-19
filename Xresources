@@ -1,0 +1,144 @@
+Emacs.FontBackend: xft
+
+XTerm*faceName: xft:Droid Sans Mono:size=10:antialias=true
+XTerm*loginShell: true
+XTerm*termName: xterm-256color
+XTerm*borderWidth: 0
+XTerm*foreground: lightgray
+XTerm*background: black
+XTerm*rightScrollBar: True
+XTerm*scrollBar: True
+XTerm*jumpScroll: True
+
+*ScrollBar.width: 3
+*Scrollbar.borderWidth: 0
+*Scrollbar.shadowWidth: 0
+*ScrollBar.Background: black
+*ScrollBar.foreground: gray
+*ScrollBar.thickness: 5 
+*Scrollbar.minimumThumb: 20
+*Scrollbar.backgroundPixmap: gradient:horizontal?dimension=14&start=gray80&end=white
+*Scrollbar.borderPixmap: gradient:horizontal?dimension=14&start=white&end=grey80
+*Scrollbar.translations: #override\
+<Btn2Down>: StartScroll(Forward) \n\
+<Btn1Down>: StartScroll(Continuous) MoveThumb() NotifyThumb() \n\
+<Btn3Down>: StartScroll(Backward) \n\
+<Btn1Motion>: MoveThumb() NotifyThumb() \n\
+<BtnUp>: NotifyScroll(Proportional) EndScroll()
+
+XTerm*highlightSelection: True
+XTerm*trimSelection: True
+
+! Cursor
+URxvt.cursorBlink: true
+URxvt.cursorUnderline: false
+ 
+! Pointer
+URxvt.pointerBlank: true
+
+URxvt*saveLines: 5000
+
+!URxvt.font: -*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-1
+!URxvt.boldFont: -*-terminus-bold-*-*-*-12-*-*-*-*-*-iso10646-1
+URxvt.font: xft:Droid Sans Mono:size=10
+URxvt.boldFont: xft:Droid Sans Mono:bold:size=10
+
+! URxvt.shading: 10
+! URxvt.transparent: true
+
+URxvt.scrollBar: false
+! scrollbar style - rxvt (default), plain (most compact), next, or xterm
+!URxvt.scrollstyle: plain
+
+! do not scroll with output
+URxvt*scrollTtyOutput: false
+
+! scroll in relation to buffer (with mouse scroll or Shift+Page Up)
+URxvt*scrollWithBuffer: true
+
+! scroll back to the bottom on keypress
+URxvt*scrollTtyKeypress: true
+
+! urxvt будет искать скрипты сначала в этой директории, потом в /usr/lib/urxvt/perl
+URxvt.perl-lib: /home/rrudakov/.config/urxvt/perl
+
+! clickable urls
+URxvt.perl-ext-common:  default,matcher,url-select
+!,clipboard
+! ,tabbedex
+URxvt.matcher.button:	1
+
+!URxvt.keysym.Shift-Control-V: perl:clipboard:paste
+!URxvt.iso14755: False
+
+##url-select without mouse
+URxvt.keysym.M-u:    perl:url-select:select_next
+URxvt.url-select.launcher:   /usr/bin/firefox -new-tab
+URxvt.url-select.underline: true
+
+! цвета табов
+!URxvt.tabbed.new-button: no
+!URxvt.tabbed.tabbar-fg: 15
+!URxvt.tabbed.tabbar-bg: 8
+!URxvt.tabbed.tab-fg:    8
+!URxvt.tabbed.tab-bg:    14
+!
+! -----------------------------------------------------------------------------
+! File: gruvbox-dark.xresources
+! Description: Retro groove colorscheme generalized
+! Author: morhetz <morhetz@gmail.com>
+! Source: https://github.com/morhetz/gruvbox-generalized
+! Last Modified: 6 Sep 2014
+! -----------------------------------------------------------------------------
+
+! hard contrast: *background: #1d2021
+*background: #282828
+! soft contrast: *background: #32302f
+*foreground: #ebdbb2
+! Black + DarkGrey
+*color0:  #282828
+*color8:  #928374
+! DarkRed + Red
+*color1:  #cc241d
+*color9:  #fb4934
+! DarkGreen + Green
+*color2:  #98971a
+*color10: #b8bb26
+! DarkYellow + Yellow
+*color3:  #d79921
+*color11: #fabd2f
+! DarkBlue + Blue
+*color4:  #458588
+*color12: #83a598
+! DarkMagenta + Magenta
+*color5:  #b16286
+*color13: #d3869b
+! DarkCyan + Cyan
+*color6:  #689d6a
+*color14: #8ec07c
+! LightGrey + White
+*color7:  #a89984
+*color15: #ebdbb2
+
+!XLock
+XLock.mode: blank
+XLock.username: Логин:
+XLock.password: Пароль:
+XLock.foreground: White
+XLock.background: Gray20
+XLock.description: false
+XLock.echokeys: true
+XLock.echokey: *
+XLock.info:
+XLock.validate: Проверка введенных данных...
+XLock.invalid: Неверный пароль
+XLock.font: -*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-1
+XLock.planfontset: -*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-1
+XLock.messagefont: -*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-1
+!-*-terminus-*-*-*-*-10-*-*-*-*-*-iso10646-1
+
+! DZEN2 CONFIG
+
+dzen2.font: -*-terminus-*-*-*-*-10-*-*-*-*-*-iso10646-1     
+dzen2.foreground: #FF8C00
+dzen2.background: black

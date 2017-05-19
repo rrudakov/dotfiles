@@ -1,0 +1,69 @@
+Config { font = "xft:Iosevka:size=10"
+       , additionalFonts = ["xft:Droid Sans Mono:size=10"]
+       , bgColor = "#1d1f21"
+       , fgColor = "#c5c8c6"
+       , position = Top
+       , border = NoBorder
+       , borderColor = "#c5c8c6"
+       , textOffset = -1
+       , iconOffset = -1
+       , lowerOnStart = True
+       , pickBroadest = False
+       , iconRoot = "."
+       , allDesktops = True
+       , overrideRedirect = True
+       , persistent = False
+       , alpha = 255
+       , commands = [ Run Weather "EGPF" ["-t","<station>: <tempC>C","-L","18","-H","25","--normal","green","--high","red","--low","lightblue"] 36000
+                    , Run Network "wlan0" ["-L", "100000"
+					  ,"-H", "1000000"
+					  ,"--normal", "#b5bd68"
+					  ,"--high", "#cc6666"
+                                          ,"-m", "4"
+                                          ,"-M", "4"
+					  ,"-t <fc=#b294bb><icon=.xpm/wifi_02.xbm/></fc> <icon=.xpm/net_down_02.xbm/><rx>KB|<tx>KB<icon=.xpm/net_up_02.xbm/>"
+					  ] 10
+                    , Run Network "eth0" ["-L", "100000"
+		      	  	  	 ,"-H", "1000000"
+					 ,"--normal", "b5bd68"
+					 ,"--high", "#cc6666"
+                                         ,"-m", "4"
+                                         ,"-M", "4"
+					 ,"-t <fc=#b294bb><icon=.xpm/net_wired.xbm/></fc> <icon=.xpm/net_down_02.xbm/><rx>KB|<tx>KB<icon=.xpm/net_up_02.xbm/>"
+					 ] 10
+                    , Run Cpu ["-L", "3"
+		      	      ,"-H", "50"
+			      ,"--normal", "#b5bd68"
+			      ,"--high", "#cc6666"
+                              ,"-p", "3"
+			      ,"-t <fc=#b294bb><icon=.xpm/cpu.xbm/></fc> <total>%"
+			      ] 10
+                    , Run Memory ["-L", "10"
+		                 ,"-H", "80"
+                                 ,"--normal", "#b5bd68"
+                                 ,"--high", "#cc6666"
+                                 ,"-p", "3"
+		                 ,"-t","<fc=#b294bb><icon=.xpm/mem.xbm/></fc> <usedratio>%"] 10
+		    , Run BatteryP ["BAT1"]
+		      	  	   [ "--template" , "<fc=#b294bb><icon=.xpm/bat_full_01.xbm/></fc> <acstatus>"
+				   , "--Low"      , "10"
+                             	   , "--High"     , "80"
+                             	   , "--low"      , "#cc6666"
+                             	   , "--normal"   , "#de935f"
+                             	   , "--high"     , "#b5bd68"
+                                   , "-m", "2"
+                                   , "-M", "2"
+				   ,"--", "-O", "<fc=#f0c674>-><left>%</fc>", "-o", "<left>%", "-i", "<fc=#81a2be>Full</fc>"
+				   ,"-f", "ACAD/online"
+				   ] 10
+                    , Run Swap [] 10
+                    , Run Com "uname" ["-s","-r"] "" 36000
+    		    , Run Date "%F %T" "date" 10
+		    , Run Kbd [("us", "US"), ("ru", "RU")]
+                    , Run StdinReader
+                    ]
+       , sepChar = "%"
+       , alignSep = "}{"
+       , template = "%cpu% %memory% %wlan0% %StdinReader% }{ <fc=#c5c8c6>%kbd% %date%</fc>"
+       , hideOnStart = False
+       }

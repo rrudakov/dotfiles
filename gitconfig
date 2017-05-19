@@ -1,0 +1,12 @@
+[user]
+	name = rrudakov
+	email = rrudakov@expertoption.com
+[core]
+	editor = vim
+	pager = cat
+[alias]
+	hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+[merge]
+	tool = vimdiff
+[push]
+	default = simple
