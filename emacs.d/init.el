@@ -9,11 +9,6 @@
 (setq show-paren-style 'expression)
 (show-paren-mode 2)
 
-(menu-bar-mode 0)
-(if window-system
-    (tool-bar-mode 0))
-(scroll-bar-mode 0)
-
 (setq make-backup-files nil)
 (setq auto-save-list-file-name nil)
 (setq auto-save-default nil)
@@ -40,6 +35,98 @@
 ;; set specific browser to open links
 (setq browse-url-browser-function 'browse-url-firefox)
 
+;;;
+;; UTF-8 as the default coding system
+(when (fboundp 'set-charset-priority)
+  (set-charset-priority 'unicode))     ; pretty
+(prefer-coding-system        'utf-8)   ; pretty
+(set-terminal-coding-system  'utf-8)   ; pretty
+(set-keyboard-coding-system  'utf-8)   ; pretty
+(set-selection-coding-system 'utf-8)   ; perdy
+(setq locale-coding-system   'utf-8)   ; please
+(setq-default buffer-file-coding-system 'utf-8) ; with sugar on top
+
+(setq-default
+ ad-redefinition-action 'accept   ; silence advised function warnings
+ apropos-do-all t                 ; make `apropos' more useful
+ compilation-always-kill t        ; kill compilation process before starting another
+ compilation-ask-about-save nil   ; save all buffers on `compile'
+ compilation-scroll-output t
+ confirm-nonexistent-file-or-buffer t
+ enable-recursive-minibuffers nil
+ idle-update-delay 2              ; update ui less often
+ ;; keep the point out of the minibuffer
+ minibuffer-prompt-properties '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt)
+ ;; History & backup settings (save nothing, that's what git is for)
+ auto-save-default nil
+ create-lockfiles nil
+ history-length 1000
+ make-backup-files nil)
+
+;; be quiet at startup
+(advice-add #'display-startup-echo-area-message :override #'ignore)
+(setq inhibit-startup-message t
+      inhibit-startup-echo-area-message user-login-name
+      initial-major-mode 'fundamental-mode
+      initial-scratch-message nil)
+
+(setq-default
+ bidi-display-reordering nil ; disable bidirectional text for tiny performance boost
+ blink-matching-paren nil    ; don't blink--too distracting
+ cursor-in-non-selected-windows nil  ; hide cursors in other windows
+ frame-inhibit-implied-resize t
+ ;; remove continuation arrow on right fringe
+ fringe-indicator-alist (delq (assq 'continuation fringe-indicator-alist)
+                              fringe-indicator-alist)
+ highlight-nonselected-windows nil
+ image-animate-loop t
+ indicate-buffer-boundaries nil
+ indicate-empty-lines nil
+ max-mini-window-height 0.3
+ mode-line-default-help-echo nil ; disable mode-line mouseovers
+ mouse-yank-at-point t           ; middle-click paste at point, not at click
+ resize-mini-windows 'grow-only  ; Minibuffer resizing
+ show-help-function nil          ; hide :help-echo text
+ split-width-threshold nil       ; favor horizontal splits
+ uniquify-buffer-name-style 'forward
+ use-dialog-box nil              ; always avoid GUI
+ visible-cursor nil
+ x-stretch-cursor nil
+ ;; defer jit font locking slightly to [try to] improve Emacs performance
+ jit-lock-defer-time nil
+ jit-lock-stealth-nice 0.1
+ jit-lock-stealth-time 0.2
+ jit-lock-stealth-verbose nil
+ ;; `pos-tip' defaults
+ pos-tip-internal-border-width 6
+ pos-tip-border-width 1
+ ;; no beeping or blinking please
+ ring-bell-function #'ignore
+ visible-bell nil)
+
+;;; More reliable inter-window border
+;; The native border "consumes" a pixel of the fringe on righter-most splits,
+;; `window-divider' does not. Available since Emacs 25.1.
+(setq-default window-divider-default-places t
+              window-divider-default-bottom-width 1
+              window-divider-default-right-width 1)
+(window-divider-mode +1)
+
+(defvar my-ui-fringe-size '4 "Default fringe width.")
+
+(tooltip-mode -1) ; relegate tooltips to echo area only
+(menu-bar-mode -1)
+(when (fboundp 'tool-bar-mode)
+  (tool-bar-mode -1))
+(when (display-graphic-p)
+  (scroll-bar-mode -1)
+  ;; buffer name  in frame title
+  (setq-default frame-title-format '("DOOM Emacs"))
+  ;; standardize fringe width
+  (push (cons 'left-fringe  my-ui-fringe-size) default-frame-alist)
+  (push (cons 'right-fringe my-ui-fringe-size) default-frame-alist))
+
+
 (require 'package)
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/"))
@@ -49,9 +136,44 @@
 (package-initialize)
 (package-refresh-contents)
 
-;; Session
-(require 'session)
-(add-hook 'after-init-hook 'session-initialize)
+;; Doom theme
+(require 'doom-themes)
+
+;; Global settings (defaults)
+(setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+      doom-themes-enable-italic t  ; if nil, italics is universally disabled
+
+      doom-neotree-file-icons t
+      doom-neotree-enable-type-colors t)
+
+;; Load the theme (doom-one, doom-molokai, etc); keep in mind that each theme
+;; may have their own settings.
+(load-theme 'doom-one t)
+
+;; Enable flashing mode-line on errors
+(doom-themes-visual-bell-config)
+
+;; Enable custom neotree theme
+(doom-themes-neotree-config)
+
+;; Doom org-mode
+(setq org-fontify-whole-heading-line t
+      org-fontify-done-headline t
+      org-fontify-quote-and-verse-blocks t)
+
+(require 'solaire-mode)
+
+;; brighten buffers (that represent real files)
+(add-hook 'after-change-major-mode-hook #'turn-on-solaire-mode)
+
+;; ...if you use auto-revert-mode:
+(add-hook 'after-revert-hook #'turn-on-solaire-mode)
+
+;; You can do similar with the minibuffer when it is activated:
+(add-hook 'minibuffer-setup-hook #'solaire-mode-in-minibuffer)
+
+;; To enable solaire-mode unconditionally for certain modes:
+(add-hook 'ediff-prepare-buffer-hook #'solaire-mode)
 
 (require 'flx-ido)
 (ido-mode 1)
@@ -79,7 +201,7 @@
 (add-to-list 'company-backends '(company-ghc :with company-dabbrev-code))
 (add-to-list 'company-backends 'company-shell)
 (add-to-list 'company-backends 'company-c-headers)
-:(add-to-list 'company-backends 'company-cabal)
+(add-to-list 'company-backends 'company-cabal)
 (add-to-list 'company-backends 'company-go)
 (add-to-list 'company-backends 'company-jedi)
 (add-to-list 'company-backends 'company-web-html)
@@ -126,7 +248,6 @@
 (setq elpy-rpc-backend "jedi")
 (elpy-use-ipython)
 (add-hook 'elpy-mode-hook 'yas-minor-mode-on)
-(add-hook 'elpy-mode-hook 'flymake-mode-off)
 
 (defun company-yasnippet-or-completion ()
   "Solve company yasnippet conflicts."
@@ -246,27 +367,54 @@
 ;; Git configuration
 (global-set-key (kbd "C-x g") 'magit-status)
 
-(require 'git-gutter-fringe)
-(global-git-gutter-mode t)
-
 ;; subtle diff indicators in the fringe
 ;; places the git gutter outside the margins.
 (setq-default fringes-outside-margins t)
-;; thin fringe bitmaps
-(fringe-helper-define 'git-gutter-fr:added '(center repeated)
-  "XXX.....")
-(fringe-helper-define 'git-gutter-fr:modified '(center repeated)
-  "XXX.....")
-(fringe-helper-define 'git-gutter-fr:deleted 'bottom
-  "X......."
-  "XX......"
-  "XXX....."
-  "XXXX....")
+
+(add-hook 'prog-mode-hook 'turn-on-diff-hl-mode)
+(add-hook 'vc-dir-mode-hook 'turn-on-diff-hl-mode)
+(add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+
+;; (require 'git-gutter-fringe)
+;; (global-git-gutter-mode t)
+;;
+;; ;; thin fringe bitmaps
+;; (fringe-helper-define 'git-gutter-fr:added '(center repeated)
+;;   "XXX.....")
+;; (fringe-helper-define 'git-gutter-fr:modified '(center repeated)
+;;   "XXX.....")
+;; (fringe-helper-define 'git-gutter-fr:deleted 'bottom
+;;   "X......."
+;;   "XX......"
+;;   "XXX....."
+;;   "XXXX....")
+
+;; ;; Update git-gutter on focus
+;; (add-hook 'focus-in-hook #'git-gutter:update-all-windows)
 
 (setq flycheck-indication-mode 'right-fringe)
 
 (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
   [0 0 0 0 0 4 12 28 60 124 252 124 60 28 12 4 0 0 0 0])
+
+(require 'highlight-symbol)
+
+(highlight-symbol-nav-mode)
+
+(add-hook 'prog-mode-hook (lambda () (highlight-symbol-mode)))
+(add-hook 'org-mode-hook (lambda () (highlight-symbol-mode)))
+
+(setq highlight-symbol-idle-delay 0.2
+      highlight-symbol-on-navigation-p t)
+
+(global-set-key [(control shift mouse-1)]
+                (lambda (event)
+                  (interactive "e")
+                  (goto-char (posn-point (event-start event)))
+                  (highlight-symbol-at-point)))
+
+(global-set-key (kbd "M-n") 'highlight-symbol-next)
+(global-set-key (kbd "M-p") 'highlight-symbol-prev)
 
 ;; YAML
 (require 'yaml-mode)
@@ -304,11 +452,11 @@
 
 (setq org-todo-keyword-faces
       '(
-;	("TODO" . org-warning)
-	("PROGRESS" :foreground "yellow" :weight bold)
-	("PAUSED" :foreground "cyan" :weight bold)
-;	("DONE" :foreground "forest green" :weight bold)
-	)
+					;	("TODO" . org-warning)
+        ("PROGRESS" :foreground "yellow" :weight bold)
+        ("PAUSED" :foreground "cyan" :weight bold)
+                                        ;	("DONE" :foreground "forest green" :weight bold)
+        )
       )
 
 (setq org-clock-persist 'history)
@@ -330,48 +478,7 @@
 
 (setq default-input-method "russian-computer")
 
-(zerodark-setup-modeline-format)
-
-;; Doom theme
-(require 'doom-themes)
-
-;;; Settings (defaults)
-(setq doom-themes-enable-bold t    ; if nil, bolding are universally disabled
-      doom-themes-enable-italic t  ; if nil, italics are universally disabled
-
-      ;; doom-one specific settings
-      doom-one-brighter-modeline nil
-      doom-one-brighter-comments nil
-      
-      doom-neotree-file-icons t
-      doom-neotree-enable-type-colors t)
-
-;; Load the theme (doom-one, doom-dark, etc.)
-(load-theme 'doom-one t)
-
-;;; OPTIONAL
-;; brighter source buffers (that represent files)
-(add-hook 'find-file-hook #'doom-buffer-mode-maybe)
-;; ...if you use auto-revert-mode
-(add-hook 'after-revert-hook #'doom-buffer-mode-maybe)
-;; And you can brighten other buffers (unconditionally) with:
-(add-hook 'ediff-prepare-buffer-hook #'doom-buffer-mode)
-
-;; brighter minibuffer when active
-(add-hook 'minibuffer-setup-hook #'doom-brighten-minibuffer)
-
-;; Enable custom neotree theme
-(doom-themes-neotree-config)  ; all-the-icons fonts must be installed!
-
-;; Enable nlinum line highlighting
-(doom-themes-nlinum-config)   ; requires nlinum and hl-line-mode
-
-;; Doom org-mode
-(setq org-fontify-whole-heading-line t
-      org-fontify-done-headline t
-      org-fontify-quote-and-verse-blocks t)
-
-(window-numbering-mode)
+;; (zerodark-setup-modeline-format)
 
 ;; Tox
 (setq tox-runner 'py.test)
@@ -382,6 +489,32 @@
 (setq paradox-github-token "619e27814936e9fe86b3394f4aca33f5f7dd9b91")
 
 (global-anzu-mode +1)
+(setq anzu-cons-mode-line-p nil)
+
+(require 'winum)
+(setq winum-auto-setup-mode-line nil)
+(winum-mode)
+
+(require 'diminish)
+(diminish 'anzu-mode)
+(diminish 'smartparens-mode)
+(diminish 'flycheck-mode)
+(diminish 'highlight-symbol-mode)
+(diminish 'projectile-mode)
+(diminish 'elpy-mode)
+(diminish 'org-indent-mode)
+(diminish 'with-editor-mode)
+(diminish 'server-buffer-clients)
+(diminish 'auto-fill-function)
+
+(require 'spaceline-config)
+(spaceline-spacemacs-theme)
+(setq spaceline-window-numbers-unicode t)
+(setq powerline-default-separator 'bar)
+(spaceline-toggle-buffer-size-off)
+(spaceline-toggle-projectile-root-on)
+(setq powerline-height 24)
+(spaceline-compile)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -391,15 +524,28 @@
  '(elpy-modules
    (quote
     (elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-sane-defaults)))
+ '(elpy-rpc-timeout 10)
+ '(flymake-allowed-file-name-masks
+   (quote
+    (("\\.\\(?:c\\(?:pp\\|xx\\|\\+\\+\\)?\\|CC\\)\\'" flymake-simple-make-init nil nil)
+     ("\\.xml\\'" flymake-xml-init nil nil)
+     ("\\.html?\\'" flymake-xml-init nil nil)
+     ("\\.cs\\'" flymake-simple-make-init nil nil)
+     ("\\.p[ml]\\'" flymake-perl-init nil nil)
+     ("\\.php[345]?\\'" flymake-php-init nil nil)
+     ("\\.h\\'" flymake-master-make-header-init flymake-master-cleanup nil)
+     ("\\.java\\'" flymake-simple-make-java-init flymake-simple-java-cleanup nil)
+     ("[0-9]+\\.tex\\'" flymake-master-tex-init flymake-master-cleanup nil)
+     ("\\.tex\\'" flymake-simple-tex-init nil nil)
+     ("\\.idl\\'" flymake-simple-make-init nil nil))))
  '(package-selected-packages
    (quote
-    (anzu elpy traad git-gutter-fringe paradox rainbow-delimiters session tox ini-mode window-numbering use-package zerodark-theme yaml-mode web-mode spaceline-all-the-icons smartparens slack projectile org-alert org nlinum neotree intero flycheck-color-mode-line flx-ido doom-themes dired+ company-web company-statistics company-shell company-auctex)))
+    (winum spaceline diminish yaml-mode company-c-headers company-cabal company-go company-jedi solaire-mode highlight-symbol diff-hl anzu elpy git-gutter-fringe paradox rainbow-delimiters tox ini-mode window-numbering use-package zerodark-theme web-mode spaceline-all-the-icons smartparens projectile org-alert org nlinum neotree intero flycheck-color-mode-line flx-ido doom-themes dired+ company-web company-statistics company-shell company-auctex)))
  '(paradox-automatically-star t)
  '(safe-local-variable-values
    (quote
     ((haskell-process-use-ghci . t)
-     (haskell-indent-spaces . 4))))
- '(session-use-package t nil (session)))
+     (haskell-indent-spaces . 4)))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
