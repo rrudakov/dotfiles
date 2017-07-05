@@ -107,7 +107,7 @@
 ;; The native border "consumes" a pixel of the fringe on righter-most splits,
 ;; `window-divider' does not. Available since Emacs 25.1.
 (setq-default window-divider-default-places t
-              window-divider-default-bottom-width 1
+              window-divider-default-bottom-width 0
               window-divider-default-right-width 1)
 (window-divider-mode +1)
 
@@ -137,32 +137,33 @@
 (package-initialize)
 (package-refresh-contents)
 
-;; Doom theme
-(require 'doom-themes)
+;; ;; Doom theme
+;; (require 'doom-themes)
 
-;; Global settings (defaults)
-(setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-      doom-themes-enable-italic t  ; if nil, italics is universally disabled
+;; ;; Global settings (defaults)
+;; (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+;;       doom-themes-enable-italic t  ; if nil, italics is universally disabled
 
-      ;;      doom-neotree-file-icons t
-      ;;      doom-neotree-enable-type-colors t
-      )
+;;       ;;      doom-neotree-file-icons t
+;;       ;;      doom-neotree-enable-type-colors t
+;;       )
 
-;; Load the theme (doom-one, doom-molokai, etc); keep in mind that each theme
-;; may have their own settings.
-(load-theme 'doom-one t)
+;; ;; Load the theme (doom-one, doom-molokai, etc); keep in mind that each theme
+;; ;; may have their own settings.
+;; (load-theme 'doom-one t)
 
-;; Enable flashing mode-line on errors
-(doom-themes-visual-bell-config)
+;; ;; Enable flashing mode-line on errors
+;; (doom-themes-visual-bell-config)
 
-;; Enable custom neotree theme
-;; (doom-themes-neotree-config)
+;; ;; Enable custom neotree theme
+;; ;; (doom-themes-neotree-config)
 
-;; Doom org-mode
-(setq org-fontify-whole-heading-line t
-      org-fontify-done-headline t
-      org-fontify-quote-and-verse-blocks t)
+;; ;; Doom org-mode
+;; (setq org-fontify-whole-heading-line t
+;;       org-fontify-done-headline t
+;;       org-fontify-quote-and-verse-blocks t)
 
+(load-theme 'base16-oceanicnext t)
 (require 'solaire-mode)
 
 ;; brighten buffers (that represent real files)
@@ -177,18 +178,34 @@
 ;; To enable solaire-mode unconditionally for certain modes:
 (add-hook 'ediff-prepare-buffer-hook #'solaire-mode)
 
-;; (require 'flx-ido)
-;; (ido-mode 1)
-;; (ido-everywhere 1)
-;; (flx-ido-mode 1)
-;; ;; disable ido faces to see flx highlights.
-;; (setq ido-enable-flex-matching t)
-;; (setq ido-use-faces nil)
-;; (global-set-key (kbd "<f2>") 'bs-show)
+(require 'flx-ido)
+(ido-mode 1)
+(ido-everywhere 1)
+(flx-ido-mode 1)
+;; disable ido faces to see flx highlights.
+(setq ido-enable-flex-matching t)
+(setq ido-use-faces nil)
+(global-set-key (kbd "<f2>") 'bs-show)
+
+(global-set-key
+ "\M-x"
+ (lambda ()
+   (interactive)
+   (call-interactively
+    (intern
+     (ido-completing-read
+      "M-x "
+      (all-completions "" obarray 'commandp))))))
+
+(require 'ido-vertical-mode)
+(ido-vertical-mode 1)
+(setq ido-vertical-define-keys 'C-n-and-C-p-only)
+(setq ido-vertical-show-count t)
 
 (projectile-mode)
-(setq projectile-indexing-method 'native)
 (add-to-list 'projectile-globally-ignored-files "*.log")
+(setq projectile-enable-caching t)
+(setq projectile-mode-line '(:eval (format " [%s]" (projectile-project-name))))
 
 ;; Install Intero
 (package-install 'intero)
@@ -344,9 +361,6 @@
 ;; Display icons
 (require 'all-the-icons)
 
-(require 'popwin)
-(popwin-mode 1)
-
 ;; Neotree
 ;; (require 'neotree)
 ;; (setq projectile-switch-project-action 'neotree-projectile-action)
@@ -368,27 +382,6 @@
 ;; (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 ;; (setq neo-window-width 45)
 ;; (setq neo-vc-integration '(face char))
-
-(ivy-mode 1)
-(setq ivy-use-virtual-buffers t)
-(setq ivy-count-format "(%d/%d) ")
-
-(global-set-key (kbd "C-s") 'swiper)
-(global-set-key (kbd "M-x") 'counsel-M-x)
-(global-set-key (kbd "C-x C-f") 'counsel-find-file)
-(global-set-key (kbd "<f1> f") 'counsel-describe-function)
-(global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-(global-set-key (kbd "<f1> l") 'counsel-find-library)
-(global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-(global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-
-(global-set-key (kbd "C-c g") 'counsel-git)
-(global-set-key (kbd "C-c j") 'counsel-git-grep)
-(global-set-key (kbd "C-x l") 'counsel-locate)
-(global-set-key (kbd "C-c C-r") 'ivy-resume)
-
-(setq projectile-completion-system 'ivy)
-(setq magit-completing-read-function 'ivy-completing-read)
 
 ;; Git configuration
 (global-set-key (kbd "C-x g") 'magit-status)
@@ -509,7 +502,7 @@
 (diminish 'smartparens-mode)
 (diminish 'flycheck-mode)
 (diminish 'highlight-symbol-mode)
-(diminish 'projectile-mode)
+;; (diminish 'projectile-mode)
 (diminish 'elpy-mode)
 (diminish 'org-indent-mode)
 (diminish 'with-editor-mode)
@@ -517,20 +510,102 @@
 (diminish 'auto-fill-function)
 (diminish 'auto-revert-mode)
 
-(require 'spaceline-config)
-(spaceline-spacemacs-theme)
-(setq spaceline-window-numbers-unicode t)
-(setq powerline-default-separator 'nil)
-(spaceline-toggle-buffer-size-off)
-(spaceline-toggle-projectile-root-on)
-(setq powerline-height 24)
-(spaceline-compile)
+
+;; Modeline
+(defun custom-modeline-modified ()
+  "Show modified."
+  (let* ((buffer-state (format-mode-line "%*"))
+         (icon (cond
+                ((string= buffer-state "-") (all-the-icons-alltheicon "arrow-right" :height 1.2 :v-adjust -0.0 :face 'success))
+                ((string= buffer-state "*") (all-the-icons-alltheicon "arrow-right" :height 1.2 :v-adjust -0.0 :face 'error))
+                ((string= buffer-state "%") (all-the-icons-alltheicon "arrow-right" :height 1.2 :v-adjust -0.0 :face 'custom-variable-tag)))))
+
+    (propertize icon
+                'mouse-face '(:box 0)
+                'local-map (make-mode-line-mouse-map
+			    'mouse-1 'read-only-mode))))
+
+
+(defun -custom-modeline-github-vc ()
+  "Show GIT status."
+  (let ((branch (mapconcat 'concat (cdr (split-string vc-mode "[:-]")) "-")))
+    (concat
+     (propertize (format "%s" (all-the-icons-octicon "git-branch" :face 'custom-variable-tag))
+                 'display '(raise -0.1))
+     (propertize (format " %s" branch) 'face 'custom-variable-tag))))
+
+(defun -custom-modeline-svn-vc ()
+  "Show SVN status."
+  (let ((revision (cadr (split-string vc-mode "-"))))
+    (concat
+     (propertize (format " %s" (all-the-icons-faicon "cloud")) 'face `(:height 1.2) 'display '(raise -0.1))
+     (propertize (format " · %s" revision) 'face `(:height 0.9)))))
+
+(defun custom-modeline-icon-vc ()
+  "Show VC status."
+  (when vc-mode
+    (cond
+     ((string-match "Git[:-]" vc-mode) (-custom-modeline-github-vc))
+     ((string-match "SVN-" vc-mode) (-custom-modeline-svn-vc))
+     (t (format "%s" vc-mode)))))
+
+(defun custom-modeline-flycheck-status ()
+  "Print current flycheck status."
+  (let* ((text (pcase flycheck-last-status-change
+		 (`finished (if flycheck-current-errors
+				(let ((count (let-alist (flycheck-count-errors flycheck-current-errors)
+					       (+ (or .warning 0) (or .error 0)))))
+				  (propertize (format "✖ %s Issue%s" count (unless (eq 1 count) "s")) 'face 'error))
+			      (propertize "✔ No Issues" 'face 'success)))
+		 (`running     (propertize "⟲ Running" 'face 'warning))
+		 (`no-checker  (propertize "⚠ No Checker" 'face 'warning))
+		 (`not-checked "✖ Disabled")
+		 (`errored     (propertize "⚠ Error" 'face 'error))
+		 (`interrupted (propertize "⛔ Interrupted" 'face 'error))
+		 (`suspicious  ""))))
+    (propertize text
+		'help-echo "Show Flycheck Errors"
+		'mouse-face '(:box 0)
+		'local-map (make-mode-line-mouse-map
+			    'mouse-1 (lambda () (interactive) (flycheck-list-errors))))))
+
+(defun mode-line-fill (face reserve)
+  "Return empty space using FACE and leaving RESERVE space on the right."
+  (unless reserve
+    (setq reserve 20))
+  (when (and window-system (eq 'right (get-scroll-bar-mode)))
+    (setq reserve (- reserve 3)))
+  (propertize " "
+              'display `((space :align-to (- (+ right right-fringe right-margin) ,reserve)))
+              'face face))
+
+(setq mode-line-format '("%e" (:eval
+			       (concat
+				(custom-modeline-modified)
+				" %b  "
+				
+				"line %l  "
+				;; (custom-modeline-window-number)
+				;; (custom-modeline-mode-icon)
+				(custom-modeline-icon-vc)
+				"  "
+				;; (custom-modeline-region-info)
+				(custom-modeline-flycheck-status)
+				;; (custom-modeline-suntime)
+				;; (custom-modeline-weather)
+				;; (custom-modeline-time)
+				(mode-line-fill 'mode-line 20)
+				" %m "
+				))))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("6145e62774a589c074a31a05dfa5efdf8789cf869104e905956f0cbd7eda9d0e" default)))
  '(elpy-modules
    (quote
     (elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-sane-defaults)))
@@ -550,7 +625,7 @@
      ("\\.idl\\'" flymake-simple-make-init nil nil))))
  '(package-selected-packages
    (quote
-    (counsel popwin winum spaceline diminish yaml-mode company-c-headers company-cabal company-go company-jedi solaire-mode highlight-symbol diff-hl anzu elpy git-gutter-fringe paradox rainbow-delimiters tox ini-mode window-numbering use-package zerodark-theme web-mode spaceline-all-the-icons smartparens projectile org-alert org nlinum neotree intero flycheck-color-mode-line flx-ido doom-themes dired+ company-web company-statistics company-shell company-auctex)))
+    (telephone-line base16-theme oceanic-theme ido-vertical-mode counsel-projectile counsel popwin winum spaceline diminish yaml-mode company-c-headers company-cabal company-go company-jedi solaire-mode highlight-symbol diff-hl anzu elpy git-gutter-fringe paradox rainbow-delimiters tox ini-mode window-numbering use-package zerodark-theme web-mode spaceline-all-the-icons smartparens projectile org-alert org nlinum neotree intero flycheck-color-mode-line flx-ido doom-themes dired+ company-web company-statistics company-shell company-auctex)))
  '(paradox-automatically-star t)
  '(safe-local-variable-values
    (quote
