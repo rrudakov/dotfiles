@@ -9,10 +9,6 @@
 (setq show-paren-style 'expression)
 (show-paren-mode 2)
 
-(setq make-backup-files nil)
-(setq auto-save-list-file-name nil)
-(setq auto-save-default nil)
-
 (set-default 'indicate-empty-lines t)
 
 ;; mode line settings
@@ -35,6 +31,9 @@
 ;; set specific browser to open links
 (setq browse-url-browser-function 'browse-url-firefox)
 
+(add-to-list 'display-buffer-alist
+             '("." nil (reusable-frames . t)))
+
 ;;;
 ;; UTF-8 as the default coding system
 (when (fboundp 'set-charset-priority)
@@ -54,7 +53,7 @@
  compilation-scroll-output t
  confirm-nonexistent-file-or-buffer t
  enable-recursive-minibuffers nil
- idle-update-delay 2              ; update ui less often
+ ;; idle-update-delay 2              ; update ui less often
  ;; keep the point out of the minibuffer
  minibuffer-prompt-properties '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt)
  ;; History & backup settings (save nothing, that's what git is for)
@@ -120,12 +119,14 @@
   (tool-bar-mode -1))
 (when (display-graphic-p)
   (scroll-bar-mode -1)
+  (setq-default line-spacing 0)
   ;; buffer name  in frame title
-  (setq-default frame-title-format '("DOOM Emacs"))
+  ;; (setq-default frame-title-format '("DOOM Emacs"))
   ;; standardize fringe width
   (push (cons 'left-fringe  my-ui-fringe-size) default-frame-alist)
   (push (cons 'right-fringe my-ui-fringe-size) default-frame-alist))
 
+(setq menu-bar-select-buffer-function 'switch-to-buffer)
 
 (require 'package)
 (add-to-list 'package-archives
@@ -342,6 +343,9 @@
 ;; Display icons
 (require 'all-the-icons)
 
+(require 'popwin)
+(popwin-mode 1)
+
 ;; Neotree
 (require 'neotree)
 (setq projectile-switch-project-action 'neotree-projectile-action)
@@ -362,7 +366,13 @@
 (global-set-key [f8] 'neotree-project-dir)
 (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 (setq neo-window-width 45)
-;;(setq neo-vc-integration '(face char))
+(setq neo-vc-integration '(face char))
+
+;; (when neo-persist-show
+;;   (add-hook 'popwin:before-popup-hook
+;; 	    (lambda () (setq neo-persist-show nil)))
+;;   (add-hook 'popwin:after-popup-hook
+;; 	    (lambda () (setq neo-persist-show t))))
 
 ;; Git configuration
 (global-set-key (kbd "C-x g") 'magit-status)
@@ -506,11 +516,12 @@
 (diminish 'with-editor-mode)
 (diminish 'server-buffer-clients)
 (diminish 'auto-fill-function)
+(diminish 'auto-revert-mode)
 
 (require 'spaceline-config)
 (spaceline-spacemacs-theme)
 (setq spaceline-window-numbers-unicode t)
-(setq powerline-default-separator 'bar)
+(setq powerline-default-separator 'nil)
 (spaceline-toggle-buffer-size-off)
 (spaceline-toggle-projectile-root-on)
 (setq powerline-height 24)
@@ -540,7 +551,7 @@
      ("\\.idl\\'" flymake-simple-make-init nil nil))))
  '(package-selected-packages
    (quote
-    (winum spaceline diminish yaml-mode company-c-headers company-cabal company-go company-jedi solaire-mode highlight-symbol diff-hl anzu elpy git-gutter-fringe paradox rainbow-delimiters tox ini-mode window-numbering use-package zerodark-theme web-mode spaceline-all-the-icons smartparens projectile org-alert org nlinum neotree intero flycheck-color-mode-line flx-ido doom-themes dired+ company-web company-statistics company-shell company-auctex)))
+    (popwin winum spaceline diminish yaml-mode company-c-headers company-cabal company-go company-jedi solaire-mode highlight-symbol diff-hl anzu elpy git-gutter-fringe paradox rainbow-delimiters tox ini-mode window-numbering use-package zerodark-theme web-mode spaceline-all-the-icons smartparens projectile org-alert org nlinum neotree intero flycheck-color-mode-line flx-ido doom-themes dired+ company-web company-statistics company-shell company-auctex)))
  '(paradox-automatically-star t)
  '(safe-local-variable-values
    (quote
