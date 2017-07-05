@@ -144,8 +144,9 @@
 (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
       doom-themes-enable-italic t  ; if nil, italics is universally disabled
 
-      doom-neotree-file-icons t
-      doom-neotree-enable-type-colors t)
+      ;;      doom-neotree-file-icons t
+      ;;      doom-neotree-enable-type-colors t
+      )
 
 ;; Load the theme (doom-one, doom-molokai, etc); keep in mind that each theme
 ;; may have their own settings.
@@ -155,7 +156,7 @@
 (doom-themes-visual-bell-config)
 
 ;; Enable custom neotree theme
-(doom-themes-neotree-config)
+;; (doom-themes-neotree-config)
 
 ;; Doom org-mode
 (setq org-fontify-whole-heading-line t
@@ -176,14 +177,14 @@
 ;; To enable solaire-mode unconditionally for certain modes:
 (add-hook 'ediff-prepare-buffer-hook #'solaire-mode)
 
-(require 'flx-ido)
-(ido-mode 1)
-(ido-everywhere 1)
-(flx-ido-mode 1)
-;; disable ido faces to see flx highlights.
-(setq ido-enable-flex-matching t)
-(setq ido-use-faces nil)
-(global-set-key (kbd "<f2>") 'bs-show)
+;; (require 'flx-ido)
+;; (ido-mode 1)
+;; (ido-everywhere 1)
+;; (flx-ido-mode 1)
+;; ;; disable ido faces to see flx highlights.
+;; (setq ido-enable-flex-matching t)
+;; (setq ido-use-faces nil)
+;; (global-set-key (kbd "<f2>") 'bs-show)
 
 (projectile-mode)
 (setq projectile-indexing-method 'native)
@@ -347,32 +348,47 @@
 (popwin-mode 1)
 
 ;; Neotree
-(require 'neotree)
-(setq projectile-switch-project-action 'neotree-projectile-action)
+;; (require 'neotree)
+;; (setq projectile-switch-project-action 'neotree-projectile-action)
 
-(defun neotree-project-dir ()
-    "Open NeoTree using the git root."
-    (interactive)
-    (let ((project-dir (projectile-project-root))
-          (file-name (buffer-file-name)))
-      (neotree-toggle)
-      (if project-dir
-          (if (neo-global--window-exists-p)
-              (progn
-                (neotree-dir project-dir)
-                (neotree-find file-name)))
-        (message "Could not find git project root."))))
+;; (defun neotree-project-dir ()
+;;     "Open NeoTree using the git root."
+;;     (interactive)
+;;     (let ((project-dir (projectile-project-root))
+;;           (file-name (buffer-file-name)))
+;;       (neotree-toggle)
+;;       (if project-dir
+;;           (if (neo-global--window-exists-p)
+;;               (progn
+;;                 (neotree-dir project-dir)
+;;                 (neotree-find file-name)))
+;;         (message "Could not find git project root."))))
 
-(global-set-key [f8] 'neotree-project-dir)
-(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
-(setq neo-window-width 45)
-(setq neo-vc-integration '(face char))
+;; (global-set-key [f8] 'neotree-project-dir)
+;; (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+;; (setq neo-window-width 45)
+;; (setq neo-vc-integration '(face char))
 
-;; (when neo-persist-show
-;;   (add-hook 'popwin:before-popup-hook
-;; 	    (lambda () (setq neo-persist-show nil)))
-;;   (add-hook 'popwin:after-popup-hook
-;; 	    (lambda () (setq neo-persist-show t))))
+(ivy-mode 1)
+(setq ivy-use-virtual-buffers t)
+(setq ivy-count-format "(%d/%d) ")
+
+(global-set-key (kbd "C-s") 'swiper)
+(global-set-key (kbd "M-x") 'counsel-M-x)
+(global-set-key (kbd "C-x C-f") 'counsel-find-file)
+(global-set-key (kbd "<f1> f") 'counsel-describe-function)
+(global-set-key (kbd "<f1> v") 'counsel-describe-variable)
+(global-set-key (kbd "<f1> l") 'counsel-find-library)
+(global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
+(global-set-key (kbd "<f2> u") 'counsel-unicode-char)
+
+(global-set-key (kbd "C-c g") 'counsel-git)
+(global-set-key (kbd "C-c j") 'counsel-git-grep)
+(global-set-key (kbd "C-x l") 'counsel-locate)
+(global-set-key (kbd "C-c C-r") 'ivy-resume)
+
+(setq projectile-completion-system 'ivy)
+(setq magit-completing-read-function 'ivy-completing-read)
 
 ;; Git configuration
 (global-set-key (kbd "C-x g") 'magit-status)
@@ -384,23 +400,6 @@
 (add-hook 'prog-mode-hook 'turn-on-diff-hl-mode)
 (add-hook 'vc-dir-mode-hook 'turn-on-diff-hl-mode)
 (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-
-;; (require 'git-gutter-fringe)
-;; (global-git-gutter-mode t)
-;;
-;; ;; thin fringe bitmaps
-;; (fringe-helper-define 'git-gutter-fr:added '(center repeated)
-;;   "XXX.....")
-;; (fringe-helper-define 'git-gutter-fr:modified '(center repeated)
-;;   "XXX.....")
-;; (fringe-helper-define 'git-gutter-fr:deleted 'bottom
-;;   "X......."
-;;   "XX......"
-;;   "XXX....."
-;;   "XXXX....")
-
-;; ;; Update git-gutter on focus
-;; (add-hook 'focus-in-hook #'git-gutter:update-all-windows)
 
 (setq flycheck-indication-mode 'right-fringe)
 
@@ -551,7 +550,7 @@
      ("\\.idl\\'" flymake-simple-make-init nil nil))))
  '(package-selected-packages
    (quote
-    (popwin winum spaceline diminish yaml-mode company-c-headers company-cabal company-go company-jedi solaire-mode highlight-symbol diff-hl anzu elpy git-gutter-fringe paradox rainbow-delimiters tox ini-mode window-numbering use-package zerodark-theme web-mode spaceline-all-the-icons smartparens projectile org-alert org nlinum neotree intero flycheck-color-mode-line flx-ido doom-themes dired+ company-web company-statistics company-shell company-auctex)))
+    (counsel popwin winum spaceline diminish yaml-mode company-c-headers company-cabal company-go company-jedi solaire-mode highlight-symbol diff-hl anzu elpy git-gutter-fringe paradox rainbow-delimiters tox ini-mode window-numbering use-package zerodark-theme web-mode spaceline-all-the-icons smartparens projectile org-alert org nlinum neotree intero flycheck-color-mode-line flx-ido doom-themes dired+ company-web company-statistics company-shell company-auctex)))
  '(paradox-automatically-star t)
  '(safe-local-variable-values
    (quote
