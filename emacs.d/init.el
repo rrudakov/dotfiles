@@ -582,8 +582,9 @@
 (setq mode-line-format '("%e" (:eval
 			       (concat
 				(custom-modeline-modified)
-				" %b  "
-				
+				"  "
+				(propertize "%b" 'face 'bold)
+				"  "
 				"line %l  "
 				;; (custom-modeline-window-number)
 				;; (custom-modeline-mode-icon)
