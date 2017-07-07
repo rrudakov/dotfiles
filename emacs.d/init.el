@@ -31,10 +31,6 @@
 ;; set specific browser to open links
 (setq browse-url-browser-function 'browse-url-firefox)
 
-(add-to-list 'display-buffer-alist
-             '("." nil (reusable-frames . t)))
-
-;;;
 ;; UTF-8 as the default coding system
 (when (fboundp 'set-charset-priority)
   (set-charset-priority 'unicode))     ; pretty
@@ -86,7 +82,6 @@
  mouse-yank-at-point t           ; middle-click paste at point, not at click
  resize-mini-windows 'grow-only  ; Minibuffer resizing
  show-help-function nil          ; hide :help-echo text
- split-width-threshold nil       ; favor horizontal splits
  uniquify-buffer-name-style 'forward
  use-dialog-box nil              ; always avoid GUI
  visible-cursor nil
@@ -107,7 +102,7 @@
 ;; The native border "consumes" a pixel of the fringe on righter-most splits,
 ;; `window-divider' does not. Available since Emacs 25.1.
 (setq-default window-divider-default-places t
-              window-divider-default-bottom-width 0
+              window-divider-default-bottom-width 1
               window-divider-default-right-width 1)
 (window-divider-mode +1)
 
@@ -126,8 +121,6 @@
   (push (cons 'left-fringe  my-ui-fringe-size) default-frame-alist)
   (push (cons 'right-fringe my-ui-fringe-size) default-frame-alist))
 
-(setq menu-bar-select-buffer-function 'switch-to-buffer)
-
 (require 'package)
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/"))
@@ -137,33 +130,32 @@
 (package-initialize)
 (package-refresh-contents)
 
-;; ;; Doom theme
-;; (require 'doom-themes)
+;; Doom theme
+(require 'doom-themes)
 
-;; ;; Global settings (defaults)
-;; (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-;;       doom-themes-enable-italic t  ; if nil, italics is universally disabled
+;; Global settings (defaults)
+(setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+      doom-themes-enable-italic t  ; if nil, italics is universally disabled
 
-;;       ;;      doom-neotree-file-icons t
-;;       ;;      doom-neotree-enable-type-colors t
-;;       )
+      doom-neotree-file-icons t
+      doom-neotree-enable-type-colors t
+      )
 
-;; ;; Load the theme (doom-one, doom-molokai, etc); keep in mind that each theme
-;; ;; may have their own settings.
-;; (load-theme 'doom-one t)
+;; Load the theme (doom-one, doom-molokai, etc); keep in mind that each theme
+;; may have their own settings.
+(load-theme 'doom-one t)
 
-;; ;; Enable flashing mode-line on errors
-;; (doom-themes-visual-bell-config)
+;; Enable flashing mode-line on errors
+(doom-themes-visual-bell-config)
 
-;; ;; Enable custom neotree theme
-;; ;; (doom-themes-neotree-config)
+;; Enable custom neotree theme
+(doom-themes-neotree-config)
 
-;; ;; Doom org-mode
-;; (setq org-fontify-whole-heading-line t
-;;       org-fontify-done-headline t
-;;       org-fontify-quote-and-verse-blocks t)
+;; Doom org-mode
+(setq org-fontify-whole-heading-line t
+      org-fontify-done-headline t
+      org-fontify-quote-and-verse-blocks t)
 
-(load-theme 'base16-oceanicnext t)
 (require 'solaire-mode)
 
 ;; brighten buffers (that represent real files)
@@ -177,6 +169,8 @@
 
 ;; To enable solaire-mode unconditionally for certain modes:
 (add-hook 'ediff-prepare-buffer-hook #'solaire-mode)
+
+(setq solaire-mode-remap-modeline nil)
 
 (require 'flx-ido)
 (ido-mode 1)
@@ -362,26 +356,26 @@
 (require 'all-the-icons)
 
 ;; Neotree
-;; (require 'neotree)
-;; (setq projectile-switch-project-action 'neotree-projectile-action)
+(require 'neotree)
+(setq projectile-switch-project-action 'neotree-projectile-action)
 
-;; (defun neotree-project-dir ()
-;;     "Open NeoTree using the git root."
-;;     (interactive)
-;;     (let ((project-dir (projectile-project-root))
-;;           (file-name (buffer-file-name)))
-;;       (neotree-toggle)
-;;       (if project-dir
-;;           (if (neo-global--window-exists-p)
-;;               (progn
-;;                 (neotree-dir project-dir)
-;;                 (neotree-find file-name)))
-;;         (message "Could not find git project root."))))
+(defun neotree-project-dir ()
+    "Open NeoTree using the git root."
+    (interactive)
+    (let ((project-dir (projectile-project-root))
+          (file-name (buffer-file-name)))
+      (neotree-toggle)
+      (if project-dir
+          (if (neo-global--window-exists-p)
+              (progn
+                (neotree-dir project-dir)
+                (neotree-find file-name)))
+        (message "Could not find git project root."))))
 
-;; (global-set-key [f8] 'neotree-project-dir)
-;; (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
-;; (setq neo-window-width 45)
-;; (setq neo-vc-integration '(face char))
+(global-set-key [f8] 'neotree-project-dir)
+(setq neo-theme (if (display-graphic-p) 'icons 'nerd))
+(setq neo-window-width 45)
+(setq neo-vc-integration '(face char))
 
 ;; Git configuration
 (global-set-key (kbd "C-x g") 'magit-status)
@@ -480,15 +474,13 @@
 
 (setq default-input-method "russian-computer")
 
-;; (zerodark-setup-modeline-format)
-
 ;; Tox
 (setq tox-runner 'py.test)
 (global-set-key "\C-ct" 'tox-current-class)
 
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 
-(setq paradox-github-token "619e27814936e9fe86b3394f4aca33f5f7dd9b91")
+;; (setq paradox-github-token "619e27814936e9fe86b3394f4aca33f5f7dd9b91")
 
 (global-anzu-mode +1)
 (setq anzu-cons-mode-line-p nil)
@@ -497,22 +489,8 @@
 (setq winum-auto-setup-mode-line nil)
 (winum-mode)
 
-(require 'diminish)
-(diminish 'anzu-mode)
-(diminish 'smartparens-mode)
-(diminish 'flycheck-mode)
-(diminish 'highlight-symbol-mode)
-;; (diminish 'projectile-mode)
-(diminish 'elpy-mode)
-(diminish 'org-indent-mode)
-(diminish 'with-editor-mode)
-(diminish 'server-buffer-clients)
-(diminish 'auto-fill-function)
-(diminish 'auto-revert-mode)
-
-
 ;; Modeline
-(defun custom-modeline-modified ()
+(defun rr-modified ()
   "Show modified."
   (let* ((buffer-state (format-mode-line "%*"))
          (icon (cond
@@ -525,31 +503,25 @@
                 'local-map (make-mode-line-mouse-map
 			    'mouse-1 'read-only-mode))))
 
+;; (spaceline-define-segment version-control
+;;   "Version control information."
+;;   (when vc-mode
+;;     (powerline-raw
+;;      (s-trim (concat vc-mode
+;;                      (when (buffer-file-name)
+;;                        (pcase (vc-state (buffer-file-name))
+;;                          (`up-to-date " ")
+;;                          (`edited " Mod")
+;;                          (`added " Add")
+;;                          (`unregistered " ??")
+;;                          (`removed " Del")
+;;                          (`needs-merge " Con")
+;;                          (`needs-update " Upd")
+;;                          (`ignored " Ign")
+;; 			 (_ " Unk"))))))))
 
-(defun -custom-modeline-github-vc ()
-  "Show GIT status."
-  (let ((branch (mapconcat 'concat (cdr (split-string vc-mode "[:-]")) "-")))
-    (concat
-     (propertize (format "%s" (all-the-icons-octicon "git-branch" :face 'custom-variable-tag))
-                 'display '(raise -0.1))
-     (propertize (format " %s" branch) 'face 'custom-variable-tag))))
 
-(defun -custom-modeline-svn-vc ()
-  "Show SVN status."
-  (let ((revision (cadr (split-string vc-mode "-"))))
-    (concat
-     (propertize (format " %s" (all-the-icons-faicon "cloud")) 'face `(:height 1.2) 'display '(raise -0.1))
-     (propertize (format " · %s" revision) 'face `(:height 0.9)))))
-
-(defun custom-modeline-icon-vc ()
-  "Show VC status."
-  (when vc-mode
-    (cond
-     ((string-match "Git[:-]" vc-mode) (-custom-modeline-github-vc))
-     ((string-match "SVN-" vc-mode) (-custom-modeline-svn-vc))
-     (t (format "%s" vc-mode)))))
-
-(defun custom-modeline-flycheck-status ()
+(defun rr-flycheck-status ()
   "Print current flycheck status."
   (let* ((text (pcase flycheck-last-status-change
 		 (`finished (if flycheck-current-errors
@@ -559,7 +531,8 @@
 			      (propertize "✔ No Issues" 'face 'success)))
 		 (`running     (propertize "⟲ Running" 'face 'warning))
 		 (`no-checker  (propertize "⚠ No Checker" 'face 'warning))
-		 (`not-checked "✖ Disabled")
+		 ;; (`not-checked "✖ Disabled")
+		 (`not-checked "")
 		 (`errored     (propertize "⚠ Error" 'face 'error))
 		 (`interrupted (propertize "⛔ Interrupted" 'face 'error))
 		 (`suspicious  ""))))
@@ -569,35 +542,146 @@
 		'local-map (make-mode-line-mouse-map
 			    'mouse-1 (lambda () (interactive) (flycheck-list-errors))))))
 
-(defun mode-line-fill (face reserve)
-  "Return empty space using FACE and leaving RESERVE space on the right."
-  (unless reserve
-    (setq reserve 20))
-  (when (and window-system (eq 'right (get-scroll-bar-mode)))
-    (setq reserve (- reserve 3)))
-  (propertize " "
-              'display `((space :align-to (- (+ right right-fringe right-margin) ,reserve)))
-              'face face))
+(defun simple-mode-line-render (left right)
+  "Return a string of `window-width' length containing LEFT, and RIGHT aligned respectively."
+  (let* ((available-width (- (window-total-width) (length left) 2)))
+    (format (format "%%s %%%ds " available-width) left right)))
 
-(setq mode-line-format '("%e" (:eval
-			       (concat
-				(custom-modeline-modified)
-				"  "
-				(propertize "%b" 'face 'bold)
-				"  "
-				"line %l  "
-				;; (custom-modeline-window-number)
-				;; (custom-modeline-mode-icon)
-				(custom-modeline-icon-vc)
-				"  "
-				;; (custom-modeline-region-info)
-				(custom-modeline-flycheck-status)
-				;; (custom-modeline-suntime)
-				;; (custom-modeline-weather)
-				;; (custom-modeline-time)
-				(mode-line-fill 'mode-line 20)
-				" %m "
-				))))
+;; (setq-default
+;;  mode-line-format
+;;  '((:eval (simple-mode-line-render
+;;  	   ;; left
+;;  	   (format-mode-line
+;; 	    (concat
+;; 	     (rr-modified)
+;; 	     "  "
+;; 	     (propertize "%b" 'face 'bold)
+;; 	     "  "
+;; 	     "line %l  "
+;; 	     (format "[%s]  " (projectile-project-name))
+;; 	     ;; (custom-modeline-window-number)
+;; 	     ;; (custom-modeline-mode-icon)
+;; 	     ;; (custom-modeline-region-info)
+;; 	     ))
+;; 	   ;; right
+;; 	   (format-mode-line
+;; 	    (concat
+;; 	     (rr-icon-vc)
+;; 	     "  "
+;; 	     "%m"
+;; 	     "  "
+;; 	     (rr-flycheck-status)
+;; 	     ))
+;; 	   ))))
+
+(defun rr/spaceline-face (face active)
+  "For spaceline-face-func get FACE and ACTIVE."
+  (pcase (cons face active)
+    ('(face1 . t)   'solaire-mode-line-face)
+    ('(face1 . nil) 'solaire-mode-line-inactive-face)
+    ('(face2 . t)   'solaire-mode-line-face)
+    ('(face2 . nil) 'solaire-mode-line-inactive-face)
+    ('(line . t)    'solaire-mode-line-face)
+    ('(line . nil)  'solaire-mode-line-inactive-face)
+    ('(highlight . t) 'solaire-mode-line-face)
+    ('(highlight . nil) 'solaire-mode-line-inactive-face)
+    (_ 'error)))
+
+(require 'spaceline-config)
+
+(defun -custom-modeline-github-vc ()
+  "Show GIT status."
+  (let ((branch (mapconcat 'concat (cdr (split-string vc-mode "[:-]")) "-")))
+    (when (buffer-file-name)
+      (pcase (vc-state (buffer-file-name))
+	(`up-to-date
+	 (concat
+	  (propertize (format "%s" (all-the-icons-octicon "git-branch" :face 'mode-line))
+		      'display '(raise -0.1))
+	  (propertize (format " %s" branch) 'face 'mode-line)))
+	(`edited
+	 (concat
+	  (propertize (format "%s" (all-the-icons-octicon "git-branch" :face 'mode-line-emphasis))
+		      'display '(raise -0.1))
+	  (propertize (format " %s" branch) 'face 'mode-line-emphasis)))
+	(`added " Add")
+	(`unregistered " ??")
+	(`removed " Del")
+	(`needs-merge " Con")
+	(`needs-update " Upd")
+	(`ignored " Ign")
+	(_ " Unk")))))
+
+(defun -custom-modeline-svn-vc ()
+  "Show SVN status."
+  (let ((revision (cadr (split-string vc-mode "-"))))
+    (concat
+     (propertize (format " %s" (all-the-icons-faicon "cloud")) 'face `(:height 1.2) 'display '(raise -0.1))
+     (propertize (format " · %s" revision) 'face `(:height 0.9)))))
+
+(spaceline-define-segment version-control
+  "Show VC status."
+  (when vc-mode
+    (cond
+     ((string-match "Git[:-]" vc-mode) (-custom-modeline-github-vc))
+     ((string-match "SVN-" vc-mode) (-custom-modeline-svn-vc))
+     (t (propertize (format "%s" vc-mode)))))
+  :enabled t)
+
+
+(setq powerline-default-separator 'slant)
+(setq spaceline-face-func 'rr/spaceline-face)
+
+;; (spaceline-spacemacs-theme)
+
+(defun spaceline-rr-theme (&rest additional-segments)
+  "Apply my spaceline theme ADDITIONAL-SEGMENTS are inserted on the right."
+  (spaceline-install
+    `(((workspace-number
+	window-number)
+       :fallback evil-state
+       :face highlight-face
+       :priority 0)
+      (anzu :priority 4)
+      auto-compile
+      ((buffer-modified buffer-id remote-host)
+       :priority 5)
+      (point-position line-column)
+      (buffer-position :priority 0)
+      (process :when active)
+      ((flycheck-error flycheck-warning flycheck-info)
+       :when active
+       :priority 3)
+      (mu4e-alert-segment :when active)
+      (erc-track :when active)
+      (org-pomodoro :when active)
+      (org-clock :when active))
+    `(which-function
+      (python-pyvenv :fallback python-pyenv)
+      purpose
+      (battery :when active)
+      (selection-info :priority 2)
+      input-method
+      (buffer-encoding-abbrev :priority 3)
+      (global :when active)
+      ,@additional-segments
+      (hud :priority 0)
+      (version-control :when active :priority 7)
+      major-mode))
+
+(setq-default mode-line-format '("%e" (:eval (spaceline-ml-main)))))
+
+(spaceline-rr-theme)
+;; Segments
+(spaceline-toggle-buffer-size-off)
+(spaceline-toggle-minor-modes-off)
+(spaceline-toggle-projectile-root-on)
+;; (spaceline-toggle-version-control-off)
+;; (spaceline-toggle-rr/version-control-on)
+(setq spaceline-window-numbers-unicode t)
+(setq powerline-height 24)
+
+(spaceline-compile)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -626,7 +710,7 @@
      ("\\.idl\\'" flymake-simple-make-init nil nil))))
  '(package-selected-packages
    (quote
-    (telephone-line base16-theme oceanic-theme ido-vertical-mode counsel-projectile counsel popwin winum spaceline diminish yaml-mode company-c-headers company-cabal company-go company-jedi solaire-mode highlight-symbol diff-hl anzu elpy git-gutter-fringe paradox rainbow-delimiters tox ini-mode window-numbering use-package zerodark-theme web-mode spaceline-all-the-icons smartparens projectile org-alert org nlinum neotree intero flycheck-color-mode-line flx-ido doom-themes dired+ company-web company-statistics company-shell company-auctex)))
+    (gruvbox-theme telephone-line base16-theme oceanic-theme ido-vertical-mode counsel-projectile counsel popwin winum spaceline diminish yaml-mode company-c-headers company-cabal company-go company-jedi solaire-mode highlight-symbol diff-hl anzu elpy git-gutter-fringe paradox rainbow-delimiters tox ini-mode window-numbering use-package zerodark-theme web-mode spaceline-all-the-icons smartparens projectile org-alert org nlinum neotree intero flycheck-color-mode-line flx-ido doom-themes dired+ company-web company-statistics company-shell company-auctex)))
  '(paradox-automatically-star t)
  '(safe-local-variable-values
    (quote
