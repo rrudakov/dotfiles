@@ -574,6 +574,9 @@
 ;; 	     ))
 ;; 	   ))))
 
+(set-face-background 'mode-line (face-attribute 'solaire-mode-line-face :background))
+(set-face-background 'mode-line-inactive (face-attribute 'solaire-mode-line-inactive-face :background))
+
 (defun rr/spaceline-face (face active)
   "For spaceline-face-func get FACE and ACTIVE."
   (pcase (cons face active)
@@ -604,9 +607,17 @@
 	  (propertize (format "%s" (all-the-icons-octicon "git-branch" :face 'mode-line-emphasis))
 		      'display '(raise -0.1))
 	  (propertize (format " %s" branch) 'face 'mode-line-emphasis)))
-	(`added " Add")
+	(`added
+	 (concat
+	  (propertize (format "%s" (all-the-icons-octicon "git-branch" :face 'compilation-mode-line-exit))
+		      'display '(raise -0.1))
+	  (propertize (format " %s" branch) 'face 'compilation-mode-line-exit)))
 	(`unregistered " ??")
-	(`removed " Del")
+	(`removed
+	 (concat
+	  (propertize (format "%s" (all-the-icons-octicon "git-branch" :face 'compilation-mode-line-fail))
+		      'display '(raise -0.1))
+	  (propertize (format " %s" branch) 'face 'compilation-mode-line-fail)))
 	(`needs-merge " Con")
 	(`needs-update " Upd")
 	(`ignored " Ign")
@@ -722,7 +733,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(mode-line ((t (:inherit solaire-mode-line-face :box nil))))
+ '(mode-line-inactive ((t (:inherit solaire-mode-line-inactive-face :box nil)))))
 ;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)
 ;; End:
