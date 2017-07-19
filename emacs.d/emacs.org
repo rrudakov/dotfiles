@@ -1,0 +1,784 @@
+* My Emacs configuration
+** Keybindings
+*** Python
+#+BEGIN_SRC text
+  C-c C-r f Format python code
+  C-c C-r r Refactoring commands
+#+END_SRC
+** Configuration
+*** Common
+**** Highlight expression in parens
+#+BEGIN_SRC emacs-lisp
+  (setq show-paren-style 'expression)
+#+END_SRC
+**** Highlight matching parens
+#+BEGIN_SRC emacs-lisp
+  (show-paren-mode 2)
+#+END_SRC
+**** Indicate empty lines at the end of the window in the left fringe
+#+BEGIN_SRC emacs-lisp
+  (set-default 'indicate-empty-lines t)
+#+END_SRC
+**** Enable y/n answers instead of yes/no
+#+BEGIN_SRC emacs-lisp
+  (fset 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+**** Highlight current line
+#+BEGIN_SRC emacs-lisp
+  (global-hl-line-mode 1)
+#+END_SRC
+**** Set default font
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'default-frame-alist '(font . "Iosevka-10"))
+  (set-frame-font "Iosevka-10")
+#+END_SRC
+**** Open files ends with "rc" in conf-unix-mode
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
+#+END_SRC
+**** Sen specific browser to open links
+#+BEGIN_SRC emacs-lisp
+  (setq browse-url-browser-function 'browse-url-firefox)
+#+END_SRC
+**** Use UTF-8 as default coding system
+#+BEGIN_SRC emacs-lisp
+  (when (fboundp 'set-charset-priority)
+    (set-charset-priority 'unicode))
+  (prefer-coding-system        'utf-8)
+  (set-terminal-coding-system  'utf-8)
+  (set-keyboard-coding-system  'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (setq locale-coding-system   'utf-8)
+  (setq-default buffer-file-coding-system 'utf-8)
+#+END_SRC
+**** Some useful settings
+#+BEGIN_SRC emacs-lisp
+  (setq-default
+   ad-redefinition-action 'accept   ; silence advised function warnings
+   apropos-do-all t                 ; make `apropos' more useful
+   compilation-always-kill t        ; kill compilation process before starting another
+   compilation-ask-about-save nil   ; save all buffers on `compile'
+   compilation-scroll-output t
+   confirm-nonexistent-file-or-buffer t
+   enable-recursive-minibuffers nil
+   ;; keep the point out of the minibuffer
+   minibuffer-prompt-properties '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt)
+   ;; History & backup settings (save nothing, that's what git is for)
+   auto-save-default nil
+   create-lockfiles nil
+   history-length 1000
+   make-backup-files nil)
+
+  (setq-default
+   bidi-display-reordering nil ; disable bidirectional text for tiny performance boost
+   blink-matching-paren nil    ; don't blink--too distracting
+   cursor-in-non-selected-windows nil  ; hide cursors in other windows
+   frame-inhibit-implied-resize t
+   ;; remove continuation arrow on right fringe
+   fringe-indicator-alist (delq (assq 'continuation fringe-indicator-alist)
+                                fringe-indicator-alist)
+   highlight-nonselected-windows nil
+   image-animate-loop t
+   indicate-buffer-boundaries nil
+   indicate-empty-lines nil
+   max-mini-window-height 0.3
+   mode-line-default-help-echo nil ; disable mode-line mouseovers
+   mouse-yank-at-point t           ; middle-click paste at point, not at click
+   resize-mini-windows 'grow-only  ; Minibuffer resizing
+   show-help-function nil          ; hide :help-echo text
+   uniquify-buffer-name-style 'forward
+   use-dialog-box nil              ; always avoid GUI
+   visible-cursor nil
+   x-stretch-cursor nil
+   ;; defer jit font locking slightly to [try to] improve Emacs performance
+   jit-lock-defer-time nil
+   jit-lock-stealth-nice 0.1
+   jit-lock-stealth-time 0.2
+   jit-lock-stealth-verbose nil
+   ;; `pos-tip' defaults
+   pos-tip-internal-border-width 6
+   pos-tip-border-width 1
+   ;; no beeping or blinking please
+   ring-bell-function #'ignore
+   visible-bell nil)
+#+END_SRC
+**** Be quiet at startup
+#+BEGIN_SRC emacs-lisp
+  (advice-add #'display-startup-echo-area-message :override #'ignore)
+  (setq inhibit-startup-message t
+        inhibit-startup-echo-area-message user-login-name
+        initial-major-mode 'fundamental-mode
+        initial-scratch-message nil)
+#+END_SRC
+**** More reliable inter-window border
+The native border "consumes" a pixel of the fringe on righter-most splits,
+'window-divider' does not. Available since Emacs 25.1.
+#+BEGIN_SRC emacs-lisp
+  (setq-default window-divider-default-places t
+                window-divider-default-bottom-width 0
+                window-divider-default-right-width 1)
+  (window-divider-mode +1)
+#+END_SRC
+**** Relegate tooltips to echo area only
+#+BEGIN_SRC emacs-lisp
+  (tooltip-mode -1)
+#+END_SRC
+**** Disable menu bar
+#+BEGIN_SRC emacs-lisp
+  (menu-bar-mode -1)
+#+END_SRC
+**** Disable toolbar
+#+BEGIN_SRC emacs-lisp
+  (when (fboundp 'tool-bar-mode)
+    (tool-bar-mode -1))
+#+END_SRC
+**** Graphic mode settings
+#+BEGIN_SRC emacs-lisp
+  (defvar my-ui-fringe-size '4 "Default fringe width.")
+
+  (when (display-graphic-p)
+    (scroll-bar-mode -1)
+    (setq-default line-spacing 0)
+    ;; buffer name  in frame title
+    (setq-default frame-title-format '("RR Emacs"))
+    ;; standardize fringe width
+    (push (cons 'left-fringe  my-ui-fringe-size) default-frame-alist)
+    (push (cons 'right-fringe my-ui-fringe-size) default-frame-alist))
+#+END_SRC
+**** Use SSH for tramp-mode
+#+BEGIN_SRC emacs-lisp
+  (setq tramp-default-method "ssh")
+#+END_SRC
+**** Set default input method
+#+BEGIN_SRC emacs-lisp
+  (setq default-input-method "russian-computer")
+#+END_SRC
+*** Theme
+**** All the icons
+#+BEGIN_SRC emacs-lisp
+  (use-package all-the-icons :ensure t)
+#+END_SRC
+**** Color scheme
+#+BEGIN_SRC emacs-lisp
+  (use-package gruvbox-theme
+    :ensure t
+    :config
+    (load-theme 'gruvbox-dark-hard t))
+#+END_SRC
+**** Highlight symbol at point
+#+BEGIN_SRC emacs-lisp
+  (use-package highlight-symbol
+    :ensure t
+    :config
+    (highlight-symbol-nav-mode)
+
+    (add-hook 'prog-mode-hook (lambda () (highlight-symbol-mode)))
+    (add-hook 'org-mode-hook (lambda () (highlight-symbol-mode)))
+
+    (setq highlight-symbol-idle-delay 0.2
+          highlight-symbol-on-navigation-p t)
+
+    (global-set-key [(control shift mouse-1)]
+                    (lambda (event)
+                      (interactive "e")
+                      (goto-char (posn-point (event-start event)))
+                      (highlight-symbol-at-point)))
+
+    (global-set-key (kbd "M-n") 'highlight-symbol-next)
+    (global-set-key (kbd "M-p") 'highlight-symbol-prev))
+#+END_SRC
+**** Modeline
+***** Custom functions
+****** Git status
+#+BEGIN_SRC emacs-lisp
+  (defun rr/modeline-git-vc ()
+    "Show GIT status."
+    (let ((branch (mapconcat 'concat (cdr (split-string vc-mode "[:-]")) "-")))
+      (when (buffer-file-name)
+        (pcase (vc-state (buffer-file-name))
+          (`up-to-date
+           (concat
+            (propertize (all-the-icons-octicon "git-branch")
+                        'face `(:inherit 'mode-line :family ,(all-the-icons-octicon-family) :height 1.2)
+                        'display '(raise -0.1))
+            (propertize (format " %s" branch) 'face `(:inherit 'mode-line))))
+          (`edited
+           (concat
+            (propertize (all-the-icons-octicon "git-branch")
+                        'face `(:inherit 'mode-line :foreground "#87afaf" :family ,(all-the-icons-octicon-family) :height 1.2)
+                        'display '(raise -0.1))
+            (propertize (format " %s" branch) 'face `(:inherit 'mode-line :foreground "#87afaf"))))
+          (`added
+           (concat
+            (propertize (all-the-icons-octicon "git-branch")
+                        'face `(:inherit 'mode-line :foreground "#b8bb26" :family ,(all-the-icons-octicon-family) :height 1.2)
+                        'display '(raise -0.1))
+            (propertize (format " %s" branch) 'face `(:inherit 'mode-line :foreground "#b8bb26"))))
+          (`unregistered " ??")
+          (`removed
+           (concat
+            (propertize (all-the-icons-octicon "git-branch")
+                        'face `(:inherit 'mode-line :foreground "#fb4934" :family ,(all-the-icons-octicon-family) :height 1.2)
+                        'display '(raise -0.1))
+            (propertize (format " %s" branch) 'face `(:inherit 'mode-line :foreground "#fb4934"))))
+          (`needs-merge " Con")
+          (`needs-update " Upd")
+          (`ignored " Ign")
+          (_ " Unk")))))
+#+END_SRC
+****** SVN status
+#+BEGIN_SRC emacs-lisp
+  (defun rr/modeline-svn-vc ()
+    "Show SVN status."
+    (let ((revision (cadr (split-string vc-mode "-"))))
+      (concat
+       (propertize (format " %s" (all-the-icons-faicon "cloud")) 'face `(:height 1.2) 'display '(raise -0.1))
+       (propertize (format " · %s" revision) 'face `(:height 0.9)))))
+#+END_SRC
+****** Flycheck status
+#+BEGIN_SRC emacs-lisp
+  (defun rr/flycheck-status-text ()
+    (let* ((text (pcase flycheck-last-status-change
+                   (`finished (if flycheck-current-errors
+                                  (let ((count (let-alist (flycheck-count-errors flycheck-current-errors)
+                                                 (+ (or .warning 0) (or .error 0)))))
+                                    (propertize (format "✖ %s Issue%s" count (if (eq 1 count) "" "s")) 'face `(:inherit 'mode-line :foreground "#fb4934")))
+                                (propertize "✔ No Issues" 'face `(:inherit 'mode-line :foreground "#afaf00"))))
+                   (`running     (propertize "⟲ Running" 'face `(:inherit 'mode-line :foreground "#87afaf")))
+                   (`no-checker  (propertize "⚠ No Checker" 'face `(:inherit 'mode-line)))
+                   (`not-checked (propertize "✖ Disabled" 'face' `(:inherit 'mode-line)))
+                   (`errored     (propertize "⚠ Error" 'face `(:inherit 'mode-line :foreground "#fb4934")))
+                   (`interrupted (propertize "⛔ Interrupted" 'face `(:inherit 'mode-line :foreground "#fb4934")))
+                   (`suspicious  ""))))
+      (propertize text)))
+#+END_SRC
+***** Spaceline
+****** Faces
+#+BEGIN_SRC emacs-lisp
+  (defface rr/spaceline-unmodified
+    '((t :inherit 'spaceline-unmodified :background "#87afaf"))
+    "Face for unmodified buffer in the mode-line.")
+
+  (defface rr/spaceline-modified
+    '((t :inherit 'spaceline-modified :background "#d75f5f"))
+    "Face for modified buffer in the mode-line.")
+
+  (defface rr/spaceline-read-only
+    '((t :inherit 'spaceline-read-only :background "#d787af"))
+    "Face for read-only buffer in the mode-line.")
+
+  (defun rr/spaceline-face (face active)
+    "For spaceline-face-func get FACE and ACTIVE."
+    (pcase (cons face active)
+      ('(face1 . t)   'mode-line)
+      ('(face1 . nil) 'mode-line-inactive)
+      ('(face2 . t)   'mode-line)
+      ('(face2 . nil) 'mode-line-inactive)
+      ('(line . t)    'mode-line)
+      ('(line . nil)  'mode-line-inactive)
+      ('(highlight . t)
+       (cond
+        (buffer-read-only 'rr/spaceline-read-only)
+        ((buffer-modified-p) 'rr/spaceline-modified)
+        (t 'rr/spaceline-unmodified)))
+      ('(highlight . nil) 'powerline-inactive1)
+      (_ 'error)))
+#+END_SRC
+****** Common configuration
+#+BEGIN_SRC emacs-lisp
+  (use-package spaceline :ensure t
+    :config
+    (setq powerline-height 30)
+    (setq spaceline-separator-dir-left '(right . right))
+    (setq spaceline-separator-dir-right '(right . right))
+    (setq powerline-default-separator 'alternate)
+    (setq spaceline-window-numbers-unicode t)
+    (setq spaceline-face-func 'rr/spaceline-face))
+#+END_SRC
+****** Custom theme
+#+BEGIN_SRC emacs-lisp
+  (require 'spaceline-config)
+
+  ;; Define custom segments
+  (spaceline-define-segment rr/version-control
+    "Show VC status."
+    (when vc-mode
+      (cond
+       ((string-match "Git[:-]" vc-mode) (rr/modeline-git-vc))
+       ((string-match "SVN-" vc-mode) (rr/modeline-svn-vc))
+       (t (propertize (format "%s" vc-mode)))))
+    :enabled t)
+
+  (spaceline-define-segment rr/flycheck-status
+    "Print current flycheck status."
+    (when (and (bound-and-true-p flycheck-mode))
+      (rr/flycheck-status-text))
+    :enabled t)
+
+  ;; My custom theme
+  (defun rr/spaceline-theme (&rest additional-segments)
+    "Apply my spaceline theme ADDITIONAL-SEGMENTS are inserted on the right."
+    (spaceline-install
+      `(((workspace-number
+          window-number)
+         :fallback evil-state
+         :face highlight-face
+         :priority 0)
+        (anzu :priority 4)
+        auto-compile
+        ((buffer-id remote-host)
+         :priority 5)
+        (point-position line-column)
+        (buffer-position :priority 0)
+        (process :when active)
+        (mu4e-alert-segment :when active)
+        (erc-track :when active)
+        (org-pomodoro :when active)
+        (org-clock :when active))
+      `(which-function
+        (python-pyvenv :fallback python-pyenv)
+        purpose
+        (battery :when active)
+        (selection-info :priority 2)
+        input-method
+        (buffer-encoding-abbrev :priority 3)
+        (global :when active)
+        ,@additional-segments
+        (rr/version-control :when active :priority 7)
+        major-mode
+        (rr/flycheck-status :when active)))
+
+    (setq-default mode-line-format '("%e" (:eval (spaceline-ml-main)))))
+
+  (rr/spaceline-theme)
+  (spaceline-compile)
+#+END_SRC
+*** Semantic
+**** Enable semantic mode global
+#+BEGIN_SRC emacs-lisp
+  (semantic-mode 1)
+#+END_SRC
+**** Highlight current function
+#+BEGIN_SRC emacs-lisp
+  (global-semantic-highlight-func-mode 1)
+#+END_SRC
+**** Show function definition at the top of buffer
+#+BEGIN_SRC emacs-lisp
+  (global-semantic-stickyfunc-mode 1)
+#+END_SRC
+**** Enable database
+#+BEGIN_SRC emacs-lisp
+  (global-semanticdb-minor-mode 1)
+#+END_SRC
+*** Autocomplete
+**** Common
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :ensure t
+    :init
+    (setq company-dabbrev-downcase nil)
+    :config
+    (setq company-auto-complete nil)
+    (add-hook 'after-init-hook 'global-company-mode))
+#+END_SRC
+**** Statistic
+Show more offten used completeons first
+#+BEGIN_SRC emacs-lisp
+  (use-package company-statistics
+    :ensure t
+    :config
+    (company-statistics-mode))
+#+END_SRC
+**** Quick help
+#+BEGIN_SRC emacs-lisp
+  (use-package company-quickhelp
+    :ensure t
+    :config
+    (company-quickhelp-mode 1))
+#+END_SRC
+**** Languages
+***** LaTeX
+#+BEGIN_SRC emacs-lisp
+  (use-package company-auctex
+    :ensure t
+    :config
+    (company-auctex-init))
+#+END_SRC
+***** WEB
+#+BEGIN_SRC emacs-lisp
+  (use-package company-web
+    :ensure t
+    :config
+    (add-to-list 'company-backends 'company-web-html)
+    (add-to-list 'company-backends 'company-web-jade)
+    (add-to-list 'company-backends 'company-web-slim))
+#+END_SRC
+***** Shell
+#+BEGIN_SRC emacs-lisp
+  (use-package company-shell
+    :ensure t
+    :config
+    (add-to-list 'company-backends 'company-shell))
+#+END_SRC
+**** Solve company and yasnippet conflict
+#+BEGIN_SRC emacs-lisp
+  (defun company-yasnippet-or-completion ()
+    "Solve company yasnippet conflicts."
+    (interactive)
+    (let ((yas-fallback-behavior
+           (apply 'company-complete-common nil)))
+      (yas-expand)))
+
+  (add-hook 'company-mode-hook
+            (lambda ()
+              (substitute-key-definition
+               'company-complete-common
+               'company-yasnippet-or-completion
+               company-active-map)))
+#+END_SRC
+*** Ido
+**** Enable ido global
+#+BEGIN_SRC emacs-lisp
+  (ido-mode 1)
+  (ido-everywhere 1)
+#+END_SRC
+**** Set keybindings
+Buffer select
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "<f2>") 'bs-show)
+#+END_SRC
+Redefine M-x with ido-mode
+#+BEGIN_SRC emacs-lisp
+  (global-set-key
+   "\M-x"
+   (lambda ()
+     (interactive)
+     (call-interactively
+      (intern
+       (ido-completing-read
+        "M-x "
+        (all-completions "" obarray 'commandp))))))
+#+END_SRC
+**** Enable Flex ido
+#+BEGIN_SRC emacs-lisp
+  (use-package flx-ido
+    :ensure t
+    :config
+    (flx-ido-mode 1)
+    (setq ido-enable-flex-matching t)
+    (setq ido-use-faces nil))
+#+END_SRC
+**** Vertical ido
+#+BEGIN_SRC emacs-lisp
+  (use-package ido-vertical-mode
+    :ensure t
+    :config
+    (ido-vertical-mode 1)
+    (setq ido-vertical-define-keys 'C-n-and-C-p-only)
+    (setq ido-vertical-show-count t))
+#+END_SRC
+*** Smartparens
+#+BEGIN_SRC emacs-lisp
+  (use-package smartparens
+    :ensure t
+    :init
+    (setq sp-show-pair-delay 0.1
+          sp-show-pair-from-inside t)
+    :config
+    (smartparens-global-mode)
+    (show-smartparens-global-mode)
+    (setq smartparens-strict-mode t))
+#+END_SRC
+*** Rainbow delimiters
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t
+    :config
+    (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+#+END_SRC
+*** Anzu
+#+BEGIN_SRC emacs-lisp
+  (use-package anzu
+    :ensure t
+    :config
+    (global-anzu-mode +1)
+    (setq anzu-cons-mode-line-p nil))
+#+END_SRC
+*** Windows navigation
+#+BEGIN_SRC emacs-lisp
+  (use-package winum
+    :ensure t
+    :config
+    (setq winum-auto-setup-mode-line nil)
+    (winum-mode))
+#+END_SRC
+*** Projectile
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :ensure t
+    :config
+    (projectile-global-mode)
+    (add-to-list 'projectile-globally-ignored-files "*.log")
+    (setq projectile-enable-caching t)
+    (setq projectile-mode-line '(:eval (format " [%s]" (projectile-project-name)))))
+#+END_SRC
+*** Syntax check
+**** Flycheck
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :config
+    (add-hook 'after-init-hook #'global-flycheck-mode)
+
+    (setq flycheck-indication-mode 'right-fringe)
+  
+    (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
+      [0 0 0 0 0 4 12 28 60 124 252 124 60 28 12 4 0 0 0 0]))
+#+END_SRC
+*** Version control
+**** GIT
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :ensure t
+    :config
+    (global-set-key (kbd "C-x g") 'magit-status))
+#+END_SRC
+**** Highlight diff
+#+BEGIN_SRC emacs-lisp
+  (use-package diff-hl
+    :ensure t
+    :init
+    (setq-default fringes-outside-margins t)
+
+    :config
+    (add-hook 'prog-mode-hook 'turn-on-diff-hl-mode)
+    (add-hook 'vc-dir-mode-hook 'turn-on-diff-hl-mode)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
+#+END_SRC
+*** Org
+**** Some tweaks
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-mode-hook 'turn-on-font-lock)
+  (setq org-startup-indented t)
+  (setq org-cycle-separator-lines 0)
+  (setq org-tags-column -100)
+  (setq org-hide-leading-stars t)
+  (setq org-hide-leading-stars-before-indent-mode t)
+  (setq org-src-window-setup 'current-window)
+#+END_SRC
+**** Agenda settings
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-files (quote ("~/Org")))
+  (setq org-directory "~/Org")
+  (setq org-enforce-todo-dependencies t)
+#+END_SRC
+**** Tag list
+#+BEGIN_SRC emacs-lisp
+  (setq org-tag-alist '((:startgroup . nil)
+                        ("@critical" . ?C)
+                        ("@medium" . ?M)
+                        ("@low" . ?L)
+                        (:endgroup . nil)))
+#+END_SRC
+**** Keywords list
+#+BEGIN_SRC emacs-lisp
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "PROGRESS(p!)" "PAUSED(h@/!)" "|" "DONE(d!)")))
+#+END_SRC
+**** Custom keywords faces
+#+BEGIN_SRC emacs-lisp
+  (setq org-todo-keyword-faces
+        '(("PROGRESS" :foreground "#b57614" :weight bold)
+          ("PAUSED" :foreground "#5f8787" :weight bold)))
+#+END_SRC
+**** Clock settings
+#+BEGIN_SRC emacs-lisp
+  (setq org-clock-persist 'history)
+  (org-clock-persistence-insinuate)
+  (setq org-log-into-drawer t)
+  (setq org-log-done 'time)
+  (setq org-blank-before-new-entry (quote ((heading) (plain-list-item))))
+
+  (defadvice org-clock-in (after wicked activate)
+    "Set this task's status to 'PROGRESS'."
+    (org-todo "PROGRESS"))
+
+  (add-hook 'org-clock-out-hook 'org-todo)
+#+END_SRC
+**** Appearance
+Org bullets
+#+BEGIN_SRC emacs-lisp
+  (use-package org-bullets
+    :ensure t
+    :init
+
+    (setq org-bullets-bullet-list '("•"))
+
+    (setq org-ellipsis "…")
+
+    :config
+    (add-hook 'org-mode-hook #'org-bullets-mode))
+#+END_SRC
+**** Alerts
+#+BEGIN_SRC emacs-lisp
+  (use-package org-alert
+    :ensure t
+    :config
+    (setq org-alert-enable t)
+    (setq alert-default-style 'libnotify))
+#+END_SRC
+*** Languages
+**** Haskell
+***** Intero
+#+BEGIN_SRC emacs-lisp
+  (use-package intero
+    :ensure t
+    :config
+    (add-hook 'haskell-mode-hook 'intero-mode))
+#+END_SRC
+***** Align rules
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'align-load-hook
+            (lambda ()
+              (add-to-list 'align-rules-list
+                           '(haskell-types
+                             (regexp . "\\(\\s-+\\)\\(::\\|∷\\)\\s-+")
+                             (modes quote (haskell-mode literate-haskell-mode))))))
+  (add-hook 'align-load-hook
+            (lambda ()
+              (add-to-list 'align-rules-list
+                           '(haskell-assignment
+                             (regexp . "\\(\\s-+\\)=\\s-+")
+                             (modes quote (haskell-mode literate-haskell-mode))))))
+
+  (add-hook 'align-load-hook
+            (lambda ()
+              (add-to-list 'align-rules-list
+                           '(haskell-arrows
+                             (regexp . "\\(\\s-+\\)\\(->\\|→\\)\\s-+")
+                             (modes quote (haskell-mode literate-haskell-mode))))))
+
+  (add-hook 'align-load-hook
+            (lambda ()
+              (add-to-list 'align-rules-list
+                           '(haskell-left-arrows
+                             (regexp . "\\(\\s-+\\)\\(<-\\|←\\)\\s-+")
+                             (modes quote (haskell-mode literate-haskell-mode))))))
+#+END_SRC
+***** Haskell doc mode
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+#+END_SRC
+**** LaTeX
+***** AucREX tweaks
+#+BEGIN_SRC emacs-lisp
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq-default TeX-master nil)
+  (add-hook 'LaTeX-mode-hook 'visual-line-mode)
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+  (setq reftex-plug-into-AUCTeX t)
+
+  (eval-after-load 'latex '(add-to-list 'LaTeX-verbatim-environments "lstlisting"))
+
+  (font-lock-add-keywords
+   'latex-mode
+   `((,(concat "^\\s-*\\\\\\("
+               "\\(documentclass\\|\\(sub\\)?section[*]?\\)"
+               "\\(\\[[^]% \t\n]*\\]\\)?{[-[:alnum:]_ ]+"
+               "\\|"
+               "\\(begin\\|end\\){document"
+               "\\)}.*\n?")
+      (0 'your-face append))))
+
+  (add-hook 'LaTeX-mode-hook (lambda ()
+                               (TeX-fold-mode 1)))
+#+END_SRC
+**** Python
+***** Virtualenv
+#+BEGIN_SRC emacs-lisp
+  (use-package virtualenvwrapper
+    :ensure t
+    :config
+    (venv-initialize-interactive-shells)
+    (venv-initialize-eshell))
+#+END_SRC
+***** Elpy
+#+BEGIN_SRC emacs-lisp
+  (use-package elpy
+    :ensure t
+    :config
+    (elpy-enable)
+    (setq elpy-rpc-backend "jedi")
+    (add-hook 'elpy-mode-hook 'yas-minor-mode-on))
+#+END_SRC
+***** Tox
+#+BEGIN_SRC emacs-lisp
+  (use-package tox
+    :ensure t
+    :config
+    (setq tox-runner 'py.test)
+    (global-set-key "\C-ct" 'tox-current-class))
+#+END_SRC
+**** JSON
+#+BEGIN_SRC emacs-lisp
+  (use-package json-mode
+    :ensure t
+    :config
+    (setq json-reformat:pretty-string? t))
+#+END_SRC
+**** YAML
+#+BEGIN_SRC emacs-lisp
+  (use-package yaml-mode
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
+#+END_SRC
+**** WEB
+#+BEGIN_SRC emacs-lisp
+  (use-package web-mode
+    :after smartparens
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+
+    (defun my-web-mode-hook ()
+      "Disable autopair in web-mode."
+      (setq web-mode-enable-auto-pairing nil))
+
+    (add-hook 'web-mode-hook  'my-web-mode-hook)
+
+    (defun sp-web-mode-is-code-context (id action context)
+      "Don't remember what this ID, ACTION and CONTEXT."
+      (and (eq action 'insert)
+           (not (or (get-text-property (point) 'part-side)
+                    (get-text-property (point) 'block-side)))))
+
+    (sp-local-pair 'web-mode "<" nil :when '(sp-web-mode-is-code-context)))
+#+END_SRC
+*** Set keybindings
+**** Common
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "M-[") 'align)
+#+END_SRC
+**** Org
+#+BEGIN_SRC emacs-lisp
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-ca" 'org-agenda)
+  (global-set-key "\C-cc" 'org-capture)
+  (global-set-key "\C-cb" 'org-iswitchb)
+
+  (global-set-key (kbd "<f5>") 'org-clock-goto)
+  (global-set-key (kbd "<f6>") 'org-clock-in)
+  (global-set-key (kbd "<f7>") 'org-clock-out)
+  (global-set-key "\C-cm" 'org-agenda-month-view)
+#+END_SRC
