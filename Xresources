@@ -82,7 +82,7 @@ URxvt.url-select.underline: true
 !URxvt.tabbed.tabbar-bg: 8
 !URxvt.tabbed.tab-fg:    8
 !URxvt.tabbed.tab-bg:    14
-!
+
 ! -----------------------------------------------------------------------------
 ! File: gruvbox-dark.xresources
 ! Description: Retro groove colorscheme generalized
@@ -92,7 +92,7 @@ URxvt.url-select.underline: true
 ! -----------------------------------------------------------------------------
 
 ! hard contrast: *background: #1d2021
-*background: #282828
+*background: #1d2021
 ! soft contrast: *background: #32302f
 *foreground: #ebdbb2
 ! Black + DarkGrey

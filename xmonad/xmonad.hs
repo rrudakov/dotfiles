@@ -23,7 +23,7 @@ import qualified Data.Map        as M
 
 -- | Set default terminal emulator
 myTerminal :: String
-myTerminal = "xfce4-terminal"
+myTerminal = "termite"
 
 -- | Set focus follow mouse
 myFocusFollowsMouse :: Bool
@@ -171,7 +171,8 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((0                 , xF86XK_AudioPrev       ), spawn "ncmpcpp prev")
     , ((0                 , xF86XK_AudioStop       ), spawn "ncmpcpp stop")
 
-    , ((0                 , xK_Print               ), spawn "scrot '%F_%H%M%S_$wx$h.png' -e 'mv $f ~/screenshots/'")
+    -- , ((0                 , xK_Print               ), spawn "scrot '%F_%H%M%S_$wx$h.png' -e 'mv $f ~/screenshots/'")
+    , ((0                 , xK_Print               ), spawn "xfce4-screenshooter")
     ]
     ++
 
@@ -297,7 +298,7 @@ main = do
       handleEventHook    = myEventHook <+> ewmhDesktopsEventHook <+> fullscreenEventHook,
       logHook            = dynamicLogWithPP xmobarPP { ppOutput          = hPutStrLn xmproc
                                                      , ppCurrent         = xmobarColor "#b294bb" "#373b41" . wrap " " " "
-                                                     , ppTitle           = xmobarColor "#de935f" "" . shorten 80
+                                                     , ppTitle           = xmobarColor "#fe8019" "" . shorten 80
                                                      , ppHidden          = xmobarColor "#c5c8c6" ""
                                                      , ppHiddenNoWindows = xmobarColor "#373b41" ""
                                                      , ppUrgent          = xmobarColor "#f0c674" "#cc6666" . wrap " " " "

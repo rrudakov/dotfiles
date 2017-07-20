@@ -97,13 +97,15 @@ set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
 Plugin 'chriskempson/base16-vim'
+Plugin 'morhetz/gruvbox'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
 
 syntax enable
-colorscheme base16-onedark
-if filereadable(expand("~/.vimrc_background"))
-        let base16colorspace=256
-        source ~/.vimrc_background
-endif
+set termguicolors
+set background=dark    " Setting dark mode
+let g:gruvbox_italic=1
+let g:gruvbox_contrast_dark='hard'
+let g:gruvbox_invert_selection=0
+colorscheme gruvbox
