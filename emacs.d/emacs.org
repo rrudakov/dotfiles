@@ -485,6 +485,7 @@ Redefine M-x with ido-mode
     (setq sp-show-pair-delay 0.1
           sp-show-pair-from-inside t)
     :config
+    (require 'smartparens-config)
     (smartparens-global-mode)
     (show-smartparens-global-mode)
     (setq smartparens-strict-mode t))
@@ -541,7 +542,8 @@ Redefine M-x with ido-mode
   (use-package magit
     :ensure t
     :config
-    (global-set-key (kbd "C-x g") 'magit-status))
+    (global-set-key (kbd "C-x g") 'magit-status)
+    (add-hook 'magit-post-refresh-hook 'vc-refresh-state))
 #+END_SRC
 **** Highlight diff
 #+BEGIN_SRC emacs-lisp
