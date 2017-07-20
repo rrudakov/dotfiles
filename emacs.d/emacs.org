@@ -542,11 +542,10 @@ Redefine M-x with ido-mode
   (use-package magit
     :ensure t
     :config
-    (global-set-key (kbd "C-x g") 'magit-status))
-
-  (add-hook 'focus-in-hook 'vc-refresh-state)
-  (add-hook 'magit-update-uncommitted-buffer-hook 'vc-refresh-state)
-  (add-hook 'magit-post-refresh-hook 'vc-refresh-state)
+    (global-set-key (kbd "C-x g") 'magit-status)
+    (add-hook 'focus-in-hook 'vc-refresh-state)
+    (add-hook 'magit-refresh-buffer-hook 'vc-refresh-state)
+    (add-hook 'magit-post-refresh-hook 'vc-refresh-state))
 #+END_SRC
 **** Highlight diff
 #+BEGIN_SRC emacs-lisp
