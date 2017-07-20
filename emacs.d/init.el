@@ -1,7 +1,7 @@
 ;;; package --- Summary
 ;;; Commentary:
 ;;;
-;;; My Emacs configuration
+;;; My Emacs configuration using org babel
 
 ;;; Code:
 (require 'package)
