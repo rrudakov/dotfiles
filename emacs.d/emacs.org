@@ -537,6 +537,13 @@ Redefine M-x with ido-mode
     (show-smartparens-global-mode)
     (setq smartparens-strict-mode t))
 #+END_SRC
+*** Popwin
+#+BEGIN_SRC emacs-lisp
+  (use-package popwin
+    :ensure t
+    :config
+    (popwin-mode 1))
+#+END_SRC
 *** Rainbow delimiters
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
