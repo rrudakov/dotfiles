@@ -10,3 +10,8 @@
 	tool = vimdiff
 [push]
 	default = simple
+[color]
+	diff = auto
+	status = auto
+	ui = auto
+	branch = auto

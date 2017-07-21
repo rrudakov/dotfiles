@@ -1,9 +1,45 @@
 * My Emacs configuration
 ** Keybindings
+*** Common
+#+BEGIN_SRC text
+  M-:	Eval command
+#+END_SRC
 *** Python
 #+BEGIN_SRC text
   C-c C-r f Format python code
   C-c C-r r Refactoring commands
+#+END_SRC
+*** Org-mode
+#+BEGIN_SRC text
+  C-c ^		Sort headlines
+  C-c / 		Prompt to make sparce-tree
+  C-c - 		Cycle list level ('-', '+', '1.', '1)' etc.)
+  C-c C-x f	Footnote action command
+  C-c C-c		When at footnote, go to definition, When at definition, go back to reference
+  C-c |		Create new table
+  M-S-<right>	Insert new table column
+  C-c +		Sum all numbers in current column
+  C-c C-x p	Insert property
+#+END_SRC
+** Useful commands
+*** Org-mode
+**** Lint document
+#+BEGIN_SRC text
+  org-lint
+#+END_SRC
+** Syntax help
+*** Org-mode
+**** Unordered lists
+#+BEGIN_SRC text
+  Start with '-', '+' or '*' (star not recommended)
+#+END_SRC
+**** Ordered lists
+#+BEGIN_SRC text
+  Starts with '1.' or '1)'
+#+END_SRC
+**** Description list
+#+BEGIN_SRC text
+  Unordered lists with separator '::'
 #+END_SRC
 ** Configuration
 *** Common
@@ -86,6 +122,7 @@
    mouse-yank-at-point t           ; middle-click paste at point, not at click
    resize-mini-windows 'grow-only  ; Minibuffer resizing
    show-help-function nil          ; hide :help-echo text
+   split-width-threshold 160	 ; favor horizontal splits
    uniquify-buffer-name-style 'forward
    use-dialog-box nil              ; always avoid GUI
    visible-cursor nil
@@ -199,28 +236,28 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
           (`up-to-date
            (concat
             (propertize (all-the-icons-octicon "git-branch")
-                        'face `(:inherit 'mode-line :family ,(all-the-icons-octicon-family) :height 1.2)
+                        'face `(:inherit mode-line :family ,(all-the-icons-octicon-family) :height 1.2)
                         'display '(raise -0.1))
-            (propertize (format " %s" branch) 'face `(:inherit 'mode-line))))
+            (propertize (format " %s" branch) 'face `(:inherit mode-line))))
           (`edited
            (concat
             (propertize (all-the-icons-octicon "git-branch")
-                        'face `(:inherit 'mode-line :foreground "#87afaf" :family ,(all-the-icons-octicon-family) :height 1.2)
+                        'face `(:inherit mode-line :foreground "#87afaf" :family ,(all-the-icons-octicon-family) :height 1.2)
                         'display '(raise -0.1))
-            (propertize (format " %s" branch) 'face `(:inherit 'mode-line :foreground "#87afaf"))))
+            (propertize (format " %s" branch) 'face `(:inherit mode-line :foreground "#87afaf"))))
           (`added
            (concat
             (propertize (all-the-icons-octicon "git-branch")
-                        'face `(:inherit 'mode-line :foreground "#b8bb26" :family ,(all-the-icons-octicon-family) :height 1.2)
+                        'face `(:inherit mode-line :foreground "#b8bb26" :family ,(all-the-icons-octicon-family) :height 1.2)
                         'display '(raise -0.1))
-            (propertize (format " %s" branch) 'face `(:inherit 'mode-line :foreground "#b8bb26"))))
+            (propertize (format " %s" branch) 'face `(:inherit mode-line :foreground "#b8bb26"))))
           (`unregistered " ??")
           (`removed
            (concat
             (propertize (all-the-icons-octicon "git-branch")
-                        'face `(:inherit 'mode-line :foreground "#fb4934" :family ,(all-the-icons-octicon-family) :height 1.2)
+                        'face `(:inherit mode-line :foreground "#fb4934" :family ,(all-the-icons-octicon-family) :height 1.2)
                         'display '(raise -0.1))
-            (propertize (format " %s" branch) 'face `(:inherit 'mode-line :foreground "#fb4934"))))
+            (propertize (format " %s" branch) 'face `(:inherit mode-line :foreground "#fb4934"))))
           (`needs-merge " Con")
           (`needs-update " Upd")
           (`ignored " Ign")
@@ -242,13 +279,13 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
                    (`finished (if flycheck-current-errors
                                   (let ((count (let-alist (flycheck-count-errors flycheck-current-errors)
                                                  (+ (or .warning 0) (or .error 0)))))
-                                    (propertize (format "✖ %s Issue%s" count (if (eq 1 count) "" "s")) 'face `(:inherit 'mode-line :foreground "#fb4934")))
-                                (propertize "✔ No Issues" 'face `(:inherit 'mode-line :foreground "#afaf00"))))
-                   (`running     (propertize "⟲ Running" 'face `(:inherit 'mode-line :foreground "#87afaf")))
-                   (`no-checker  (propertize "⚠ No Checker" 'face `(:inherit 'mode-line)))
-                   (`not-checked (propertize "✖ Disabled" 'face' `(:inherit 'mode-line)))
-                   (`errored     (propertize "⚠ Error" 'face `(:inherit 'mode-line :foreground "#fb4934")))
-                   (`interrupted (propertize "⛔ Interrupted" 'face `(:inherit 'mode-line :foreground "#fb4934")))
+                                    (propertize (format "✖ %s Issue%s" count (if (eq 1 count) "" "s")) 'face `(:inherit mode-line :foreground "#fb4934")))
+                                (propertize "✔ No Issues" 'face `(:inherit mode-line :foreground "#afaf00"))))
+                   (`running     (propertize "⟲ Running" 'face `(:inherit mode-line :foreground "#87afaf")))
+                   (`no-checker  (propertize "⚠ No Checker" 'face `(:inherit mode-line)))
+                   (`not-checked (propertize "✖ Disabled" 'face' `(:inherit mode-line)))
+                   (`errored     (propertize "⚠ Error" 'face `(:inherit mode-line :foreground "#fb4934")))
+                   (`interrupted (propertize "⛔ Interrupted" 'face `(:inherit mode-line :foreground "#fb4934")))
                    (`suspicious  ""))))
       (propertize text)))
 #+END_SRC
@@ -298,6 +335,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   (use-package spaceline :ensure t
     :config
     (setq powerline-height 30)
+    (setq powerline-default-separator 'utf-8)
     (setq spaceline-separator-dir-left '(right . right))
     (setq spaceline-separator-dir-right '(right . right))
     (setq powerline-default-separator 'alternate)
@@ -321,7 +359,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   (spaceline-define-segment rr/flycheck-status
     "Print current flycheck status."
     (when (and (bound-and-true-p flycheck-mode))
-      (rr/flycheck-status-text))
+      (format "%s " (rr/flycheck-status-text)))
     :enabled t)
 
   ;; My custom theme
@@ -577,6 +615,9 @@ Redefine M-x with ido-mode
   (setq org-hide-leading-stars t)
   (setq org-hide-leading-stars-before-indent-mode t)
   (setq org-src-window-setup 'current-window)
+  (setq org-catch-invisible-edits 'show-and-error)
+  (setq org-return-follows-link t)
+  (add-to-list 'org-modules 'org-habit)
 #+END_SRC
 **** Agenda settings
 #+BEGIN_SRC emacs-lisp
