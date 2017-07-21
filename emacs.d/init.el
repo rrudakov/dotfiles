@@ -15,11 +15,6 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-;; Dired configuration
-(require 'dired+)
-(setq dired-listing-switches "--group-directories-first -alh")
-(toggle-diredp-find-file-reuse-dir 1)
-
 (require 'org)
 (setq vc-follow-symlinks "t")
 (org-babel-load-file (expand-file-name "emacs.org" user-emacs-directory))

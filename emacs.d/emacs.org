@@ -560,6 +560,14 @@ Redefine M-x with ido-mode
     (setq winum-auto-setup-mode-line nil)
     (winum-mode))
 #+END_SRC
+*** Dired
+#+BEGIN_SRC emacs-lisp
+  (use-package dired+
+    :ensure t
+    :config
+    (setq dired-listing-switches "--group-directories-first -alh")
+    (toggle-diredp-find-file-reuse-dir 1))
+#+END_SRC
 *** Projectile
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
