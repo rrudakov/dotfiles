@@ -639,6 +639,7 @@ Redefine M-x with ido-mode
   (setq org-agenda-files (quote ("~/Org")))
   (setq org-directory "~/Org")
   (setq org-enforce-todo-dependencies t)
+  (setq org-agenda-restore-windows-after-quit t)
 #+END_SRC
 **** Capture settings
 #+BEGIN_SRC emacs-lisp
