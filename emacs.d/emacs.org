@@ -667,11 +667,52 @@ Redefine M-x with ido-mode
   (setq org-log-done 'time)
   (setq org-blank-before-new-entry (quote ((heading) (plain-list-item))))
 
-  (defadvice org-clock-in (after wicked activate)
-    "Set this task's status to 'PROGRESS'."
-    (org-todo "PROGRESS"))
+  (defun rr/set-progress (last)
+    "Set PROGRESS state if LAST is different."
+    (when (not (string-equal last "PROGRESS"))
+               "PROGRESS"))
 
-  (add-hook 'org-clock-out-hook 'org-todo)
+  (setq org-clock-in-switch-to-state 'rr/set-progress)
+
+  (setq non-clocking-states '("PAUSED" "DONE"))
+
+  (defun rr/ido-non-clocking-state ()
+    "Prompt to select non-clocking state."
+    (interactive)
+    (message "%s" (ido-completing-read "Select state: " non-clocking-states)))
+
+  (defun rr/after-clock-stop (last)
+    "Change TASK state after clock stop depends on LAST state."
+    (when (not (or (string-equal last "PAUSED")
+                   (string-equal last "DONE")
+                   (string-equal last "TODO")))
+      (if (y-or-n-p "Current task DONE? ")
+          "DONE"
+        "PAUSED")))
+
+  (setq org-clock-out-switch-to-state 'rr/after-clock-stop)
+
+  (defun rr/stop-clock ()
+    "Stop clock if task state changed to PAUSED or DONE."
+    (when (and (org-clocking-p)
+               (or (string-equal org-state "PAUSED")
+                   (string-equal org-state "DONE")
+                   (string-equal org-state "TODO"))
+               (< (point) org-clock-marker)
+               (> (save-excursion (outline-next-heading) (point))
+                  org-clock-marker))
+      (let ((org-log-note-clock-out nil)
+            (org-clock-out-switch-to-state nil))
+        (org-clock-out))))
+
+  (add-hook 'org-after-todo-state-change-hook 'rr/stop-clock)
+
+  (defun rr/start-clock ()
+    "Start clock if task state changed to PROGRESS."
+    (when (string-equal org-state "PROGRESS")
+      (org-clock-in)))
+
+  (add-hook 'org-after-todo-state-change-hook 'rr/start-clock)
 #+END_SRC
 **** Appearance
 Org bullets
@@ -846,7 +887,14 @@ Org bullets
   (global-set-key "\C-cb" 'org-iswitchb)
 
   (global-set-key (kbd "<f5>") 'org-clock-goto)
-  (global-set-key (kbd "<f6>") 'org-clock-in)
-  (global-set-key (kbd "<f7>") 'org-clock-out)
+  (global-set-key (kbd "<f6>") (lambda ()
+                                 (interactive)
+                                 (org-call-with-arg 'org-todo "PROGRESS")))
+  (global-set-key (kbd "<f7>") (lambda ()
+                                 (interactive)
+                                 (org-call-with-arg 'org-todo "PAUSED")))
+  (global-set-key (kbd "<f8>") (lambda ()
+                                 (interactive)
+                                 (org-call-with-arg 'org-todo "DONE")))
   (global-set-key "\C-cm" 'org-agenda-month-view)
 #+END_SRC
