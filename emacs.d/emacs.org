@@ -684,7 +684,13 @@ Redefine M-x with ido-mode
   (defun rr/set-progress (last)
     "Set PROGRESS state if LAST is different."
     (when (not (string-equal last "PROGRESS"))
-               "PROGRESS"))
+      (let ()
+        (remove-hook 'org-after-todo-state-change-hook 'rr/start-clock)
+        "PROGRESS")))
+
+  (add-hook 'org-clock-in-hook
+            (lambda ()
+              (add-hook 'org-after-todo-state-change-hook 'rr/start-clock)))
 
   (setq org-clock-in-switch-to-state 'rr/set-progress)
 
@@ -723,8 +729,14 @@ Redefine M-x with ido-mode
 
   (defun rr/start-clock ()
     "Start clock if task state changed to PROGRESS."
-    (when (string-equal org-state "PROGRESS")
-      (org-clock-in)))
+    (if (org-clocking-p)
+        (when (and (string-equal org-state "PROGRESS")
+                   (not (string-equal (nth 4 (org-heading-components)) org-clock-heading)))
+          (let ((org-clock-in-switch-to-state nil))
+            (org-clock-in)))
+      (when (string-equal org-state "PROGRESS")
+        (let ((org-clock-in-switch-to-state nil))
+          (org-clock-in)))))
 
   (add-hook 'org-after-todo-state-change-hook 'rr/start-clock)
 #+END_SRC
