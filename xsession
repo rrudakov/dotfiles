@@ -14,7 +14,7 @@ sysmodmap=/etc/X11/xinit/.Xmodmap
 #$HOME/.screenlayout/dual.sh
 compton --config ~/.config/compton.conf -b
 export DE="xfce"
-xgamma -bgamma 0.8 &
+xgamma -rgamma 1 -ggamma 1 -bgamma 0.8 &
 xbacklight -set 80 &
 stalonetray &
 #dunst &
