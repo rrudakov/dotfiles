@@ -640,6 +640,19 @@ Redefine M-x with ido-mode
   (setq org-directory "~/Org")
   (setq org-enforce-todo-dependencies t)
 #+END_SRC
+**** Capture settings
+#+BEGIN_SRC emacs-lisp
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
+
+  (setq org-capture-templates
+        '(("t" "Todo" entry (file+headline "" "Tasks")
+           "* TODO %?\n%i"
+           :clock-in t
+           :clock-resume t)))
+
+  (setq org-refile-targets (quote ((nil :maxlevel . 9)
+                                   (org-agenda-files :maxlevel . 9))))
+#+END_SRC
 **** Tag list
 #+BEGIN_SRC emacs-lisp
   (setq org-tag-alist '((:startgroup . nil)
@@ -651,7 +664,7 @@ Redefine M-x with ido-mode
 **** Keywords list
 #+BEGIN_SRC emacs-lisp
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "PROGRESS(p!)" "PAUSED(h@/!)" "|" "DONE(d!)")))
+        '((sequence "TODO(t)" "PROGRESS(p!)" "PAUSED(h!)" "|" "DONE(d!)")))
 #+END_SRC
 **** Custom keywords faces
 #+BEGIN_SRC emacs-lisp
