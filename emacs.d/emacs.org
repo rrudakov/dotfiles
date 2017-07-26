@@ -210,7 +210,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
     (highlight-symbol-nav-mode)
 
     (add-hook 'prog-mode-hook (lambda () (highlight-symbol-mode)))
-    (add-hook 'org-mode-hook (lambda () (highlight-symbol-mode)))
 
     (setq highlight-symbol-idle-delay 0.2
           highlight-symbol-on-navigation-p t)
@@ -624,11 +623,13 @@ Redefine M-x with ido-mode
 **** Some tweaks
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-mode-hook 'turn-on-font-lock)
-  (setq org-startup-indented t)
-  (setq org-cycle-separator-lines 0)
+  (add-hook 'org-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
+  (setq org-startup-folded 'content) ;; overview | content | all | showeverything
+  (setq org-cycle-separator-lines 1)
   (setq org-tags-column -100)
+  (setq org-startup-indented t)
   (setq org-hide-leading-stars t)
-  (setq org-hide-leading-stars-before-indent-mode t)
+  (setq org-adapt-indentation nil)
   (setq org-src-window-setup 'current-window)
   (setq org-catch-invisible-edits 'show-and-error)
   (setq org-return-follows-link t)
@@ -679,7 +680,6 @@ Redefine M-x with ido-mode
   (org-clock-persistence-insinuate)
   (setq org-log-into-drawer t)
   (setq org-log-done 'time)
-  (setq org-blank-before-new-entry (quote ((heading) (plain-list-item))))
 
   (defun rr/set-progress (last)
     "Set PROGRESS state if LAST is different."
@@ -706,9 +706,15 @@ Redefine M-x with ido-mode
     (when (not (or (string-equal last "PAUSED")
                    (string-equal last "DONE")
                    (string-equal last "TODO")))
-      (if (y-or-n-p "Current task DONE? ")
-          "DONE"
-        "PAUSED")))
+      (let ()
+        (remove-hook 'org-after-todo-state-change-hook 'rr/stop-clock)
+        (if (y-or-n-p "Current task DONE? ")
+              "DONE"
+            "PAUSED"))))
+
+  (add-hook 'org-clock-out-hook
+            (lambda ()
+              (add-hook 'org-after-todo-state-change-hook 'rr/stop-clock)))
 
   (setq org-clock-out-switch-to-state 'rr/after-clock-stop)
 
@@ -741,7 +747,7 @@ Redefine M-x with ido-mode
   (add-hook 'org-after-todo-state-change-hook 'rr/start-clock)
 #+END_SRC
 **** Appearance
-Org bullets
+***** Org bullets
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
     :ensure t
@@ -754,6 +760,19 @@ Org bullets
     :config
     (add-hook 'org-mode-hook #'org-bullets-mode))
 #+END_SRC
+***** Org source code
+#+BEGIN_SRC emacs-lisp
+  (setq org-src-fontify-natively t)
+
+  (require 'color)
+  (set-face-attribute 'org-block nil :background
+                      (color-darken-name
+                       (face-attribute 'default :background) 3))
+
+  (setq org-src-block-faces '(("emacs-lisp" (:background "#282828"))
+                              ("python" (:background "#282828"))))
+
+#+END_SRC
 **** Alerts
 #+BEGIN_SRC emacs-lisp
   (use-package org-alert
@@ -761,6 +780,10 @@ Org bullets
     :config
     (setq org-alert-enable t)
     (setq alert-default-style 'libnotify))
+#+END_SRC
+**** Markdown export
+#+BEGIN_SRC emacs-lisp
+  (require 'ox-md nil t)
 #+END_SRC
 *** Languages
 **** Haskell
@@ -913,14 +936,13 @@ Org bullets
   (global-set-key "\C-cb" 'org-iswitchb)
 
   (global-set-key (kbd "<f5>") 'org-clock-goto)
-  (global-set-key (kbd "<f6>") (lambda ()
-                                 (interactive)
-                                 (org-call-with-arg 'org-todo "PROGRESS")))
-  (global-set-key (kbd "<f7>") (lambda ()
-                                 (interactive)
-                                 (org-call-with-arg 'org-todo "PAUSED")))
-  (global-set-key (kbd "<f8>") (lambda ()
-                                 (interactive)
-                                 (org-call-with-arg 'org-todo "DONE")))
+  (global-set-key (kbd "<f6>") 'org-clock-in)
+  (global-set-key (kbd "<f7>") 'org-clock-out)
+  ;; (global-set-key (kbd "<f7>") (lambda ()
+  ;;                                (interactive)
+  ;;                                (org-call-with-arg 'org-todo "PAUSED")))
+  ;; (global-set-key (kbd "<f8>") (lambda ()
+  ;;                                (interactive)
+  ;;                                (org-call-with-arg 'org-todo "DONE")))
   (global-set-key "\C-cm" 'org-agenda-month-view)
 #+END_SRC
