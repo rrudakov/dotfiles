@@ -11,6 +11,7 @@ sysmodmap=/etc/X11/xinit/.Xmodmap
 [ -f $userresources ] && /usr/bin/xrdb -merge $userresources
 [ -f $usermodmap ] && /usr/bin/xmodmap $usermodmap
 
+export GDK_USE_XFT=1
 #$HOME/.screenlayout/dual.sh
 compton --config ~/.config/compton.conf -b
 export DE="xfce"

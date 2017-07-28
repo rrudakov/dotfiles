@@ -21,6 +21,10 @@
   C-c +		Sum all numbers in current column
   C-c C-x p	Insert property
 #+END_SRC
+*** Projectile
+#+BEGIN_EXAMPLE
+  C-p p SPC	Counsel projectile
+#+END_EXAMPLE
 ** Useful commands
 *** Org-mode
 **** Lint document
@@ -65,8 +69,8 @@
 #+END_SRC
 **** Set default font
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'default-frame-alist '(font . "Iosevka-10"))
-  (set-frame-font "Iosevka-10")
+  (add-to-list 'default-frame-alist '(font . "Hack-10"))
+  (set-frame-font "Hack-10")
 #+END_SRC
 **** Open files ends with "rc" in conf-unix-mode
 #+BEGIN_SRC emacs-lisp
@@ -482,46 +486,38 @@ Show more offten used completeons first
                'company-yasnippet-or-completion
                company-active-map)))
 #+END_SRC
-*** Ido
-**** Enable ido global
+*** Paradox
 #+BEGIN_SRC emacs-lisp
-  (ido-mode 1)
-  (ido-everywhere 1)
+  (use-package paradox :ensure t)
 #+END_SRC
-**** Set keybindings
-Buffer select
+*** Ivy
+**** Install and activate ivy
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "<f2>") 'bs-show)
-#+END_SRC
-Redefine M-x with ido-mode
-#+BEGIN_SRC emacs-lisp
-  (global-set-key
-   "\M-x"
-   (lambda ()
-     (interactive)
-     (call-interactively
-      (intern
-       (ido-completing-read
-        "M-x "
-        (all-completions "" obarray 'commandp))))))
-#+END_SRC
-**** Enable Flex ido
-#+BEGIN_SRC emacs-lisp
-  (use-package flx-ido
+  (use-package ivy
     :ensure t
     :config
-    (flx-ido-mode 1)
-    (setq ido-enable-flex-matching t)
-    (setq ido-use-faces nil))
+    (ivy-mode 1)
+    (setq ivy-use-virtual-buffers t)
+    (setq ivy-count-format "(%d/%d) ")
+    :bind (("<f2>" . bs-show)))
 #+END_SRC
-**** Vertical ido
+**** Swiper
 #+BEGIN_SRC emacs-lisp
-  (use-package ido-vertical-mode
+  (use-package swiper
     :ensure t
-    :config
-    (ido-vertical-mode 1)
-    (setq ido-vertical-define-keys 'C-n-and-C-p-only)
-    (setq ido-vertical-show-count t))
+    :bind (("C-s" . swiper)))
+#+END_SRC
+**** Counsel
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel
+    :ensure t
+    :bind (("M-x" . counsel-M-x)
+           ("C-x C-f" . counsel-find-file)
+           ("<f1> f" . counsel-describe-function)
+           ("<f1> v" . counsel-describe-variable)
+           ("<f1> l" . counsel-find-library)
+           ("<f1> i" . counsel-info-lookup-symbol)
+           ("<f1> u" . counsel-unicode-char)))
 #+END_SRC
 *** Smartparens
 #+BEGIN_SRC emacs-lisp
@@ -575,14 +571,28 @@ Redefine M-x with ido-mode
     (toggle-diredp-find-file-reuse-dir 1))
 #+END_SRC
 *** Projectile
+**** Basic setup
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
     :ensure t
     :config
     (projectile-global-mode)
+    (setq projectile-completion-system 'ivy)
     (add-to-list 'projectile-globally-ignored-files "*.log")
     (setq projectile-enable-caching t)
     (setq projectile-mode-line '(:eval (format " [%s]" (projectile-project-name)))))
+#+END_SRC
+**** Counsel projectile
+#+BEGIN_SRC emacs-lisp
+  (use-package counsel-projectile
+    :ensure t
+    :config
+    (counsel-projectile-on))
+#+END_SRC
+*** Htmlize
+#+BEGIN_SRC emacs-lisp
+  (use-package htmlize
+    :ensure t)
 #+END_SRC
 *** Syntax check
 **** Flycheck
@@ -604,6 +614,7 @@ Redefine M-x with ido-mode
     :ensure t
     :config
     (global-set-key (kbd "C-x g") 'magit-status)
+    (setq magit-completing-read-function 'ivy-completing-read)
     (add-hook 'focus-in-hook 'rr/refresh-vc-state)
     (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state))
 #+END_SRC
@@ -785,6 +796,33 @@ Redefine M-x with ido-mode
 #+BEGIN_SRC emacs-lisp
   (require 'ox-md nil t)
 #+END_SRC
+**** Org-mime
+#+BEGIN_SRC emacs-lisp
+  (use-package org-mime
+    :ensure t
+    :config
+    (add-hook 'message-mode-hook
+            (lambda ()
+              (local-set-key (kbd "C-c M-o") 'org-mime-htmlize)))
+    (add-hook 'org-mode-hook
+              (lambda ()
+                (local-set-key (kbd "C-c M-o") 'org-mime-org-buffer-htmlize)))
+
+    (add-hook 'org-mime-html-hook
+              (lambda ()
+                (org-mime-change-element-style
+                 "pre" (format "color: %s; background-color: %s; padding: 0.5em;"
+                               "#E6E1DC" "#232323"))))
+
+    ;; the following can be used to nicely offset block quotes in email bodies
+    (add-hook 'org-mime-html-hook
+              (lambda ()
+                (org-mime-change-element-style
+                 "blockquote" "border-left: 2px solid gray; padding-left: 4px;")))
+
+    (setq org-mime-export-options
+          '(:section-numbers nil :with-author nil :with-toc nil)))
+#+END_SRC
 *** Languages
 **** Haskell
 ***** Intero
@@ -828,7 +866,7 @@ Redefine M-x with ido-mode
   (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
 #+END_SRC
 **** LaTeX
-***** AucREX tweaks
+***** AucTEX tweaks
 #+BEGIN_SRC emacs-lisp
   (setq TeX-auto-save t)
   (setq TeX-parse-self t)
