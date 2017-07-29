@@ -54,7 +54,7 @@ Config { font = "xft:Iosevka:size=10"
                                    , "-m", "2"
                                    , "-M", "2"
 				   ,"--", "-O", "<fc=#f0c674>-><left>%</fc>", "-o", "<left>%", "-i", "<fc=#81a2be>Full</fc>"
-				   ,"-f", "ACAD/online"
+				   ,"-f", "AC/online"
 				   ] 10
                     , Run Swap [] 10
                     , Run Com "uname" ["-s","-r"] "" 36000
@@ -64,6 +64,6 @@ Config { font = "xft:Iosevka:size=10"
                     ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = "%cpu% %memory% %wlan0% %StdinReader% }{ <fc=#c5c8c6>%kbd% %date%</fc>"
+       , template = "%cpu% %memory% %wlan0% %battery% %StdinReader% }{ <fc=#c5c8c6>%kbd% %date%</fc>"
        , hideOnStart = False
        }
