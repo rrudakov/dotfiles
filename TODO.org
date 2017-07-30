@@ -1,0 +1,2 @@
+* Emacs
+** TODO try delete-selection-mode

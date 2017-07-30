@@ -48,7 +48,7 @@
      ("\\.idl\\'" flymake-simple-make-init nil nil))))
  '(package-selected-packages
    (quote
-    (ivy-todo counsel-projectile all-the-icons-ivy counsel swiper htmlize w3m org-mime company-shell org-bullets gitignore-mode magit company-quickhelp virtualenvwrapper epc json-mode gruvbox-theme ido-vertical-mode popwin winum spaceline diminish yaml-mode company-c-headers company-cabal company-go company-jedi solaire-mode highlight-symbol diff-hl anzu paradox rainbow-delimiters tox ini-mode window-numbering use-package web-mode spaceline-all-the-icons smartparens projectile org-alert org nlinum neotree intero flycheck-color-mode-line flx-ido doom-themes dired+ company-web)))
+    (auto-dim-other-buffers shackle ivy-todo counsel-projectile all-the-icons-ivy counsel swiper htmlize w3m org-mime company-shell org-bullets gitignore-mode magit company-quickhelp virtualenvwrapper epc json-mode gruvbox-theme ido-vertical-mode popwin winum spaceline diminish yaml-mode company-c-headers company-cabal company-go company-jedi solaire-mode highlight-symbol diff-hl anzu paradox rainbow-delimiters tox ini-mode window-numbering use-package web-mode spaceline-all-the-icons smartparens projectile org-alert org nlinum neotree intero flycheck-color-mode-line flx-ido doom-themes dired+ company-web)))
  '(paradox-github-token t)
  '(safe-local-variable-values
    (quote

@@ -428,8 +428,13 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
     :init
     (setq company-dabbrev-downcase nil)
     :config
-    (setq company-auto-complete nil)
-    (add-hook 'after-init-hook 'global-company-mode))
+    ;; (setq company-auto-complete nil)
+    (add-hook 'after-init-hook 'global-company-mode)
+    (setq-default
+     company-idle-delay .2
+     company-minimum-prefix-length 1
+     company-require-match nil
+     company-tooltip-align-annotations t))
 #+END_SRC
 **** Statistic
 Show more offten used completeons first
@@ -488,7 +493,14 @@ Show more offten used completeons first
 #+END_SRC
 *** Paradox
 #+BEGIN_SRC emacs-lisp
-  (use-package paradox :ensure t)
+  (use-package paradox
+    :ensure t
+    :config
+    (setq-default
+     paradox-column-width-package 27
+     paradox-column-width-version 13
+     paradox-execute-asynchronously t
+     paradox-hide-wiki-packages t))
 #+END_SRC
 *** Ivy
 **** Install and activate ivy
@@ -532,12 +544,14 @@ Show more offten used completeons first
     (show-smartparens-global-mode)
     (setq smartparens-strict-mode t))
 #+END_SRC
-*** Popwin
+*** Popup windows settings
+**** Shackle
 #+BEGIN_SRC emacs-lisp
-  (use-package popwin
+  (use-package shackle
     :ensure t
     :config
-    (popwin-mode 1))
+    (setq shackle-rules '((compilation-mode :noselect t :popup t))
+          shackle-default-rule '(:select t)))
 #+END_SRC
 *** Rainbow delimiters
 #+BEGIN_SRC emacs-lisp
@@ -636,7 +650,7 @@ Show more offten used completeons first
   (add-hook 'org-mode-hook 'turn-on-font-lock)
   (add-hook 'org-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
   (setq org-startup-folded 'content) ;; overview | content | all | showeverything
-  (setq org-cycle-separator-lines 1)
+  (setq org-cycle-separator-lines 0)
   (setq org-tags-column -100)
   (setq org-startup-indented t)
   (setq org-hide-leading-stars t)

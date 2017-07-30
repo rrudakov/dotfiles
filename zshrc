@@ -65,4 +65,5 @@ zstyle ':completion:*' rehash true
 zstyle ':completion:*' use-compctl false
 setopt completealiases
 export EDITOR=vim
+export GREP_OPTIONS='--color=always'
 export QT_STYLE_OVERRIDE=gtk
