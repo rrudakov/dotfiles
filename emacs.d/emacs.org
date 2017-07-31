@@ -669,7 +669,8 @@ link.
 #+END_SRC
 **** Agenda settings
 #+BEGIN_SRC emacs-lisp
-  (setq org-agenda-files (quote ("~/Org")))
+  (setq org-agenda-files (quote ("~/Org/"
+                                 "~/Org/work")))
   (setq org-directory "~/Org")
   (setq org-enforce-todo-dependencies t)
   (setq org-agenda-restore-windows-after-quit t)
@@ -682,7 +683,9 @@ link.
         '(("t" "Todo" entry (file+headline "" "Tasks")
            "* TODO %?\n%i"
            :clock-in t
-           :clock-resume t)))
+           :clock-resume t)
+          ("n" "Note" entry (file+headline "" "Notes")
+           "* TODO %?\n%i")))
 
   (setq org-refile-targets (quote ((nil :maxlevel . 9)
                                    (org-agenda-files :maxlevel . 9))))
@@ -698,13 +701,13 @@ link.
 **** Keywords list
 #+BEGIN_SRC emacs-lisp
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "PROGRESS(p!)" "PAUSED(h!)" "|" "DONE(d!)")))
+        '((sequence "TODO(t)" "PROGRESS(p)" "WAITING(w)" "|" "DONE(d)")))
 #+END_SRC
 **** Custom keywords faces
 #+BEGIN_SRC emacs-lisp
   (setq org-todo-keyword-faces
-        '(("PROGRESS" :foreground "#b57614" :weight bold)
-          ("PAUSED" :foreground "#5f8787" :weight bold)))
+        '(("PROGRESS" :foreground "#458588" :weight bold)
+          ("WAITING" :foreground "#d65d0e" :weight bold)))
 #+END_SRC
 **** Clock settings
 #+BEGIN_SRC emacs-lisp
@@ -712,6 +715,9 @@ link.
   (org-clock-persistence-insinuate)
   (setq org-log-into-drawer t)
   (setq org-log-done 'time)
+  (setq org-clock-out-when-done t)
+  (setq org-clock-out-remove-zero-time-clocks t)
+  (setq org-clock-report-include-clocking-task t)
 
   (defun rr/set-progress (last)
     "Set PROGRESS state if LAST is different."
@@ -726,7 +732,7 @@ link.
 
   (setq org-clock-in-switch-to-state 'rr/set-progress)
 
-  (setq non-clocking-states '("PAUSED" "DONE"))
+  (setq non-clocking-states '("WAITING" "DONE"))
 
   (defun rr/ido-non-clocking-state ()
     "Prompt to select non-clocking state."
@@ -735,14 +741,14 @@ link.
 
   (defun rr/after-clock-stop (last)
     "Change TASK state after clock stop depends on LAST state."
-    (when (not (or (string-equal last "PAUSED")
+    (when (not (or (string-equal last "WAITING")
                    (string-equal last "DONE")
                    (string-equal last "TODO")))
       (let ()
         (remove-hook 'org-after-todo-state-change-hook 'rr/stop-clock)
         (if (y-or-n-p "Current task DONE? ")
               "DONE"
-            "PAUSED"))))
+            "WAITING"))))
 
   (add-hook 'org-clock-out-hook
             (lambda ()
@@ -751,9 +757,9 @@ link.
   (setq org-clock-out-switch-to-state 'rr/after-clock-stop)
 
   (defun rr/stop-clock ()
-    "Stop clock if task state changed to PAUSED or DONE."
+    "Stop clock if task state changed to WAITING or DONE."
     (when (and (org-clocking-p)
-               (or (string-equal org-state "PAUSED")
+               (or (string-equal org-state "WAITING")
                    (string-equal org-state "DONE")
                    (string-equal org-state "TODO"))
                (< (point) org-clock-marker)
