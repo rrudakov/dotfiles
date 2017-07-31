@@ -68,9 +68,14 @@
   (global-hl-line-mode 1)
 #+END_SRC
 **** Set default font
+Good choices:
++ [[https://slackbuilds.org/repository/14.2/system/Iosevka/][Iosevka]]
++ [[https://github.com/mozilla/Fira][Fira]]
++ [[https://github.com/adobe-fonts/source-code-pro][SourceCodePro]] :: currently used
++ [[https://slackbuilds.org/repository/14.2/system/hack-font-ttf/][Hack]]
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'default-frame-alist '(font . "Hack-10"))
-  (set-frame-font "Hack-10")
+  (add-to-list 'default-frame-alist '(font . "Source Code Pro-10"))
+  (set-frame-font "Source Code Pro-10")
 #+END_SRC
 **** Open files ends with "rc" in conf-unix-mode
 #+BEGIN_SRC emacs-lisp
@@ -545,13 +550,15 @@ Show more offten used completeons first
     (setq smartparens-strict-mode t))
 #+END_SRC
 *** Popup windows settings
-**** Shackle
+I've tried ~shackle~, but it doesn't close help window after go to any
+link.
+**** Popwin
 #+BEGIN_SRC emacs-lisp
-  (use-package shackle
+  (use-package popwin
     :ensure t
     :config
-    (setq shackle-rules '((compilation-mode :noselect t :popup t))
-          shackle-default-rule '(:select t)))
+    (setq popwin:popup-window-height 0.5)
+    (popwin-mode 1))
 #+END_SRC
 *** Rainbow delimiters
 #+BEGIN_SRC emacs-lisp
