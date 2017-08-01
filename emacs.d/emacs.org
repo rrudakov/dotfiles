@@ -74,8 +74,8 @@ Good choices:
 + [[https://github.com/adobe-fonts/source-code-pro][SourceCodePro]] :: currently used
 + [[https://slackbuilds.org/repository/14.2/system/hack-font-ttf/][Hack]]
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'default-frame-alist '(font . "Source Code Pro-10"))
-  (set-frame-font "Source Code Pro-10")
+  (add-to-list 'default-frame-alist '(font . "Fira Mono-10"))
+  (set-frame-font "Fira Mono-10")
 #+END_SRC
 **** Open files ends with "rc" in conf-unix-mode
 #+BEGIN_SRC emacs-lisp
@@ -198,6 +198,14 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** Set default input method
 #+BEGIN_SRC emacs-lisp
   (setq default-input-method "russian-computer")
+#+END_SRC
+**** Replace selected text on input
+#+BEGIN_SRC emacs-lisp
+  (delete-selection-mode)
+#+END_SRC
+**** Prettify symbols
+#+BEGIN_SRC emacs-lisp
+  (global-prettify-symbols-mode)
 #+END_SRC
 *** Theme
 **** All the icons
@@ -665,7 +673,12 @@ link.
   (setq org-src-window-setup 'current-window)
   (setq org-catch-invisible-edits 'show-and-error)
   (setq org-return-follows-link t)
+  (org-display-inline-images)
+  (setq org-startup-with-inline-images t)
   (add-to-list 'org-modules 'org-habit)
+  (add-hook 'mail-mode-hook 'turn-on-orgtbl)
+  (add-hook 'mail-mode-hook 'turn-on-orgstruct)
+  (setq org-cycle-include-plain-lists t)
 #+END_SRC
 **** Agenda settings
 #+BEGIN_SRC emacs-lisp
@@ -714,7 +727,7 @@ link.
   (setq org-clock-persist 'history)
   (org-clock-persistence-insinuate)
   (setq org-log-into-drawer t)
-  (setq org-log-done 'time)
+  (setq org-log-done nil)
   (setq org-clock-out-when-done t)
   (setq org-clock-out-remove-zero-time-clocks t)
   (setq org-clock-report-include-clocking-task t)
