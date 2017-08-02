@@ -5,7 +5,7 @@
 Probably ~global-prettify-symbol-mode~
 * Xmonad
 ** TODO Improve xmobar configuration
-- [ ] Find optimal font :: Probably same as Emacs and terminal emulator
+- [X] Find optimal font :: Probably same as Emacs and terminal emulator
 - [ ] Improve icons :: battery, cpu, network, memory
-- [ ] Change colors :: Use gruvbox theme
-- [ ] Change border color and width :: Use gruvbox theme
+- [X] Change colors :: Use gruvbox theme
+- [X] Change border color and width :: Use gruvbox theme

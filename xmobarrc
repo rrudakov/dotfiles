@@ -1,7 +1,7 @@
-Config { font = "xft:Iosevka:size=10"
+Config { font = "xft:Fira Mono:size=10:bold:antialias=true"
        , additionalFonts = ["xft:Droid Sans Mono:size=10"]
-       , bgColor = "#1d1f21"
-       , fgColor = "#c5c8c6"
+       , bgColor = "#282828"
+       , fgColor = "#ebdbb2"
        , position = Top
        , border = NoBorder
        , borderColor = "#c5c8c6"
@@ -14,38 +14,37 @@ Config { font = "xft:Iosevka:size=10"
        , overrideRedirect = True
        , persistent = False
        , alpha = 255
-       , commands = [ Run Weather "EGPF" ["-t","<station>: <tempC>C","-L","18","-H","25","--normal","green","--high","red","--low","lightblue"] 36000
-                    , Run Network "wlan0" ["-L", "100000"
+       , commands = [ Run Network "wlan0" ["-L", "100000"
 					  ,"-H", "1000000"
-					  ,"--normal", "#b5bd68"
-					  ,"--high", "#cc6666"
+					  ,"--normal", "#98971a"
+					  ,"--high", "#cc241d"
                                           ,"-m", "4"
                                           ,"-M", "4"
-					  ,"-t <fc=#b294bb><icon=.xpm/wifi_02.xbm/></fc> <icon=.xpm/net_down_02.xbm/><rx>KB|<tx>KB<icon=.xpm/net_up_02.xbm/>"
+					  ,"-t <fc=#689d6a><icon=.xpm/net_down_03.xbm/></fc><rx>KB|<tx>KB<fc=#b16286><icon=.xpm/net_up_03.xbm/></fc>"
 					  ] 10
                     , Run Network "eth0" ["-L", "100000"
 		      	  	  	 ,"-H", "1000000"
-					 ,"--normal", "b5bd68"
-					 ,"--high", "#cc6666"
+					 ,"--normal", "98971a"
+					 ,"--high", "#cc241d"
                                          ,"-m", "4"
                                          ,"-M", "4"
-					 ,"-t <fc=#b294bb><icon=.xpm/net_wired.xbm/></fc> <icon=.xpm/net_down_02.xbm/><rx>KB|<tx>KB<icon=.xpm/net_up_02.xbm/>"
+					 ,"-t <fc=#689d6a><icon=.xpm/net_down_03.xbm/></fc><rx>KB|<tx>KB<fc=#b16286><icon=.xpm/net_up_03.xbm/></fc>"
 					 ] 10
                     , Run Cpu ["-L", "3"
 		      	      ,"-H", "50"
-			      ,"--normal", "#b5bd68"
-			      ,"--high", "#cc6666"
+			      ,"--normal", "#98971a"
+			      ,"--high", "#cc241d"
                               ,"-p", "3"
-			      ,"-t <fc=#b294bb><icon=.xpm/cpu.xbm/></fc> <total>%"
+			      ,"-t <fc=#a89984><icon=.xpm/cpu.xbm/></fc> <total>%"
 			      ] 10
                     , Run Memory ["-L", "10"
 		                 ,"-H", "80"
-                                 ,"--normal", "#b5bd68"
-                                 ,"--high", "#cc6666"
+                                 ,"--normal", "#98971a"
+                                 ,"--high", "#cc241d"
                                  ,"-p", "3"
-		                 ,"-t","<fc=#b294bb><icon=.xpm/mem.xbm/></fc> <usedratio>%"] 10
+		                 ,"-t","<fc=#a89984><icon=.xpm/mem.xbm/></fc> <usedratio>%"] 10
 		    , Run BatteryP ["BAT1"]
-		      	  	   [ "--template" , "<fc=#b294bb><icon=.xpm/bat_full_01.xbm/></fc> <acstatus>"
+		      	  	   [ "--template" , "<fc=#a89984><icon=.xpm/bat_full_01.xbm/></fc> <acstatus>"
 				   , "--Low"      , "10"
                              	   , "--High"     , "80"
                              	   , "--low"      , "#cc6666"
@@ -53,7 +52,7 @@ Config { font = "xft:Iosevka:size=10"
                              	   , "--high"     , "#b5bd68"
                                    , "-m", "2"
                                    , "-M", "2"
-				   ,"--", "-O", "<fc=#f0c674>-><left>%</fc>", "-o", "<left>%", "-i", "<fc=#81a2be>Full</fc>"
+				   ,"--", "-O", "<fc=#98971a>→<left>%</fc>", "-o", "<left>%", "-i", "<fc=#458588>Full</fc>"
 				   ,"-f", "AC/online"
 				   ] 10
                     , Run Swap [] 10
@@ -64,6 +63,6 @@ Config { font = "xft:Iosevka:size=10"
                     ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = "%cpu% %memory% %wlan0% %battery% %StdinReader% }{ <fc=#c5c8c6>%kbd% %date%</fc>"
+       , template = "%cpu% %memory% %wlan0% %battery% %StdinReader% }{ <fc=#ebdbb2>%kbd% %date%</fc>"
        , hideOnStart = False
        }

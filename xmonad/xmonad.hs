@@ -47,17 +47,17 @@ myWorkspaces    = map show [1 .. 9 :: Int]
 
 -- | Set unfocused windows border color
 myNormalBorderColor :: String
-myNormalBorderColor  = "#969896"
+myNormalBorderColor  = "#282828"
 
 -- | Set focused window border color
 myFocusedBorderColor :: String
-myFocusedBorderColor = "#de935f"
+myFocusedBorderColor = "#928374"
 
 -- | Settings for ssh prompt
 myPromptConfig :: XPConfig
-myPromptConfig = XPC { font              = "xft:Iosevka-10"
-                     , bgColor           = "#1D1F21"
-                     , fgColor           = "#C5C6C8"
+myPromptConfig = XPC { font              = "xft:Fira Mono:size=10:bold:antialias=true"
+                     , bgColor           = "#282828"
+                     , fgColor           = "#ebdbb2"
                      , fgHLight          = "black"
                      , bgHLight          = "grey"
                      , borderColor       = "#C5C8C6"
@@ -297,13 +297,13 @@ main = do
       layoutHook         = myLayout,
       handleEventHook    = myEventHook <+> ewmhDesktopsEventHook <+> fullscreenEventHook,
       logHook            = dynamicLogWithPP xmobarPP { ppOutput          = hPutStrLn xmproc
-                                                     , ppCurrent         = xmobarColor "#b294bb" "#373b41" . wrap " " " "
-                                                     , ppTitle           = xmobarColor "#fe8019" "" . shorten 80
-                                                     , ppHidden          = xmobarColor "#c5c8c6" ""
-                                                     , ppHiddenNoWindows = xmobarColor "#373b41" ""
+                                                     , ppCurrent         = xmobarColor "#b16286" "#3c3836" . wrap " " " "
+                                                     , ppTitle           = xmobarColor "#d79921" "" . shorten 60
+                                                     , ppHidden          = xmobarColor "#ebdbb2" ""
+                                                     , ppHiddenNoWindows = xmobarColor "#504945" ""
                                                      , ppUrgent          = xmobarColor "#f0c674" "#cc6666" . wrap " " " "
                                                      , ppSep             = " "
-                                                     , ppLayout          = xmobarColor "#c5c8c6" "" },
+                                                     , ppLayout          = xmobarColor "#ebdbb2" "" },
       startupHook        = myStartupHook,
       handleExtraArgs    = \ xs theConf -> case xs of
                                              [] -> return theConf
