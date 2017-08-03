@@ -20,6 +20,7 @@
   M-S-<right>	Insert new table column
   C-c +		Sum all numbers in current column
   C-c C-x p	Insert property
+  C-c C-x C-d	Display time summaries for each subtree in the current buffer
 #+END_SRC
 *** Projectile
 #+BEGIN_EXAMPLE
