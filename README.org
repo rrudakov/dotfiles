@@ -1,0 +1,38 @@
+* My configuration
+** Requirements
+[[https://mirrors.slackware.com/slackware/slackware64-current/][Slackware64-current]] with next extra packages:
+- compton :: Compositor
+- [[https://slackbuilds.org/repository/14.2/desktop/stalonetray/][stalonetray]] :: Standalone tray for xmonad and other
+- xfce4 :: From slackware official repo, I use some packages in my environment
+- [[https://slackbuilds.org/repository/14.2/desktop/nitrogen/][nitrogen]] :: Set background
+- nm-applet :: GUI for managing network connections (included in slackware)
+- [[https://slackbuilds.org/repository/14.2/desktop/kbdd/][kbdd]] :: Save keyboard-layout per window
+- [[https://haskell-lang.org/get-started/linux][stack]] :: Haskell build system and package management (install manually)
+** Installation
+1. Install all requirements
+2. Install [[http://xmonad.org/][xmonad]]:
+   1. Run ~stack setup~
+   2. Run ~stack install xmonad-contrib~
+3. Install [[http://projects.haskell.org/xmobar/][xmobar]]:
+   1. Clone git repository:
+      #+BEGIN_EXAMPLE
+        git clone git://github.com/jaor/xmobar
+      #+END_EXAMPLE
+   2. Modify flags in ~stack.yaml~:
+      #+BEGIN_EXAMPLE
+        flags:
+          xmobar:
+            with_threaded: true
+            with_utf8: true
+            with_xft: true
+            with_xpm: true
+      #+END_EXAMPLE
+   3. Run ~stack install~
+4. Add ~$HOME/.local/bin~ to ~PATH~ variable
+5. Make next script and put it in ~/usr/local/bin/xmonad~:
+   #+BEGIN_SRC bash
+     #!/bin/bash
+     stack exec $HOME/.local/bin/xmonad -- $@
+   #+END_SRC
+   Make sure it executable.
+6. Run ~install.sh~ from this repository
