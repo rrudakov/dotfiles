@@ -22,6 +22,13 @@
   C-c C-x p	Insert property
   C-c C-x C-d	Display time summaries for each subtree in the current buffer
 #+END_SRC
+**** Agenda view
+#+BEGIN_SRC text
+  p	Previous period
+  n	Next period
+  .	Today
+  F	Follow mode
+#+END_SRC
 *** Projectile
 #+BEGIN_EXAMPLE
   C-p p SPC	Counsel projectile
