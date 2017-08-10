@@ -682,7 +682,7 @@ link.
   (setq org-catch-invisible-edits 'show-and-error)
   (setq org-return-follows-link t)
   (org-display-inline-images)
-  (setq org-startup-with-inline-images t)
+  ;;(setq org-startup-with-inline-images t)
   (add-to-list 'org-modules 'org-habit)
   (add-hook 'mail-mode-hook 'turn-on-orgtbl)
   (add-hook 'mail-mode-hook 'turn-on-orgstruct)
@@ -870,6 +870,62 @@ link.
 
     (setq org-mime-export-options
           '(:section-numbers nil :with-author nil :with-toc nil)))
+#+END_SRC
+**** Jekyll export
+#+BEGIN_SRC emacs-lisp
+  (defvar rr-org-blog-files "~/MySoft/beriya.github.io/org"
+    "Path to my blog org files.")
+
+  (setq org-export-with-section-numbers nil
+        org-publish-project-alist
+        `(("org-post"
+           :base-directory ,rr-org-blog-files
+           :base-extension "org"
+           :publishing-directory "~/MySoft/beriya.github.io"
+           :publishing-function org-html-publish-to-html
+           :headline-levels 6
+           :html-extension "html"
+           :body-only t
+           :with-toc nil
+           :recursive t
+           :section-number nil)
+
+          ("org-images"
+           :base-directory "~/MySoft/beriya.github.io/org/img"
+           :base-extension "jpg\\|gif\\|png"
+           :publishing-directory "~/MySoft/beriya.github.io/img"
+           :publishing-function org-publish-attachment
+           :recursive t)
+          ("blog" :components ("org-post" "org-images"))
+          ))
+
+  (defun rr/org-link-img (path)
+    "Link type for images in my project by relative PATH."
+    (org-open-file-with-emacs
+     (format "%s/img/%s" rr-org-blog-files path)))
+
+
+  (defun rr/org-link-img-export (path desc format)
+    "How to export img links using PATH and DESC for html FORMAT."
+    (cond
+     ((eq format 'html)
+      (format "<img src=\"/img/%s\" alt=\"%s\"/>" path desc))))
+
+  (org-add-link-type "img" 'rr/org-link-img 'rr/org-link-img-export)
+#+END_SRC
+*** Email
+**** Sending email
+#+BEGIN_SRC emacs-lisp
+  (setq mail-user-agent 'message-user-agent)
+
+  (setq user-mail-address "phentagram@gmail.com"
+        user-full-name "Roman Rudakov")
+
+  (setq smtpmail-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-service 587
+
+        message-send-mail-function 'message-smtpmail-send-it
+        compose-mail-user-agent-warnings nil)
 #+END_SRC
 *** Languages
 **** Haskell

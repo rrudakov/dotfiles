@@ -48,14 +48,13 @@
      ("\\.idl\\'" flymake-simple-make-init nil nil))))
  '(package-selected-packages
    (quote
-    (auto-dim-other-buffers shackle ivy-todo counsel-projectile all-the-icons-ivy counsel swiper htmlize w3m org-mime company-shell org-bullets gitignore-mode magit company-quickhelp virtualenvwrapper epc json-mode gruvbox-theme ido-vertical-mode popwin winum spaceline diminish yaml-mode company-c-headers company-cabal company-go company-jedi solaire-mode highlight-symbol diff-hl anzu paradox rainbow-delimiters tox ini-mode window-numbering use-package web-mode spaceline-all-the-icons smartparens projectile org-alert org nlinum neotree intero flycheck-color-mode-line flx-ido doom-themes dired+ company-web)))
+    (yaml-mode winum web-mode virtualenvwrapper use-package tox spaceline smartparens rainbow-delimiters popwin paradox ox-gfm org-plus-contrib org-mime org-bullets org-alert magit kv json-mode intero htmlize highlight-symbol gruvbox-theme elpy dired+ diff-hl deferred dash-functional counsel-projectile company-web company-statistics company-shell company-quickhelp company-auctex anzu all-the-icons)))
  '(paradox-github-token t)
  '(safe-local-variable-values
    (quote
     ((eval venv-workon "at-env")
      (haskell-process-use-ghci . t)
-     (haskell-indent-spaces . 4))))
- '(send-mail-function (quote smtpmail-send-it)))
+     (haskell-indent-spaces . 4)))))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
