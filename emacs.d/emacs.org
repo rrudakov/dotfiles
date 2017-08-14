@@ -78,12 +78,13 @@
 **** Set default font
 Good choices:
 + [[https://slackbuilds.org/repository/14.2/system/Iosevka/][Iosevka]]
-+ [[https://github.com/mozilla/Fira][Fira]]
-+ [[https://github.com/adobe-fonts/source-code-pro][SourceCodePro]] :: currently used
++ [[https://github.com/mozilla/Fira][Fira Mono]] :: Currently used
++ [[https://github.com/adobe-fonts/source-code-pro][SourceCodePro]]
 + [[https://slackbuilds.org/repository/14.2/system/hack-font-ttf/][Hack]]
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'default-frame-alist '(font . "Fira Mono-10"))
   (set-frame-font "Fira Mono-10")
+
 #+END_SRC
 **** Open files ends with "rc" in conf-unix-mode
 #+BEGIN_SRC emacs-lisp

@@ -228,10 +228,10 @@ myLayout = avoidStruts $ lessBorders Screen tiled ||| noBorders Full ||| lessBor
 
 -- | Set hooks for applications
 myManageHook :: Query (Endo WindowSet)
-myManageHook = composeAll [ className =? "Firefox"        --> doShift "2"
+myManageHook = composeAll [ className =? "Firefox"        --> doShift "5"
                           , className =? "Thunderbird"    --> doShift "3"
                           , className =? "Skype"          --> doShift "4"
-                          , className =? "Google-chrome"  --> doShift "5"
+                          , className =? "Google-chrome"  --> doShift "2"
                           , className =? "MPlayer"        --> doFloat
                           , className =? "Gimp"           --> doFloat
                           , resource  =? "desktop_window" --> doIgnore
