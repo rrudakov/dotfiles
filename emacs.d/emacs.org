@@ -442,6 +442,15 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
   (global-semanticdb-minor-mode 1)
 #+END_SRC
+*** SQL
+**** Make PostgreSQL default
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load "sql"
+    '(progn
+       (sql-set-product 'postgres)
+       )
+    )
+#+END_SRC
 *** Autocomplete
 **** Common
 #+BEGIN_SRC emacs-lisp
