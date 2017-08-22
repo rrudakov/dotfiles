@@ -31,21 +31,8 @@
     ("6145e62774a589c074a31a05dfa5efdf8789cf869104e905956f0cbd7eda9d0e" default)))
  '(elpy-modules
    (quote
-    (elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-sane-defaults)))
+    (elpy-module-company elpy-module-eldoc elpy-module-pyvenv elpy-module-sane-defaults)))
  '(elpy-rpc-timeout 10)
- '(flymake-allowed-file-name-masks
-   (quote
-    (("\\.\\(?:c\\(?:pp\\|xx\\|\\+\\+\\)?\\|CC\\)\\'" flymake-simple-make-init nil nil)
-     ("\\.xml\\'" flymake-xml-init nil nil)
-     ("\\.html?\\'" flymake-xml-init nil nil)
-     ("\\.cs\\'" flymake-simple-make-init nil nil)
-     ("\\.p[ml]\\'" flymake-perl-init nil nil)
-     ("\\.php[345]?\\'" flymake-php-init nil nil)
-     ("\\.h\\'" flymake-master-make-header-init flymake-master-cleanup nil)
-     ("\\.java\\'" flymake-simple-make-java-init flymake-simple-java-cleanup nil)
-     ("[0-9]+\\.tex\\'" flymake-master-tex-init flymake-master-cleanup nil)
-     ("\\.tex\\'" flymake-simple-tex-init nil nil)
-     ("\\.idl\\'" flymake-simple-make-init nil nil))))
  '(package-selected-packages
    (quote
     (yaml-mode winum web-mode virtualenvwrapper use-package tox spaceline smartparens rainbow-delimiters popwin paradox ox-gfm org-plus-contrib org-mime org-bullets org-alert magit kv json-mode intero htmlize highlight-symbol gruvbox-theme elpy dired+ diff-hl deferred dash-functional counsel-projectile company-web company-statistics company-shell company-quickhelp company-auctex anzu all-the-icons)))
@@ -61,7 +48,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(window-divider ((t (:foreground "#282828")))))
+ )
 ;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)
 ;; End:

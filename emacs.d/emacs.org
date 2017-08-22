@@ -1013,6 +1013,7 @@ link.
     :config
     (elpy-enable)
     (setq elpy-rpc-backend "jedi")
+    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
     (add-hook 'elpy-mode-hook 'yas-minor-mode-on))
 #+END_SRC
 ***** Tox
