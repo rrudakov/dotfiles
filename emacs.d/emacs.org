@@ -9,6 +9,11 @@
   C-c C-r f Format python code
   C-c C-r r Refactoring commands
 #+END_SRC
+*** Haskell
+#+BEGIN_SRC text
+  M-q	reformats the current declaration. When inside a comment, it fills the current paragraph instead, like the standard M-q
+  C-M-\	reformats the current region
+#+END_SRC
 *** Org-mode
 #+BEGIN_SRC text
   C-c ^		Sort headlines
@@ -978,6 +983,13 @@ link.
 ***** Haskell doc mode
 #+BEGIN_SRC emacs-lisp
   (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+#+END_SRC
+***** Indentation
+#+BEGIN_SRC emacs-lisp
+  (use-package hindent
+    :ensure t
+    :config
+    (add-hook 'haskell-mode-hook #'hindent-mode))
 #+END_SRC
 **** LaTeX
 ***** AucTEX tweaks

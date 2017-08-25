@@ -35,11 +35,12 @@
  '(elpy-rpc-timeout 10)
  '(package-selected-packages
    (quote
-    (yaml-mode winum web-mode virtualenvwrapper use-package tox spaceline smartparens rainbow-delimiters popwin paradox ox-gfm org-plus-contrib org-mime org-bullets org-alert magit kv json-mode intero htmlize highlight-symbol gruvbox-theme elpy dired+ diff-hl deferred dash-functional counsel-projectile company-web company-statistics company-shell company-quickhelp company-auctex anzu all-the-icons)))
+    (hindent yaml-mode winum web-mode virtualenvwrapper use-package tox spaceline smartparens rainbow-delimiters popwin paradox ox-gfm org-plus-contrib org-mime org-bullets org-alert magit kv json-mode intero htmlize highlight-symbol gruvbox-theme elpy dired+ diff-hl deferred dash-functional counsel-projectile company-web company-statistics company-shell company-quickhelp company-auctex anzu all-the-icons)))
  '(paradox-github-token t)
  '(safe-local-variable-values
    (quote
-    ((eval venv-workon "at-env")
+    ((eval venv-workon "ws")
+     (eval venv-workon "at-env")
      (haskell-process-use-ghci . t)
      (haskell-indent-spaces . 4)))))
 
