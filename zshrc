@@ -66,3 +66,5 @@ zstyle ':completion:*' use-compctl false
 setopt completealiases
 export EDITOR=vim
 export QT_STYLE_OVERRIDE=gtk
+
+export PATH="$HOME/.yarn/bin:$PATH"

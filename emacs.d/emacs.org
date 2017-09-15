@@ -126,6 +126,7 @@ Good choices:
    auto-save-default nil
    create-lockfiles nil
    history-length 1000
+   indent-tabs-mode nil
    make-backup-files nil)
 
   (setq-default
@@ -468,9 +469,12 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
     (add-hook 'after-init-hook 'global-company-mode)
     (setq-default
      company-idle-delay .2
-     company-minimum-prefix-length 1
+     company-minimum-prefix-length 2
      company-require-match nil
-     company-tooltip-align-annotations t))
+     company-tooltip-align-annotations t)
+    (add-to-list 'company-backends 'company-dabbrev-code)
+    (add-to-list 'company-backends 'company-yasnippet)
+    (add-to-list 'company-backends 'company-files))
 #+END_SRC
 **** Statistic
 Show more offten used completeons first
@@ -510,6 +514,15 @@ Show more offten used completeons first
     :ensure t
     :config
     (add-to-list 'company-backends 'company-shell))
+#+END_SRC
+***** JavaScript
+#+BEGIN_SRC emacs-lisp
+  (use-package company-tern
+    :ensure t
+    :after tern
+    :config
+    (add-to-list 'company-backends 'company-tern)
+    (setq company-tooltip-align-annotations t))
 #+END_SRC
 **** Solve company and yasnippet conflict
 #+BEGIN_SRC emacs-lisp
@@ -655,9 +668,36 @@ link.
     (add-hook 'after-init-hook #'global-flycheck-mode)
 
     (setq flycheck-indication-mode 'right-fringe)
-  
+
     (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
-      [0 0 0 0 0 4 12 28 60 124 252 124 60 28 12 4 0 0 0 0]))
+      [0 0 0 0 0 4 12 28 60 124 252 124 60 28 12 4 0 0 0 0])
+
+    (setq-default flycheck-disabled-checkers
+                  (append flycheck-disabled-checkers
+                          '(javascript-jshint)))
+
+    ;; use eslint with web-mode for jsx files
+    (setq flycheck-checkers '(javascript-eslint))
+    ;; use eslint with web-mode for jsx files
+    (flycheck-add-mode 'javascript-eslint 'web-mode)
+    (flycheck-add-mode 'javascript-eslint 'js2-mode)
+    (flycheck-add-mode 'javascript-eslint 'js-mode)
+
+    (add-to-list 'flycheck-checkers 'python-flake8)
+    (add-to-list 'flycheck-checkers 'python-pylint)
+
+    ;; disable json-jsonlist checking for json files
+    ;; (setq-default flycheck-disabled-checkers
+    ;;               (append flycheck-disabled-checkers
+    ;;                       '(json-jsonlist)))
+    )
+#+END_SRC
+**** Spell checking
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck-vale
+    :ensure t
+    :config
+    (flycheck-vale-setup))
 #+END_SRC
 *** Version control
 **** GIT
@@ -949,6 +989,7 @@ link.
   (use-package intero
     :ensure t
     :config
+    (add-hook 'haskell-mode-hook 'company-mode)
     (add-hook 'haskell-mode-hook 'intero-mode))
 #+END_SRC
 ***** Align rules
@@ -1050,6 +1091,8 @@ link.
   (use-package json-mode
     :ensure t
     :config
+    (add-hook 'json-mode-hook #'flycheck-mode)
+    (setq json-reformat:indent-width 2)
     (setq json-reformat:pretty-string? t))
 #+END_SRC
 **** YAML
@@ -1074,20 +1117,34 @@ link.
     (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
     (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
     (add-to-list 'auto-mode-alist '("\\.jinja2\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.js[x]?\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("components\\/.*\\.js[x]?\\'" . web-mode))
+    (add-to-list 'web-mode-content-types '("jsx" . "components\\/.*\\.js[x]?\\'"))
+    (add-to-list 'web-mode-content-types '("jsx" . "\\.jsx?\\'"))
 
-    (defun my-web-mode-hook ()
-      "Disable autopair in web-mode."
-      (setq web-mode-enable-auto-pairing nil))
-
-    (add-hook 'web-mode-hook  'my-web-mode-hook)
-
-    (defun sp-web-mode-is-code-context (id action context)
-      "Don't remember what this ID, ACTION and CONTEXT."
-      (and (eq action 'insert)
-           (not (or (get-text-property (point) 'part-side)
-                    (get-text-property (point) 'block-side)))))
-
-    (sp-local-pair 'web-mode "<" nil :when '(sp-web-mode-is-code-context)))
+    (setq web-mode-markup-indent-offset 2)
+    (setq web-mode-css-indent-offset 2)
+    (setq web-mode-code-indent-offset 2)
+    (setq web-mode-enable-auto-pairing t)
+    (setq web-mode-enable-css-colorization t))
+#+END_SRC
+**** JavaScript
+***** js2-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package js2-mode
+    :ensure t
+    :config
+    ;; (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+    (setq js2-basic-offset 2)
+    ;; (setq js2-mode-show-parse-errors nil)
+    (setq js2-mode-show-strict-warnings nil))
+#+END_SRC
+***** tern integration
+#+BEGIN_SRC emacs-lisp
+  (use-package tern
+    :ensure t
+    :config
+    (add-hook 'web-mode-hook (lambda () (tern-mode t))))
 #+END_SRC
 *** Set keybindings
 **** Common
