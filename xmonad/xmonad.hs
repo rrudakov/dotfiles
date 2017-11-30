@@ -1,29 +1,29 @@
-import XMonad
-import Data.Monoid
-import Data.List
-import System.Exit
-import XMonad.Hooks.DynamicLog
-import XMonad.Hooks.ManageDocks
-import XMonad.Hooks.UrgencyHook
-import XMonad.Hooks.EwmhDesktops
-import XMonad.Layout.NoBorders
-import XMonad.Layout.Grid
-import XMonad.Prompt
-import XMonad.Prompt.Shell
-import XMonad.Prompt.Ssh
-import XMonad.Hooks.ManageHelpers
-import XMonad.Layout.LayoutModifier
-import Graphics.X11.ExtraTypes.XF86
-import XMonad.Hooks.SetWMName
-import XMonad.Util.Run(spawnPipe)
-import System.IO
+import           Data.List
+import           Data.Monoid
+import           Graphics.X11.ExtraTypes.XF86
+import           System.Exit
+import           System.IO
+import           XMonad
+import           XMonad.Hooks.DynamicLog
+import           XMonad.Hooks.EwmhDesktops
+import           XMonad.Hooks.ManageDocks
+import           XMonad.Hooks.ManageHelpers
+import           XMonad.Hooks.SetWMName
+import           XMonad.Hooks.UrgencyHook
+import           XMonad.Layout.Grid
+import           XMonad.Layout.LayoutModifier
+import           XMonad.Layout.NoBorders
+import           XMonad.Prompt
+import           XMonad.Prompt.Shell
+import           XMonad.Prompt.Ssh
+import           XMonad.Util.Run              (spawnPipe)
 
-import qualified XMonad.StackSet as W
-import qualified Data.Map        as M
+import qualified Data.Map                     as M
+import qualified XMonad.StackSet              as W
 
 -- | Set default terminal emulator
 myTerminal :: String
-myTerminal = "termite"
+myTerminal = "gnome-terminal"
 
 -- | Set focus follow mouse
 myFocusFollowsMouse :: Bool
@@ -55,7 +55,7 @@ myFocusedBorderColor = "#928374"
 
 -- | Settings for ssh prompt
 myPromptConfig :: XPConfig
-myPromptConfig = XPC { font              = "xft:Fira Mono:size=10:bold:antialias=true"
+myPromptConfig = XPC { font              = "xft:Source Code Variable:size=10:bold:antialias=true"
                      , bgColor           = "#282828"
                      , fgColor           = "#ebdbb2"
                      , fgHLight          = "black"
@@ -66,7 +66,7 @@ myPromptConfig = XPC { font              = "xft:Fira Mono:size=10:bold:antialias
                      , completionKey     = (0, xK_Tab)
                      , changeModeKey     = xK_grave
                      , position          = Bottom
-                     , height            = 18
+                     , height            = 30
                      , historySize       = 256
                      , historyFilter     = id
                      , defaultText       = []
@@ -79,7 +79,7 @@ myPromptConfig = XPC { font              = "xft:Fira Mono:size=10:bold:antialias
 
 -- | My keybindings
 myKeys :: XConfig Layout -> M.Map (KeyMask, KeySym) (X ())
-myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
+myKeys conf@XConfig {XMonad.modMask = modm} = M.fromList $
 
     -- launch a terminal
     [ ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
@@ -154,7 +154,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm .|. shiftMask, xK_q     ), io exitSuccess)
 
     -- Restart xmonad
-    , ((modm              , xK_q     ), spawn "if type xmonad; then xmonad --recompile && xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
+    , ((modm              , xK_q     ), spawn "if type /usr/local/bin/xmonad; then /usr/local/bin/xmonad --recompile && /usr/local/bin/xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
     --, ((modm              , xK_q     ), spawn "stack exec xmonad -- --recompile && stack exec xmonad -- --restart")
 
     , ((modm              , xK_b     ), sendMessage ToggleStruts)
@@ -197,7 +197,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
 ------------------------------------------------------------------------
 -- | Mouse bindings: default actions bound to mouse events
 myMouseBindings :: XConfig Layout -> M.Map (KeyMask, Button) (Window -> X ())
-myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList
+myMouseBindings XConfig {XMonad.modMask = modm} = M.fromList
 
     -- mod-button1, Set the window to floating mode and move by dragging
     [ ((modm, button1), \w -> focus w >> mouseMoveWindow w
@@ -230,7 +230,7 @@ myLayout = avoidStruts $ lessBorders Screen tiled ||| noBorders Full ||| lessBor
 myManageHook :: Query (Endo WindowSet)
 myManageHook = composeAll [ className =? "Firefox"        --> doShift "5"
                           , className =? "Thunderbird"    --> doShift "3"
-                          , className =? "Skype"          --> doShift "4"
+                          , className =? "Skype"          --> doShift "7"
                           , className =? "Google-chrome"  --> doShift "2"
                           , className =? "MPlayer"        --> doFloat
                           , className =? "Gimp"           --> doFloat
