@@ -9,7 +9,7 @@
 ############### Variables:
 
 dir=${HOME}/dotfiles
-files="Xresources emacs.d/init.el tmux.conf vimrc xmonad/xmonad.hs xmobarrc xsession gitconfig stalonetrayrc zshrc zshenv aliasrc Xmodmap"
+files="Xresources emacs.d/init.el tmux.conf vimrc xmonad/xmonad.hs xmobarrc xsession gitconfig stalonetrayrc zshrc zshenv aliasrc"
 
 ###############
 

@@ -51,8 +51,11 @@ fi
 zmodload -i zsh/complist
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
+BASE16_SHELL=$HOME/.config/base16-shell/
+[ -n "$PS1" ] && [ -s $BASE16_SHELL/profile_helper.sh ] && eval "$($BASE16_SHELL/profile_helper.sh)"
+
 # PATH=$PATH:$HOME/.stack/programs/x86_64-linux/ghc-8.0.2/bin
-PATH=$PATH:$HOME/.local/bin
+PATH=$HOME/.local/bin:$PATH
 export PATH
 export WORKON_HOME=$HOME/.virtualenvs
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3

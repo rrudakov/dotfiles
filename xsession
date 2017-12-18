@@ -12,20 +12,18 @@ sysmodmap=/etc/X11/xinit/.Xmodmap
 [ -f $usermodmap ] && /usr/bin/xmodmap $usermodmap
 
 export GDK_USE_XFT=1
-#$HOME/.screenlayout/dual.sh
-compton --config ~/.config/compton.conf -b
 export DE="xfce"
-xgamma -rgamma 1 -ggamma 1 -bgamma 0.8 &
-xbacklight -set 80 &
-stalonetray &
-#dunst &
-xfce4-power-manager &
-nitrogen --restore &
-#volumeicon &
-nm-applet &
-#yandex-disk start &
-#dropboxd &
-kbdd &
+# compton --backend glx --vsync opengl-swc -b
+# xgamma -rgamma 1 -ggamma 1 -bgamma 0.8 &
+# stalonetray &
+# dunst &
+# xfce4-power-manager &
+# nitrogen --restore &
+# volumeicon &
+# nm-applet &
+# yandex-disk start &
+# dropboxd &
+# kbdd &
 
 # Start xmonad
 exec ck-launch-session dbus-launch --exit-with-session xmonad

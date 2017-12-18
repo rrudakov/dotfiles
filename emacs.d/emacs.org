@@ -3,6 +3,8 @@
 *** Common
 #+BEGIN_SRC text
   M-:	Eval command
+  C-x t   Switch to ansi-terminal or create new
+  C-x T   Create new ansi-terminal
 #+END_SRC
 *** Python
 #+BEGIN_SRC text
@@ -38,6 +40,11 @@
 #+BEGIN_EXAMPLE
   C-p p SPC	Counsel projectile
 #+END_EXAMPLE
+*** Terminal
+#+BEGIN_SRC text
+  C-c C-j Switch to term-line-mode, which you can then treat like a normal emacs buffer (move, yank, etc)
+  C-c C-k Return to term-char-mode, which will act like a traditional ansi-term
+#+END_SRC
 ** Useful commands
 *** Org-mode
 **** Lint document
@@ -60,6 +67,11 @@
 #+END_SRC
 ** Configuration
 *** Common
+**** Increase performance
+#+BEGIN_SRC emacs-lisp
+  (setq gc-cons-threshold 50000000)
+  (setq gnutls-min-prime-bits 4096)
+#+END_SRC
 **** Highlight expression in parens
 #+BEGIN_SRC emacs-lisp
   (setq show-paren-style 'expression)
@@ -87,8 +99,10 @@ Good choices:
 + [[https://github.com/adobe-fonts/source-code-pro][SourceCodePro]]
 + [[https://slackbuilds.org/repository/14.2/system/hack-font-ttf/][Hack]]
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'default-frame-alist '(font . "Fira Mono-10"))
-  (set-frame-font "Fira Mono-10")
+  ;; (add-to-list 'default-frame-alist '(font . "Fira Mono-10"))
+  ;; (set-frame-font "Fira Mono-10")
+  (add-to-list 'default-frame-alist '(font . "Source Code Variable-10"))
+  (set-frame-font "Source Code Variable-10")
 
 #+END_SRC
 **** Open files ends with "rc" in conf-unix-mode
@@ -222,6 +236,18 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
   (global-prettify-symbols-mode)
 #+END_SRC
+**** Smooth scrolling
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package smooth-scrolling
+  ;;   :ensure t
+  ;;   :config
+  ;;   (smooth-scrolling-mode 1))
+  (setq redisplay-dont-pause t
+    scroll-margin 1
+    scroll-step 1
+    scroll-conservatively 10000
+    scroll-preserve-screen-position 1)
+#+END_SRC
 *** Theme
 **** All the icons
 #+BEGIN_SRC emacs-lisp
@@ -229,10 +255,18 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 **** Color scheme
 #+BEGIN_SRC emacs-lisp
-  (use-package gruvbox-theme
+  ;; (use-package gruvbox-theme
+  ;;   :ensure t
+  ;;   :config
+  ;;   (load-theme 'gruvbox-dark-hard t))
+  ;; (use-package zenburn-theme
+  ;;   :ensure t
+  ;;   :config
+  ;;   (load-theme 'zenburn t))
+  (use-package color-theme-sanityinc-tomorrow
     :ensure t
     :config
-    (load-theme 'gruvbox-dark-hard t))
+    (load-theme 'sanityinc-tomorrow-night t))
 #+END_SRC
 **** Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
@@ -365,7 +399,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
   (use-package spaceline :ensure t
     :config
-    (setq powerline-height 30)
+    (setq powerline-height 40)
     (setq powerline-default-separator 'utf-8)
     (setq spaceline-separator-dir-left '(right . right))
     (setq spaceline-separator-dir-right '(right . right))
@@ -676,20 +710,16 @@ link.
                   (append flycheck-disabled-checkers
                           '(javascript-jshint)))
 
-    ;; use eslint with web-mode for jsx files
-    (setq flycheck-checkers '(javascript-eslint))
-    ;; use eslint with web-mode for jsx files
-    (flycheck-add-mode 'javascript-eslint 'web-mode)
-    (flycheck-add-mode 'javascript-eslint 'js2-mode)
-    (flycheck-add-mode 'javascript-eslint 'js-mode)
+    (setq-default flycheck-disabled-checkers
+                  (append flycheck-disabled-checkers
+                          '(json-jsonlist)))
 
-    (add-to-list 'flycheck-checkers 'python-flake8)
-    (add-to-list 'flycheck-checkers 'python-pylint)
+    (setq-default flycheck-disabled-checkers
+                  (append flycheck-disabled-checkers
+                          '(python-flake8)))
 
-    ;; disable json-jsonlist checking for json files
-    ;; (setq-default flycheck-disabled-checkers
-    ;;               (append flycheck-disabled-checkers
-    ;;                       '(json-jsonlist)))
+    ;; (add-to-list 'flycheck-checkers 'python-flake8)
+    ;; (add-to-list 'flycheck-checkers 'python-pylint)
     )
 #+END_SRC
 **** Spell checking
@@ -722,6 +752,37 @@ link.
     (add-hook 'vc-dir-mode-hook 'turn-on-diff-hl-mode)
     (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
 #+END_SRC
+*** Multiple cursors
+#+BEGIN_SRC emacs-lisp
+  (use-package multiple-cursors
+    :ensure t
+    :config
+    (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+    (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+    (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+    (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+    (global-set-key (kbd "C-c C-d") 'mc/skip-to-next-like-this))
+#+END_SRC
+*** Terminal emulator
+#+BEGIN_SRC emacs-lisp
+  (use-package sane-term
+    :ensure t
+    :config
+    (global-set-key (kbd "C-x t") 'sane-term)
+    (global-set-key (kbd "C-x T") 'sane-term-create)
+
+
+  ;; Optional convenience binding. This allows C-y to paste even when in term-char-mode (see below). 
+    (add-hook
+     'term-mode-hook
+     (lambda ()
+       (define-key term-raw-map (kbd "C-y")
+         (lambda ()
+           (interactive)
+           (term-line-mode)
+           (yank)
+           (term-char-mode))))))
+#+END_SRC
 *** Org
 **** Some tweaks
 #+BEGIN_SRC emacs-lisp
@@ -731,8 +792,8 @@ link.
   (setq org-cycle-separator-lines 0)
   (setq org-tags-column -100)
   (setq org-startup-indented t)
-  (setq org-hide-leading-stars t)
-  (setq org-adapt-indentation nil)
+  ;; (setq org-hide-leading-stars nil)
+  ;; (setq org-adapt-indentation nil)
   (setq org-src-window-setup 'current-window)
   (setq org-catch-invisible-edits 'show-and-error)
   (setq org-return-follows-link t)
@@ -742,6 +803,8 @@ link.
   (add-hook 'mail-mode-hook 'turn-on-orgtbl)
   (add-hook 'mail-mode-hook 'turn-on-orgstruct)
   (setq org-cycle-include-plain-lists t)
+  (add-to-list 'flycheck-checkers 'org-lint)
+  (setq org-hide-emphasis-markers t)
 #+END_SRC
 **** Agenda settings
 #+BEGIN_SRC emacs-lisp
@@ -883,8 +946,8 @@ link.
                       (color-darken-name
                        (face-attribute 'default :background) 3))
 
-  (setq org-src-block-faces '(("emacs-lisp" (:background "#282828"))
-                              ("python" (:background "#282828"))))
+  ;; (setq org-src-block-faces '(("emacs-lisp" (:background "#282828"))
+  ;;                             ("python" (:background "#282828"))))
 
 #+END_SRC
 **** Alerts
@@ -898,6 +961,8 @@ link.
 **** Markdown export
 #+BEGIN_SRC emacs-lisp
   (require 'ox-md nil t)
+  (eval-after-load "org"
+    '(require 'ox-gfm nil t))
 #+END_SRC
 **** Org-mime
 #+BEGIN_SRC emacs-lisp
@@ -987,10 +1052,25 @@ link.
 ***** Intero
 #+BEGIN_SRC emacs-lisp
   (use-package intero
+    :after flycheck
     :ensure t
     :config
     (add-hook 'haskell-mode-hook 'company-mode)
-    (add-hook 'haskell-mode-hook 'intero-mode))
+    (add-hook 'haskell-mode-hook 'intero-mode)
+    (flycheck-add-next-checker 'intero '(warning . haskell-hlint))
+    (custom-set-variables
+     '(haskell-stylish-on-save t))
+    (add-hook 'haskell-mode-hook
+              (lambda ()
+                (set (make-local-variable 'company-backends)
+                     (append '((company-capf company-dabbrev-code))
+                             company-backends))))
+    (add-hook 'haskell-mode-hook 'turn-on-haskell-unicode-input-method)
+    (setq haskell-tags-on-save t)
+    (setq tags-revert-without-query t)
+    (setq haskell-indentation-electric-flag t)
+    (add-hook 'haskell-mode-hook 'haskell-auto-insert-module-template)
+    (add-hook 'haskell-mode-hook 'flyspell-prog-mode))
 #+END_SRC
 ***** Align rules
 #+BEGIN_SRC emacs-lisp
@@ -1032,6 +1112,15 @@ link.
     :config
     (add-hook 'haskell-mode-hook #'hindent-mode))
 #+END_SRC
+***** Stack interface
+#+BEGIN_SRC emacs-lisp
+  (use-package hasky-stack
+    :ensure t
+    :config
+    (global-set-key (kbd "C-c h e") #'hasky-stack-execute)
+    (global-set-key (kbd "C-c h h") #'hasky-stack-package-action)
+    (global-set-key (kbd "C-c h i") #'hasky-stack-new))
+#+END_SRC
 **** LaTeX
 ***** AucTEX tweaks
 #+BEGIN_SRC emacs-lisp
@@ -1068,15 +1157,37 @@ link.
     (venv-initialize-interactive-shells)
     (venv-initialize-eshell))
 #+END_SRC
-***** Elpy
+***** Anaconda mode
 #+BEGIN_SRC emacs-lisp
-  (use-package elpy
+  (use-package anaconda-mode
     :ensure t
     :config
-    (elpy-enable)
-    (setq elpy-rpc-backend "jedi")
-    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-    (add-hook 'elpy-mode-hook 'yas-minor-mode-on))
+    (add-hook 'python-mode-hook 'anaconda-mode)
+    (add-hook 'python-mode-hook 'anaconda-eldoc-mode))
+#+END_SRC
+***** Completeon
+#+BEGIN_SRC emacs-lisp
+  (use-package company-anaconda
+    :ensure t
+    :after anaconda-mode
+    :config
+    (eval-after-load "company"
+      '(add-to-list 'company-backends 'company-anaconda)))
+#+END_SRC
+***** Import management
+#+BEGIN_SRC emacs-lisp
+  (use-package py-isort
+      :ensure t
+      :config
+      (setq py-isort-options '("--lines=79"))
+      (add-hook 'before-save-hook 'py-isort-before-save))
+#+END_SRC
+***** Format code
+#+BEGIN_SRC emacs-lisp
+  (use-package yapfify
+    :ensure t
+    :config
+    (add-hook 'python-mode-hook 'yapf-mode))
 #+END_SRC
 ***** Tox
 #+BEGIN_SRC emacs-lisp
@@ -1105,7 +1216,7 @@ link.
 **** WEB
 #+BEGIN_SRC emacs-lisp
   (use-package web-mode
-    :after smartparens
+    :after smartparens tide
     :ensure t
     :config
     (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
@@ -1117,34 +1228,55 @@ link.
     (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
     (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
     (add-to-list 'auto-mode-alist '("\\.jinja2\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.js[x]?\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("components\\/.*\\.js[x]?\\'" . web-mode))
-    (add-to-list 'web-mode-content-types '("jsx" . "components\\/.*\\.js[x]?\\'"))
-    (add-to-list 'web-mode-content-types '("jsx" . "\\.jsx?\\'"))
+    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+    (add-hook 'web-mode-hook
+              (lambda ()
+                (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                  (setup-tide-mode))))
+    ;; enable typescript-tslint checker
+    (flycheck-add-mode 'typescript-tslint 'web-mode)
 
+    (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+    (add-hook 'web-mode-hook
+              (lambda ()
+                (when (string-equal "jsx" (file-name-extension buffer-file-name))
+                  (setup-tide-mode))))
+    ;; configure jsx-tide checker to run after your default jsx checker
+    (flycheck-add-mode 'javascript-eslint 'web-mode)
+    (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
     (setq web-mode-markup-indent-offset 2)
     (setq web-mode-css-indent-offset 2)
     (setq web-mode-code-indent-offset 2)
     (setq web-mode-enable-auto-pairing t)
-    (setq web-mode-enable-css-colorization t))
+    (setq web-mode-enable-css-colorization t)
+    )
 #+END_SRC
 **** JavaScript
-***** js2-mode
+***** TypeScript
 #+BEGIN_SRC emacs-lisp
-  (use-package js2-mode
+  (use-package tide
     :ensure t
+    :after company
     :config
-    ;; (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-    (setq js2-basic-offset 2)
-    ;; (setq js2-mode-show-parse-errors nil)
-    (setq js2-mode-show-strict-warnings nil))
-#+END_SRC
-***** tern integration
-#+BEGIN_SRC emacs-lisp
-  (use-package tern
-    :ensure t
-    :config
-    (add-hook 'web-mode-hook (lambda () (tern-mode t))))
+    (defun setup-tide-mode ()
+      (interactive)
+      (tide-setup)
+      (flycheck-mode +1)
+      (setq flycheck-check-syntax-automatically '(save mode-enabled))
+      (eldoc-mode +1)
+      (tide-hl-identifier-mode +1)
+      (company-mode +1))
+
+    ;; aligns annotation to the right hand side
+    (setq company-tooltip-align-annotations t)
+
+    ;; formats the buffer before saving
+    (add-hook 'before-save-hook 'tide-format-before-save)
+
+    (add-hook 'typescript-mode-hook #'setup-tide-mode)
+    (add-hook 'js2-mode-hook #'setup-tide-mode)
+    ;; configure javascript-tide checker to run after your default javascript checker
+    (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append))
 #+END_SRC
 *** Set keybindings
 **** Common
