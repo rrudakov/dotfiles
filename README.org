@@ -35,4 +35,14 @@
      stack exec $HOME/.local/bin/xmonad -- $@
    #+END_SRC
    Make sure it executable.
-6. Run ~install.sh~ from this repository
+6. In case of using sddm create ~/usr/share/xsessions/xmonad.desktop~:
+#+BEGIN_EXAMPLE
+  [Desktop Entry]
+  Encoding=UTF-8
+  Type=Application
+  Exec=/usr/local/bin/xmonad
+  TryExec=/usr/local/bin/xmonad
+  DesktopNames=XMonad
+  Name=XMonad
+#+END_EXAMPLE
+7. Run ~install.sh~ from this repository

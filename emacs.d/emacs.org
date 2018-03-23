@@ -232,21 +232,37 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
   (delete-selection-mode)
 #+END_SRC
+**** Disabled commands
+#+BEGIN_SRC emacs-lisp
+  (setq disabled-command-function nil)
+#+END_SRC
+**** EPA
+#+BEGIN_SRC emacs-lisp
+  (setq epa-pinentry-mode 'loopback)
+#+END_SRC
 **** Prettify symbols
 #+BEGIN_SRC emacs-lisp
   (global-prettify-symbols-mode)
 #+END_SRC
 **** Smooth scrolling
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package smooth-scrolling
-  ;;   :ensure t
-  ;;   :config
-  ;;   (smooth-scrolling-mode 1))
-  (setq redisplay-dont-pause t
-    scroll-margin 1
-    scroll-step 1
-    scroll-conservatively 10000
-    scroll-preserve-screen-position 1)
+  ;; (setq scroll-conservatively 101) ;; move minimum when cursor exits view, instead of recentering
+  ;; (setq mouse-wheel-scroll-amount '(1)) ;; mouse scroll moves 1 line at a time, instead of 5 lines
+  ;; (setq mouse-wheel-progressive-speed nil) ;; on a long mouse scroll keep scrolling by 1 line
+  (setq scroll-step 1
+        scroll-conservatively 10000
+        auto-hscroll-mode 'current-line)
+  (setq mouse-wheel-scroll-amount '(2 ((shift) . 1) ((control) . nil))
+        mouse-wheel-progressive-speed nil)
+#+END_SRC
+**** Default mode
+#+BEGIN_SRC emacs-lisp
+  (setq-default major-mode 'text-mode)
+#+END_SRC
+**** Fill column
+#+BEGIN_SRC emacs-lisp
+  (setq-default fill-column 79)
+  (add-hook 'text-mode-hook 'auto-fill-mode)
 #+END_SRC
 *** Theme
 **** All the icons
@@ -492,6 +508,14 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
     )
 #+END_SRC
 *** Autocomplete
+**** YASnippet
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :config
+    (yas-reload-all)
+    (add-hook 'prog-mode-hook #'yas-minor-mode))
+#+END_SRC
 **** Common
 #+BEGIN_SRC emacs-lisp
   (use-package company
@@ -686,7 +710,7 @@ link.
   (use-package counsel-projectile
     :ensure t
     :config
-    (counsel-projectile-on))
+    (counsel-projectile-mode 1))
 #+END_SRC
 *** Htmlize
 #+BEGIN_SRC emacs-lisp
@@ -721,13 +745,6 @@ link.
     ;; (add-to-list 'flycheck-checkers 'python-flake8)
     ;; (add-to-list 'flycheck-checkers 'python-pylint)
     )
-#+END_SRC
-**** Spell checking
-#+BEGIN_SRC emacs-lisp
-  (use-package flycheck-vale
-    :ensure t
-    :config
-    (flycheck-vale-setup))
 #+END_SRC
 *** Version control
 **** GIT
@@ -783,28 +800,88 @@ link.
            (yank)
            (term-char-mode))))))
 #+END_SRC
+*** Rainbow mode
+#+BEGIN_QUOTE
+Colorize color names in buffers
+#+END_QUOTE
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-mode
+    :ensure t
+    :config
+    (setq rainbow-x-colors-major-mode-list '(web-mode python-mode)))
+#+END_SRC
+*** REST client
+Quite interesting package. I think it will be replace for Postman for me.
+#+BEGIN_SRC emacs-lisp
+  (use-package restclient :ensure t)
+#+END_SRC
+And autocompletion for it:
+#+BEGIN_SRC emacs-lisp
+  (use-package company-restclient
+    :ensure t
+    :config
+    (add-to-list 'company-backends 'company-restclient))
+#+END_SRC
+And even org-babel integration:
+#+BEGIN_SRC emacs-lisp
+  (use-package ob-restclient
+    :ensure t
+    :config
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((restclient . t))))
+#+END_SRC
+*** PDF tools
+#+BEGIN_SRC emacs-lisp
+  (use-package pdf-tools
+    :ensure t
+    :config
+    (pdf-tools-install))
+#+END_SRC
+*** Edit text areas in browsers from emacs
+#+BEGIN_SRC emacs-lisp
+  (use-package edit-server
+    :ensure t
+    :config
+    (when (require 'edit-server nil t)
+      (setq edit-server-new-frame nil)
+      (edit-server-start)))
+#+END_SRC
 *** Org
 **** Some tweaks
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-mode-hook 'turn-on-font-lock)
   (add-hook 'org-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
-  (setq org-startup-folded 'content) ;; overview | content | all | showeverything
-  (setq org-cycle-separator-lines 0)
-  (setq org-tags-column -100)
-  (setq org-startup-indented t)
-  ;; (setq org-hide-leading-stars nil)
-  ;; (setq org-adapt-indentation nil)
-  (setq org-src-window-setup 'current-window)
-  (setq org-catch-invisible-edits 'show-and-error)
-  (setq org-return-follows-link t)
+  ;; (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
+  (setq org-startup-folded 'content ;; overview | content | all | showeverything
+        org-cycle-separator-lines 0
+        org-tags-column -100
+        org-startup-indented t
+        org-src-window-setup 'current-window
+        org-catch-invisible-edits 'show-and-error
+        org-return-follows-link t
+        org-startup-with-inline-images nil
+        org-cycle-include-plain-lists t
+        org-hide-emphasis-markers t
+        org-insert-heading-respect-content t
+        ;; org-M-RET-may-split-line nil
+        org-list-use-circular-motion t
+        org-fontify-quote-and-verse-blocks t
+        org-pretty-entities nil
+        org-fontify-done-headline t
+        org-image-actual-width 500
+        org-export-with-drawers t
+        org-export-with-properties t)
   (org-display-inline-images)
-  ;;(setq org-startup-with-inline-images t)
   (add-to-list 'org-modules 'org-habit)
   (add-hook 'mail-mode-hook 'turn-on-orgtbl)
   (add-hook 'mail-mode-hook 'turn-on-orgstruct)
-  (setq org-cycle-include-plain-lists t)
   (add-to-list 'flycheck-checkers 'org-lint)
-  (setq org-hide-emphasis-markers t)
+#+END_SRC
+**** Effort estimates
+#+BEGIN_SRC emacs-lisp
+  (setq org-global-properties '(("Effort_ALL" . "0 0:30 1:00 2:00 4:00 6:00 8:00 16:00")))
+  (setq org-columns-default-format "%40ITEM(Task) %17Effort(Estimated Effort){:} %CLOCKSUM")
 #+END_SRC
 **** Agenda settings
 #+BEGIN_SRC emacs-lisp
@@ -842,11 +919,20 @@ link.
   (setq org-todo-keywords
         '((sequence "TODO(t)" "PROGRESS(p)" "WAITING(w)" "|" "DONE(d)")))
 #+END_SRC
+**** Mark task as DONE if all subtasks are DONE
+#+BEGIN_SRC emacs-lisp
+  (defun org-summary-todo (n-done n-not-done)
+    "Switch entry to DONE when all subentries are done, to TODO otherwise."
+    (let (org-log-done org-log-states)   ; turn off logging
+      (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+
+  (add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
+#+END_SRC
 **** Custom keywords faces
 #+BEGIN_SRC emacs-lisp
   (setq org-todo-keyword-faces
-        '(("PROGRESS" :foreground "#458588" :weight bold)
-          ("WAITING" :foreground "#d65d0e" :weight bold)))
+        '(("PROGRESS" 'org-agenda-date-weekend)
+          ("WAITING" 'org-todo)))
 #+END_SRC
 **** Clock settings
 #+BEGIN_SRC emacs-lisp
@@ -964,6 +1050,10 @@ link.
   (eval-after-load "org"
     '(require 'ox-gfm nil t))
 #+END_SRC
+**** Confluence export
+#+BEGIN_SRC emacs-lisp
+  (require 'ox-confluence)
+#+END_SRC
 **** Org-mime
 #+BEGIN_SRC emacs-lisp
   (use-package org-mime
@@ -1033,6 +1123,52 @@ link.
 
   (org-add-link-type "img" 'rr/org-link-img 'rr/org-link-img-export)
 #+END_SRC
+**** LaTeX export
+#+BEGIN_SRC emacs-lisp
+  (require 'ox-latex)
+  (setq org-latex-inputenc-alist '(("utf8" . "utf8x")))
+  (setq org-latex-default-packages-alist
+        '(("AUTO" "inputenc"  t ("pdflatex"))
+          ("T2A"   "fontenc"   t ("pdflatex"))
+          (""     "graphicx"  t)
+          (""     "grffile"   t)
+          (""     "longtable" nil)
+          (""     "wrapfig"   nil)
+          (""     "rotating"  nil)
+          ("normalem" "ulem"  t)
+          (""     "amsmath"   t)
+          (""     "textcomp"  t)
+          (""     "amssymb"   t)
+          (""     "capt-of"   nil)
+          (""     "hyperref"  nil)))
+#+END_SRC
+**** Evaluate source code
+#+BEGIN_SRC emacs-lisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (python . t)
+     (sql . t)
+     (sh . t)
+     (haskell . t)))
+  (setq org-confirm-babel-evaluate t)
+#+END_SRC
+**** Manage passwords using org-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package org-password-manager
+    :ensure t
+    :config
+    (add-hook 'org-mode-hook 'org-password-manager-key-bindings))
+#+END_SRC
+**** Google calendar sync
+#+BEGIN_SRC emacs-lisp
+  (use-package org-gcal
+    :ensure t
+    :config
+    (setq org-gcal-client-id "746234569233-nrqvf2rke8skag1hadbu15clkpmgr9bk.apps.googleusercontent.com"
+          org-gcal-client-secret "1JolKXlhxyoNmABe8qIbw40H"
+          org-gcal-file-alist '(("phentagram@gmail.com" .  "~/gmail.org"))))
+#+END_SRC
 *** Email
 **** Sending email
 #+BEGIN_SRC emacs-lisp
@@ -1070,7 +1206,8 @@ link.
     (setq tags-revert-without-query t)
     (setq haskell-indentation-electric-flag t)
     (add-hook 'haskell-mode-hook 'haskell-auto-insert-module-template)
-    (add-hook 'haskell-mode-hook 'flyspell-prog-mode))
+    ;; (add-hook 'haskell-mode-hook 'flyspell-prog-mode)
+    )
 #+END_SRC
 ***** Align rules
 #+BEGIN_SRC emacs-lisp
@@ -1157,30 +1294,59 @@ link.
     (venv-initialize-interactive-shells)
     (venv-initialize-eshell))
 #+END_SRC
-***** Anaconda mode
+***** Elpy
 #+BEGIN_SRC emacs-lisp
-  (use-package anaconda-mode
+  (use-package elpy
     :ensure t
     :config
-    (add-hook 'python-mode-hook 'anaconda-mode)
-    (add-hook 'python-mode-hook 'anaconda-eldoc-mode))
+    (elpy-enable)
+    (setq elpy-rpc-backend "jedi")
+    (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+    ;; (add-hook 'elpy-mode-hook 'yas-minor-mode-on)
+    )
+#+END_SRC
+***** Traad
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package traad
+  ;;   :ensure t)
+#+END_SRC
+***** Anaconda mode
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package anaconda-mode
+  ;;   :ensure t
+  ;;   :config
+  ;;   (add-hook 'python-mode-hook 'anaconda-mode)
+  ;;   (add-hook 'python-mode-hook 'anaconda-eldoc-mode)
+  ;;   (add-to-list 'python-shell-extra-pythonpaths "/home/rrudakov/Work/QAAutotesting/src")
+  ;;   (add-to-list 'python-shell-extra-pythonpaths "/home/rrudakov/Work/allure-pytest"))
 #+END_SRC
 ***** Completeon
 #+BEGIN_SRC emacs-lisp
-  (use-package company-anaconda
+  ;; (use-package company-anaconda
+  ;;   :ensure t
+  ;;   :after anaconda-mode
+  ;;   :config
+  ;;   (eval-after-load "company"
+  ;;     '(add-to-list 'company-backends 'company-anaconda)))
+  (use-package company-jedi
     :ensure t
-    :after anaconda-mode
     :config
-    (eval-after-load "company"
-      '(add-to-list 'company-backends 'company-anaconda)))
+    (defun company-jedi-setup ()
+      (add-to-list 'company-backends 'company-jedi))
+    (add-hook 'python-mode-hook 'company-jedi-setup)
+    (setq jedi:complete-on-dot t)
+    ;; (add-hook 'python-mode-hook (lambda ()
+    ;;                               (hack-local-variables)
+    ;;                               (venv-workon project-venv-name)))
+    (add-hook 'python-mode-hook 'jedi:setup))
 #+END_SRC
 ***** Import management
 #+BEGIN_SRC emacs-lisp
-  (use-package py-isort
-      :ensure t
-      :config
-      (setq py-isort-options '("--lines=79"))
-      (add-hook 'before-save-hook 'py-isort-before-save))
+  ;; (use-package py-isort
+  ;;     :ensure t
+  ;;     :config
+  ;;     (setq py-isort-options '("--lines=79"))
+  ;;     (add-hook 'before-save-hook 'py-isort-before-save))
 #+END_SRC
 ***** Format code
 #+BEGIN_SRC emacs-lisp
@@ -1197,6 +1363,10 @@ link.
     (setq tox-runner 'py.test)
     (global-set-key "\C-ct" 'tox-current-class))
 #+END_SRC
+***** Code folding
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'python-mode-hook 'hs-minor-mode)
+#+END_SRC
 **** JSON
 #+BEGIN_SRC emacs-lisp
   (use-package json-mode
@@ -1212,6 +1382,33 @@ link.
     :ensure t
     :config
     (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
+#+END_SRC
+**** JavaScript
+***** TypeScript
+#+BEGIN_SRC emacs-lisp
+  (use-package tide
+    :ensure t
+    :after company
+    :config
+    (defun setup-tide-mode ()
+      (interactive)
+      (tide-setup)
+      (flycheck-mode +1)
+      (setq flycheck-check-syntax-automatically '(save mode-enabled))
+      (eldoc-mode +1)
+      (tide-hl-identifier-mode +1)
+      (company-mode +1))
+
+    ;; aligns annotation to the right hand side
+    (setq company-tooltip-align-annotations t)
+
+    ;; formats the buffer before saving
+    (add-hook 'before-save-hook 'tide-format-before-save)
+
+    (add-hook 'typescript-mode-hook #'setup-tide-mode)
+    (add-hook 'js2-mode-hook #'setup-tide-mode)
+    ;; configure javascript-tide checker to run after your default javascript checker
+    (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append))
 #+END_SRC
 **** WEB
 #+BEGIN_SRC emacs-lisp
@@ -1251,32 +1448,10 @@ link.
     (setq web-mode-enable-css-colorization t)
     )
 #+END_SRC
-**** JavaScript
-***** TypeScript
+*** Funny
+**** Speed type
 #+BEGIN_SRC emacs-lisp
-  (use-package tide
-    :ensure t
-    :after company
-    :config
-    (defun setup-tide-mode ()
-      (interactive)
-      (tide-setup)
-      (flycheck-mode +1)
-      (setq flycheck-check-syntax-automatically '(save mode-enabled))
-      (eldoc-mode +1)
-      (tide-hl-identifier-mode +1)
-      (company-mode +1))
-
-    ;; aligns annotation to the right hand side
-    (setq company-tooltip-align-annotations t)
-
-    ;; formats the buffer before saving
-    (add-hook 'before-save-hook 'tide-format-before-save)
-
-    (add-hook 'typescript-mode-hook #'setup-tide-mode)
-    (add-hook 'js2-mode-hook #'setup-tide-mode)
-    ;; configure javascript-tide checker to run after your default javascript checker
-    (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append))
+  (use-package speed-type :ensure t)
 #+END_SRC
 *** Set keybindings
 **** Common

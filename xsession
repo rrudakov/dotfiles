@@ -13,14 +13,15 @@ sysmodmap=/etc/X11/xinit/.Xmodmap
 
 export GDK_USE_XFT=1
 export DE="xfce"
-# compton --backend glx --vsync opengl-swc -b
+# compton -b
 # xgamma -rgamma 1 -ggamma 1 -bgamma 0.8 &
-# stalonetray &
+nvidia-settings --load-config-only &
+stalonetray &
 # dunst &
-# xfce4-power-manager &
-# nitrogen --restore &
+xfce4-power-manager &
+nitrogen --restore &
 # volumeicon &
-# nm-applet &
+nm-applet &
 # yandex-disk start &
 # dropboxd &
 # kbdd &

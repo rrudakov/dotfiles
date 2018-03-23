@@ -1,6 +1,6 @@
 ! Emacs.FontBackend: xft
 
-XTerm*faceName: xft:Fira Mono:size=10:antialias=true
+XTerm*faceName: xft:Source Code Variable:size=10:antialias=true
 XTerm*loginShell: true
 XTerm*termName: xterm-256color
 XTerm*borderWidth: 0
@@ -40,8 +40,8 @@ URxvt*saveLines: 5000
 
 !URxvt.font: -*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-1
 !URxvt.boldFont: -*-terminus-bold-*-*-*-12-*-*-*-*-*-iso10646-1
-URxvt.font: xft:Fira Mono:size=10:antialias=true
-URxvt.boldFont: xft:Fira Mono:size=10:bold:antialias=true
+URxvt.font: xft:Source Code Variable:size=10:antialias=true
+URxvt.boldFont: xft:Source Code Variable:size=10:bold:antialias=true
 
 ! URxvt.shading: 10
 ! URxvt.transparent: true

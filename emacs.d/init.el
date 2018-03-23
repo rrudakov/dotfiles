@@ -9,10 +9,17 @@
                     (not (gnutls-available-p))))
        (url (concat (if no-ssl "http" "https") "://melpa.org/packages/")))
   (add-to-list 'package-archives (cons "melpa" url) t))
+
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+
 (when (< emacs-major-version 24)
   ;; For important compatibility libraries like cl-lib
   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+
+(add-to-list
+ 'package-archives
+ '("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/") t)
+
 (package-initialize) ;; You might already have this line
 
 (unless (package-installed-p 'use-package)
@@ -48,13 +55,17 @@
  '(flymake-start-syntax-check-on-find-file nil)
  '(flymake-start-syntax-check-on-newline nil)
  '(flymake-warning-bitmap nil)
+ '(haskell-stylish-on-save t)
  '(package-selected-packages
    (quote
-    (company-jedi tide sane-term multiple-cursors hasky-stack indent-tools yapfify py-isort importmagic company-anaconda anaconda-mode sublimity smooth-scrolling company-ghci company-ghc ghc groovy-mode color-theme-sanityinc-tomorrow cyberpunk-theme sunburn-theme material-theme tao-theme zenburn-theme zenburn flycheck-proselint flycheck-vale company-tern tern js2-mode hindent yaml-mode winum web-mode virtualenvwrapper use-package tox spaceline smartparens rainbow-delimiters popwin paradox ox-gfm org-plus-contrib org-mime org-bullets org-alert magit kv json-mode intero htmlize highlight-symbol gruvbox-theme elpy dired+ diff-hl deferred dash-functional counsel-projectile company-web company-statistics company-shell company-quickhelp company-auctex anzu all-the-icons)))
+    (all-the-icons-ivy pdf-tools edit-server traad ob-restclient restclient sane-term indent-tools company-ghci sunburn-theme tao-theme zenburn flycheck-proselint flycheck-vale kv dired+ company-auctex)))
  '(paradox-github-token t)
  '(safe-local-variable-values
    (quote
-    ((eval venv-workon "allure2")
+    ((eval venv-workon "crypto")
+     (eval venv-workon "bunny")
+     (eval venv-workon "api")
+     (eval venv-workon "allure2")
      (eval progn
            (add-to-list
             (quote exec-path)
