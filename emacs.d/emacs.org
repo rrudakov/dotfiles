@@ -264,6 +264,10 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   (setq-default fill-column 79)
   (add-hook 'text-mode-hook 'auto-fill-mode)
 #+END_SRC
+**** Auto revert changes
+#+BEGIN_SRC emacs-lisp
+  (global-auto-revert-mode 1)
+#+END_SRC
 *** Theme
 **** All the icons
 #+BEGIN_SRC emacs-lisp
@@ -506,6 +510,13 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
        (sql-set-product 'postgres)
        )
     )
+#+END_SRC
+*** Undo tree
+#+BEGIN_SRC emacs-lisp
+  (use-package undo-tree
+    :ensure t
+    :config
+    (global-undo-tree-mode))
 #+END_SRC
 *** Autocomplete
 **** YASnippet
@@ -1447,6 +1458,10 @@ And even org-babel integration:
     (setq web-mode-enable-auto-pairing t)
     (setq web-mode-enable-css-colorization t)
     )
+#+END_SRC
+**** Groovy
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package groovy-mode :ensure t)
 #+END_SRC
 *** Funny
 **** Speed type
