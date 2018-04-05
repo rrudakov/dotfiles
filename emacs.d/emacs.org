@@ -268,6 +268,10 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
   (global-auto-revert-mode 1)
 #+END_SRC
+**** Auto rescan imenu
+#+BEGIN_SRC emacs-lisp
+  (setq imenu-auto-rescan t)
+#+END_SRC
 *** Theme
 **** All the icons
 #+BEGIN_SRC emacs-lisp
@@ -485,6 +489,15 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   (rr/spaceline-theme)
   (spaceline-compile)
 #+END_SRC
+**** Highlight indentation
+#+BEGIN_SRC emacs-lisp
+  (use-package highlight-indent-guides
+    :ensure t
+    :config
+    (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+    (setq highlight-indent-guides-method 'character
+          highlight-indent-guides-character ?\x258F))
+#+END_SRC
 *** Semantic
 **** Enable semantic mode global
 #+BEGIN_SRC emacs-lisp
@@ -540,7 +553,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   (use-package undo-tree
     :ensure t
     :config
-    (global-undo-tree-mode))
+    (global-undo-tree-mode)
+    (setq undo-tree-visualizer-diff t
+          undo-tree-visualizer-timestamps t))
 #+END_SRC
 *** Autocomplete
 **** YASnippet
