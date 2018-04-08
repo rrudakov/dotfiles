@@ -58,7 +58,7 @@
  '(haskell-stylish-on-save t)
  '(package-selected-packages
    (quote
-    (all-the-icons-ivy pdf-tools edit-server traad ob-restclient restclient sane-term indent-tools company-ghci sunburn-theme tao-theme zenburn flycheck-proselint flycheck-vale kv dired+ company-auctex)))
+    (ace-window which-key highlight-indent-guides undo-tree groovy-mode all-the-icons-ivy pdf-tools edit-server traad ob-restclient restclient sane-term indent-tools company-ghci sunburn-theme tao-theme zenburn flycheck-proselint flycheck-vale kv dired+ company-auctex)))
  '(paradox-github-token t)
  '(safe-local-variable-values
    (quote

@@ -95,8 +95,8 @@
 **** Set default font
 Good choices:
 + [[https://slackbuilds.org/repository/14.2/system/Iosevka/][Iosevka]]
-+ [[https://github.com/mozilla/Fira][Fira Mono]] :: Currently used
-+ [[https://github.com/adobe-fonts/source-code-pro][SourceCodePro]]
++ [[https://github.com/mozilla/Fira][Fira Mono]]
++ [[https://github.com/adobe-fonts/source-code-pro][SourceCodePro]] :: Currently used
 + [[https://slackbuilds.org/repository/14.2/system/hack-font-ttf/][Hack]]
 #+BEGIN_SRC emacs-lisp
   ;; (add-to-list 'default-frame-alist '(font . "Fira Mono-10"))
@@ -267,10 +267,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** Auto revert changes
 #+BEGIN_SRC emacs-lisp
   (global-auto-revert-mode 1)
-#+END_SRC
-**** Auto rescan imenu
-#+BEGIN_SRC emacs-lisp
-  (setq imenu-auto-rescan t)
 #+END_SRC
 *** Theme
 **** All the icons
@@ -451,11 +447,17 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
       (format "%s " (rr/flycheck-status-text)))
     :enabled t)
 
+  (spaceline-define-segment rr/modified
+    "Buffer status."
+    " "
+    :enabled t)
+
   ;; My custom theme
   (defun rr/spaceline-theme (&rest additional-segments)
     "Apply my spaceline theme ADDITIONAL-SEGMENTS are inserted on the right."
     (spaceline-install
-      `(((workspace-number
+      `(((rr/modified
+          workspace-number
           window-number)
          :fallback evil-state
          :face highlight-face
@@ -523,6 +525,13 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
        (sql-set-product 'postgres)
        )
     )
+#+END_SRC
+*** Which key
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :ensure t
+    :config
+    (which-key-mode))
 #+END_SRC
 *** Undo tree
 #+BEGIN_SRC emacs-lisp
@@ -640,17 +649,22 @@ Show more offten used completeons first
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
     :ensure t
+    :bind (("C-x b" . ivy-switch-buffer))
     :config
     (ivy-mode 1)
-    (setq ivy-use-virtual-buffers t)
-    (setq ivy-count-format "(%d/%d) ")
+    (setq ivy-use-virtual-buffers t
+          ivy-display-style 'fancy
+          ivy-count-format "(%d/%d) ")
+    (defalias 'list-buffers 'ibuffer)
     :bind (("<f2>" . bs-show)))
 #+END_SRC
 **** Swiper
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
     :ensure t
-    :bind (("C-s" . swiper)))
+    :bind (("C-s" . swiper)
+           ("C-r" . swiper)
+           ("C-c C-r" . ivy-resume)))
 #+END_SRC
 **** Counsel
 #+BEGIN_SRC emacs-lisp
@@ -705,11 +719,15 @@ link.
 #+END_SRC
 *** Windows navigation
 #+BEGIN_SRC emacs-lisp
-  (use-package winum
+  ;; (use-package winum
+  ;;   :ensure t
+  ;;   :config
+  ;;   (setq winum-auto-setup-mode-line nil)
+  ;;   (winum-mode))
+  (use-package ace-window
     :ensure t
     :config
-    (setq winum-auto-setup-mode-line nil)
-    (winum-mode))
+    (global-set-key (kbd "M-o") 'ace-window))
 #+END_SRC
 *** Dired
 #+BEGIN_SRC emacs-lisp
