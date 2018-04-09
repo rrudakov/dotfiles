@@ -532,22 +532,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
     (eval-after-load "sql"
       '(load-library "sql-indent")))
 #+END_SRC
-**** Databases
-#+BEGIN_SRC emacs-lisp
-  (use-package ejc-sql
-    :ensure t
-    :config
-    (ejc-create-connection
-     "sanchez"
-     :classpath "~/Work/BSC/ArsNova/Sanchez/ScJDBC-3.5.2.2.jar"
-     ;; :classpath "~/.m2/repository/com/sanchez/scjdbc/3.0.1/scjdbc-3.0.1.jar"
-     :classname "fisglobal.jdbc.driver.ScDriver"
-     ;; :connection-uri "protocol=jdbc:sanchez/database=gecifpreprod.rccf.ru:30060:SCA$DAT/signOnType=0/timeout=300/garbageCollect=1/processAlias=1/debugLevel=999/garbageCollect=1/rowPrefetch=1/locale=RU:RU/fileencoding=Cp1251;user=99;password=XXX"
-     :connection-uri "jdbc:fisglobal/database=gecifpreprod.rccf.ru:30060:SCA$DAT/locale=RU:RU/fileencoding=Cp1251/rowPrefetch=50/timeOut=120;user=99;password=XXX"
-     ;; :user "99"
-     ;; :password "XXX"
-     ))
-#+END_SRC
 *** Undo tree
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
