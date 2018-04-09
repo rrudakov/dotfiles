@@ -95,8 +95,8 @@
 **** Set default font
 Good choices:
 + [[https://slackbuilds.org/repository/14.2/system/Iosevka/][Iosevka]]
-+ [[https://github.com/mozilla/Fira][Fira Mono]] :: Currently used
-+ [[https://github.com/adobe-fonts/source-code-pro][SourceCodePro]]
++ [[https://github.com/mozilla/Fira][Fira Mono]]
++ [[https://github.com/adobe-fonts/source-code-pro][SourceCodePro]] :: Currently used
 + [[https://slackbuilds.org/repository/14.2/system/hack-font-ttf/][Hack]]
 #+BEGIN_SRC emacs-lisp
   ;; (add-to-list 'default-frame-alist '(font . "Fira Mono-10"))
@@ -176,6 +176,8 @@ Good choices:
    ;; no beeping or blinking please
    ring-bell-function #'ignore
    visible-bell nil)
+
+  (setq save-interprogmam-kill-before-paste t)
 #+END_SRC
 **** Be quiet at startup
 #+BEGIN_SRC emacs-lisp
@@ -267,10 +269,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** Auto revert changes
 #+BEGIN_SRC emacs-lisp
   (global-auto-revert-mode 1)
-#+END_SRC
-**** Auto rescan imenu
-#+BEGIN_SRC emacs-lisp
-  (setq imenu-auto-rescan t)
+  (setq auto-revert-verbose nil)
 #+END_SRC
 *** Theme
 **** All the icons
@@ -451,11 +450,17 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
       (format "%s " (rr/flycheck-status-text)))
     :enabled t)
 
+  (spaceline-define-segment rr/modified
+    "Buffer status."
+    " "
+    :enabled t)
+
   ;; My custom theme
   (defun rr/spaceline-theme (&rest additional-segments)
     "Apply my spaceline theme ADDITIONAL-SEGMENTS are inserted on the right."
     (spaceline-install
-      `(((workspace-number
+      `(((rr/modified
+          workspace-number
           window-number)
          :fallback evil-state
          :face highlight-face
@@ -524,6 +529,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
        )
     )
 #+END_SRC
+<<<<<<< HEAD
 **** Indentation
 #+BEGIN_SRC emacs-lisp
   (use-package sql-indent
@@ -531,6 +537,14 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
     :config
     (eval-after-load "sql"
       '(load-library "sql-indent")))
+=======
+*** Which key
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :ensure t
+    :config
+    (which-key-mode))
+>>>>>>> 668b87e2af116ddb660b7f4623cf79068856a3af
 #+END_SRC
 *** Undo tree
 #+BEGIN_SRC emacs-lisp
@@ -648,17 +662,22 @@ Show more offten used completeons first
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
     :ensure t
+    :bind (("C-x b" . ivy-switch-buffer))
     :config
     (ivy-mode 1)
-    (setq ivy-use-virtual-buffers t)
-    (setq ivy-count-format "(%d/%d) ")
+    (setq ivy-use-virtual-buffers t
+          ivy-display-style 'fancy
+          ivy-count-format "(%d/%d) ")
+    (defalias 'list-buffers 'ibuffer)
     :bind (("<f2>" . bs-show)))
 #+END_SRC
 **** Swiper
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
     :ensure t
-    :bind (("C-s" . swiper)))
+    :bind (("C-s" . swiper)
+           ("C-r" . swiper)
+           ("C-c C-r" . ivy-resume)))
 #+END_SRC
 **** Counsel
 #+BEGIN_SRC emacs-lisp
@@ -670,7 +689,10 @@ Show more offten used completeons first
            ("<f1> v" . counsel-describe-variable)
            ("<f1> l" . counsel-find-library)
            ("<f1> i" . counsel-info-lookup-symbol)
-           ("<f1> u" . counsel-unicode-char)))
+           ("<f1> u" . counsel-unicode-char)
+           ("M-y" . counsel-yank-pop)
+           :map ivy-minibuffer-map
+           ("M-y" . ivy-next-line)))
 #+END_SRC
 *** Smartparens
 #+BEGIN_SRC emacs-lisp
@@ -713,11 +735,15 @@ link.
 #+END_SRC
 *** Windows navigation
 #+BEGIN_SRC emacs-lisp
-  (use-package winum
+  ;; (use-package winum
+  ;;   :ensure t
+  ;;   :config
+  ;;   (setq winum-auto-setup-mode-line nil)
+  ;;   (winum-mode))
+  (use-package ace-window
     :ensure t
     :config
-    (setq winum-auto-setup-mode-line nil)
-    (winum-mode))
+    (global-set-key (kbd "M-o") 'ace-window))
 #+END_SRC
 *** Dired
 #+BEGIN_SRC emacs-lisp
@@ -814,6 +840,13 @@ link.
     (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
     (global-set-key (kbd "C-c C-d") 'mc/skip-to-next-like-this))
 #+END_SRC
+*** Expand region
+#+BEGIN_SRC emacs-lisp
+  (use-package expand-region
+    :ensure t
+    :config
+    (global-set-key (kbd "C-=") 'er/expand-region))
+#+END_SRC
 *** Terminal emulator
 #+BEGIN_SRC emacs-lisp
   (use-package sane-term
@@ -871,6 +904,10 @@ And even org-babel integration:
     :ensure t
     :config
     (pdf-tools-install))
+#+END_SRC
+*** Gitignore templates
+#+BEGIN_SRC emacs-lisp
+  (use-package gitignore-templates :ensure t)
 #+END_SRC
 *** Edit text areas in browsers from emacs
 #+BEGIN_SRC emacs-lisp
@@ -1475,12 +1512,12 @@ And even org-babel integration:
     ;; configure jsx-tide checker to run after your default jsx checker
     (flycheck-add-mode 'javascript-eslint 'web-mode)
     (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
-    (setq web-mode-markup-indent-offset 2)
-    (setq web-mode-css-indent-offset 2)
-    (setq web-mode-code-indent-offset 2)
-    (setq web-mode-enable-auto-pairing t)
-    (setq web-mode-enable-css-colorization t)
-    )
+    (setq web-mode-markup-indent-offset 2
+          web-mode-css-indent-offset 2
+          web-mode-code-indent-offset 2
+          web-mode-enable-auto-pairing t
+          web-mode-enable-auto-closing t
+          web-mode-enable-css-colorization t))
 #+END_SRC
 **** Groovy
 #+BEGIN_SRC emacs-lisp
