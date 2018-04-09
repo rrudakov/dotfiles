@@ -3,7 +3,7 @@
 {-# OPTIONS_GHC -Wall #-}
 import           Data.List
 import           Data.Monoid
--- import           Graphics.X11.ExtraTypes.XF86
+import           Graphics.X11.ExtraTypes.XF86
 import qualified Data.Map                        as M
 import           System.Exit
 import           System.IO
@@ -148,9 +148,9 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
   , ((modm, xK_BackSpace), focusUrgent)
     -- Run xmessage with a summary of the default keybindings (useful for beginners)
     -- , ((modMask .|. shiftMask, xK_slash ), spawn ("echo \"" ++ help ++ "\" | xmessage -file -"))
-    -- , ((0                 , xF86XK_AudioLowerVolume), spawn "amixer -c 0 -q set Master 2dB-")
-    -- , ((0                 , xF86XK_AudioRaiseVolume), spawn "amixer -c 0 -q set Master 2dB+")
-    -- , ((0                 , xF86XK_AudioMute       ), spawn "amixer -c 0 -q set Master toggle")
+    , ((0                 , xF86XK_AudioLowerVolume), spawn "amixer -q set Master 2%-")
+    , ((0                 , xF86XK_AudioRaiseVolume), spawn "amixer -q set Master 2%+")
+    , ((0                 , xF86XK_AudioMute       ), spawn "amixer -q set Master toggle")
     -- , ((0                 , xF86XK_AudioPlay       ), spawn "ncmpcpp toggle")
     -- , ((0                 , xF86XK_AudioNext       ), spawn "ncmpcpp next")
     -- , ((0                 , xF86XK_AudioPrev       ), spawn "ncmpcpp prev")
@@ -218,12 +218,12 @@ myLayout = avoidStruts $ lessBorders Screen tiled ||| noBorders Full ||| lessBor
 scratchpads ∷ [NamedScratchpad]
 scratchpads =
   [ NS "htop" "gnome-terminal -- htop" (title =? "htop") (customFloating $ W.RationalRect (1/6) (1/6) (2/3) (2/3))
-  , NS "telegram" "telegram" (className =? "TelegramDesktop") (customFloating $ W.RationalRect (1/6) (1/6) (2/3) (2/3))
-  , NS "spotify" "spotify" (appName =? "spotify") (customFloating $ W.RationalRect (1/6) (1/6) (2/3) (2/3))
-  , NS "wire" "wire-desktop" (appName =? "wire") (customFloating $ W.RationalRect (1/4) (1/8) (2/4) (3/4))
-  , NS "slack" "slack" (appName =? "slack") (customFloating $ W.RationalRect (1/6) (1/6) (2/3) (2/3))
-  , NS "skype" "skypeforlinux" (className =? "Skype") (customFloating $ W.RationalRect (1/6) (1/6) (2/3) (2/3))
-  , NS "mattermost" "mattermost" (appName =? "mattermost") (customFloating $ W.RationalRect (1/6) (1/6) (2/3) (2/3))
+  , NS "telegram" "telegram" (className =? "TelegramDesktop") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
+  , NS "spotify" "spotify" (appName =? "spotify") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
+  , NS "wire" "wire-desktop" (appName =? "wire") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
+  , NS "slack" "slack" (appName =? "slack") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
+  , NS "skype" "skypeforlinux" (className =? "Skype") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
+  , NS "mattermost" "mattermost" (appName =? "mattermost") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
   ]
 
 -- | Set hooks for applications

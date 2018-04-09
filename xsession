@@ -15,7 +15,7 @@ export GDK_USE_XFT=1
 export DE="xfce"
 # compton -b
 # xgamma -rgamma 1 -ggamma 1 -bgamma 0.8 &
-nvidia-settings --load-config-only &
+# nvidia-settings --load-config-only &
 stalonetray &
 # dunst &
 xfce4-power-manager &

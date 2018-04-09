@@ -43,7 +43,7 @@ Config { font = "xft:Source Code Variable:size=10:antialias=true"
                                  ,"--high", "#cc241d"
                                  ,"-p", "3"
 		                 ,"-t","<fc=#a89984><icon=.xpm/mem.xbm/></fc> <usedratio>%"] 10
-		    , Run BatteryP ["BAT1"]
+		    , Run BatteryP ["BAT0"]
 		      	  	   [ "--template" , "<fc=#a89984><icon=.xpm/bat_full_01.xbm/></fc> <acstatus>"
 				   , "--Low"      , "10"
                              	   , "--High"     , "80"
