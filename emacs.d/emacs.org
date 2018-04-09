@@ -176,6 +176,8 @@ Good choices:
    ;; no beeping or blinking please
    ring-bell-function #'ignore
    visible-bell nil)
+
+  (setq save-interprogmam-kill-before-paste t)
 #+END_SRC
 **** Be quiet at startup
 #+BEGIN_SRC emacs-lisp
@@ -267,6 +269,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** Auto revert changes
 #+BEGIN_SRC emacs-lisp
   (global-auto-revert-mode 1)
+  (setq auto-revert-verbose nil)
 #+END_SRC
 *** Theme
 **** All the icons
@@ -676,7 +679,10 @@ Show more offten used completeons first
            ("<f1> v" . counsel-describe-variable)
            ("<f1> l" . counsel-find-library)
            ("<f1> i" . counsel-info-lookup-symbol)
-           ("<f1> u" . counsel-unicode-char)))
+           ("<f1> u" . counsel-unicode-char)
+           ("M-y" . counsel-yank-pop)
+           :map ivy-minibuffer-map
+           ("M-y" . ivy-next-line)))
 #+END_SRC
 *** Smartparens
 #+BEGIN_SRC emacs-lisp
@@ -824,6 +830,13 @@ link.
     (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
     (global-set-key (kbd "C-c C-d") 'mc/skip-to-next-like-this))
 #+END_SRC
+*** Expand region
+#+BEGIN_SRC emacs-lisp
+  (use-package expand-region
+    :ensure t
+    :config
+    (global-set-key (kbd "C-=") 'er/expand-region))
+#+END_SRC
 *** Terminal emulator
 #+BEGIN_SRC emacs-lisp
   (use-package sane-term
@@ -881,6 +894,10 @@ And even org-babel integration:
     :ensure t
     :config
     (pdf-tools-install))
+#+END_SRC
+*** Gitignore templates
+#+BEGIN_SRC emacs-lisp
+  (use-package gitignore-templates :ensure t)
 #+END_SRC
 *** Edit text areas in browsers from emacs
 #+BEGIN_SRC emacs-lisp
@@ -1485,12 +1502,12 @@ And even org-babel integration:
     ;; configure jsx-tide checker to run after your default jsx checker
     (flycheck-add-mode 'javascript-eslint 'web-mode)
     (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
-    (setq web-mode-markup-indent-offset 2)
-    (setq web-mode-css-indent-offset 2)
-    (setq web-mode-code-indent-offset 2)
-    (setq web-mode-enable-auto-pairing t)
-    (setq web-mode-enable-css-colorization t)
-    )
+    (setq web-mode-markup-indent-offset 2
+          web-mode-css-indent-offset 2
+          web-mode-code-indent-offset 2
+          web-mode-enable-auto-pairing t
+          web-mode-enable-auto-closing t
+          web-mode-enable-css-colorization t))
 #+END_SRC
 **** Groovy
 #+BEGIN_SRC emacs-lisp
