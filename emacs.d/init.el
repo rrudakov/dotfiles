@@ -44,11 +44,7 @@
  '(haskell-stylish-on-save t)
  '(package-selected-packages
    (quote
-<<<<<<< HEAD
     (highlight-indent-guides ejc-sql sql-indent speed-type web-mode tide yaml-mode json-mode tox yapfify company-jedi elpy virtualenvwrapper hasky-stack hindent intero org-gcal org-password-manager org-mime org-alert org-bullets edit-server pdf-tools ob-restclient company-restclient restclient rainbow-mode sane-term multiple-cursors diff-hl magit flycheck htmlize counsel-projectile projectile dired+ winum anzu rainbow-delimiters popwin smartparens counsel swiper ivy paradox company-tern company-shell company-web company-auctex company-quickhelp company-statistics company yasnippet spaceline highlight-symbol color-theme-sanityinc-tomorrow all-the-icons use-package org-plus-contrib)))
-=======
-    (gitignore-templates expand-region ace-window which-key highlight-indent-guides undo-tree groovy-mode all-the-icons-ivy pdf-tools edit-server traad ob-restclient restclient sane-term indent-tools company-ghci sunburn-theme tao-theme zenburn flycheck-proselint flycheck-vale kv dired+ company-auctex)))
->>>>>>> 668b87e2af116ddb660b7f4623cf79068856a3af
  '(paradox-github-token t)
  '(safe-local-variable-values
    (quote

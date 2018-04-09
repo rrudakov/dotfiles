@@ -529,7 +529,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
        )
     )
 #+END_SRC
-<<<<<<< HEAD
 **** Indentation
 #+BEGIN_SRC emacs-lisp
   (use-package sql-indent
@@ -537,14 +536,13 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
     :config
     (eval-after-load "sql"
       '(load-library "sql-indent")))
-=======
+#+END_SRC
 *** Which key
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
     :ensure t
     :config
     (which-key-mode))
->>>>>>> 668b87e2af116ddb660b7f4623cf79068856a3af
 #+END_SRC
 *** Undo tree
 #+BEGIN_SRC emacs-lisp
