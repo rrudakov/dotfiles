@@ -139,6 +139,8 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
   , ((modm, xK_y), namedScratchpadAction scratchpads "mattermost")
     -- Toggle copy to all
   , ((modm, xK_a), toggleCopyToAll)
+    -- Org capture
+  , ((modm, xK_c), spawn "emacsclient -ne \"(make-capture-frame)\"")
     -- Quit xmonad
   , ((modm .|. shiftMask, xK_q), io exitSuccess)
     -- Restart xmonad
@@ -236,6 +238,7 @@ myManageHook = composeAll [ className =? "Firefox"        --> doShift "2"
                           , className =? "xfce4-notifyd"  --> doIgnore
                           , className =? "rdesktop"       --> doFullFloat
                           , className =? "Nm-openconnect-auth-dialog" --> doCenterFloat
+                          , title =? "capture" --> customFloating (W.RationalRect (1/5) (1/5) (3/5) (3/5))
                           -- scratchpads
                           , namedScratchpadManageHook scratchpads
                           ]

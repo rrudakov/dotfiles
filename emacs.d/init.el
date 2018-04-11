@@ -41,50 +41,24 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-    ("6145e62774a589c074a31a05dfa5efdf8789cf869104e905956f0cbd7eda9d0e" default)))
- '(elpy-modules
-   (quote
-    (elpy-module-company elpy-module-eldoc elpy-module-pyvenv elpy-module-sane-defaults)))
- '(elpy-rpc-timeout 10)
- '(flymake-allowed-file-name-masks nil)
- '(flymake-error-bitmap nil)
- '(flymake-gui-warnings-enabled nil)
- '(flymake-no-changes-timeout 10)
- '(flymake-start-syntax-check-on-find-file nil)
- '(flymake-start-syntax-check-on-newline nil)
- '(flymake-warning-bitmap nil)
  '(haskell-stylish-on-save t)
  '(package-selected-packages
    (quote
-    (gitignore-templates expand-region ace-window which-key highlight-indent-guides undo-tree groovy-mode all-the-icons-ivy pdf-tools edit-server traad ob-restclient restclient sane-term indent-tools company-ghci sunburn-theme tao-theme zenburn flycheck-proselint flycheck-vale kv dired+ company-auctex)))
+    (zenburn-theme yapfify yaml-mode winum which-key web-mode virtualenvwrapper use-package undo-tree tox tide speed-type spaceline smartparens sane-term rainbow-mode rainbow-delimiters popwin pdf-tools paradox org-plus-contrib org-password-manager org-mime org-gcal org-bullets org-alert ob-restclient noflet multiple-cursors magit json-mode intero htmlize hindent highlight-symbol highlight-indent-guides hasky-stack groovy-mode gitignore-templates expand-region elpy edit-server dired+ diff-hl counsel-projectile company-web company-tern company-statistics company-shell company-restclient company-quickhelp company-jedi company-auctex color-theme-sanityinc-tomorrow anzu all-the-icons-ivy ace-window)))
  '(paradox-github-token t)
  '(safe-local-variable-values
    (quote
     ((eval venv-workon "crypto")
+     (eval venv-workon "eotrade")
      (eval venv-workon "bunny")
-     (eval venv-workon "api")
-     (eval venv-workon "allure2")
-     (eval progn
-           (add-to-list
-            (quote exec-path)
-            (concat
-             (locate-dominating-file default-directory ".dir-locals.el")
-             "node_modules/.bin/")))
-     (eval venv-workon "ws")
-     (eval venv-workon "at-env")
-     (haskell-indent-spaces . 4)))))
-
+     (eval venv-workon "at-env")))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(flymake-errline ((t nil)))
- '(flymake-warnline ((t nil)))
- '(ghc-face-error ((t nil))))
-;; Local Variables:
+ )
+ ;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)
 ;; End:
 (provide 'init)

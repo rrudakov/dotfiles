@@ -66,6 +66,10 @@
   Unordered lists with separator '::'
 #+END_SRC
 ** Configuration
+*** Start emacs server
+#+BEGIN_SRC emacs-lisp
+  (server-start)
+#+END_SRC
 *** Common
 **** Increase performance
 #+BEGIN_SRC emacs-lisp
@@ -270,6 +274,32 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
   (global-auto-revert-mode 1)
   (setq auto-revert-verbose nil)
+#+END_SRC
+**** Ibuffer
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+  (setq ibuffer-saved-filter-groups
+        (quote (("default"
+                 ("dired" (mode . dired-mode))
+                 ("org" (name . "^.*org$"))
+                 ("shell" (or (mode . eshell-mode) (mode . shell-mode)))
+                 ("Python" (mode . python-mode))
+                 ("Haskell" (mode . haskell-mode))
+                 ("Web" (mode . web-mode))
+                 ("emacs" (or
+                           (name . "^\\*scratch\\*$")
+                           (name . "^\\*Messages\\*$")))
+                 ))))
+  (add-hook 'ibuffer-mode-hook
+            (lambda ()
+              (ibuffer-auto-mode 1)
+              (ibuffer-switch-to-saved-filter-groups "default")))
+
+  ;; Don't show filter groups if there are no buffers in that group
+  (setq ibuffer-show-empty-filter-groups nil)
+
+  ;; Don't ask for confirmation to delete marked buffers
+  (setq ibuffer-expert t)
 #+END_SRC
 *** Theme
 **** All the icons
@@ -506,19 +536,19 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 *** Semantic
 **** Enable semantic mode global
 #+BEGIN_SRC emacs-lisp
-  (semantic-mode 1)
+  ;; (semantic-mode 1)
 #+END_SRC
 **** Highlight current function
 #+BEGIN_SRC emacs-lisp
-  (global-semantic-highlight-func-mode 1)
+  ;; (global-semantic-highlight-func-mode 1)
 #+END_SRC
 **** Show function definition at the top of buffer
 #+BEGIN_SRC emacs-lisp
-  (global-semantic-stickyfunc-mode 1)
+  ;; (global-semantic-stickyfunc-mode 1)
 #+END_SRC
 **** Enable database
 #+BEGIN_SRC emacs-lisp
-  (global-semanticdb-minor-mode 1)
+  ;; (global-semanticdb-minor-mode 1)
 #+END_SRC
 *** SQL
 **** Make PostgreSQL default
@@ -571,6 +601,12 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
     (add-to-list 'company-backends 'company-dabbrev-code)
     (add-to-list 'company-backends 'company-yasnippet)
     (add-to-list 'company-backends 'company-files))
+#+END_SRC
+**** Completeon with icons
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package company-box
+  ;;   :ensure t
+  ;;   :hook (company-mode . company-box-mode))
 #+END_SRC
 **** Statistic
 Show more offten used completeons first
@@ -658,7 +694,6 @@ Show more offten used completeons first
     (setq ivy-use-virtual-buffers t
           ivy-display-style 'fancy
           ivy-count-format "(%d/%d) ")
-    (defalias 'list-buffers 'ibuffer)
     :bind (("<f2>" . bs-show)))
 #+END_SRC
 **** Swiper
@@ -702,11 +737,11 @@ I've tried ~shackle~, but it doesn't close help window after go to any
 link.
 **** Popwin
 #+BEGIN_SRC emacs-lisp
-  (use-package popwin
-    :ensure t
-    :config
-    (setq popwin:popup-window-height 0.5)
-    (popwin-mode 1))
+  ;; (use-package popwin
+  ;;   :ensure t
+  ;;   :config
+  ;;   (setq popwin:popup-window-height 0.5)
+  ;;   (popwin-mode 1))
 #+END_SRC
 *** Rainbow delimiters
 #+BEGIN_SRC emacs-lisp
@@ -766,6 +801,35 @@ link.
 #+BEGIN_SRC emacs-lisp
   (use-package htmlize
     :ensure t)
+#+END_SRC
+*** Syntax check
+**** Flycheck
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :config
+    (add-hook 'after-init-hook #'global-flycheck-mode)
+
+    (setq flycheck-indication-mode 'right-fringe)
+
+    (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
+      [0 0 0 0 0 4 12 28 60 124 252 124 60 28 12 4 0 0 0 0])
+
+    (setq-default flycheck-disabled-checkers
+                  (append flycheck-disabled-checkers
+                          '(javascript-jshint)))
+
+    (setq-default flycheck-disabled-checkers
+                  (append flycheck-disabled-checkers
+                          '(json-jsonlist)))
+
+    (setq-default flycheck-disabled-checkers
+                  (append flycheck-disabled-checkers
+                          '(python-flake8)))
+
+    ;; (add-to-list 'flycheck-checkers 'python-flake8)
+    ;; (add-to-list 'flycheck-checkers 'python-pylint)
+    )
 #+END_SRC
 *** Syntax check
 **** Flycheck
@@ -962,10 +1026,46 @@ And even org-babel integration:
            :clock-in t
            :clock-resume t)
           ("n" "Note" entry (file+headline "" "Notes")
-           "* TODO %?\n%i")))
+           "* TODO %?\n%i")
+          ("l" "Link" entry (file+headline "~/Org/links.org" "Links")
+           "* %? %^L \n%T"
+           :prepend t)
+          ))
 
-  (setq org-refile-targets (quote ((nil :maxlevel . 9)
-                                   (org-agenda-files :maxlevel . 9))))
+  (setq org-refile-targets
+        (quote ((nil :maxlevel . 6)
+                (org-agenda-files :maxlevel . 6))))
+
+  (defadvice org-capture-finalize (after delete-capture-frame activate)
+    "Advise capture-finalize to close the frame."
+    (if (equal "capture" (frame-parameter nil 'name))
+        (delete-frame)))
+
+  (defadvice org-capture-destroy (after delete-capture-frame activate)
+    "Advise capture-destroy to close the frame."
+    (if (equal "capture" (frame-parameter nil 'name))
+      (delete-frame)))
+
+  (defadvice org-capture-select-template (around delete-capture-frame activate)
+    "Advise org-capture-select-template to close the frame on abort."
+    (unless (ignore-errors ad-do-it t)
+      (setq ad-return-value "q"))
+    (if (and
+         (equal "q" ad-return-value)
+         (equal "capture" (frame-parameter nil 'name)))
+        (delete-frame)))
+
+  (use-package noflet
+    :ensure t)
+
+  (defun make-capture-frame ()
+    "Create a new frame and run 'org-capture'."
+    (interactive)
+    (make-frame '((name . "capture")))
+    (select-frame-by-name "capture")
+    (delete-other-windows)
+    (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
+      (org-capture)))
 #+END_SRC
 **** Tag list
 #+BEGIN_SRC emacs-lisp
@@ -1092,10 +1192,6 @@ And even org-babel integration:
   (set-face-attribute 'org-block nil :background
                       (color-darken-name
                        (face-attribute 'default :background) 3))
-
-  ;; (setq org-src-block-faces '(("emacs-lisp" (:background "#282828"))
-  ;;                             ("python" (:background "#282828"))))
-
 #+END_SRC
 **** Alerts
 #+BEGIN_SRC emacs-lisp
@@ -1361,10 +1457,8 @@ And even org-babel integration:
     :ensure t
     :config
     (elpy-enable)
-    (setq elpy-rpc-backend "jedi")
     (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-    ;; (add-hook 'elpy-mode-hook 'yas-minor-mode-on)
-    )
+    (add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode 0))))
 #+END_SRC
 ***** Traad
 #+BEGIN_SRC emacs-lisp
