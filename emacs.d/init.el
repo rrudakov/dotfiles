@@ -56,7 +56,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-;; Local Variables:
+ ;; Local Variables:
 ;; byte-compile-warnings: (not free-vars)
 ;; End:
 (provide 'init)
