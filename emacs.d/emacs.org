@@ -588,16 +588,13 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :ensure t
-    :init
-    (setq company-dabbrev-downcase nil)
+    :hook (after-init-hook . global-company-mode)
     :config
-    ;; (setq company-auto-complete nil)
-    (add-hook 'after-init-hook 'global-company-mode)
-    (setq-default
-     company-idle-delay .2
-     company-minimum-prefix-length 2
-     company-require-match nil
-     company-tooltip-align-annotations t)
+    (setq company-dabbrev-downcase nil)
+    (setq-default company-idle-delay .2
+                  company-minimum-prefix-length 2
+                  company-require-match nil
+                  company-tooltip-align-annotations t)
     (add-to-list 'company-backends 'company-dabbrev-code)
     (add-to-list 'company-backends 'company-yasnippet)
     (add-to-list 'company-backends 'company-files))
@@ -1306,7 +1303,7 @@ And even org-babel integration:
    '((emacs-lisp . t)
      (python . t)
      (sql . t)
-     (sh . t)
+     (shell . t)
      (haskell . t)))
   (setq org-confirm-babel-evaluate t)
 #+END_SRC
