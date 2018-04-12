@@ -75,6 +75,11 @@
 #+BEGIN_SRC emacs-lisp
   (setq gc-cons-threshold 50000000)
   (setq gnutls-min-prime-bits 4096)
+  ;; Font lock settings
+  (setq jit-lock-stealth-time 16
+        jit-lock-defer-contextually t
+        jit-lock-stealth-nice 0.5)
+  (setq-default font-lock-multiline t)
 #+END_SRC
 **** Highlight expression in parens
 #+BEGIN_SRC emacs-lisp
@@ -319,7 +324,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   (use-package color-theme-sanityinc-tomorrow
     :ensure t
     :config
-    (load-theme 'sanityinc-tomorrow-night t))
+    (load-theme 'sanityinc-tomorrow-eighties t))
 #+END_SRC
 **** Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
@@ -526,12 +531,12 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 **** Highlight indentation
 #+BEGIN_SRC emacs-lisp
-  (use-package highlight-indent-guides
-    :ensure t
-    :config
-    (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-    (setq highlight-indent-guides-method 'character
-          highlight-indent-guides-character ?\x258F))
+  ;; (use-package highlight-indent-guides
+  ;;   :ensure t
+  ;;   :config
+  ;;   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+  ;;   (setq highlight-indent-guides-method 'character
+  ;;         highlight-indent-guides-character ?\x258F))
 #+END_SRC
 *** Semantic
 **** Enable semantic mode global
@@ -772,6 +777,7 @@ link.
   (use-package dired+
     :ensure t
     :config
+    (require 'dired+)
     (setq dired-listing-switches "--group-directories-first -alh")
     (toggle-diredp-find-file-reuse-dir 1))
 #+END_SRC
