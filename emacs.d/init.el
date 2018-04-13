@@ -44,13 +44,12 @@
  '(haskell-stylish-on-save t)
  '(package-selected-packages
    (quote
-    (zenburn-theme yapfify yaml-mode winum which-key web-mode virtualenvwrapper use-package undo-tree tox tide speed-type spaceline smartparens sane-term rainbow-mode rainbow-delimiters popwin pdf-tools paradox org-plus-contrib org-password-manager org-mime org-gcal org-bullets org-alert ob-restclient noflet multiple-cursors magit json-mode intero htmlize hindent highlight-symbol highlight-indent-guides hasky-stack groovy-mode gitignore-templates expand-region elpy edit-server dired+ diff-hl counsel-projectile company-web company-tern company-statistics company-shell company-restclient company-quickhelp company-jedi company-auctex color-theme-sanityinc-tomorrow anzu all-the-icons-ivy ace-window)))
+    (gruvbox-theme mu4e-alert zenburn-theme company-box speed-type web-mode tide yaml-mode json-mode tox yapfify company-jedi elpy virtualenvwrapper hasky-stack hindent intero org-gcal org-password-manager which-key use-package undo-tree spaceline smartparens sane-term rainbow-mode rainbow-delimiters pdf-tools paradox org-plus-contrib org-mime org-bullets org-alert ob-restclient noflet multiple-cursors magit htmlize highlight-symbol highlight-indent-guides gitignore-templates flycheck expand-region edit-server dired+ diff-hl counsel-projectile company-web company-tern company-statistics company-shell company-restclient company-quickhelp company-auctex color-theme-sanityinc-tomorrow anzu all-the-icons ace-window)))
  '(paradox-github-token t)
  '(safe-local-variable-values
    (quote
-    ((eval venv-workon "crypto")
+    ((eval venv-workon "bunny")
      (eval venv-workon "eotrade")
-     (eval venv-workon "bunny")
      (eval venv-workon "at-env")))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

@@ -288,6 +288,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
                  ("dired" (mode . dired-mode))
                  ("org" (name . "^.*org$"))
                  ("shell" (or (mode . eshell-mode) (mode . shell-mode)))
+                 ("mu4e" (name . "\*mu4e\*"))
                  ("Python" (mode . python-mode))
                  ("Haskell" (mode . haskell-mode))
                  ("Web" (mode . web-mode))
@@ -313,18 +314,18 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 **** Color scheme
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package gruvbox-theme
-  ;;   :ensure t
-  ;;   :config
-  ;;   (load-theme 'gruvbox-dark-hard t))
+  (use-package gruvbox-theme
+    :ensure t
+    :config
+    (load-theme 'gruvbox-dark-hard t))
   ;; (use-package zenburn-theme
   ;;   :ensure t
   ;;   :config
   ;;   (load-theme 'zenburn t))
-  (use-package color-theme-sanityinc-tomorrow
-    :ensure t
-    :config
-    (load-theme 'sanityinc-tomorrow-eighties t))
+  ;; (use-package color-theme-sanityinc-tomorrow
+  ;;   :ensure t
+  ;;   :config
+  ;;   (load-theme 'sanityinc-tomorrow-night t))
 #+END_SRC
 **** Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
@@ -1332,16 +1333,69 @@ And even org-babel integration:
 *** Email
 **** Sending email
 #+BEGIN_SRC emacs-lisp
-  (setq mail-user-agent 'message-user-agent)
+  (require 'smtpmail)
 
-  (setq user-mail-address "phentagram@gmail.com"
-        user-full-name "Roman Rudakov")
-
-  (setq smtpmail-smtp-server "smtp.gmail.com"
+  (setq message-send-mail-function 'smtpmail-send-it
+        smtpmail-starttls-credentials '(("outlook.office365.com" 587 nil nil))
+        smtpmail-default-smtp-server "outlook.office365.com"
+        smtpmail-smtp-server "outlook.office365.com"
         smtpmail-smtp-service 587
+        smtpmail-stream-type 'starttls
+        smtpmail-debug-info t)
 
-        message-send-mail-function 'message-smtpmail-send-it
-        compose-mail-user-agent-warnings nil)
+  (require 'mu4e)
+
+  (setq mu4e-maildir (expand-file-name "~/Maildir/BSC"))
+  (setq mu4e-drafts-folder "/Drafts")
+  (setq mu4e-sent-folder   "/Sent Items")
+  (setq mu4e-trash-folder  "/Deleted Items")
+
+  (setq mu4e-get-mail-command "mbsync BSC"
+        mu4e-update-interval 120
+        mu4e-headers-auto-update t
+        mu4e-compose-signature-auto-include nil)
+
+  (setq mu4e-maildir-shortcuts
+        '(("/INBOX" . ?i)
+          ("/Sent Items" . ?s)
+          ("/Deleted Items" . ?t)
+          ("/Drafts" . ?d)))
+
+  (setq mu4e-use-fancy-chars t)
+  (setq mu4e-show-images t)
+
+  (when (fboundp 'imagemagick-register-types)
+    (imagemagick-register-types))
+
+  (setq mu4e-view-prefer-html t)
+
+  (setq smtpmail-queue-mail t
+        smtpmail-queue-dir   "~/Maildir/queue/cur")
+
+  (setq message-kill-buffer-on-exit t)
+
+  (setq mu4e-reply-to-address "Roman.Rudakov@bsc-ideas.com"
+        user-mail-address "Roman.Rudakov@bsc-ideas.com"
+        user-full-name  "Roman Rudakov")
+
+
+  (require 'org-mu4e)
+  (setq org-mu4e-convert-to-html t)
+
+  (setq mu4e-headers-fields
+        '((:human-date . 25)
+          (:flags . 6)
+          (:from . 22)
+          (:subject . nil)))
+#+END_SRC
+**** Alerts
+#+BEGIN_SRC emacs-lisp
+  (use-package mu4e-alert
+    :ensure t
+    :config
+    (mu4e-alert-set-default-style 'libnotify)
+    (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
+    (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
 #+END_SRC
 *** Languages
 **** Haskell
