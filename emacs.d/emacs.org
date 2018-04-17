@@ -73,7 +73,14 @@
 *** Common
 **** Increase performance
 #+BEGIN_SRC emacs-lisp
-  (setq gc-cons-threshold 50000000)
+  (setq gc-cons-threshold 50000000
+        gc-cons-percentage 0.6)
+
+  (add-hook 'after-init-hook
+            (lambda () ;; restore after startup
+              (setq gc-cons-threshold 16777216
+                    gc-cons-percentage 0.1)))
+
   (setq gnutls-min-prime-bits 4096)
   ;; Font lock settings
   (setq jit-lock-stealth-time 16
@@ -228,8 +235,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
     ;; buffer name  in frame title
     (setq-default frame-title-format '("RR Emacs"))
     ;; standardize fringe width
-    (push (cons 'left-fringe  my-ui-fringe-size) default-frame-alist)
-    (push (cons 'right-fringe my-ui-fringe-size) default-frame-alist))
+    ;; (push (cons 'left-fringe  my-ui-fringe-size) default-frame-alist)
+    ;; (push (cons 'right-fringe my-ui-fringe-size) default-frame-alist)
+    )
 #+END_SRC
 **** Use SSH for tramp-mode
 #+BEGIN_SRC emacs-lisp
@@ -307,15 +315,18 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   ;; Don't ask for confirmation to delete marked buffers
   (setq ibuffer-expert t)
 #+END_SRC
+**** Use package default settings
+#+BEGIN_SRC emacs-lisp
+  (setq-default use-package-always-ensure t)
+#+END_SRC
 *** Theme
 **** All the icons
 #+BEGIN_SRC emacs-lisp
-  (use-package all-the-icons :ensure t)
+  (use-package all-the-icons)
 #+END_SRC
 **** Color scheme
 #+BEGIN_SRC emacs-lisp
   (use-package gruvbox-theme
-    :ensure t
     :config
     (load-theme 'gruvbox-dark-hard t))
   ;; (use-package zenburn-theme
@@ -330,7 +341,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
   (use-package highlight-symbol
-    :ensure t
     :config
     (highlight-symbol-nav-mode)
 
@@ -532,12 +542,11 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 **** Highlight indentation
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package highlight-indent-guides
-  ;;   :ensure t
-  ;;   :config
-  ;;   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-  ;;   (setq highlight-indent-guides-method 'character
-  ;;         highlight-indent-guides-character ?\x258F))
+  (use-package highlight-indent-guides
+    :config
+    (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+    (setq highlight-indent-guides-method 'character
+          highlight-indent-guides-character ?\x258F))
 #+END_SRC
 *** Semantic
 **** Enable semantic mode global
@@ -568,14 +577,12 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 *** Which key
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
-    :ensure t
     :config
     (which-key-mode))
 #+END_SRC
 *** Undo tree
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
-    :ensure t
     :config
     (global-undo-tree-mode)
     (setq undo-tree-visualizer-diff t
@@ -585,7 +592,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** YASnippet
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
-    :ensure t
     :config
     (yas-reload-all)
     (add-hook 'prog-mode-hook #'yas-minor-mode))
@@ -593,17 +599,18 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** Common
 #+BEGIN_SRC emacs-lisp
   (use-package company
-    :ensure t
-    :hook (after-init-hook . global-company-mode)
     :config
-    (setq company-dabbrev-downcase nil)
+    (add-hook 'after-init-hook 'global-company-mode)
+    (setq company-dabbrev-downcase nil
+          company-sort-by-occurrence t)
     (setq-default company-idle-delay .2
                   company-minimum-prefix-length 2
                   company-require-match nil
                   company-tooltip-align-annotations t)
     (add-to-list 'company-backends 'company-dabbrev-code)
     (add-to-list 'company-backends 'company-yasnippet)
-    (add-to-list 'company-backends 'company-files))
+    (add-to-list 'company-backends 'company-files)
+    (add-to-list 'company-backends 'company-elisp))
 #+END_SRC
 **** Completeon with icons
 #+BEGIN_SRC emacs-lisp
@@ -614,10 +621,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** Statistic
 Show more offten used completeons first
 #+BEGIN_SRC emacs-lisp
-  (use-package company-statistics
-    :ensure t
-    :config
-    (company-statistics-mode))
+  ;; (use-package company-statistics
+  ;;   :config
+  ;;   (company-statistics-mode))
 #+END_SRC
 **** Quick help
 #+BEGIN_SRC emacs-lisp
@@ -810,44 +816,51 @@ link.
 **** Flycheck
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
-    :ensure t
     :config
     (add-hook 'after-init-hook #'global-flycheck-mode)
 
-    (setq flycheck-indication-mode 'right-fringe)
+    ;; (setq flycheck-indication-mode 'right-fringe)
 
-    (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
-      [0 0 0 0 0 4 12 28 60 124 252 124 60 28 12 4 0 0 0 0])
+    ;; (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
+    ;;   [0 0 0 0 0 4 12 28 60 124 252 124 60 28 12 4 0 0 0 0])
 
-    (setq-default flycheck-disabled-checkers
-                  (append flycheck-disabled-checkers
-                          '(javascript-jshint)))
+    (when (fboundp 'define-fringe-bitmap)
+      (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
+        (vector #b00000000
+                #b00000000
+                #b00000000
+                #b00000000
+                #b00000000
+                #b00000000
+                #b00000000
+                #b00011100
+                #b00111110
+                #b00111110
+                #b00111110
+                #b00011100
+                #b00000000
+                #b00000000
+                #b00000000
+                #b00000000
+                #b00000000)))
 
-    (setq-default flycheck-disabled-checkers
-                  (append flycheck-disabled-checkers
-                          '(json-jsonlist)))
-
-    (setq-default flycheck-disabled-checkers
-                  (append flycheck-disabled-checkers
-                          '(python-flake8)))
-
-    ;; (add-to-list 'flycheck-checkers 'python-flake8)
-    ;; (add-to-list 'flycheck-checkers 'python-pylint)
-    )
-#+END_SRC
-*** Syntax check
-**** Flycheck
-#+BEGIN_SRC emacs-lisp
-  (use-package flycheck
-    :ensure t
-    :config
-    (add-hook 'after-init-hook #'global-flycheck-mode)
-
-    (setq flycheck-indication-mode 'right-fringe)
-
-    (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
-      [0 0 0 0 0 4 12 28 60 124 252 124 60 28 12 4 0 0 0 0])
-
+    (let ((bitmap 'flycheck-fringe-bitmap-double-arrow))
+      (flycheck-define-error-level 'error
+        :severity 2
+        :overlay-category 'flycheck-error-overlay
+        :fringe-bitmap bitmap
+        :fringe-face 'flycheck-fringe-error)
+      (flycheck-define-error-level 'warning
+        :severity 1
+        :overlay-category 'flycheck-warning-overlay
+        :fringe-bitmap bitmap
+        :fringe-face 'flycheck-fringe-warning)
+      (flycheck-define-error-level 'info
+        :severity 0
+        :overlay-category 'flycheck-info-overlay
+        :fringe-bitmap bitmap
+        :fringe-face 'flycheck-fringe-info))
+      
     (setq-default flycheck-disabled-checkers
                   (append flycheck-disabled-checkers
                           '(javascript-jshint)))
@@ -871,9 +884,11 @@ link.
     :ensure t
     :config
     (global-set-key (kbd "C-x g") 'magit-status)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
     (setq magit-completing-read-function 'ivy-completing-read)
-    (add-hook 'focus-in-hook 'rr/refresh-vc-state)
-    (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state))
+    ;; (add-hook 'focus-in-hook 'rr/refresh-vc-state)
+    ;; (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state)
+    )
 #+END_SRC
 **** Highlight diff
 #+BEGIN_SRC emacs-lisp
@@ -1403,7 +1418,6 @@ And even org-babel integration:
 #+BEGIN_SRC emacs-lisp
   (use-package intero
     :after flycheck
-    :ensure t
     :config
     (add-hook 'haskell-mode-hook 'company-mode)
     (add-hook 'haskell-mode-hook 'intero-mode)
@@ -1511,7 +1525,6 @@ And even org-babel integration:
 ***** Elpy
 #+BEGIN_SRC emacs-lisp
   (use-package elpy
-    :ensure t
     :config
     (elpy-enable)
     (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
@@ -1540,17 +1553,17 @@ And even org-babel integration:
   ;;   :config
   ;;   (eval-after-load "company"
   ;;     '(add-to-list 'company-backends 'company-anaconda)))
-  (use-package company-jedi
-    :ensure t
-    :config
-    (defun company-jedi-setup ()
-      (add-to-list 'company-backends 'company-jedi))
-    (add-hook 'python-mode-hook 'company-jedi-setup)
-    (setq jedi:complete-on-dot t)
-    ;; (add-hook 'python-mode-hook (lambda ()
-    ;;                               (hack-local-variables)
-    ;;                               (venv-workon project-venv-name)))
-    (add-hook 'python-mode-hook 'jedi:setup))
+  ;; (use-package company-jedi
+  ;;   :ensure t
+  ;;   :config
+  ;;   (defun company-jedi-setup ()
+  ;;     (add-to-list 'company-backends 'company-jedi))
+  ;;   (add-hook 'python-mode-hook 'company-jedi-setup)
+  ;;   (setq jedi:complete-on-dot t)
+  ;;   ;; (add-hook 'python-mode-hook (lambda ()
+  ;;   ;;                               (hack-local-variables)
+  ;;   ;;                               (venv-workon project-venv-name)))
+  ;;   (add-hook 'python-mode-hook 'jedi:setup))
 #+END_SRC
 ***** Import management
 #+BEGIN_SRC emacs-lisp
