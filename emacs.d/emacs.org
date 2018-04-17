@@ -73,8 +73,20 @@
 *** Common
 **** Increase performance
 #+BEGIN_SRC emacs-lisp
-  (setq gc-cons-threshold 50000000)
+  (setq gc-cons-threshold 50000000
+        gc-cons-percentage 0.6)
+
+  (add-hook 'after-init-hook
+            (lambda () ;; restore after startup
+              (setq gc-cons-threshold 16777216
+                    gc-cons-percentage 0.1)))
+
   (setq gnutls-min-prime-bits 4096)
+  ;; Font lock settings
+  (setq jit-lock-stealth-time 16
+        jit-lock-defer-contextually t
+        jit-lock-stealth-nice 0.5)
+  (setq-default font-lock-multiline t)
 #+END_SRC
 **** Highlight expression in parens
 #+BEGIN_SRC emacs-lisp
@@ -223,8 +235,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
     ;; buffer name  in frame title
     (setq-default frame-title-format '("RR Emacs"))
     ;; standardize fringe width
-    (push (cons 'left-fringe  my-ui-fringe-size) default-frame-alist)
-    (push (cons 'right-fringe my-ui-fringe-size) default-frame-alist))
+    ;; (push (cons 'left-fringe  my-ui-fringe-size) default-frame-alist)
+    ;; (push (cons 'right-fringe my-ui-fringe-size) default-frame-alist)
+    )
 #+END_SRC
 **** Use SSH for tramp-mode
 #+BEGIN_SRC emacs-lisp
@@ -283,6 +296,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
                  ("dired" (mode . dired-mode))
                  ("org" (name . "^.*org$"))
                  ("shell" (or (mode . eshell-mode) (mode . shell-mode)))
+                 ("mu4e" (name . "\*mu4e\*"))
                  ("Python" (mode . python-mode))
                  ("Haskell" (mode . haskell-mode))
                  ("Web" (mode . web-mode))
@@ -301,30 +315,32 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   ;; Don't ask for confirmation to delete marked buffers
   (setq ibuffer-expert t)
 #+END_SRC
+**** Use package default settings
+#+BEGIN_SRC emacs-lisp
+  (setq-default use-package-always-ensure t)
+#+END_SRC
 *** Theme
 **** All the icons
 #+BEGIN_SRC emacs-lisp
-  (use-package all-the-icons :ensure t)
+  (use-package all-the-icons)
 #+END_SRC
 **** Color scheme
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package gruvbox-theme
-  ;;   :ensure t
-  ;;   :config
-  ;;   (load-theme 'gruvbox-dark-hard t))
+  (use-package gruvbox-theme
+    :config
+    (load-theme 'gruvbox-dark-hard t))
   ;; (use-package zenburn-theme
   ;;   :ensure t
   ;;   :config
   ;;   (load-theme 'zenburn t))
-  (use-package color-theme-sanityinc-tomorrow
-    :ensure t
-    :config
-    (load-theme 'sanityinc-tomorrow-night t))
+  ;; (use-package color-theme-sanityinc-tomorrow
+  ;;   :ensure t
+  ;;   :config
+  ;;   (load-theme 'sanityinc-tomorrow-night t))
 #+END_SRC
 **** Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
   (use-package highlight-symbol
-    :ensure t
     :config
     (highlight-symbol-nav-mode)
 
@@ -527,7 +543,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** Highlight indentation
 #+BEGIN_SRC emacs-lisp
   (use-package highlight-indent-guides
-    :ensure t
     :config
     (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
     (setq highlight-indent-guides-method 'character
@@ -570,14 +585,12 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 *** Which key
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
-    :ensure t
     :config
     (which-key-mode))
 #+END_SRC
 *** Undo tree
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
-    :ensure t
     :config
     (global-undo-tree-mode)
     (setq undo-tree-visualizer-diff t
@@ -587,7 +600,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** YASnippet
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
-    :ensure t
     :config
     (yas-reload-all)
     (add-hook 'prog-mode-hook #'yas-minor-mode))
@@ -595,20 +607,18 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** Common
 #+BEGIN_SRC emacs-lisp
   (use-package company
-    :ensure t
-    :init
-    (setq company-dabbrev-downcase nil)
     :config
-    ;; (setq company-auto-complete nil)
     (add-hook 'after-init-hook 'global-company-mode)
-    (setq-default
-     company-idle-delay .2
-     company-minimum-prefix-length 2
-     company-require-match nil
-     company-tooltip-align-annotations t)
+    (setq company-dabbrev-downcase nil
+          company-sort-by-occurrence t)
+    (setq-default company-idle-delay .2
+                  company-minimum-prefix-length 2
+                  company-require-match nil
+                  company-tooltip-align-annotations t)
     (add-to-list 'company-backends 'company-dabbrev-code)
     (add-to-list 'company-backends 'company-yasnippet)
-    (add-to-list 'company-backends 'company-files))
+    (add-to-list 'company-backends 'company-files)
+    (add-to-list 'company-backends 'company-elisp))
 #+END_SRC
 **** Completeon with icons
 #+BEGIN_SRC emacs-lisp
@@ -619,10 +629,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** Statistic
 Show more offten used completeons first
 #+BEGIN_SRC emacs-lisp
-  (use-package company-statistics
-    :ensure t
-    :config
-    (company-statistics-mode))
+  ;; (use-package company-statistics
+  ;;   :config
+  ;;   (company-statistics-mode))
 #+END_SRC
 **** Quick help
 #+BEGIN_SRC emacs-lisp
@@ -783,6 +792,7 @@ link.
   (use-package dired+
     :ensure t
     :config
+    (require 'dired+)
     (setq dired-listing-switches "--group-directories-first -alh")
     (toggle-diredp-find-file-reuse-dir 1))
 #+END_SRC
@@ -814,44 +824,51 @@ link.
 **** Flycheck
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
-    :ensure t
     :config
     (add-hook 'after-init-hook #'global-flycheck-mode)
 
-    (setq flycheck-indication-mode 'right-fringe)
+    ;; (setq flycheck-indication-mode 'right-fringe)
 
-    (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
-      [0 0 0 0 0 4 12 28 60 124 252 124 60 28 12 4 0 0 0 0])
+    ;; (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
+    ;;   [0 0 0 0 0 4 12 28 60 124 252 124 60 28 12 4 0 0 0 0])
 
-    (setq-default flycheck-disabled-checkers
-                  (append flycheck-disabled-checkers
-                          '(javascript-jshint)))
+    (when (fboundp 'define-fringe-bitmap)
+      (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
+        (vector #b00000000
+                #b00000000
+                #b00000000
+                #b00000000
+                #b00000000
+                #b00000000
+                #b00000000
+                #b00011100
+                #b00111110
+                #b00111110
+                #b00111110
+                #b00011100
+                #b00000000
+                #b00000000
+                #b00000000
+                #b00000000
+                #b00000000)))
 
-    (setq-default flycheck-disabled-checkers
-                  (append flycheck-disabled-checkers
-                          '(json-jsonlist)))
-
-    (setq-default flycheck-disabled-checkers
-                  (append flycheck-disabled-checkers
-                          '(python-flake8)))
-
-    ;; (add-to-list 'flycheck-checkers 'python-flake8)
-    ;; (add-to-list 'flycheck-checkers 'python-pylint)
-    )
-#+END_SRC
-*** Syntax check
-**** Flycheck
-#+BEGIN_SRC emacs-lisp
-  (use-package flycheck
-    :ensure t
-    :config
-    (add-hook 'after-init-hook #'global-flycheck-mode)
-
-    (setq flycheck-indication-mode 'right-fringe)
-
-    (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
-      [0 0 0 0 0 4 12 28 60 124 252 124 60 28 12 4 0 0 0 0])
-
+    (let ((bitmap 'flycheck-fringe-bitmap-double-arrow))
+      (flycheck-define-error-level 'error
+        :severity 2
+        :overlay-category 'flycheck-error-overlay
+        :fringe-bitmap bitmap
+        :fringe-face 'flycheck-fringe-error)
+      (flycheck-define-error-level 'warning
+        :severity 1
+        :overlay-category 'flycheck-warning-overlay
+        :fringe-bitmap bitmap
+        :fringe-face 'flycheck-fringe-warning)
+      (flycheck-define-error-level 'info
+        :severity 0
+        :overlay-category 'flycheck-info-overlay
+        :fringe-bitmap bitmap
+        :fringe-face 'flycheck-fringe-info))
+      
     (setq-default flycheck-disabled-checkers
                   (append flycheck-disabled-checkers
                           '(javascript-jshint)))
@@ -875,9 +892,11 @@ link.
     :ensure t
     :config
     (global-set-key (kbd "C-x g") 'magit-status)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
     (setq magit-completing-read-function 'ivy-completing-read)
-    (add-hook 'focus-in-hook 'rr/refresh-vc-state)
-    (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state))
+    ;; (add-hook 'focus-in-hook 'rr/refresh-vc-state)
+    ;; (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state)
+    )
 #+END_SRC
 **** Highlight diff
 #+BEGIN_SRC emacs-lisp
@@ -1314,7 +1333,7 @@ And even org-babel integration:
    '((emacs-lisp . t)
      (python . t)
      (sql . t)
-     (sh . t)
+     (shell . t)
      (haskell . t)))
   (setq org-confirm-babel-evaluate t)
 #+END_SRC
@@ -1337,16 +1356,69 @@ And even org-babel integration:
 *** Email
 **** Sending email
 #+BEGIN_SRC emacs-lisp
-  (setq mail-user-agent 'message-user-agent)
+  (require 'smtpmail)
 
-  (setq user-mail-address "phentagram@gmail.com"
-        user-full-name "Roman Rudakov")
-
-  (setq smtpmail-smtp-server "smtp.gmail.com"
+  (setq message-send-mail-function 'smtpmail-send-it
+        smtpmail-starttls-credentials '(("outlook.office365.com" 587 nil nil))
+        smtpmail-default-smtp-server "outlook.office365.com"
+        smtpmail-smtp-server "outlook.office365.com"
         smtpmail-smtp-service 587
+        smtpmail-stream-type 'starttls
+        smtpmail-debug-info t)
 
-        message-send-mail-function 'message-smtpmail-send-it
-        compose-mail-user-agent-warnings nil)
+  (require 'mu4e)
+
+  (setq mu4e-maildir (expand-file-name "~/Maildir/BSC"))
+  (setq mu4e-drafts-folder "/Drafts")
+  (setq mu4e-sent-folder   "/Sent Items")
+  (setq mu4e-trash-folder  "/Deleted Items")
+
+  (setq mu4e-get-mail-command "mbsync BSC"
+        mu4e-update-interval 120
+        mu4e-headers-auto-update t
+        mu4e-compose-signature-auto-include nil)
+
+  (setq mu4e-maildir-shortcuts
+        '(("/INBOX" . ?i)
+          ("/Sent Items" . ?s)
+          ("/Deleted Items" . ?t)
+          ("/Drafts" . ?d)))
+
+  (setq mu4e-use-fancy-chars t)
+  (setq mu4e-show-images t)
+
+  (when (fboundp 'imagemagick-register-types)
+    (imagemagick-register-types))
+
+  (setq mu4e-view-prefer-html t)
+
+  (setq smtpmail-queue-mail t
+        smtpmail-queue-dir   "~/Maildir/queue/cur")
+
+  (setq message-kill-buffer-on-exit t)
+
+  (setq mu4e-reply-to-address "Roman.Rudakov@bsc-ideas.com"
+        user-mail-address "Roman.Rudakov@bsc-ideas.com"
+        user-full-name  "Roman Rudakov")
+
+
+  (require 'org-mu4e)
+  (setq org-mu4e-convert-to-html t)
+
+  (setq mu4e-headers-fields
+        '((:human-date . 25)
+          (:flags . 6)
+          (:from . 22)
+          (:subject . nil)))
+#+END_SRC
+**** Alerts
+#+BEGIN_SRC emacs-lisp
+  (use-package mu4e-alert
+    :ensure t
+    :config
+    (mu4e-alert-set-default-style 'libnotify)
+    (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
+    (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
 #+END_SRC
 *** Languages
 **** Haskell
@@ -1354,7 +1426,6 @@ And even org-babel integration:
 #+BEGIN_SRC emacs-lisp
   (use-package intero
     :after flycheck
-    :ensure t
     :config
     (add-hook 'haskell-mode-hook 'company-mode)
     (add-hook 'haskell-mode-hook 'intero-mode)
@@ -1462,7 +1533,6 @@ And even org-babel integration:
 ***** Elpy
 #+BEGIN_SRC emacs-lisp
   (use-package elpy
-    :ensure t
     :config
     (elpy-enable)
     (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
@@ -1491,17 +1561,17 @@ And even org-babel integration:
   ;;   :config
   ;;   (eval-after-load "company"
   ;;     '(add-to-list 'company-backends 'company-anaconda)))
-  (use-package company-jedi
-    :ensure t
-    :config
-    (defun company-jedi-setup ()
-      (add-to-list 'company-backends 'company-jedi))
-    (add-hook 'python-mode-hook 'company-jedi-setup)
-    (setq jedi:complete-on-dot t)
-    ;; (add-hook 'python-mode-hook (lambda ()
-    ;;                               (hack-local-variables)
-    ;;                               (venv-workon project-venv-name)))
-    (add-hook 'python-mode-hook 'jedi:setup))
+  ;; (use-package company-jedi
+  ;;   :ensure t
+  ;;   :config
+  ;;   (defun company-jedi-setup ()
+  ;;     (add-to-list 'company-backends 'company-jedi))
+  ;;   (add-hook 'python-mode-hook 'company-jedi-setup)
+  ;;   (setq jedi:complete-on-dot t)
+  ;;   ;; (add-hook 'python-mode-hook (lambda ()
+  ;;   ;;                               (hack-local-variables)
+  ;;   ;;                               (venv-workon project-venv-name)))
+  ;;   (add-hook 'python-mode-hook 'jedi:setup))
 #+END_SRC
 ***** Import management
 #+BEGIN_SRC emacs-lisp

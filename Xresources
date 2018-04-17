@@ -197,3 +197,6 @@ XLock.messagefont: -*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-1
 dzen2.font: -*-terminus-*-*-*-*-10-*-*-*-*-*-iso10646-1     
 dzen2.foreground: #FF8C00
 dzen2.background: black
+
+! Emacs lucid
+Emacs.pane.menubar.background: base00
