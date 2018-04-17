@@ -44,7 +44,7 @@
  '(haskell-stylish-on-save t)
  '(package-selected-packages
    (quote
-    (highlight-indent-guides ejc-sql sql-indent speed-type web-mode tide yaml-mode json-mode tox yapfify company-jedi elpy virtualenvwrapper hasky-stack hindent intero org-gcal org-password-manager org-mime org-alert org-bullets edit-server pdf-tools ob-restclient company-restclient restclient rainbow-mode sane-term multiple-cursors diff-hl magit flycheck htmlize counsel-projectile projectile dired+ winum anzu rainbow-delimiters popwin smartparens counsel swiper ivy paradox company-tern company-shell company-web company-auctex company-quickhelp company-statistics company yasnippet spaceline highlight-symbol color-theme-sanityinc-tomorrow all-the-icons use-package org-plus-contrib)))
+    (gruvbox-theme highlight-indent-guides ejc-sql sql-indent speed-type web-mode tide yaml-mode json-mode tox yapfify company-jedi elpy virtualenvwrapper hasky-stack hindent intero org-gcal org-password-manager org-mime org-alert org-bullets edit-server pdf-tools ob-restclient company-restclient restclient rainbow-mode sane-term multiple-cursors diff-hl magit flycheck htmlize counsel-projectile projectile dired+ winum anzu rainbow-delimiters popwin smartparens counsel swiper ivy paradox company-tern company-shell company-web company-auctex company-quickhelp company-statistics company yasnippet spaceline highlight-symbol color-theme-sanityinc-tomorrow all-the-icons use-package org-plus-contrib)))
  '(paradox-github-token t)
  '(safe-local-variable-values
    (quote
