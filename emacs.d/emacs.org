@@ -75,9 +75,9 @@
 #+BEGIN_SRC emacs-lisp
   (setq gnutls-min-prime-bits 4096)
   ;; Font lock settings
-  (setq jit-lock-stealth-time 16
-        jit-lock-defer-contextually t
-        jit-lock-stealth-nice 0.5)
+  ;; (setq jit-lock-stealth-time 16
+  ;;       jit-lock-defer-contextually t
+  ;;       jit-lock-stealth-nice 0.5)
   (setq-default font-lock-multiline t)
 #+END_SRC
 **** Highlight expression in parens
