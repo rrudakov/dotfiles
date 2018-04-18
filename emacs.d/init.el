@@ -20,7 +20,16 @@
  'package-archives
  '("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/") t)
 
+(let ((normal-gc-cons-threshold (* 20 1024 1024))
+      (init-gc-cons-threshold (* 128 1024 1024)))
+  (setq gc-cons-threshold init-gc-cons-threshold)
+  (add-hook 'after-init-hook
+            (lambda () (setq gc-cons-threshold normal-gc-cons-threshold))))
+
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
 (package-initialize) ;; You might already have this line
+
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -36,29 +45,7 @@
 (setq vc-follow-symlinks "t")
 (org-babel-load-file (expand-file-name "emacs.org" user-emacs-directory))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(haskell-stylish-on-save t)
- '(package-selected-packages
-   (quote
-    (gruvbox-theme mu4e-alert zenburn-theme company-box speed-type web-mode tide yaml-mode json-mode tox yapfify company-jedi elpy virtualenvwrapper hasky-stack hindent intero org-gcal org-password-manager which-key use-package undo-tree spaceline smartparens sane-term rainbow-mode rainbow-delimiters pdf-tools paradox org-plus-contrib org-mime org-bullets org-alert ob-restclient noflet multiple-cursors magit htmlize highlight-symbol highlight-indent-guides gitignore-templates flycheck expand-region edit-server dired+ diff-hl counsel-projectile company-web company-tern company-statistics company-shell company-restclient company-quickhelp company-auctex color-theme-sanityinc-tomorrow anzu all-the-icons ace-window)))
- '(paradox-github-token t)
- '(safe-local-variable-values
-   (quote
-    ((eval venv-workon "bunny")
-     (eval venv-workon "eotrade")
-     (eval venv-workon "at-env")))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
- ;; Local Variables:
-;; byte-compile-warnings: (not free-vars)
-;; End:
+(when (file-exists-p custom-file)
+  (load custom-file))
 (provide 'init)
 ;;; init.el ends here

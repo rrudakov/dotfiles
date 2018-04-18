@@ -73,14 +73,6 @@
 *** Common
 **** Increase performance
 #+BEGIN_SRC emacs-lisp
-  (setq gc-cons-threshold 50000000
-        gc-cons-percentage 0.6)
-
-  (add-hook 'after-init-hook
-            (lambda () ;; restore after startup
-              (setq gc-cons-threshold 16777216
-                    gc-cons-percentage 0.1)))
-
   (setq gnutls-min-prime-bits 4096)
   ;; Font lock settings
   (setq jit-lock-stealth-time 16
@@ -318,6 +310,13 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** Use package default settings
 #+BEGIN_SRC emacs-lisp
   (setq-default use-package-always-ensure t)
+#+END_SRC
+**** Recent files
+#+BEGIN_SRC emacs-lisp
+  (require 'recentf)
+  (setq recentf-max-saved-items 200
+        recentf-max-menu-items 15)
+  (recentf-mode)
 #+END_SRC
 *** Theme
 **** All the icons
@@ -1332,14 +1331,12 @@ And even org-babel integration:
 **** Manage passwords using org-mode
 #+BEGIN_SRC emacs-lisp
   (use-package org-password-manager
-    :ensure t
     :config
     (add-hook 'org-mode-hook 'org-password-manager-key-bindings))
 #+END_SRC
 **** Google calendar sync
 #+BEGIN_SRC emacs-lisp
   (use-package org-gcal
-    :ensure t
     :config
     (setq org-gcal-client-id "746234569233-nrqvf2rke8skag1hadbu15clkpmgr9bk.apps.googleusercontent.com"
           org-gcal-client-secret "1JolKXlhxyoNmABe8qIbw40H"
