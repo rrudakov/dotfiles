@@ -20,7 +20,16 @@
  'package-archives
  '("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/") t)
 
+(let ((normal-gc-cons-threshold (* 20 1024 1024))
+      (init-gc-cons-threshold (* 128 1024 1024)))
+  (setq gc-cons-threshold init-gc-cons-threshold)
+  (add-hook 'after-init-hook
+            (lambda () (setq gc-cons-threshold normal-gc-cons-threshold))))
+
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
 (package-initialize) ;; You might already have this line
+
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -36,28 +45,7 @@
 (setq vc-follow-symlinks "t")
 (org-babel-load-file (expand-file-name "emacs.org" user-emacs-directory))
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(haskell-stylish-on-save t)
- '(package-selected-packages
-   (quote
-    (gruvbox-theme highlight-indent-guides ejc-sql sql-indent speed-type web-mode tide yaml-mode json-mode tox yapfify company-jedi elpy virtualenvwrapper hasky-stack hindent intero org-gcal org-password-manager org-mime org-alert org-bullets edit-server pdf-tools ob-restclient company-restclient restclient rainbow-mode sane-term multiple-cursors diff-hl magit flycheck htmlize counsel-projectile projectile dired+ winum anzu rainbow-delimiters popwin smartparens counsel swiper ivy paradox company-tern company-shell company-web company-auctex company-quickhelp company-statistics company yasnippet spaceline highlight-symbol color-theme-sanityinc-tomorrow all-the-icons use-package org-plus-contrib)))
- '(paradox-github-token t)
- '(safe-local-variable-values
-   (quote
-    ((eval venv-workon "eo")
-     (eval venv-workon "crypto")))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
- ;; Local Variables:
-;; byte-compile-warnings: (not free-vars)
-;; End:
+(when (file-exists-p custom-file)
+  (load custom-file))
 (provide 'init)
 ;;; init.el ends here
