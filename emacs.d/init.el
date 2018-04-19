@@ -20,11 +20,9 @@
  'package-archives
  '("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/") t)
 
-(let ((normal-gc-cons-threshold (* 20 1024 1024))
-      (init-gc-cons-threshold (* 128 1024 1024)))
-  (setq gc-cons-threshold init-gc-cons-threshold)
-  (add-hook 'after-init-hook
-            (lambda () (setq gc-cons-threshold normal-gc-cons-threshold))))
+(setq gc-cons-threshold (* 128 1024 1024))
+(add-hook 'after-init-hook
+          (lambda () (setq gc-cons-threshold 800000)))
 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
