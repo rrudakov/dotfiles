@@ -78,7 +78,7 @@
   ;; (setq jit-lock-stealth-time 16
   ;;       jit-lock-defer-contextually t
   ;;       jit-lock-stealth-nice 0.5)
-  (setq-default font-lock-multiline t)
+  ;; (setq-default font-lock-multiline t)
 #+END_SRC
 **** Highlight expression in parens
 #+BEGIN_SRC emacs-lisp
@@ -622,8 +622,8 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** Completeon with icons
 #+BEGIN_SRC emacs-lisp
   ;; (use-package company-box
-  ;;   :ensure t
-  ;;   :hook (company-mode . company-box-mode))
+  ;;   :config
+  ;;   (add-hook 'company-mode-hook 'company-box-mode))
 #+END_SRC
 **** Statistic
 Show more offten used completeons first
@@ -635,7 +635,6 @@ Show more offten used completeons first
 **** Quick help
 #+BEGIN_SRC emacs-lisp
   (use-package company-quickhelp
-    :ensure t
     :config
     (company-quickhelp-mode 1))
 #+END_SRC
@@ -893,9 +892,8 @@ link.
     (global-set-key (kbd "C-x g") 'magit-status)
     (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
     (setq magit-completing-read-function 'ivy-completing-read)
-    ;; (add-hook 'focus-in-hook 'rr/refresh-vc-state)
-    ;; (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state)
-    )
+    (add-hook 'focus-in-hook 'rr/refresh-vc-state)
+    (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state))
 #+END_SRC
 **** Highlight diff
 #+BEGIN_SRC emacs-lisp
