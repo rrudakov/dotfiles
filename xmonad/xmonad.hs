@@ -28,7 +28,8 @@ import           XMonad.Util.Run                 (spawnPipe)
 
 -- | Set default terminal emulator
 myTerminal ∷ String
-myTerminal = "gnome-terminal"
+-- myTerminal = "gnome-terminal"
+myTerminal = "xfce4-terminal"
 
 -- | Set focus follow mouse
 myFocusFollowsMouse ∷ Bool

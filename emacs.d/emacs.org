@@ -611,6 +611,13 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
     (add-to-list 'company-backends 'company-files)
     (add-to-list 'company-backends 'company-elisp))
 #+END_SRC
+**** Child frame
+#+BEGIN_SRC emacs-lisp
+  (use-package company-childframe
+    :after company
+    :config
+    (company-childframe-mode 1))
+#+END_SRC
 **** Completeon with icons
 #+BEGIN_SRC emacs-lisp
   ;; (use-package company-box
@@ -626,9 +633,9 @@ Show more offten used completeons first
 #+END_SRC
 **** Quick help
 #+BEGIN_SRC emacs-lisp
-  (use-package company-quickhelp
-    :config
-    (company-quickhelp-mode 1))
+  ;; (use-package company-quickhelp
+  ;;   :config
+  ;;   (company-quickhelp-mode 1))
 #+END_SRC
 **** Languages
 ***** LaTeX

@@ -21,8 +21,6 @@
  '("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/") t)
 
 (setq gc-cons-threshold (* 128 1024 1024))
-(add-hook 'after-init-hook
-          (lambda () (setq gc-cons-threshold 800000)))
 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
