@@ -40,7 +40,7 @@ URxvt*saveLines: 5000
 
 !URxvt.font: -*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-1
 !URxvt.boldFont: -*-terminus-bold-*-*-*-12-*-*-*-*-*-iso10646-1
-URxvt.font: xft:Source Code Variable:size=10:antialias=true
+URxvt.font: xft:Source Code Variable:size=10:medium:antialias=true
 URxvt.boldFont: xft:Source Code Variable:size=10:bold:antialias=true
 
 ! URxvt.shading: 10
@@ -59,29 +59,11 @@ URxvt*scrollWithBuffer: true
 ! scroll back to the bottom on keypress
 URxvt*scrollTtyKeypress: true
 
-! urxvt будет искать скрипты сначала в этой директории, потом в /usr/lib/urxvt/perl
-URxvt.perl-lib: /home/rrudakov/.config/urxvt/perl
+URxvt.letterSpace: -1
 
-! clickable urls
-URxvt.perl-ext-common:  default,matcher,url-select
-!,clipboard
-! ,tabbedex
-URxvt.matcher.button:	1
-
-!URxvt.keysym.Shift-Control-V: perl:clipboard:paste
-!URxvt.iso14755: False
-
-##url-select without mouse
-URxvt.keysym.M-u:    perl:url-select:select_next
-URxvt.url-select.launcher:   /usr/bin/firefox -new-tab
-URxvt.url-select.underline: true
-
-! цвета табов
-!URxvt.tabbed.new-button: no
-!URxvt.tabbed.tabbar-fg: 15
-!URxvt.tabbed.tabbar-bg: 8
-!URxvt.tabbed.tab-fg:    8
-!URxvt.tabbed.tab-bg:    14
+URxvt.perl-ext-common: default,matcher,selection-to-clipboard
+URxvt.url-launcher: /usr/bin/xdg-open
+URxvt.matcher.button: 1
 
 ! -----------------------------------------------------------------------------
 ! File: gruvbox-dark.xresources
@@ -92,88 +74,72 @@ URxvt.url-select.underline: true
 ! -----------------------------------------------------------------------------
 
 ! hard contrast: *background: #1d2021
-! *background: #1d2021
-! ! soft contrast: *background: #32302f
-! *foreground: #ebdbb2
-! ! Black + DarkGrey
-! *color0:  #282828
-! *color8:  #928374
-! ! DarkRed + Red
-! *color1:  #cc241d
-! *color9:  #fb4934
-! ! DarkGreen + Green
-! *color2:  #98971a
-! *color10: #b8bb26
-! ! DarkYellow + Yellow
-! *color3:  #d79921
-! *color11: #fabd2f
-! ! DarkBlue + Blue
-! *color4:  #458588
-! *color12: #83a598
-! ! DarkMagenta + Magenta
-! *color5:  #b16286
-! *color13: #d3869b
-! ! DarkCyan + Cyan
-! *color6:  #689d6a
-! *color14: #8ec07c
-! ! LightGrey + White
-! *color7:  #a89984
-! *color15: #ebdbb2
+*background: #282828
+! soft contrast: *background: #32302f
+*foreground: #ebdbb2
+! Black + DarkGrey
+*color0:  #282828
+*color8:  #928374
+! DarkRed + Red
+*color1:  #cc241d
+*color9:  #fb4934
+! DarkGreen + Green
+*color2:  #98971a
+*color10: #b8bb26
+! DarkYellow + Yellow
+*color3:  #d79921
+*color11: #fabd2f
+! DarkBlue + Blue
+*color4:  #458588
+*color12: #83a598
+! DarkMagenta + Magenta
+*color5:  #b16286
+*color13: #d3869b
+! DarkCyan + Cyan
+*color6:  #689d6a
+*color14: #8ec07c
+! LightGrey + White
+*color7:  #a89984
+*color15: #ebdbb2
 
-! Base16 Tomorrow Night
-! Scheme: Chris Kempson (http://chriskempson.com)
+! -----------------------------------------------------------------------------
+! File: gruvbox-urxvt256.xresources
+! Description: Retro groove colorscheme generalized
+! Author: morhetz <morhetz@gmail.com>
+! Source: https://github.com/morhetz/gruvbox-generalized
+! Last Modified: 13 Dec 2013
+! -----------------------------------------------------------------------------
 
-#define base00 #1d1f21
-#define base01 #282a2e
-#define base02 #373b41
-#define base03 #969896
-#define base04 #b4b7b4
-#define base05 #c5c8c6
-#define base06 #e0e0e0
-#define base07 #ffffff
-#define base08 #cc6666
-#define base09 #de935f
-#define base0A #f0c674
-#define base0B #b5bd68
-#define base0C #8abeb7
-#define base0D #81a2be
-#define base0E #b294bb
-#define base0F #a3685a
-
-*.foreground:   base05
-#ifdef background_opacity
-*.background:   [background_opacity]base00
-#else
-*.background:   base00
-#endif
-*.cursorColor:  base05
-
-*.color0:       base00
-*.color1:       base08
-*.color2:       base0B
-*.color3:       base0A
-*.color4:       base0D
-*.color5:       base0E
-*.color6:       base0C
-*.color7:       base05
-
-*.color8:       base03
-*.color9:       base08
-*.color10:      base0B
-*.color11:      base0A
-*.color12:      base0D
-*.color13:      base0E
-*.color14:      base0C
-*.color15:      base07
-
-! Note: colors beyond 15 might not be loaded (e.g., xterm, urxvt),
-! use 'shell' template to set these if necessary
-*.color16:      base09
-*.color17:      base0F
-*.color18:      base01
-*.color19:      base02
-*.color20:      base04
-*.color21:      base06
+URxvt.color24:  #076678
+URxvt.color66:  #427b58
+URxvt.color88:  #9d0006
+URxvt.color96:  #8f3f71
+URxvt.color100: #79740e
+URxvt.color108: #8ec07c
+URxvt.color109: #83a598
+URxvt.color130: #af3a03
+URxvt.color136: #b57614
+URxvt.color142: #b8bb26
+URxvt.color167: #fb4934
+URxvt.color175: #d3869b
+URxvt.color208: #fe8019
+URxvt.color214: #fabd2f
+URxvt.color223: #ebdbb2
+URxvt.color228: #f2e5bc
+URxvt.color229: #fbf1c7
+URxvt.color230: #f9f5d7
+URxvt.color234: #1d2021
+URxvt.color235: #282828
+URxvt.color236: #32302f
+URxvt.color237: #3c3836
+URxvt.color239: #504945
+URxvt.color241: #665c54
+URxvt.color243: #7c6f64
+URxvt.color244: #928374
+URxvt.color245: #928374
+URxvt.color246: #a89984
+URxvt.color248: #bdae93
+URxvt.color250: #d5c4a1
 
 !XLock
 XLock.mode: blank

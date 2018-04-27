@@ -1,12 +1,10 @@
 * My configuration
 ** Requirements
 [[https://mirrors.slackware.com/slackware/slackware64-current/][Slackware64-current]] with next extra packages:
-- compton :: Compositor
 - [[https://slackbuilds.org/repository/14.2/desktop/stalonetray/][stalonetray]] :: Standalone tray for xmonad and other
 - xfce4 :: From slackware official repo, I use some packages in my environment
 - [[https://slackbuilds.org/repository/14.2/desktop/nitrogen/][nitrogen]] :: Set background
 - nm-applet :: GUI for managing network connections (included in slackware)
-- [[https://slackbuilds.org/repository/14.2/desktop/kbdd/][kbdd]] :: Save keyboard-layout per window
 - [[https://haskell-lang.org/get-started/linux][stack]] :: Haskell build system and package management (install manually)
 ** Installation
 1. Install all requirements

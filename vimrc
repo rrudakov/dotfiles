@@ -12,7 +12,7 @@ set ruler
 set showcmd		
 
 " Включаем нумерацию строк
-set nu
+" set nu
 
 " Фолдинг по отсупам
 " set foldmethod=indent
@@ -88,10 +88,10 @@ set backupdir=~/.vimbak/
 nmap yy yy:silent .w !xclip<cr>
 vmap y y:silent '<,'> w !xclip<cr>
 
-set t_Co=256              
+set t_Co=256 
 set modeline
 
-let base16colorspace=256
+" let base16colorspace=256
 filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
@@ -103,10 +103,10 @@ call vundle#end()            " required
 filetype plugin indent on    " required
 
 syntax enable
-set termguicolors
-" set background=dark    " Setting dark mode
-" let g:gruvbox_italic=1
-" let g:gruvbox_contrast_dark='hard'
-" let g:gruvbox_invert_selection=0
-" colorscheme gruvbox
-colorscheme base16-tomorrow-night
+" set termguicolors
+set background=dark    " Setting dark mode
+let g:gruvbox_italic=1
+let g:gruvbox_contrast_dark='hard'
+let g:gruvbox_invert_selection=0
+colorscheme gruvbox
+" colorscheme base16-tomorrow-night
