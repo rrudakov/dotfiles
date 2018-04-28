@@ -12,21 +12,16 @@
 
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
 
-(when (< emacs-major-version 24)
-  ;; For important compatibility libraries like cl-lib
-  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
-
 (add-to-list
  'package-archives
  '("emacswiki" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/emacswiki/") t)
 
-(setq gc-cons-threshold (* 128 1024 1024))
-(add-hook 'after-init-hook
-          (lambda () (setq gc-cons-threshold 800000)))
+(setq gc-cons-threshold (* 16 1024 1024)
+      gc-cons-percentage 0.1)
 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
-(package-initialize) ;; You might already have this line
+(package-initialize)
 
 
 (unless (package-installed-p 'use-package)
