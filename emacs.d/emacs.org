@@ -325,17 +325,29 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 **** Color scheme
 #+BEGIN_SRC emacs-lisp
-  (use-package gruvbox-theme
-    :config
-    (load-theme 'gruvbox-dark-hard t))
-  ;; (use-package zenburn-theme
-  ;;   :ensure t
-  ;;   :config
-  ;;   (load-theme 'zenburn t))
-  ;; (use-package color-theme-sanityinc-tomorrow
-  ;;   :ensure t
-  ;;   :config
-  ;;   (load-theme 'sanityinc-tomorrow-night t))
+    ;; (use-package gruvbox-theme
+    ;;   :config
+    ;;   (load-theme 'gruvbox-dark-soft t))
+    (use-package spacemacs-common
+     :ensure spacemacs-theme
+     :config
+     (setq spacemacs-theme-comment-bg nil
+           spacemacs-theme-comment-italic t
+           spacemacs-theme-org-height nil)
+     (load-theme 'spacemacs-dark t))
+    ;; (use-package solarized-theme
+    ;;   :config
+    ;;   (setq solarized-use-variable-pitch nil)
+    ;;   (setq solarized-high-contrast-mode-line t)
+    ;;   ;; (setq x-underline-at-descent-line t)
+    ;;   (load-theme 'solarized-dark t))
+    ;; (use-package zenburn-theme
+    ;;   :config
+    ;;   (load-theme 'zenburn t))
+    ;; (use-package color-theme-sanityinc-tomorrow
+    ;;   :ensure t
+    ;;   :config
+    ;;   (load-theme 'sanityinc-tomorrow-night t))
 #+END_SRC
 **** Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
@@ -474,7 +486,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 ****** Common configuration
 #+BEGIN_SRC emacs-lisp
-  (use-package spaceline :ensure t
+  (use-package spaceline
     :config
     (setq powerline-height 40)
     (setq powerline-default-separator 'utf-8)
@@ -1138,7 +1150,7 @@ But there is no backward compatibility.
 **** Custom keywords faces
 #+BEGIN_SRC emacs-lisp
   (setq org-todo-keyword-faces
-        '(("PROGRESS" 'org-agenda-date-weekend)
+        '(("PROGRESS" 'font-lock-constant-face)
           ("WAITING" 'org-todo)))
 #+END_SRC
 **** Clock settings

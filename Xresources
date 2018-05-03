@@ -29,6 +29,7 @@ XTerm*jumpScroll: True
 XTerm*highlightSelection: True
 XTerm*trimSelection: True
 
+URxvt*title: Terminal
 ! Cursor
 URxvt.cursorBlink: true
 URxvt.cursorUnderline: false
