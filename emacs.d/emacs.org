@@ -37,7 +37,7 @@
 #+END_SRC
 *** Projectile
 #+BEGIN_EXAMPLE
-  C-p p SPC	Counsel projectile
+  C-p p s s	Projectile ag search
 #+END_EXAMPLE
 *** Terminal
 #+BEGIN_SRC text
