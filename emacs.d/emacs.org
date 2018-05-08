@@ -325,29 +325,29 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 **** Color scheme
 #+BEGIN_SRC emacs-lisp
-    ;; (use-package gruvbox-theme
-    ;;   :config
-    ;;   (load-theme 'gruvbox-dark-soft t))
-    (use-package spacemacs-common
-     :ensure spacemacs-theme
-     :config
-     (setq spacemacs-theme-comment-bg nil
-           spacemacs-theme-comment-italic t
-           spacemacs-theme-org-height nil)
-     (load-theme 'spacemacs-dark t))
-    ;; (use-package solarized-theme
-    ;;   :config
-    ;;   (setq solarized-use-variable-pitch nil)
-    ;;   (setq solarized-high-contrast-mode-line t)
-    ;;   ;; (setq x-underline-at-descent-line t)
-    ;;   (load-theme 'solarized-dark t))
-    ;; (use-package zenburn-theme
-    ;;   :config
-    ;;   (load-theme 'zenburn t))
-    ;; (use-package color-theme-sanityinc-tomorrow
-    ;;   :ensure t
-    ;;   :config
-    ;;   (load-theme 'sanityinc-tomorrow-night t))
+  (use-package gruvbox-theme
+    :config
+    (load-theme 'gruvbox-dark-medium t))
+  ;; (use-package spacemacs-common
+  ;;  :ensure spacemacs-theme
+  ;;  :config
+  ;;  (setq spacemacs-theme-comment-bg nil
+  ;;        spacemacs-theme-comment-italic t
+  ;;        spacemacs-theme-org-height nil)
+  ;;  (load-theme 'spacemacs-dark t))
+  ;; (use-package solarized-theme
+  ;;   :config
+  ;;   (setq solarized-use-variable-pitch nil)
+  ;;   (setq solarized-high-contrast-mode-line t)
+  ;;   ;; (setq x-underline-at-descent-line t)
+  ;;   (load-theme 'solarized-dark t))
+  ;; (use-package zenburn-theme
+  ;;   :config
+  ;;   (load-theme 'zenburn t))
+  ;; (use-package color-theme-sanityinc-tomorrow
+  ;;   :ensure t
+  ;;   :config
+  ;;   (load-theme 'sanityinc-tomorrow-night t))
 #+END_SRC
 **** Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
@@ -654,9 +654,9 @@ Show more offten used completeons first
 #+END_SRC
 **** Quick help
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package company-quickhelp
-  ;;   :config
-  ;;   (company-quickhelp-mode 1))
+  (use-package company-quickhelp
+    :config
+    (company-quickhelp-mode 1))
 #+END_SRC
 **** Languages
 ***** LaTeX
@@ -1450,6 +1450,16 @@ But there is no backward compatibility.
     (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
 #+END_SRC
 *** Languages
+**** LSP mode
+#+BEGIN_SRC emacs-lisp
+  (use-package lsp-mode
+    :config
+    (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
+
+  (use-package lsp-ui
+    :config
+    (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+#+END_SRC
 **** Haskell
 ***** Intero
 #+BEGIN_SRC emacs-lisp
@@ -1554,7 +1564,6 @@ But there is no backward compatibility.
 ***** Virtualenv
 #+BEGIN_SRC emacs-lisp
   (use-package virtualenvwrapper
-    :ensure t
     :config
     (venv-initialize-interactive-shells)
     (venv-initialize-eshell))
@@ -1566,6 +1575,12 @@ But there is no backward compatibility.
     (elpy-enable)
     (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
     (add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode 0))))
+#+END_SRC
+***** Flyckeck using mypy
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck-mypy
+    :config
+    (add-hook 'python-mode-hook 'flycheck-mode))
 #+END_SRC
 ***** Traad
 #+BEGIN_SRC emacs-lisp
@@ -1581,6 +1596,13 @@ But there is no backward compatibility.
   ;;   (add-hook 'python-mode-hook 'anaconda-eldoc-mode)
   ;;   (add-to-list 'python-shell-extra-pythonpaths "/home/rrudakov/Work/QAAutotesting/src")
   ;;   (add-to-list 'python-shell-extra-pythonpaths "/home/rrudakov/Work/allure-pytest"))
+#+END_SRC
+***** Python language server
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package lsp-python
+  ;;   :after (lsp-mode)
+  ;;   :config
+  ;;   (add-hook 'python-mode-hook #'lsp-python-enable))
 #+END_SRC
 ***** Completeon
 #+BEGIN_SRC emacs-lisp
@@ -1601,6 +1623,10 @@ But there is no backward compatibility.
   ;;   ;;                               (hack-local-variables)
   ;;   ;;                               (venv-workon project-venv-name)))
   ;;   (add-hook 'python-mode-hook 'jedi:setup))
+  (use-package company-lsp
+    :config
+    (push 'company-lsp company-backends)
+    (setf company-lsp-async t))
 #+END_SRC
 ***** Import management
 #+BEGIN_SRC emacs-lisp
