@@ -8,7 +8,6 @@
 #+END_SRC
 *** Python
 #+BEGIN_SRC text
-  C-c C-r f Format python code
   C-c C-r r Refactoring commands
 #+END_SRC
 *** Haskell
