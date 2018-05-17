@@ -317,6 +317,10 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
         recentf-max-menu-items 15)
   (recentf-mode)
 #+END_SRC
+**** Imenu
+#+BEGIN_SRC emacs-lisp
+  (setq imenu-auto-rescan t)
+#+END_SRC
 *** Theme
 **** All the icons
 #+BEGIN_SRC emacs-lisp
@@ -1067,9 +1071,10 @@ And even org-babel integration:
 #+END_SRC
 **** Agenda settings
 #+BEGIN_SRC emacs-lisp
-  (setq org-agenda-files (quote ("~/Org/"
-                                 "~/Org/work")))
-  (setq org-directory "~/Org")
+  (setq org-agenda-files (quote ("~/Dropbox/Org/"
+                                 "~/Dropbox/Org/work"
+                                 "~/Dropbox/Org/mobile")))
+  (setq org-directory "~/Dropbox/Org")
   (setq org-enforce-todo-dependencies t)
   (setq org-agenda-restore-windows-after-quit t)
 #+END_SRC
@@ -1084,7 +1089,7 @@ And even org-babel integration:
            :clock-resume t)
           ("n" "Note" entry (file+headline "" "Notes")
            "* TODO %?\n%i")
-          ("l" "Link" entry (file+headline "~/Org/links.org" "Links")
+          ("l" "Link" entry (file+headline "~/Dropbox/Org/links.org" "Links")
            "* %? %^L \n%T"
            :prepend t)
           ))
@@ -1461,11 +1466,19 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
     :config
-    (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
+    ;; (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
+    )
 
-  (use-package lsp-ui
+  ;; (use-package lsp-ui
+  ;;   :config
+  ;;   (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+#+END_SRC
+***** Completeon
+#+BEGIN_SRC emacs-lisp
+  (use-package company-lsp
     :config
-    (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+    (push 'company-lsp company-backends)
+    (setf company-lsp-async t))
 #+END_SRC
 **** Haskell
 ***** Intero
@@ -1585,9 +1598,9 @@ But there is no backward compatibility.
 #+END_SRC
 ***** Flyckeck using mypy
 #+BEGIN_SRC emacs-lisp
-  (use-package flycheck-mypy
-    :config
-    (add-hook 'python-mode-hook 'flycheck-mode))
+  ;; (use-package flycheck-mypy
+  ;;   :config
+  ;;   (add-hook 'python-mode-hook 'flycheck-mode))
 #+END_SRC
 ***** Traad
 #+BEGIN_SRC emacs-lisp
@@ -1611,7 +1624,7 @@ But there is no backward compatibility.
   ;;   :config
   ;;   (add-hook 'python-mode-hook #'lsp-python-enable))
 #+END_SRC
-***** Completeon
+***** Auto completeon
 #+BEGIN_SRC emacs-lisp
   ;; (use-package company-anaconda
   ;;   :ensure t
@@ -1630,10 +1643,6 @@ But there is no backward compatibility.
   ;;   ;;                               (hack-local-variables)
   ;;   ;;                               (venv-workon project-venv-name)))
   ;;   (add-hook 'python-mode-hook 'jedi:setup))
-  (use-package company-lsp
-    :config
-    (push 'company-lsp company-backends)
-    (setf company-lsp-async t))
 #+END_SRC
 ***** Import management
 #+BEGIN_SRC emacs-lisp
@@ -1646,7 +1655,6 @@ But there is no backward compatibility.
 ***** Format code
 #+BEGIN_SRC emacs-lisp
   (use-package yapfify
-    :ensure t
     :config
     (add-hook 'python-mode-hook 'yapf-mode))
 #+END_SRC
@@ -1661,6 +1669,10 @@ But there is no backward compatibility.
 ***** Code folding
 #+BEGIN_SRC emacs-lisp
   (add-hook 'python-mode-hook 'hs-minor-mode)
+#+END_SRC
+***** Editing requirements files
+#+BEGIN_SRC emacs-lisp
+  (use-package pip-requirements)
 #+END_SRC
 **** JSON
 #+BEGIN_SRC emacs-lisp

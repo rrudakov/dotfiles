@@ -11,6 +11,7 @@
 2. Install [[http://xmonad.org/][xmonad]]:
    1. Run ~stack setup~
    2. Run ~stack install xmonad-contrib~
+   3. Run ~stack install xmonad-extras~
 3. Install [[http://projects.haskell.org/xmobar/][xmobar]]:
    1. Clone git repository:
       #+BEGIN_EXAMPLE
