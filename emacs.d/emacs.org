@@ -732,38 +732,74 @@ Show more offten used completeons first
 *** Ivy
 **** Install and activate ivy
 #+BEGIN_SRC emacs-lisp
-  (use-package ivy
-    :ensure t
-    :bind (("C-x b" . ivy-switch-buffer))
-    :config
-    (ivy-mode 1)
-    (setq ivy-use-virtual-buffers t
-          ivy-display-style 'fancy
-          ivy-count-format "(%d/%d) ")
-    :bind (("<f2>" . bs-show)))
+  ;; (use-package ivy
+  ;;   :ensure t
+  ;;   :bind (("C-x b" . ivy-switch-buffer))
+  ;;   :config
+  ;;   (ivy-mode 1)
+  ;;   (setq ivy-use-virtual-buffers t
+  ;;         ivy-display-style 'fancy
+  ;;         ivy-count-format "(%d/%d) ")
+  ;;   :bind (("<f2>" . bs-show)))
 #+END_SRC
 **** Swiper
 #+BEGIN_SRC emacs-lisp
-  (use-package swiper
-    :ensure t
-    :bind (("C-s" . swiper)
-           ("C-r" . swiper)
-           ("C-c C-r" . ivy-resume)))
+  ;; (use-package swiper
+  ;;   :ensure t
+  ;;   :bind (("C-s" . swiper)
+  ;;          ("C-r" . swiper)
+  ;;          ("C-c C-r" . ivy-resume)))
 #+END_SRC
 **** Counsel
 #+BEGIN_SRC emacs-lisp
-  (use-package counsel
-    :ensure t
-    :bind (("M-x" . counsel-M-x)
-           ("C-x C-f" . counsel-find-file)
-           ("<f1> f" . counsel-describe-function)
-           ("<f1> v" . counsel-describe-variable)
-           ("<f1> l" . counsel-find-library)
-           ("<f1> i" . counsel-info-lookup-symbol)
-           ("<f1> u" . counsel-unicode-char)
-           ("M-y" . counsel-yank-pop)
-           :map ivy-minibuffer-map
-           ("M-y" . ivy-next-line)))
+  ;; (use-package counsel
+  ;;   :ensure t
+  ;;   :bind (("M-x" . counsel-M-x)
+  ;;          ("C-x C-f" . counsel-find-file)
+  ;;          ("<f1> f" . counsel-describe-function)
+  ;;          ("<f1> v" . counsel-describe-variable)
+  ;;          ("<f1> l" . counsel-find-library)
+  ;;          ("<f1> i" . counsel-info-lookup-symbol)
+  ;;          ("<f1> u" . counsel-unicode-char)
+  ;;          ("M-y" . counsel-yank-pop)
+  ;;          :map ivy-minibuffer-map
+  ;;          ("M-y" . ivy-next-line)))
+#+END_SRC
+*** Helm
+**** Config
+#+BEGIN_SRC emacs-lisp
+  (use-package helm
+    :config
+    (require 'helm)
+    (require 'helm-config)
+
+    (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
+    (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
+    (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+
+    (when (executable-find "curl")
+      (setq helm-google-suggest-use-curl-p t))
+
+    (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
+          helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+          helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+          helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+          helm-ff-file-name-history-use-recentf t
+          helm-echo-input-in-header-line t
+          helm-inherit-input-method nil)
+
+
+    (global-set-key (kbd "M-x") 'helm-M-x)
+    (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+    (global-set-key (kbd "C-x b") 'helm-mini)
+    (global-set-key (kbd "C-x C-f") 'helm-find-files)
+    (helm-mode 1))
+#+END_SRC
+**** Swiper
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper-helm
+    :bind (("C-s" . swiper-helm)
+           ("C-r" . swiper-helm)))
 #+END_SRC
 *** Smartparens
 #+BEGIN_SRC emacs-lisp
@@ -829,10 +865,9 @@ link.
 **** Basic setup
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
-    :ensure t
     :config
     (projectile-global-mode)
-    (setq projectile-completion-system 'ivy)
+    (setq projectile-completion-system 'helm)
     (add-to-list 'projectile-globally-ignored-files "*.log")
     (setq projectile-enable-caching t)
     (setq projectile-mode-line '(:eval (format " [%s]" (projectile-project-name)))))
@@ -842,6 +877,13 @@ link.
   ;; (use-package counsel-projectile
   ;;   :config
   ;;   (counsel-projectile-mode 1))
+#+END_SRC
+**** Helm projectile
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-projectile
+    :config
+    (helm-projectile-on)
+    (setq projectile-switch-project-action 'helm-projectile))
 #+END_SRC
 *** Htmlize
 #+BEGIN_SRC emacs-lisp
@@ -1393,6 +1435,12 @@ But there is no backward compatibility.
     (setq org-gcal-client-id "746234569233-nrqvf2rke8skag1hadbu15clkpmgr9bk.apps.googleusercontent.com"
           org-gcal-client-secret "1JolKXlhxyoNmABe8qIbw40H"
           org-gcal-file-alist '(("phentagram@gmail.com" .  "~/gmail.org"))))
+#+END_SRC
+**** JIRA integration for Org-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package org-jira
+    :config
+    (setq jiralib-url "https://jira.eoadm.com"))
 #+END_SRC
 *** Email
 **** Sending email
