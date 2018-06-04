@@ -338,12 +338,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   ;;        spacemacs-theme-comment-italic t
   ;;        spacemacs-theme-org-height nil)
   ;;  (load-theme 'spacemacs-dark t))
-  ;; (use-package solarized-theme
-  ;;   :config
-  ;;   (setq solarized-use-variable-pitch nil)
-  ;;   (setq solarized-high-contrast-mode-line t)
-  ;;   ;; (setq x-underline-at-descent-line t)
-  ;;   (load-theme 'solarized-dark t))
   ;; (use-package zenburn-theme
   ;;   :config
   ;;   (load-theme 'zenburn t))
@@ -565,11 +559,11 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 **** Highlight indentation
 #+BEGIN_SRC emacs-lisp
-  (use-package highlight-indent-guides
-    :config
-    (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-    (setq highlight-indent-guides-method 'character
-          highlight-indent-guides-character ?\x258F))
+  ;; (use-package highlight-indent-guides
+  ;;   :config
+  ;;   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+  ;;   (setq highlight-indent-guides-method 'character
+  ;;         highlight-indent-guides-character ?\x258F))
 #+END_SRC
 *** Semantic
 **** Enable semantic mode global
@@ -961,7 +955,7 @@ link.
   (use-package magit
     :config
     (global-set-key (kbd "C-x g") 'magit-status)
-    (setq magit-completing-read-function 'ivy-completing-read)
+    (setq magit-completing-read-function 'helm--completing-read-default)
     (add-hook 'focus-in-hook 'rr/refresh-vc-state)
     (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state))
 #+END_SRC
