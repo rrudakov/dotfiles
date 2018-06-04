@@ -1390,7 +1390,7 @@ But there is no backward compatibility.
      ((eq format 'html)
       (format "<img src=\"/img/%s\" alt=\"%s\"/>" path desc))))
 
-  (org-add-link-type "img" 'rr/org-link-img 'rr/org-link-img-export)
+  (org-link-set-parameters "img" 'rr/org-link-img 'rr/org-link-img-export)
 #+END_SRC
 **** LaTeX export
 #+BEGIN_SRC emacs-lisp
