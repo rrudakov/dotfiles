@@ -338,12 +338,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   ;;        spacemacs-theme-comment-italic t
   ;;        spacemacs-theme-org-height nil)
   ;;  (load-theme 'spacemacs-dark t))
-  ;; (use-package solarized-theme
-  ;;   :config
-  ;;   (setq solarized-use-variable-pitch nil)
-  ;;   (setq solarized-high-contrast-mode-line t)
-  ;;   ;; (setq x-underline-at-descent-line t)
-  ;;   (load-theme 'solarized-dark t))
   ;; (use-package zenburn-theme
   ;;   :config
   ;;   (load-theme 'zenburn t))

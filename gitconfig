@@ -1,6 +1,7 @@
 [user]
 	name = rrudakov
 	email = rrudakov@protonmail.com
+	signingkey = FB43E281457C5165
 [core]
 	editor = vim
 	pager = cat
@@ -15,3 +16,7 @@
 	status = auto
 	ui = auto
 	branch = auto
+[gpg]
+	program = gpg2
+[commit]
+	gpgsign = true
