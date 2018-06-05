@@ -321,6 +321,10 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
   (setq imenu-auto-rescan t)
 #+END_SRC
+**** Single line horizontal scrolling
+#+BEGIN_SRC emacs-lisp
+  (setq auto-hscroll-mode 'current-line)
+#+END_SRC
 *** Theme
 **** All the icons
 #+BEGIN_SRC emacs-lisp
@@ -331,20 +335,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   (use-package gruvbox-theme
     :config
     (load-theme 'gruvbox-dark-medium t))
-  ;; (use-package spacemacs-common
-  ;;  :ensure spacemacs-theme
-  ;;  :config
-  ;;  (setq spacemacs-theme-comment-bg nil
-  ;;        spacemacs-theme-comment-italic t
-  ;;        spacemacs-theme-org-height nil)
-  ;;  (load-theme 'spacemacs-dark t))
-  ;; (use-package zenburn-theme
-  ;;   :config
-  ;;   (load-theme 'zenburn t))
-  ;; (use-package color-theme-sanityinc-tomorrow
-  ;;   :ensure t
-  ;;   :config
-  ;;   (load-theme 'sanityinc-tomorrow-night t))
 #+END_SRC
 **** Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
@@ -659,14 +649,12 @@ Show more offten used completeons first
 ***** LaTeX
 #+BEGIN_SRC emacs-lisp
   (use-package company-auctex
-    :ensure t
     :config
     (company-auctex-init))
 #+END_SRC
 ***** WEB
 #+BEGIN_SRC emacs-lisp
   (use-package company-web
-    :ensure t
     :config
     (add-to-list 'company-backends 'company-web-html)
     (add-to-list 'company-backends 'company-web-jade)
@@ -873,8 +861,7 @@ link.
 #+END_SRC
 *** Htmlize
 #+BEGIN_SRC emacs-lisp
-  (use-package htmlize
-    :ensure t)
+  (use-package htmlize)
 #+END_SRC
 *** Syntax check
 **** Flycheck
@@ -975,7 +962,6 @@ link.
 *** Expand region
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
-    :ensure t
     :config
     (global-set-key (kbd "C-=") 'er/expand-region))
 #+END_SRC
@@ -1054,12 +1040,12 @@ And even org-babel integration:
 #+END_SRC
 *** Edit text areas in browsers from emacs
 #+BEGIN_SRC emacs-lisp
-  (use-package edit-server
-    :ensure t
-    :config
-    (when (require 'edit-server nil t)
-      (setq edit-server-new-frame nil)
-      (edit-server-start)))
+  ;; (use-package edit-server
+  ;;   :ensure t
+  ;;   :config
+  ;;   (when (require 'edit-server nil t)
+  ;;     (setq edit-server-new-frame nil)
+  ;;     (edit-server-start)))
 #+END_SRC
 *** Org
 **** Some tweaks
@@ -1286,10 +1272,10 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
   (setq org-src-fontify-natively t)
 
-  (require 'color)
-  (set-face-attribute 'org-block nil :background
-                      (color-darken-name
-                       (face-attribute 'default :background) 3))
+  ;; (require 'color)
+  ;; (set-face-attribute 'org-block nil :background
+  ;;                     (color-darken-name
+  ;;                      (face-attribute 'default :background) 3))
 #+END_SRC
 **** Alerts
 #+BEGIN_SRC emacs-lisp
@@ -1434,18 +1420,21 @@ But there is no backward compatibility.
   (require 'smtpmail)
 
   (setq message-send-mail-function 'smtpmail-send-it
-        smtpmail-starttls-credentials '(("outlook.office365.com" 587 nil nil))
-        smtpmail-default-smtp-server "outlook.office365.com"
-        smtpmail-smtp-server "outlook.office365.com"
-        smtpmail-smtp-service 587
+        starttls-use-gnutls t
+        mu4e-sent-messages-behavior 'sent
+        mu4e-drafts-folder "/Drafts"
+        mu4e-sent-folder "/Sent Items"
+        user-mail-address "Roman.Rudakov@bsc-ideas.com"
+        user-full-name "Roman Rudakov"
+        smtpmail-default-smtp-server "smtp.office365.com"
+        smtpmail-local-domain "bscpraha.cz"
+        smtpmail-smtp-server "smtp.office365.com"
         smtpmail-stream-type 'starttls
-        smtpmail-debug-info t)
+        smtpmail-smtp-service 587)
 
   (require 'mu4e)
 
   (setq mu4e-maildir (expand-file-name "~/Maildir/BSC"))
-  (setq mu4e-drafts-folder "/Drafts")
-  (setq mu4e-sent-folder   "/Sent Items")
   (setq mu4e-trash-folder  "/Deleted Items")
 
   (setq mu4e-get-mail-command "mbsync BSC"
@@ -1459,26 +1448,27 @@ But there is no backward compatibility.
           ("/Deleted Items" . ?t)
           ("/Drafts" . ?d)))
 
-  (setq mu4e-use-fancy-chars t)
+  (setq mu4e-use-fancy-chars nil)
   (setq mu4e-show-images t)
 
   (when (fboundp 'imagemagick-register-types)
     (imagemagick-register-types))
 
   (setq mu4e-view-prefer-html t)
+  (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t)
 
-  (setq smtpmail-queue-mail t
-        smtpmail-queue-dir   "~/Maildir/queue/cur")
+  ;; (setq smtpmail-queue-mail t
+  ;;       smtpmail-queue-dir   "~/Maildir/queue/cur")
 
   (setq message-kill-buffer-on-exit t)
 
-  (setq mu4e-reply-to-address "Roman.Rudakov@bsc-ideas.com"
-        user-mail-address "Roman.Rudakov@bsc-ideas.com"
-        user-full-name  "Roman Rudakov")
-
+  (setq mu4e-reply-to-address "Roman.Rudakov@bsc-ideas.com")
 
   (require 'org-mu4e)
   (setq org-mu4e-convert-to-html t)
+
+  (setq mu4e-html2text-command "w3m -T text/html")
+  (setq mu4e-html-renderer 'w3m)
 
   (setq mu4e-headers-fields
         '((:human-date . 25)
@@ -1530,13 +1520,11 @@ But there is no backward compatibility.
                 (set (make-local-variable 'company-backends)
                      (append '((company-capf company-dabbrev-code))
                              company-backends))))
-    (add-hook 'haskell-mode-hook 'turn-on-haskell-unicode-input-method)
+    ;; (add-hook 'haskell-mode-hook 'turn-on-haskell-unicode-input-method)
     (setq haskell-tags-on-save t)
     (setq tags-revert-without-query t)
     (setq haskell-indentation-electric-flag t)
-    (add-hook 'haskell-mode-hook 'haskell-auto-insert-module-template)
-    ;; (add-hook 'haskell-mode-hook 'flyspell-prog-mode)
-    )
+    (add-hook 'haskell-mode-hook 'haskell-auto-insert-module-template))
 #+END_SRC
 ***** Align rules
 #+BEGIN_SRC emacs-lisp
