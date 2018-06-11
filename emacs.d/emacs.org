@@ -1009,19 +1009,17 @@ Colorize color names in buffers
 *** REST client
 Quite interesting package. I think it will be replace for Postman for me.
 #+BEGIN_SRC emacs-lisp
-  (use-package restclient :ensure t)
+  (use-package restclient)
 #+END_SRC
 And autocompletion for it:
 #+BEGIN_SRC emacs-lisp
   (use-package company-restclient
-    :ensure t
     :config
     (add-to-list 'company-backends 'company-restclient))
 #+END_SRC
 And even org-babel integration:
 #+BEGIN_SRC emacs-lisp
   (use-package ob-restclient
-    :ensure t
     :config
     (org-babel-do-load-languages
      'org-babel-load-languages
