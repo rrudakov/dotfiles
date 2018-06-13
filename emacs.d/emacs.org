@@ -323,7 +323,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 **** Single line horizontal scrolling
 #+BEGIN_SRC emacs-lisp
-  (setq auto-hscroll-mode 'current-line)
+  (setq auto-hscroll-mode t)
 #+END_SRC
 *** Theme
 **** All the icons
@@ -1578,11 +1578,21 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
   (setq TeX-auto-save t)
   (setq TeX-parse-self t)
+
+  ;; Use pdf-tools to open PDF files
+  (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+        TeX-source-correlate-start-server t)
+
+  ;; Update PDF buffers after successful LaTeX runs
+  (add-hook 'TeX-after-compilation-finished-functions
+            #'TeX-revert-document-buffer)
+
   (setq-default TeX-master nil)
   (add-hook 'LaTeX-mode-hook 'visual-line-mode)
   (add-hook 'LaTeX-mode-hook 'flyspell-mode)
   (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
   (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+  (add-hook 'LaTeX-mode-hook (lambda () (auto-fill-mode -1)))
   (setq reftex-plug-into-AUCTeX t)
 
   (eval-after-load 'latex '(add-to-list 'LaTeX-verbatim-environments "lstlisting"))
@@ -1693,6 +1703,10 @@ But there is no backward compatibility.
 ***** Editing requirements files
 #+BEGIN_SRC emacs-lisp
   (use-package pip-requirements)
+#+END_SRC
+***** PIP interface
+#+BEGIN_SRC emacs-lisp
+  (use-package pippel)
 #+END_SRC
 **** JSON
 #+BEGIN_SRC emacs-lisp
