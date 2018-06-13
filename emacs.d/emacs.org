@@ -1390,6 +1390,24 @@ But there is no backward compatibility.
           (""     "amssymb"   t)
           (""     "capt-of"   nil)
           (""     "hyperref"  nil)))
+  (unless (boundp 'org-latex-classes)
+    (setq org-latex-classes nil))
+
+  (add-to-list 'org-latex-classes
+               '("org-article"
+                 "\\documentclass[11pt,a4paper]{article}
+  \\usepackage{dejavu}
+  \\usepackage[english, russian]{babel}
+  \\usepackage{geometry}
+  \\geometry{a4paper}
+  \\geometry{left=2cm,right=1cm,top=1cm,bottom=1cm,includeheadfoot,headheight=1.2cm}
+  \\renewcommand*\\familydefault{\\sfdefault}
+  \\renewcommand*\\ttdefault{cmvtt}"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 #+END_SRC
 **** Evaluate source code
 #+BEGIN_SRC emacs-lisp
