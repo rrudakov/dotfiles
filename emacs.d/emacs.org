@@ -1729,10 +1729,6 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
   (use-package pip-requirements)
 #+END_SRC
-***** PIP interface
-#+BEGIN_SRC emacs-lisp
-  (use-package pippel)
-#+END_SRC
 **** JSON
 #+BEGIN_SRC emacs-lisp
   (use-package json-mode
