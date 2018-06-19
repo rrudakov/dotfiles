@@ -783,6 +783,12 @@ Show more offten used completeons first
     :bind (("C-s" . swiper-helm)
            ("C-r" . swiper-helm)))
 #+END_SRC
+**** Tramp
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-tramp
+    :config
+    (define-key global-map (kbd "C-c s") 'helm-tramp))
+#+END_SRC
 *** Smartparens
 #+BEGIN_SRC emacs-lisp
   (use-package smartparens
@@ -1388,19 +1394,19 @@ But there is no backward compatibility.
           (""     "amssymb"   t)
           (""     "capt-of"   nil)
           (""     "hyperref"  nil)))
-  (unless (boundp 'org-latex-classes)
-    (setq org-latex-classes nil))
+    (unless (boundp 'org-latex-classes)
+      (setq org-latex-classes nil))
 
   (add-to-list 'org-latex-classes
                '("org-article"
                  "\\documentclass[11pt,a4paper]{article}
-  \\usepackage{dejavu}
-  \\usepackage[english, russian]{babel}
-  \\usepackage{geometry}
-  \\geometry{a4paper}
-  \\geometry{left=2cm,right=1cm,top=1cm,bottom=1cm,includeheadfoot,headheight=1.2cm}
-  \\renewcommand*\\familydefault{\\sfdefault}
-  \\renewcommand*\\ttdefault{cmvtt}"
+    \\usepackage{dejavu}
+    \\usepackage[english, russian]{babel}
+    \\usepackage{geometry}
+    \\geometry{a4paper}
+    \\geometry{left=2cm,right=1cm,top=1cm,bottom=1cm,includeheadfoot,headheight=1.2cm}
+    \\renewcommand*\\familydefault{\\sfdefault}
+    \\renewcommand*\\ttdefault{cmvtt}"
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
@@ -1464,7 +1470,8 @@ But there is no backward compatibility.
   (setq mu4e-get-mail-command "mbsync BSC"
         mu4e-update-interval 120
         mu4e-headers-auto-update t
-        mu4e-compose-signature-auto-include nil)
+        mu4e-compose-signature-auto-include nil
+        mu4e-completing-read-function 'completing-read)
 
   (setq mu4e-maildir-shortcuts
         '(("/INBOX" . ?i)
@@ -1473,7 +1480,7 @@ But there is no backward compatibility.
           ("/Drafts" . ?d)))
 
   (setq mu4e-use-fancy-chars nil)
-  (setq mu4e-show-images t)
+  (setq mu4e-view-show-images t)
 
   (when (fboundp 'imagemagick-register-types)
     (imagemagick-register-types))
@@ -1496,6 +1503,18 @@ But there is no backward compatibility.
           (:flags . 6)
           (:from . 22)
           (:subject . nil)))
+
+  (use-package mu4e-conversation
+    :after mu4e
+    :config
+    (setq mu4e-view-func 'mu4e-conversation))
+
+  (use-package helm-mu
+    :after (helm mu4e)
+    :config
+    (define-key mu4e-main-mode-map "s" 'helm-mu)
+    (define-key mu4e-headers-mode-map "s" 'helm-mu)
+    (define-key mu4e-view-mode-map "s" 'helm-mu))
 #+END_SRC
 **** Alerts
 #+BEGIN_SRC emacs-lisp
@@ -1726,10 +1745,6 @@ But there is no backward compatibility.
 ***** Editing requirements files
 #+BEGIN_SRC emacs-lisp
   (use-package pip-requirements)
-#+END_SRC
-***** PIP interface
-#+BEGIN_SRC emacs-lisp
-  (use-package pippel)
 #+END_SRC
 **** JSON
 #+BEGIN_SRC emacs-lisp
