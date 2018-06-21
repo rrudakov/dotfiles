@@ -1529,12 +1529,12 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
     :config
-    ;; (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
+    (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
     )
 
-  ;; (use-package lsp-ui
-  ;;   :config
-  ;;   (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+  (use-package lsp-ui
+    :config
+    (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 #+END_SRC
 ***** Completeon
 #+BEGIN_SRC emacs-lisp
@@ -1542,6 +1542,13 @@ But there is no backward compatibility.
     :config
     (push 'company-lsp company-backends)
     (setf company-lsp-async t))
+#+END_SRC
+**** Java
+#+BEGIN_SRC emacs-lisp
+  (use-package lsp-java
+    :config
+    (add-hook 'java-mode-hook #'lsp-java-enable)
+    (setq lsp-java--workspace-folders (list "/home/rrudakov/Work/rencredit-load")))
 #+END_SRC
 **** Haskell
 ***** Intero
@@ -1725,9 +1732,13 @@ But there is no backward compatibility.
 #+END_SRC
 ***** Format code
 #+BEGIN_SRC emacs-lisp
-  (use-package yapfify
+  ;; (use-package yapfify
+  ;;   :config
+  ;;   (add-hook 'python-mode-hook 'yapf-mode))
+  (use-package blacken
     :config
-    (add-hook 'python-mode-hook 'yapf-mode))
+    (setq blacken-line-length 79)
+    (add-hook 'python-mode-hook 'blacken-mode))
 #+END_SRC
 ***** Tox
 #+BEGIN_SRC emacs-lisp
