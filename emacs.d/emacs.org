@@ -325,6 +325,10 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
   (setq auto-hscroll-mode t)
 #+END_SRC
+**** Show trailing whitespace
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'prog-mode-hook (lambda () (interactive) (setq show-trailing-whitespace 1)))
+#+END_SRC
 *** Theme
 **** All the icons
 #+BEGIN_SRC emacs-lisp
@@ -335,6 +339,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   (use-package gruvbox-theme
     :config
     (load-theme 'gruvbox-dark-medium t))
+  ;; (use-package zenburn-theme
+  ;;   :config
+  ;;   (load-theme 'zenburn t))
 #+END_SRC
 **** Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
@@ -408,10 +415,21 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
   (defun rr/flycheck-status-text ()
     (let* ((text (pcase flycheck-last-status-change
+                   ;; (`finished (if flycheck-current-errors
+                   ;;                (let ((count (let-alist (flycheck-count-errors flycheck-current-errors)
+                   ;;                               (+ (or .warning 0) (or .error 0)))))
+                   ;;                  (propertize (format "✖ %s Issue%s" count (if (eq 1 count) "" "s")) 'face `(:inherit mode-line :foreground "#fb4934")))
+                   ;;              (propertize "✔ No Issues" 'face `(:inherit mode-line :foreground "#afaf00"))))
                    (`finished (if flycheck-current-errors
-                                  (let ((count (let-alist (flycheck-count-errors flycheck-current-errors)
-                                                 (+ (or .warning 0) (or .error 0)))))
-                                    (propertize (format "✖ %s Issue%s" count (if (eq 1 count) "" "s")) 'face `(:inherit mode-line :foreground "#fb4934")))
+                                  (let-alist (flycheck-count-errors flycheck-current-errors)
+                                    (if .error
+                                        (let ((sum (or .error 0)))
+                                          (propertize (format "✖ %s Error%s" sum (if (eq 1 sum) "" "s")) 'face `(:inherit mode-line :foreground "#fb4934")))
+                                      (if .warning
+                                          (let ((sum (or .warning 0)))
+                                            (propertize (format "✖ %s Warning%s" sum (if (eq 1 sum) "" "s")) 'face `(:inherit mode-line :foreground "#fe8019")))
+                                        (let ((sum (or .info 0)))
+                                              (propertize (format "✖ %s Info%s" sum (if (eq 1 sum) "" "s")) 'face `(:inherit mode-line :foreground "#fabd2f"))))))
                                 (propertize "✔ No Issues" 'face `(:inherit mode-line :foreground "#afaf00"))))
                    (`running     (propertize "⟲ Running" 'face `(:inherit mode-line :foreground "#87afaf")))
                    (`no-checker  (propertize "⚠ No Checker" 'face `(:inherit mode-line)))
@@ -423,21 +441,14 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 ****** Update vc-state in all buffers
 #+BEGIN_SRC emacs-lisp
-  ;; (defun rr/refresh-vc-state ()
-  ;;   "Refresh vc-state on all buffers."
-  ;;   (dolist (buff (buffer-list))
-  ;;     (with-current-buffer buff
-  ;;       (when (vc-mode)
-  ;;         (progn
-  ;;           (vc-refresh-state)
-  ;;           (diff-hl-update))))))
-
   (defun rr/refresh-vc-state ()
     "Refresh vc-state on all buffers."
     (dolist (buff (buffer-list))
       (with-current-buffer buff
         (when (vc-mode)
-          (vc-refresh-state)))))
+          (progn
+            (vc-refresh-state)
+            (diff-hl-update))))))
 #+END_SRC
 ***** Spaceline
 ****** Faces
@@ -475,8 +486,8 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
   (use-package spaceline
     :config
+    (setq powerline-default-separator 'bar)
     (setq powerline-height 40)
-    (setq powerline-default-separator 'utf-8)
     (setq spaceline-separator-dir-left '(right . right))
     (setq spaceline-separator-dir-right '(right . right))
     (setq powerline-default-separator 'alternate)
@@ -517,7 +528,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
           window-number)
          :fallback evil-state
          :face highlight-face
-         :priority 0)
+         :priority 0
+         :tight-left t
+         :tight-right t)
         (anzu :priority 4)
         auto-compile
         ((buffer-id remote-host)
@@ -762,7 +775,7 @@ Show more offten used completeons first
     (when (executable-find "curl")
       (setq helm-google-suggest-use-curl-p t))
 
-    (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
+    (setq helm-split-window-inside-p            t ; open helm buffer inside current window, not occupy whole other window
           helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
           helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
           helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
@@ -843,11 +856,17 @@ link.
 *** Dired
 #+BEGIN_SRC emacs-lisp
   (use-package dired+
-    :ensure t
     :config
     (require 'dired+)
-    (setq dired-listing-switches "--group-directories-first -alh")
+    (setq dired-listing-switches "--group-directories-first -alh"
+          dired-dwim-target t            ; if another Dired buffer is visible in another window, use that directory as target for Rename/Copy
+          dired-recursive-copies 'always         ; "always" means no asking
+          dired-recursive-deletes 'top           ; "top" means ask once for top level directory
+          )
     (toggle-diredp-find-file-reuse-dir 1))
+
+  ;; automatically refresh dired buffer on changes
+  (add-hook 'dired-mode-hook 'auto-revert-mode)
 #+END_SRC
 *** Projectile
 **** Basic setup
@@ -1016,7 +1035,6 @@ Colorize color names in buffers
 #+END_QUOTE
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-mode
-    :ensure t
     :config
     (setq rainbow-x-colors-major-mode-list '(web-mode python-mode)))
 #+END_SRC
@@ -1058,6 +1076,18 @@ And even org-babel integration:
   ;;   (when (require 'edit-server nil t)
   ;;     (setq edit-server-new-frame nil)
   ;;     (edit-server-start)))
+#+END_SRC
+*** Volatile highlight
+#+BEGIN_SRC emacs-lisp
+  (use-package volatile-highlights
+    :config
+    (volatile-highlights-mode t))
+#+END_SRC
+*** Highlight numbers
+#+BEGIN_SRC emacs-lisp
+  (use-package highlight-numbers
+    :config
+    (add-hook 'prog-mode-hook 'highlight-numbers-mode))
 #+END_SRC
 *** Org
 **** Some tweaks
@@ -1548,7 +1578,8 @@ But there is no backward compatibility.
   (use-package lsp-java
     :config
     (add-hook 'java-mode-hook #'lsp-java-enable)
-    (setq lsp-java--workspace-folders (list "/home/rrudakov/Work/rencredit-load")))
+    (setq lsp-java--workspace-folders (list "/home/rrudakov/Work/rencredit-load"
+                                            "/home/rrudakov/Work/arsnova-load")))
 #+END_SRC
 **** Haskell
 ***** Intero
@@ -1672,18 +1703,8 @@ But there is no backward compatibility.
     :config
     (elpy-enable)
     (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
+    (add-hook 'elpy-mode-hook 'flycheck-mode)
     (add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode 0))))
-#+END_SRC
-***** Flyckeck using mypy
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package flycheck-mypy
-  ;;   :config
-  ;;   (add-hook 'python-mode-hook 'flycheck-mode))
-#+END_SRC
-***** Traad
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package traad
-  ;;   :ensure t)
 #+END_SRC
 ***** Anaconda mode
 #+BEGIN_SRC emacs-lisp
@@ -1697,10 +1718,22 @@ But there is no backward compatibility.
 #+END_SRC
 ***** Python language server
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package lsp-python
-  ;;   :after (lsp-mode)
-  ;;   :config
-  ;;   (add-hook 'python-mode-hook #'lsp-python-enable))
+  ;; (lsp-define-stdio-client lsp-python "python"
+  ;;                          #'projectile-project-root
+  ;;                          '("pyls"))
+
+  ;; ;; make sure this is activated when python-mode is activated
+  ;; ;; lsp-python-enable is created by macro above 
+  ;; (add-hook 'python-mode-hook
+  ;;           (lambda ()
+  ;;             (lsp-python-enable)))
+
+  ;; (defun lsp-set-cfg ()
+  ;;   (let ((lsp-cfg `(:pyls (:configurationSources ("flake8")))))
+  ;;     ;; TODO: check lsp--cur-workspace here to decide per server / project
+  ;;     (lsp--set-configuration lsp-cfg)))
+
+  ;; (add-hook 'lsp-after-initialize-hook 'lsp-set-cfg)
 #+END_SRC
 ***** Auto completeon
 #+BEGIN_SRC emacs-lisp
@@ -1724,6 +1757,9 @@ But there is no backward compatibility.
 #+END_SRC
 ***** Import management
 #+BEGIN_SRC emacs-lisp
+  (use-package isortify
+    :config
+    (add-hook 'python-mode-hook 'isortify-mode))
   ;; (use-package py-isort
   ;;     :ensure t
   ;;     :config
@@ -1868,4 +1904,11 @@ But there is no backward compatibility.
   ;;                                (interactive)
   ;;                                (org-call-with-arg 'org-todo "DONE")))
   (global-set-key "\C-cm" 'org-agenda-month-view)
+#+END_SRC
+*** Imenu list
+#+BEGIN_SRC emacs-lisp
+  (use-package imenu-list
+    :config
+    (global-set-key (kbd "C-'") #'imenu-list-smart-toggle)
+    (setq imenu-list-focus-after-activation t))
 #+END_SRC
