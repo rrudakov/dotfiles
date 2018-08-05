@@ -64,6 +64,16 @@
 #+BEGIN_SRC text
   Unordered lists with separator '::'
 #+END_SRC
+** Useful functions
+*** Capitalize first char
+#+BEGIN_SRC emacs-lisp
+  (defun rr/capitalize-first-char (&optional string)
+    "Capitalize only the first character of the input STRING."
+    (when (and string (> (length string) 0))
+      (let ((first-char (substring string nil 1))
+            (rest-str   (substring string 1)))
+        (concat (capitalize first-char) rest-str))))
+#+END_SRC
 ** Configuration
 *** Start emacs server
 #+BEGIN_SRC emacs-lisp
@@ -108,8 +118,10 @@ Good choices:
 #+BEGIN_SRC emacs-lisp
   ;; (add-to-list 'default-frame-alist '(font . "Fira Mono-10"))
   ;; (set-frame-font "Fira Mono-10")
+  (add-to-list 'default-frame-alist '(font . "Iosevka-10"))
   (add-to-list 'default-frame-alist '(font . "Source Code Variable-10"))
   (set-frame-font "Source Code Variable-10")
+  ;; (set-frame-font "Iosevka-10")
 
 #+END_SRC
 **** Open files ends with "rc" in conf-unix-mode
@@ -612,9 +624,15 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree
     :config
-    (global-undo-tree-mode)
-    (setq undo-tree-visualizer-diff t
-          undo-tree-visualizer-timestamps t))
+    (setq undo-limit 78643200)
+    (setq undo-outer-limit 104857600)
+    (setq undo-strong-limit 157286400)
+    (setq undo-tree-auto-save-history t)
+    (setq undo-tree-enable-undo-in-region nil)
+    (setq undo-tree-history-directory-alist '(("." . "~/emacs.d/undo")))
+    (add-hook 'undo-tree-visualizer-mode-hook (lambda ()
+                                                (undo-tree-visualizer-selection-mode)))
+    (global-undo-tree-mode 1))
 #+END_SRC
 *** Autocomplete
 **** YASnippet
@@ -872,12 +890,14 @@ link.
 **** Basic setup
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
+    :init
+    (setq projectile-keymap-prefix (kbd "C-c p"))
     :config
-    (projectile-global-mode)
     (setq projectile-completion-system 'helm)
     (add-to-list 'projectile-globally-ignored-files "*.log")
     (setq projectile-enable-caching t)
-    (setq projectile-mode-line '(:eval (format " [%s]" (projectile-project-name)))))
+    (setq projectile-mode-line '(:eval (format " [%s]" (projectile-project-name))))
+    (projectile-mode +1))
 #+END_SRC
 **** Counsel projectile
 #+BEGIN_SRC emacs-lisp
@@ -1560,11 +1580,18 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
     :config
-    (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
-    )
+    (setq lsp-inhibit-message t
+          lsp-eldoc-render-all nil
+          lsp-highlight-symbol-at-point nil)
+    (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
 
   (use-package lsp-ui
     :config
+    (setq lsp-ui-sideline-enable t
+          lsp-ui-sideline-show-symbol t
+          lsp-ui-sideline-show-hover t
+          lsp-ui-sideline-show-code-actions t
+          lsp-ui-sideline-update-mode 'point)
     (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 #+END_SRC
 ***** Completeon
@@ -1572,15 +1599,26 @@ But there is no backward compatibility.
   (use-package company-lsp
     :config
     (push 'company-lsp company-backends)
-    (setf company-lsp-async t))
+    (setf company-lsp-async t)
+    (setq company-lsp-enable-snippet t
+          company-lsp-cache-candidates t))
 #+END_SRC
 **** Java
 #+BEGIN_SRC emacs-lisp
+  (require 'cc-mode)
+
   (use-package lsp-java
+    :requires (lsp-ui-flycheck lsp-ui-sideline)
     :config
-    (add-hook 'java-mode-hook #'lsp-java-enable)
-    (setq lsp-java--workspace-folders (list "/home/rrudakov/Work/rencredit-load"
-                                            "/home/rrudakov/Work/arsnova-load")))
+    (add-hook 'java-mode-hook 'lsp-java-enable)
+    (add-hook 'java-mode-hook 'lsp-ui-sideline-mode)
+    (setq lsp-java--workspace-folders (list "/home/rrudakov/Work/arsnova-load"
+                                            "/home/rrudakov/Work/appium-lesson")))
+
+  (add-hook 'java-mode-hook (lambda () (setq c-basic-offset 2)))
+
+  (require 'google-java-format)
+  (add-hook 'java-mode-hook (lambda () (local-set-key (kbd "C-c C-f") #'google-java-format-buffer)))
 #+END_SRC
 **** Haskell
 ***** Intero

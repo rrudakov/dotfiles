@@ -52,10 +52,9 @@ zmodload -i zsh/complist
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
 BASE16_SHELL=$HOME/.config/base16-shell/
-# [ -n "$PS1" ] && [ -s $BASE16_SHELL/profile_helper.sh ] && eval "$($BASE16_SHELL/profile_helper.sh)"
 
-# PATH=$PATH:$HOME/.stack/programs/x86_64-linux/ghc-8.0.2/bin
-PATH=$HOME/.local/texlive/2017/bin/x86_64-linux:$HOME/.local/bin:$PATH
+ANDROID_HOME=$HOME/Android/Sdk
+PATH=$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools/bin:$HOME/.local/texlive/2017/bin/x86_64-linux:$HOME/.local/bin:$PATH
 export PATH
 MANPATH=$HOME/.local/texlive/2017/texmf-dist/doc/man:$MANPATH
 export MANPATH

@@ -23,6 +23,7 @@
 
 (package-initialize)
 
+(add-to-list 'load-path "~/.emacs.d/custom/")
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)

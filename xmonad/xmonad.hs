@@ -226,7 +226,7 @@ scratchpads =
   , NS "wire" "wire-desktop" (appName =? "wire") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
   , NS "slack" "slack" (appName =? "slack") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
   , NS "skype" "skypeforlinux" (className =? "Skype") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
-  , NS "mattermost" "mattermost" (appName =? "mattermost") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
+  , NS "mattermost" "mattermost-desktop" (appName =? "mattermost") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
   ]
 
 -- | Set hooks for applications
