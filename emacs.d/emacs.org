@@ -351,6 +351,12 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   (use-package gruvbox-theme
     :config
     (load-theme 'gruvbox-dark-medium t))
+  ;; (use-package leuven-theme
+  ;;   :config
+  ;;     (load-theme 'leuven-dark t))
+  ;; (use-package color-theme-sanityinc-tomorrow
+  ;;   :config
+  ;;   (load-theme 'sanityinc-tomorrow-night t))
   ;; (use-package zenburn-theme
   ;;   :config
   ;;   (load-theme 'zenburn t))
@@ -614,6 +620,12 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
     (eval-after-load "sql"
       '(load-library "sql-indent")))
 #+END_SRC
+**** Disable line breaking
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'sql-interactive-mode-hook
+            (lambda ()
+              (toggle-truncate-lines t)))
+#+END_SRC
 *** Which key
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
@@ -810,9 +822,9 @@ Show more offten used completeons first
 #+END_SRC
 **** Swiper
 #+BEGIN_SRC emacs-lisp
-  (use-package swiper-helm
-    :bind (("C-s" . swiper-helm)
-           ("C-r" . swiper-helm)))
+  ;; (use-package swiper-helm
+  ;;   :bind (("C-s" . swiper-helm)
+  ;;          ("C-r" . swiper-helm)))
 #+END_SRC
 **** Tramp
 #+BEGIN_SRC emacs-lisp
