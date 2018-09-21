@@ -80,6 +80,9 @@
   (server-start)
 #+END_SRC
 *** Common
+:PROPERTIES:
+:VISIBILITY: folded
+:END:
 **** Increase performance
 #+BEGIN_SRC emacs-lisp
   (setq gnutls-min-prime-bits 4096)
@@ -340,6 +343,10 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** Show trailing whitespace
 #+BEGIN_SRC emacs-lisp
   (add-hook 'prog-mode-hook (lambda () (interactive) (setq show-trailing-whitespace 1)))
+#+END_SRC
+**** Set minimal height of window
+#+BEGIN_SRC emacs-lisp
+  (setq window-min-height 10)
 #+END_SRC
 *** Theme
 **** All the icons
@@ -641,7 +648,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
     (setq undo-strong-limit 157286400)
     (setq undo-tree-auto-save-history t)
     (setq undo-tree-enable-undo-in-region nil)
-    (setq undo-tree-history-directory-alist '(("." . "~/emacs.d/undo")))
+    (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
     (add-hook 'undo-tree-visualizer-mode-hook (lambda ()
                                                 (undo-tree-visualizer-selection-mode)))
     (global-undo-tree-mode 1))
@@ -1552,6 +1559,13 @@ But there is no backward compatibility.
   (use-package org-jira
     :config
     (setq jiralib-url "https://jira.eoadm.com"))
+#+END_SRC
+*** Outshine
+#+BEGIN_SRC emacs-lisp
+  (use-package outshine
+    :config
+    (add-hook 'outline-minor-mode-hook 'outshine-hook-function)
+    (add-hook 'prog-mode-hook 'outline-minor-mode))
 #+END_SRC
 *** Email
 **** Sending email
