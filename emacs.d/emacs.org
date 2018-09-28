@@ -479,15 +479,15 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 ****** Faces
 #+BEGIN_SRC emacs-lisp
   (defface rr/spaceline-unmodified
-    '((t :inherit 'spaceline-unmodified :background "#87afaf"))
+    '((t :inherit 'spaceline-unmodified :foreground "#87afaf" :background "#665c54"))
     "Face for unmodified buffer in the mode-line.")
 
   (defface rr/spaceline-modified
-    '((t :inherit 'spaceline-modified :background "#d75f5f"))
+    '((t :inherit 'spaceline-modified :foreground "#d75f5f" :background "#665c54"))
     "Face for modified buffer in the mode-line.")
 
   (defface rr/spaceline-read-only
-    '((t :inherit 'spaceline-read-only :background "#d787af"))
+    '((t :inherit 'spaceline-read-only :foreground "#d787af" :background "#665c54"))
     "Face for read-only buffer in the mode-line.")
 
   (defun rr/spaceline-face (face active)
@@ -506,15 +506,21 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
         (t 'rr/spaceline-unmodified)))
       ('(highlight . nil) 'powerline-inactive1)
       (_ 'error)))
+
+  ;; (set-face-attribute 'mode-line nil
+  ;;                     :box '(:line-width 6 :color "#665c54"))
+
+  ;; (set-face-attribute 'mode-line-inactive nil
+  ;;                     :box '(:line-width 6 :color "#3c3836"))
 #+END_SRC
 ****** Common configuration
 #+BEGIN_SRC emacs-lisp
   (use-package spaceline
     :config
-    (setq powerline-default-separator 'bar)
-    (setq powerline-height 40)
-    (setq spaceline-separator-dir-left '(right . right))
-    (setq spaceline-separator-dir-right '(right . right))
+    ;; (setq powerline-default-separator 'bar)
+    (setq powerline-height 36)
+    ;; (setq spaceline-separator-dir-left '(right . right))
+    ;; (setq spaceline-separator-dir-right '(right . right))
     (setq powerline-default-separator 'alternate)
     (setq spaceline-window-numbers-unicode t)
     (setq spaceline-face-func 'rr/spaceline-face))
@@ -541,7 +547,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 
   (spaceline-define-segment rr/modified
     "Buffer status."
-    " "
+    "•"
     :enabled t)
 
   ;; My custom theme
@@ -554,8 +560,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
          :fallback evil-state
          :face highlight-face
          :priority 0
-         :tight-left t
-         :tight-right t)
+         ;; :tight-left t
+         ;; :tight-right t
+         )
         (anzu :priority 4)
         auto-compile
         ((buffer-id remote-host)
@@ -583,7 +590,17 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
     (setq-default mode-line-format '("%e" (:eval (spaceline-ml-main)))))
 
   (rr/spaceline-theme)
+
   (spaceline-compile)
+#+END_SRC
+***** Moody
+Quiet interesting package. But i need more time to set it up the way I want.
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package moody
+  ;;   :config
+  ;;   (setq x-underline-at-descent-line t)
+  ;;   (moody-replace-mode-line-buffer-identification)
+  ;;   (moody-replace-vc-mode))
 #+END_SRC
 **** Highlight indentation
 #+BEGIN_SRC emacs-lisp
@@ -611,6 +628,24 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   ;; (global-semanticdb-minor-mode 1)
 #+END_SRC
 *** SQL
+**** Emacs database interface
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package edbi)
+  ;; (use-package company-edbi)
+#+END_SRC
+**** Emacs database connection over clojure
+#+BEGIN_SRC emacs-lisp
+  (use-package ejc-sql
+    :config
+    (ejc-create-connection
+     "blogdb"
+     :classpath "~/.m2/repository/postgresql/postgresql/9.3-1102.jdbc41/postgresql-9.3-1102.jdbc41.jar"
+     :classname "org.postgresql.Driver"
+     :subprotocol "postgresql"
+     :subname "//localhost:5432/blogdb"
+     :user "blog"
+     :password "123456"))
+#+END_SRC
 **** Make PostgreSQL default
 #+BEGIN_SRC emacs-lisp
   (eval-after-load "sql"
@@ -693,9 +728,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** Statistic
 Show more offten used completeons first
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package company-statistics
-  ;;   :config
-  ;;   (company-statistics-mode))
+  (use-package company-statistics
+    :config
+    (company-statistics-mode))
 #+END_SRC
 **** Quick help
 #+BEGIN_SRC emacs-lisp
@@ -909,6 +944,18 @@ link.
   ;;   :config
   ;;   (setq popwin:popup-window-height 0.5)
   ;;   (popwin-mode 1))
+#+END_SRC
+**** Shackle
+#+BEGIN_SRC emacs-lisp
+  (use-package shackle
+    :config
+    (setq helm-display-function 'pop-to-buffer)
+    (setq shackle-rules '(
+                          ("\\`\\*helm.*?\\*\\'" :regexp t :align t :size 0.4)
+                          (compilation-mode :select t)
+                          (help-mode :select t :align t :size 0.4)
+                          ))
+    (shackle-mode))
 #+END_SRC
 *** Rainbow delimiters
 #+BEGIN_SRC emacs-lisp
