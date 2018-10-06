@@ -1607,7 +1607,8 @@ But there is no backward compatibility.
     :config
     (setq jiralib-url "https://jira.eoadm.com"))
 #+END_SRC
-*** Outshine
+*** Code folding
+**** Outshine
 #+BEGIN_SRC emacs-lisp
   (use-package outshine
     :config
@@ -1945,7 +1946,7 @@ But there is no backward compatibility.
 #+END_SRC
 ***** Code folding
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'python-mode-hook 'hs-minor-mode)
+  ;; (add-hook 'python-mode-hook 'hs-minor-mode)
 #+END_SRC
 ***** Editing requirements files
 #+BEGIN_SRC emacs-lisp
