@@ -44,4 +44,12 @@
   DesktopNames=XMonad
   Name=XMonad
 #+END_EXAMPLE
+#+BEGIN_EXAMPLE
+[Desktop Entry]
+Name=XMonad
+Comment=Lightweight tiling window manager
+Exec=xmonad-session
+Icon=xmonad.png
+Type=XSession
+#+END_EXAMPLE
 7. Run ~install.sh~ from this repository
