@@ -246,9 +246,10 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
     ;; (push (cons 'right-fringe my-ui-fringe-size) default-frame-alist)
     )
 #+END_SRC
-**** Use SSH for tramp-mode
+**** Settings for tramp-mode
 #+BEGIN_SRC emacs-lisp
-  (setq tramp-default-method "ssh")
+  (setq tramp-terminal-type "tramp"
+        tramp-default-method "ssh")
 #+END_SRC
 **** Set default input method
 #+BEGIN_SRC emacs-lisp

@@ -29,7 +29,7 @@ import           XMonad.Util.Run                 (spawnPipe)
 -- | Set default terminal emulator
 myTerminal ∷ String
 -- myTerminal = "gnome-terminal"
-myTerminal = "urxvt256c"
+myTerminal = "urxvt"
 
 -- | Set focus follow mouse
 myFocusFollowsMouse ∷ Bool
@@ -103,7 +103,7 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
   , ((modm, xK_space), sendMessage NextLayout)
     --  Reset the layouts on the current workspace to default
   , ((modm .|. shiftMask, xK_space), setLayout $ XMonad.layoutHook conf)
-  , ((modm .|. shiftMask, xK_x), spawn "xlock")
+  , ((modm .|. shiftMask, xK_x), spawn "i3lock-wrapper")
     -- Resize viewed windows to the correct size
   , ((modm, xK_n), refresh)
     -- Move focus to the next window
@@ -145,7 +145,7 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
     -- Quit xmonad
   , ((modm .|. shiftMask, xK_q), io exitSuccess)
     -- Restart xmonad
-  , ((modm, xK_q), spawn  "if type /usr/local/bin/xmonad; then /usr/local/bin/xmonad --recompile && /usr/local/bin/xmonad --restart; else xmessage xmonad not in \\$PATH: \"$PATH\"; fi")
+  , ((modm, xK_q), spawn  "if type /usr/local/bin/xmonad-session; then xmonad-session --recompile && xmonad-session --restart; else xmessage xmonad-session not in \\$PATH: \"$PATH\"; fi")
     --, ((modm              , xK_q     ), spawn "stack exec xmonad -- --recompile && stack exec xmonad -- --restart")
   , ((modm, xK_b), sendMessage ToggleStruts)
   , ((modm, xK_BackSpace), focusUrgent)
@@ -221,7 +221,7 @@ myLayout = avoidStruts $ lessBorders Screen tiled ||| noBorders Full ||| lessBor
 scratchpads ∷ [NamedScratchpad]
 scratchpads =
   [ NS "htop" "gnome-terminal -- htop" (title =? "htop") (customFloating $ W.RationalRect (1/6) (1/6) (2/3) (2/3))
-  , NS "telegram" "telegram" (className =? "TelegramDesktop") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
+  , NS "telegram" "telegram-desktop" (className =? "TelegramDesktop") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
   , NS "spotify" "spotify" (appName =? "spotify") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
   , NS "wire" "wire-desktop" (appName =? "wire") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
   , NS "slack" "slack" (appName =? "slack") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))

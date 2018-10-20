@@ -1,3 +1,10 @@
+Xft.antialias: 1
+Xft.autohint: 0
+Xft.dpi: 141
+Xft.hinting: 1
+Xft.hintstyle: hintslight
+Xft.lcdfilter: lcddefault
+Xft.rgba: rgb
 ! Emacs.FontBackend: xft
 
 XTerm*faceName: xft:Source Code Variable:size=10:antialias=true
@@ -141,6 +148,10 @@ URxvt.color245: #928374
 URxvt.color246: #a89984
 URxvt.color248: #bdae93
 URxvt.color250: #d5c4a1
+
+URxvt.colorIT:      #87af5f
+URxvt.colorBD:      #d7d7d7
+URxvt.colorUL:      #87afd7
 
 !XLock
 XLock.mode: blank

@@ -14,22 +14,14 @@ Config { font = "xft:Source Code Variable:size=10:antialias=true"
        , overrideRedirect = True
        , persistent = False
        , alpha = 255
-       , commands = [ Run Network "wlan0" ["-L", "100000"
-					  ,"-H", "1000000"
-					  ,"--normal", "#98971a"
-					  ,"--high", "#cc241d"
-                                          ,"-m", "4"
-                                          ,"-M", "4"
-					  ,"-t <fc=#689d6a><icon=.xpm/net_down_03.xbm/></fc><rx>KB|<tx>KB<fc=#b16286><icon=.xpm/net_up_03.xbm/></fc>"
-					  ] 10
-                    , Run Network "eth0" ["-L", "100000"
-		      	  	  	 ,"-H", "1000000"
-					 ,"--normal", "98971a"
-					 ,"--high", "#cc241d"
-                                         ,"-m", "4"
-                                         ,"-M", "4"
-					 ,"-t <fc=#689d6a><icon=.xpm/net_down_03.xbm/></fc><rx>KB|<tx>KB<fc=#b16286><icon=.xpm/net_up_03.xbm/></fc>"
-					 ] 10
+       , commands = [ Run DynNetwork ["--template" , "<fc=#689d6a><icon=.xpm/net_down_03.xbm/></fc><rx>kB/s|<tx>kB/s<fc=#b16286><icon=.xpm/net_up_03.xbm/></fc>"
+                                     , "--Low"      , "100000"       -- units: B/s
+                                     , "--High"     , "1000000"       -- units: B/s
+		                     ,"--normal", "98971a"
+		                     ,"--high", "#cc241d"
+                                     ,"-m", "4"
+                                     ,"-M", "4"
+		                     ] 10
                     , Run Cpu ["-L", "3"
 		      	      ,"-H", "50"
 			      ,"--normal", "#98971a"
@@ -63,6 +55,6 @@ Config { font = "xft:Source Code Variable:size=10:antialias=true"
                     ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = "%cpu% %memory% %wlan0% %battery% %StdinReader% }{ <fc=#ebdbb2>%kbd% %date%</fc>"
+       , template = "%cpu% %memory% %dynnetwork% %battery% %StdinReader% }{ <fc=#ebdbb2>%kbd% %date%</fc>"
        , hideOnStart = False
        }

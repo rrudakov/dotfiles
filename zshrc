@@ -42,7 +42,7 @@ case $TERM in
 esac
 
 autoload -U colors && colors
-PROMPT="%{$fg[green]%}%#%{$reset_color%} %{$fg[blue]%}%d %{$reset_color%}"
+PROMPT='%F{green}%n%f@%F{blue}%m%f %F{yellow}%1~%f %# '
 
 if [[ -r ~/.aliasrc ]]; then
 . ~/.aliasrc
@@ -51,15 +51,31 @@ fi
 zmodload -i zsh/complist
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
+export LESS=-R
+export LESS_TERMCAP_mb=$'\E[1;31m'     # begin bold
+export LESS_TERMCAP_md=$'\E[1;36m'     # begin blink
+export LESS_TERMCAP_me=$'\E[0m'        # reset bold/blink
+export LESS_TERMCAP_so=$'\E[01;44;33m' # begin reverse video
+export LESS_TERMCAP_se=$'\E[0m'        # reset reverse video
+export LESS_TERMCAP_us=$'\E[1;32m'     # begin underline
+export LESS_TERMCAP_ue=$'\E[0m'        # reset underline
+
+if [ "$TERM" = "linux" ]; then
+    _SEDCMD='s/.*\*color\([0-9]\{1,\}\).*#\([0-9a-fA-F]\{6\}\).*/\1 \2/p'
+    for i in $(sed -n "$_SEDCMD" $HOME/.Xresources | awk '$1 < 16 {printf "\\e]P%X%s", $1, $2}'); do
+        echo -en "$i"
+    done
+    clear
+fi
 BASE16_SHELL=$HOME/.config/base16-shell/
 
-ANDROID_HOME=$HOME/Android/Sdk
-PATH=$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools/bin:$HOME/.local/texlive/2017/bin/x86_64-linux:$HOME/.local/bin:$PATH
+# ANDROID_HOME=$HOME/Android/Sdk
+PATH=$HOME/.local/bin:$PATH
 export PATH
-MANPATH=$HOME/.local/texlive/2017/texmf-dist/doc/man:$MANPATH
-export MANPATH
-INFOPATH=$HOME/.local/texlive/2017/texmf-dist/doc/info:$INFOPATH
-export INFOPATH
+#MANPATH=$HOME/.local/texlive/2017/texmf-dist/doc/man:$MANPATH
+#export MANPATH
+#INFOPATH=$HOME/.local/texlive/2017/texmf-dist/doc/info:$INFOPATH
+#export INFOPATH
 export WORKON_HOME=$HOME/.virtualenvs
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
 source /usr/bin/virtualenvwrapper.sh
@@ -73,5 +89,5 @@ setopt completealiases
 export EDITOR=vim
 export QT_QPA_PLATFORMTHEME=qt5ct
 
-export PATH="$HOME/.yarn/bin:$PATH"
-export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=lcd'
+#export PATH="$HOME/.yarn/bin:$PATH"
+#export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=lcd'

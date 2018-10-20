@@ -9,7 +9,7 @@
 ############### Variables:
 
 dir=${HOME}/dotfiles
-files="Xresources emacs.d/init.el tmux.conf vimrc xmonad/xmonad.hs xmobarrc xsession gitconfig stalonetrayrc zshrc zshenv aliasrc"
+files="Xresources emacs.d/init.el emacs.d/emacs.org tmux.conf vimrc xmonad/xmonad.hs xmobarrc xprofile gitconfig stalonetrayrc zshrc zshenv aliasrc config/dunst/dunstrc"
 
 ###############
 
@@ -17,6 +17,10 @@ files="Xresources emacs.d/init.el tmux.conf vimrc xmonad/xmonad.hs xmobarrc xses
 
 echo "Changing to the $dir directory"
 cd ${dir}
+echo "...done"
+
+echo "Create directories"
+mkdir -p .xmonad .emacs.d/custom .config/dunst
 echo "...done"
 
 # Move any existing dotfiles to ~/dotfiles_old, then creating symlinks
