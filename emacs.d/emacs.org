@@ -86,11 +86,6 @@
 **** Increase performance
 #+BEGIN_SRC emacs-lisp
   (setq gnutls-min-prime-bits 4096)
-  ;; Font lock settings
-  ;; (setq jit-lock-stealth-time 16
-  ;;       jit-lock-defer-contextually t
-  ;;       jit-lock-stealth-nice 0.5)
-  ;; (setq-default font-lock-multiline t)
   (setq font-lock-maximum-decoration nil)
 #+END_SRC
 **** Highlight expression in parens
@@ -120,13 +115,8 @@ Good choices:
 + [[https://github.com/adobe-fonts/source-code-pro][SourceCodePro]] :: Currently used
 + [[https://slackbuilds.org/repository/14.2/system/hack-font-ttf/][Hack]]
 #+BEGIN_SRC emacs-lisp
-  ;; (add-to-list 'default-frame-alist '(font . "Fira Mono-10"))
-  ;; (set-frame-font "Fira Mono-10")
-  (add-to-list 'default-frame-alist '(font . "Iosevka-10"))
   (add-to-list 'default-frame-alist '(font . "Source Code Variable-10"))
   (set-frame-font "Source Code Variable-10")
-  ;; (set-frame-font "Iosevka-10")
-
 #+END_SRC
 **** Open files ends with "rc" in conf-unix-mode
 #+BEGIN_SRC emacs-lisp
@@ -271,17 +261,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
   (global-prettify-symbols-mode)
 #+END_SRC
-**** Smooth scrolling
-#+BEGIN_SRC emacs-lisp
-  ;; (setq scroll-conservatively 101) ;; move minimum when cursor exits view, instead of recentering
-  ;; (setq mouse-wheel-scroll-amount '(1)) ;; mouse scroll moves 1 line at a time, instead of 5 lines
-  ;; (setq mouse-wheel-progressive-speed nil) ;; on a long mouse scroll keep scrolling by 1 line
-  ;; (setq scroll-step 1
-  ;;       scroll-conservatively 10000
-  ;;       auto-hscroll-mode 'current-line)
-  ;; (setq mouse-wheel-scroll-amount '(2 ((shift) . 1) ((control) . nil))
-  ;;       mouse-wheel-progressive-speed nil)
-#+END_SRC
 **** Default mode
 #+BEGIN_SRC emacs-lisp
   (setq-default major-mode 'text-mode)
@@ -360,15 +339,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   (use-package gruvbox-theme
     :config
     (load-theme 'gruvbox-dark-medium t))
-  ;; (use-package leuven-theme
-  ;;   :config
-  ;;     (load-theme 'leuven-dark t))
-  ;; (use-package color-theme-sanityinc-tomorrow
-  ;;   :config
-  ;;   (load-theme 'sanityinc-tomorrow-night t))
-  ;; (use-package zenburn-theme
-  ;;   :config
-  ;;   (load-theme 'zenburn t))
 #+END_SRC
 **** Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
@@ -519,10 +489,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
   (use-package spaceline
     :config
-    ;; (setq powerline-default-separator 'bar)
     (setq powerline-height 36)
-    ;; (setq spaceline-separator-dir-left '(right . right))
-    ;; (setq spaceline-separator-dir-right '(right . right))
     (setq powerline-default-separator 'alternate)
     (setq spaceline-window-numbers-unicode t)
     (setq spaceline-face-func 'rr/spaceline-face))
@@ -605,29 +572,13 @@ Quiet interesting package. But i need more time to set it up the way I want.
   ;;   (moody-replace-vc-mode))
 #+END_SRC
 **** Highlight indentation
+Good, but has performance problems
 #+BEGIN_SRC emacs-lisp
   ;; (use-package highlight-indent-guides
   ;;   :config
   ;;   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
   ;;   (setq highlight-indent-guides-method 'character
   ;;         highlight-indent-guides-character ?\x258F))
-#+END_SRC
-*** Semantic
-**** Enable semantic mode global
-#+BEGIN_SRC emacs-lisp
-  ;; (semantic-mode 1)
-#+END_SRC
-**** Highlight current function
-#+BEGIN_SRC emacs-lisp
-  ;; (global-semantic-highlight-func-mode 1)
-#+END_SRC
-**** Show function definition at the top of buffer
-#+BEGIN_SRC emacs-lisp
-  ;; (global-semantic-stickyfunc-mode 1)
-#+END_SRC
-**** Enable database
-#+BEGIN_SRC emacs-lisp
-  ;; (global-semanticdb-minor-mode 1)
 #+END_SRC
 *** SQL
 **** Emacs database interface
@@ -714,19 +665,6 @@ Quiet interesting package. But i need more time to set it up the way I want.
     (add-to-list 'company-backends 'company-files)
     (add-to-list 'company-backends 'company-elisp))
 #+END_SRC
-**** Child frame
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package company-childframe
-  ;;   :after company
-  ;;   :config
-  ;;   (company-childframe-mode 1))
-#+END_SRC
-**** Completeon with icons
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package company-box
-  ;;   :config
-  ;;   (add-hook 'company-mode-hook 'company-box-mode))
-#+END_SRC
 **** Statistic
 Show more offten used completeons first
 #+BEGIN_SRC emacs-lisp
@@ -758,14 +696,12 @@ Show more offten used completeons first
 ***** Shell
 #+BEGIN_SRC emacs-lisp
   (use-package company-shell
-    :ensure t
     :config
     (add-to-list 'company-backends 'company-shell))
 #+END_SRC
 ***** JavaScript
 #+BEGIN_SRC emacs-lisp
   (use-package company-tern
-    :ensure t
     :after tern
     :config
     (add-to-list 'company-backends 'company-tern)
@@ -790,49 +726,12 @@ Show more offten used completeons first
 *** Paradox
 #+BEGIN_SRC emacs-lisp
   (use-package paradox
-    :ensure t
     :config
     (setq-default
      paradox-column-width-package 27
      paradox-column-width-version 13
      paradox-execute-asynchronously t
      paradox-hide-wiki-packages t))
-#+END_SRC
-*** Ivy
-**** Install and activate ivy
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package ivy
-  ;;   :ensure t
-  ;;   :bind (("C-x b" . ivy-switch-buffer))
-  ;;   :config
-  ;;   (ivy-mode 1)
-  ;;   (setq ivy-use-virtual-buffers t
-  ;;         ivy-display-style 'fancy
-  ;;         ivy-count-format "(%d/%d) ")
-  ;;   :bind (("<f2>" . bs-show)))
-#+END_SRC
-**** Swiper
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package swiper
-  ;;   :ensure t
-  ;;   :bind (("C-s" . swiper)
-  ;;          ("C-r" . swiper)
-  ;;          ("C-c C-r" . ivy-resume)))
-#+END_SRC
-**** Counsel
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package counsel
-  ;;   :ensure t
-  ;;   :bind (("M-x" . counsel-M-x)
-  ;;          ("C-x C-f" . counsel-find-file)
-  ;;          ("<f1> f" . counsel-describe-function)
-  ;;          ("<f1> v" . counsel-describe-variable)
-  ;;          ("<f1> l" . counsel-find-library)
-  ;;          ("<f1> i" . counsel-info-lookup-symbol)
-  ;;          ("<f1> u" . counsel-unicode-char)
-  ;;          ("M-y" . counsel-yank-pop)
-  ;;          :map ivy-minibuffer-map
-  ;;          ("M-y" . ivy-next-line)))
 #+END_SRC
 *** Helm
 **** Config
@@ -842,9 +741,9 @@ Show more offten used completeons first
     (require 'helm)
     (require 'helm-config)
 
-    (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-    (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
-    (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+    ;; (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
+    ;; (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
+    ;; (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
 
     (when (executable-find "curl")
       (setq helm-google-suggest-use-curl-p t))
@@ -863,12 +762,6 @@ Show more offten used completeons first
     (global-set-key (kbd "C-x b") 'helm-mini)
     (global-set-key (kbd "C-x C-f") 'helm-find-files)
     (helm-mode 1))
-#+END_SRC
-**** Swiper
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package swiper-helm
-  ;;   :bind (("C-s" . swiper-helm)
-  ;;          ("C-r" . swiper-helm)))
 #+END_SRC
 **** Tramp
 #+BEGIN_SRC emacs-lisp
@@ -926,7 +819,6 @@ Replace for i-search or swiper
 *** Smartparens
 #+BEGIN_SRC emacs-lisp
   (use-package smartparens
-    :ensure t
     :init
     (setq sp-show-pair-delay 0.1
           sp-show-pair-from-inside t)
@@ -937,16 +829,6 @@ Replace for i-search or swiper
     (setq smartparens-strict-mode t))
 #+END_SRC
 *** Popup windows settings
-I've tried ~shackle~, but it doesn't close help window after go to any
-link.
-**** Popwin
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package popwin
-  ;;   :ensure t
-  ;;   :config
-  ;;   (setq popwin:popup-window-height 0.5)
-  ;;   (popwin-mode 1))
-#+END_SRC
 **** Shackle
 #+BEGIN_SRC emacs-lisp
   (use-package shackle
@@ -962,27 +844,19 @@ link.
 *** Rainbow delimiters
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
-    :ensure t
     :config
     (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 #+END_SRC
 *** Anzu
 #+BEGIN_SRC emacs-lisp
   (use-package anzu
-    :ensure t
     :config
     (global-anzu-mode +1)
     (setq anzu-cons-mode-line-p nil))
 #+END_SRC
 *** Windows navigation
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package winum
-  ;;   :ensure t
-  ;;   :config
-  ;;   (setq winum-auto-setup-mode-line nil)
-  ;;   (winum-mode))
   (use-package ace-window
-    :ensure t
     :config
     (global-set-key (kbd "M-o") 'ace-window))
 #+END_SRC
@@ -1014,12 +888,6 @@ link.
     (setq projectile-mode-line '(:eval (format " [%s]" (projectile-project-name))))
     (projectile-mode +1))
 #+END_SRC
-**** Counsel projectile
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package counsel-projectile
-  ;;   :config
-  ;;   (counsel-projectile-mode 1))
-#+END_SRC
 **** Helm projectile
 #+BEGIN_SRC emacs-lisp
   (use-package helm-projectile
@@ -1037,11 +905,6 @@ link.
   (use-package flycheck
     :config
     (add-hook 'after-init-hook #'global-flycheck-mode)
-
-    ;; (setq flycheck-indication-mode 'right-fringe)
-
-    ;; (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
-    ;;   [0 0 0 0 0 4 12 28 60 124 252 124 60 28 12 4 0 0 0 0])
 
     (when (fboundp 'define-fringe-bitmap)
       (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
@@ -1091,9 +954,6 @@ link.
     (setq-default flycheck-disabled-checkers
                   (append flycheck-disabled-checkers
                           '(python-flake8)))
-
-    ;; (add-to-list 'flycheck-checkers 'python-flake8)
-    ;; (add-to-list 'flycheck-checkers 'python-pylint)
     )
 #+END_SRC
 *** Version control
@@ -1119,7 +979,6 @@ link.
 *** Multiple cursors
 #+BEGIN_SRC emacs-lisp
   (use-package multiple-cursors
-    :ensure t
     :config
     (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
     (global-set-key (kbd "C->") 'mc/mark-next-like-this)
@@ -1147,7 +1006,6 @@ link.
 *** Terminal emulator
 #+BEGIN_SRC emacs-lisp
   (use-package sane-term
-    :ensure t
     :config
     (global-set-key (kbd "C-x t") 'sane-term)
     (global-set-key (kbd "C-x T") 'sane-term-create)
@@ -1195,22 +1053,12 @@ And even org-babel integration:
 *** PDF tools
 #+BEGIN_SRC emacs-lisp
   (use-package pdf-tools
-    :ensure t
     :config
     (pdf-tools-install))
 #+END_SRC
 *** Gitignore templates
 #+BEGIN_SRC emacs-lisp
   (use-package gitignore-templates :ensure t)
-#+END_SRC
-*** Edit text areas in browsers from emacs
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package edit-server
-  ;;   :ensure t
-  ;;   :config
-  ;;   (when (require 'edit-server nil t)
-  ;;     (setq edit-server-new-frame nil)
-  ;;     (edit-server-start)))
 #+END_SRC
 *** Volatile highlight
 #+BEGIN_SRC emacs-lisp
@@ -1435,13 +1283,9 @@ But there is no backward compatibility.
 ***** Org bullets
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
-    :ensure t
     :init
-
     (setq org-bullets-bullet-list '("•"))
-
     (setq org-ellipsis "…")
-
     :config
     (add-hook 'org-mode-hook #'org-bullets-mode))
 #+END_SRC
@@ -1457,7 +1301,6 @@ But there is no backward compatibility.
 **** Alerts
 #+BEGIN_SRC emacs-lisp
   (use-package org-alert
-    :ensure t
     :config
     (setq org-alert-enable t)
     (setq alert-default-style 'libnotify))
@@ -1475,7 +1318,6 @@ But there is no backward compatibility.
 **** Org-mime
 #+BEGIN_SRC emacs-lisp
   (use-package org-mime
-    :ensure t
     :config
     (add-hook 'message-mode-hook
             (lambda ()
@@ -1692,7 +1534,6 @@ But there is no backward compatibility.
 **** Alerts
 #+BEGIN_SRC emacs-lisp
   (use-package mu4e-alert
-    :ensure t
     :config
     (mu4e-alert-set-default-style 'libnotify)
     (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
@@ -1801,14 +1642,12 @@ But there is no backward compatibility.
 ***** Indentation
 #+BEGIN_SRC emacs-lisp
   (use-package hindent
-    :ensure t
     :config
     (add-hook 'haskell-mode-hook #'hindent-mode))
 #+END_SRC
 ***** Stack interface
 #+BEGIN_SRC emacs-lisp
   (use-package hasky-stack
-    :ensure t
     :config
     (global-set-key (kbd "C-c h e") #'hasky-stack-execute)
     (global-set-key (kbd "C-c h h") #'hasky-stack-package-action)
@@ -1922,17 +1761,9 @@ But there is no backward compatibility.
   (use-package isortify
     :config
     (add-hook 'python-mode-hook 'isortify-mode))
-  ;; (use-package py-isort
-  ;;     :ensure t
-  ;;     :config
-  ;;     (setq py-isort-options '("--lines=79"))
-  ;;     (add-hook 'before-save-hook 'py-isort-before-save))
 #+END_SRC
 ***** Format code
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package yapfify
-  ;;   :config
-  ;;   (add-hook 'python-mode-hook 'yapf-mode))
   (use-package blacken
     :config
     (setq blacken-line-length 79)
@@ -1941,14 +1772,9 @@ But there is no backward compatibility.
 ***** Tox
 #+BEGIN_SRC emacs-lisp
   (use-package tox
-    :ensure t
     :config
     (setq tox-runner 'py.test)
     (global-set-key "\C-ct" 'tox-current-class))
-#+END_SRC
-***** Code folding
-#+BEGIN_SRC emacs-lisp
-  ;; (add-hook 'python-mode-hook 'hs-minor-mode)
 #+END_SRC
 ***** Editing requirements files
 #+BEGIN_SRC emacs-lisp
@@ -1957,7 +1783,6 @@ But there is no backward compatibility.
 **** JSON
 #+BEGIN_SRC emacs-lisp
   (use-package json-mode
-    :ensure t
     :config
     (add-hook 'json-mode-hook #'flycheck-mode)
     (setq json-reformat:indent-width 2)
@@ -1966,7 +1791,6 @@ But there is no backward compatibility.
 **** YAML
 #+BEGIN_SRC emacs-lisp
   (use-package yaml-mode
-    :ensure t
     :config
     (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
 #+END_SRC
@@ -1974,7 +1798,6 @@ But there is no backward compatibility.
 ***** TypeScript
 #+BEGIN_SRC emacs-lisp
   (use-package tide
-    :ensure t
     :after company
     :config
     (defun setup-tide-mode ()
@@ -2001,7 +1824,6 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
   (use-package web-mode
     :after smartparens tide
-    :ensure t
     :config
     (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
     (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
@@ -2042,7 +1864,7 @@ But there is no backward compatibility.
 *** Funny
 **** Speed type
 #+BEGIN_SRC emacs-lisp
-  (use-package speed-type :ensure t)
+  (use-package speed-type)
 #+END_SRC
 *** Set keybindings
 **** Common
