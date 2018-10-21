@@ -86,7 +86,6 @@
 **** Increase performance
 #+BEGIN_SRC emacs-lisp
   (setq gnutls-min-prime-bits 4096)
-  (setq font-lock-maximum-decoration nil)
 #+END_SRC
 **** Highlight expression in parens
 #+BEGIN_SRC emacs-lisp
@@ -818,15 +817,15 @@ Replace for i-search or swiper
 #+END_SRC
 *** Smartparens
 #+BEGIN_SRC emacs-lisp
-  (use-package smartparens
-    :init
-    (setq sp-show-pair-delay 0.1
-          sp-show-pair-from-inside t)
+  (use-package smartparens-config
+    :ensure smartparens
     :config
-    (require 'smartparens-config)
-    (smartparens-global-mode)
-    (show-smartparens-global-mode)
-    (setq smartparens-strict-mode t))
+    (progn
+      (show-smartparens-global-mode t))
+
+    (add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
+    (add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
+    (add-hook 'org-mode-hook 'turn-on-smartparens-strict-mode))
 #+END_SRC
 *** Popup windows settings
 **** Shackle
@@ -897,7 +896,9 @@ Replace for i-search or swiper
 #+END_SRC
 *** Htmlize
 #+BEGIN_SRC emacs-lisp
-  (use-package htmlize)
+  (use-package htmlize
+    :config
+    (setq org-html-htmlize-output-type 'inline-css))
 #+END_SRC
 *** Syntax check
 **** Flycheck
@@ -956,6 +957,14 @@ Replace for i-search or swiper
                           '(python-flake8)))
     )
 #+END_SRC
+**** Show errors in posframe
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck-posframe
+    :after flycheck
+    :config
+    (flycheck-posframe-configure-pretty-defaults)
+    (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
+#+END_SRC
 *** Version control
 **** GIT
 #+BEGIN_SRC emacs-lisp
@@ -984,7 +993,7 @@ Replace for i-search or swiper
     (global-set-key (kbd "C->") 'mc/mark-next-like-this)
     (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
     (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-    (global-set-key (kbd "C-c C-d") 'mc/skip-to-next-like-this))
+    (global-set-key (kbd "C-c d") 'mc/skip-to-next-like-this))
 #+END_SRC
 *** Expand region
 #+BEGIN_SRC emacs-lisp
@@ -1020,7 +1029,8 @@ Replace for i-search or swiper
            (interactive)
            (term-line-mode)
            (yank)
-           (term-char-mode))))))
+           (term-char-mode)))))
+    (add-hook 'term-mode-hook (lambda () (setq-local global-hl-line-mode nil))))
 #+END_SRC
 *** Rainbow mode
 #+BEGIN_QUOTE
@@ -1030,6 +1040,27 @@ Colorize color names in buffers
   (use-package rainbow-mode
     :config
     (setq rainbow-x-colors-major-mode-list '(web-mode python-mode)))
+#+END_SRC
+*** CSV
+Major mode for work with CSV files
+#+BEGIN_SRC emacs-lisp
+  (use-package csv-mode)
+#+END_SRC
+*** Log files
+#+BEGIN_SRC emacs-lisp
+  (use-package vlf)
+
+  (use-package logview)
+  ;; (use-package log4j-mode
+  ;;   :disabled t
+  ;;   :init
+  ;;   (add-hook #'log4j-mode-hook #'view-mode)
+  ;;   (add-hook #'log4j-mode-hook #'read-only-mode)
+  ;;   (add-hook #'log4j-mode-hook 'eos/turn-on-hl-line))
+#+END_SRC
+*** Nginx
+#+BEGIN_SRC emacs-lisp
+  (use-package nginx-mode)
 #+END_SRC
 *** REST client
 Quite interesting package. I think it will be replace for Postman for me.
@@ -1072,6 +1103,13 @@ And even org-babel integration:
     :config
     (add-hook 'prog-mode-hook 'highlight-numbers-mode))
 #+END_SRC
+*** Regexps
+#+BEGIN_SRC emacs-lisp
+  (use-package re-builder
+    :bind (("C-c R" . re-builder))
+    :config
+    (setq reb-re-syntax 'string))
+#+END_SRC
 *** Org
 **** Some tweaks
 #+BEGIN_SRC emacs-lisp
@@ -1110,10 +1148,10 @@ And even org-babel integration:
 #+END_SRC
 **** Agenda settings
 #+BEGIN_SRC emacs-lisp
-  (setq org-agenda-files (quote ("~/Dropbox/Org/"
-                                 "~/Dropbox/Org/work"
-                                 "~/Dropbox/Org/mobile")))
-  (setq org-directory "~/Dropbox/Org")
+  (setq org-agenda-files (quote ("~/Org/"
+                                 "~/Org/work"
+                                 "~/Org/mobile")))
+  (setq org-directory "~/Org")
   (setq org-enforce-todo-dependencies t)
   (setq org-agenda-restore-windows-after-quit t)
 #+END_SRC
@@ -1128,7 +1166,7 @@ And even org-babel integration:
            :clock-resume t)
           ("n" "Note" entry (file+headline "" "Notes")
            "* TODO %?\n%i")
-          ("l" "Link" entry (file+headline "~/Dropbox/Org/links.org" "Links")
+          ("l" "Link" entry (file+headline "~/Org/links.org" "Links")
            "* %? %^L \n%T"
            :prepend t)
           ))
@@ -1187,7 +1225,7 @@ Maybe it's a good idea to use unicode symbols for TODO keywords:
 But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "PROGRESS(p)" "WAITING(w)" "|" "DONE(d)")))
+        '((sequence "TODO(t)" "PROGRESS(p)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
 #+END_SRC
 **** Mark task as DONE if all subtasks are DONE
 #+BEGIN_SRC emacs-lisp
@@ -1201,8 +1239,18 @@ But there is no backward compatibility.
 **** Custom keywords faces
 #+BEGIN_SRC emacs-lisp
   (setq org-todo-keyword-faces
-        '(("PROGRESS" 'font-lock-constant-face)
-          ("WAITING" 'org-todo)))
+        '(("PROGRESS" . (:foreground "#458588" :weight bold))
+          ("WAITING" . (:foreground "#d65d0e" :weight bold))
+          ("CANCELLED" . (:foreground "#a89984" :weight bold))))
+#+END_SRC
+**** Handle local file links by extension
+#+BEGIN_SRC emacs-lisp
+  (setq org-file-apps
+        '((auto-mode . emacs)
+          ("\\.x?html\\'" . "firefox %s")
+          ("\\(?:xhtml\\|html\\)\\'" . "firefox %s")
+          ("\\.mm\\'" . default)
+          ("\\.pdf\\'" . default)))
 #+END_SRC
 **** Clock settings
 #+BEGIN_SRC emacs-lisp
@@ -1422,14 +1470,16 @@ But there is no backward compatibility.
 #+END_SRC
 **** Evaluate source code
 #+BEGIN_SRC emacs-lisp
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)
-     (python . t)
-     (sql . t)
-     (shell . t)
-     (haskell . t)))
-  (setq org-confirm-babel-evaluate t)
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((emacs-lisp . t)
+       (python . t)
+       (sql . t)
+       (shell . t)
+       (haskell . t)))
+    (setq org-confirm-babel-evaluate t)
+
+  (use-package ob-async)
 #+END_SRC
 **** Manage passwords using org-mode
 #+BEGIN_SRC emacs-lisp
@@ -1439,25 +1489,13 @@ But there is no backward compatibility.
 #+END_SRC
 **** Google calendar sync
 #+BEGIN_SRC emacs-lisp
-  (use-package org-gcal
-    :config
-    (setq org-gcal-client-id "746234569233-nrqvf2rke8skag1hadbu15clkpmgr9bk.apps.googleusercontent.com"
-          org-gcal-client-secret "1JolKXlhxyoNmABe8qIbw40H"
-          org-gcal-file-alist '(("phentagram@gmail.com" .  "~/gmail.org"))))
+  (use-package org-gcal)
 #+END_SRC
 **** JIRA integration for Org-mode
 #+BEGIN_SRC emacs-lisp
   (use-package org-jira
     :config
     (setq jiralib-url "https://jira.eoadm.com"))
-#+END_SRC
-*** Code folding
-**** Outshine
-#+BEGIN_SRC emacs-lisp
-  (use-package outshine
-    :config
-    (add-hook 'outline-minor-mode-hook 'outshine-hook-function)
-    (add-hook 'prog-mode-hook 'outline-minor-mode))
 #+END_SRC
 *** Email
 **** Sending email
@@ -1522,7 +1560,7 @@ But there is no backward compatibility.
   (use-package mu4e-conversation
     :after mu4e
     :config
-    (setq mu4e-view-func 'mu4e-conversation))
+    (global-mu4e-conversation-mode))
 
   (use-package helm-mu
     :after (helm mu4e)
@@ -1544,28 +1582,28 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
     :config
-    (setq lsp-inhibit-message t
-          lsp-eldoc-render-all nil
-          lsp-highlight-symbol-at-point nil)
+    (setq lsp-eldoc-render-all nil
+          lsp-highlight-symbol-at-point nil
+          lsp-inhibit-message t
+          lsp-message-project-root-warning t)
+    (require 'lsp-imenu)
     (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
 
   (use-package lsp-ui
+    :after lsp-mode
     :config
-    (setq lsp-ui-sideline-enable t
-          lsp-ui-sideline-show-symbol t
-          lsp-ui-sideline-show-hover t
-          lsp-ui-sideline-show-code-actions t
-          lsp-ui-sideline-update-mode 'point)
+    (setq lsp-ui-sideline-update-mode 'point)
     (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 #+END_SRC
 ***** Completeon
 #+BEGIN_SRC emacs-lisp
   (use-package company-lsp
+    :after company
     :config
     (push 'company-lsp company-backends)
-    (setf company-lsp-async t)
+    ;; (setf company-lsp-async t)
     (setq company-lsp-enable-snippet t
-          company-lsp-cache-candidates t))
+          company-lsp-cache-candidates 'auto))
 #+END_SRC
 **** Java
 #+BEGIN_SRC emacs-lisp
@@ -1575,14 +1613,15 @@ But there is no backward compatibility.
     :requires (lsp-ui-flycheck lsp-ui-sideline)
     :config
     (add-hook 'java-mode-hook 'lsp-java-enable)
-    (add-hook 'java-mode-hook 'lsp-ui-sideline-mode)
-    (setq lsp-java--workspace-folders (list "/home/rrudakov/Work/arsnova-load"
-                                            "/home/rrudakov/Work/appium-lesson")))
-
-  (add-hook 'java-mode-hook (lambda () (setq c-basic-offset 2)))
+    (add-hook 'java-mode-hook 'flycheck-mode)
+    (add-hook 'java-mode-hook 'company-mode))
+    ;; (add-hook 'java-mode-hook (lambda () (lsp-ui-flycheck-enable t)))
 
   (require 'google-java-format)
-  (add-hook 'java-mode-hook (lambda () (local-set-key (kbd "C-c C-f") #'google-java-format-buffer)))
+
+  (add-hook 'java-mode-hook (lambda () (local-set-key (kbd "C-c C-f") 'google-java-format-buffer)))
+  (add-hook 'java-mode-hook (lambda ()
+                              (setq c-basic-offset 2)))
 #+END_SRC
 **** Haskell
 ***** Intero
