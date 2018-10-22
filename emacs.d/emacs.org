@@ -9,6 +9,7 @@
 *** Python
 #+BEGIN_SRC text
   C-c C-r r Refactoring commands
+  M-m       Go to begining of line with indentation
 #+END_SRC
 *** Haskell
 #+BEGIN_SRC text
@@ -49,6 +50,10 @@
 **** Lint document
 #+BEGIN_SRC text
   org-lint
+#+END_SRC
+*** Magit
+#+BEGIN_SRC text
+  magit-blame
 #+END_SRC
 ** Syntax help
 *** Org-mode
@@ -327,6 +332,24 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** Set minimal height of window
 #+BEGIN_SRC emacs-lisp
   (setq window-min-height 10)
+#+END_SRC
+**** Ediff settings
+#+BEGIN_SRC emacs-lisp
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain
+        ediff-split-window-function 'split-window-horizontally)
+#+END_SRC
+**** Ansi colors
+***** Compilation buffer
+#+BEGIN_SRC emacs-lisp
+  (require 'ansi-color)
+  (defun colorize-compilation-buffer ()
+    (let ((inhibit-read-only t))
+      (ansi-color-apply-on-region (point-min) (point-max))))
+  (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+#+END_SRC
+***** Shell
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 #+END_SRC
 *** Theme
 **** All the icons
@@ -609,7 +632,6 @@ Good, but has performance problems
 **** Indentation
 #+BEGIN_SRC emacs-lisp
   (use-package sql-indent
-    :ensure t
     :config
     (eval-after-load "sql"
       '(load-library "sql-indent")))
@@ -835,7 +857,7 @@ Replace for i-search or swiper
     (setq helm-display-function 'pop-to-buffer)
     (setq shackle-rules '(
                           ("\\`\\*helm.*?\\*\\'" :regexp t :align t :size 0.4)
-                          (compilation-mode :select t)
+                          (compilation-mode :select t :align t :size 0.4)
                           (help-mode :select t :align t :size 0.4)
                           ))
     (shackle-mode))
@@ -1019,7 +1041,6 @@ Replace for i-search or swiper
     (global-set-key (kbd "C-x t") 'sane-term)
     (global-set-key (kbd "C-x T") 'sane-term-create)
 
-
   ;; Optional convenience binding. This allows C-y to paste even when in term-char-mode (see below). 
     (add-hook
      'term-mode-hook
@@ -1089,7 +1110,7 @@ And even org-babel integration:
 #+END_SRC
 *** Gitignore templates
 #+BEGIN_SRC emacs-lisp
-  (use-package gitignore-templates :ensure t)
+  (use-package gitignore-templates)
 #+END_SRC
 *** Volatile highlight
 #+BEGIN_SRC emacs-lisp
@@ -1194,8 +1215,7 @@ And even org-babel integration:
          (equal "capture" (frame-parameter nil 'name)))
         (delete-frame)))
 
-  (use-package noflet
-    :ensure t)
+  (use-package noflet)
 
   (defun make-capture-frame ()
     "Create a new frame and run 'org-capture'."
@@ -1737,6 +1757,11 @@ But there is no backward compatibility.
     (venv-initialize-interactive-shells)
     (venv-initialize-eshell))
 #+END_SRC
+***** Default interpreter
+#+BEGIN_SRC emacs-lisp
+  ;; (setq python-shell-interpreter "ipython"
+  ;;       python-shell-interpreter-args "-i --simple-prompt")
+#+END_SRC
 ***** Elpy
 #+BEGIN_SRC emacs-lisp
   (use-package elpy
@@ -1749,12 +1774,9 @@ But there is no backward compatibility.
 ***** Anaconda mode
 #+BEGIN_SRC emacs-lisp
   ;; (use-package anaconda-mode
-  ;;   :ensure t
   ;;   :config
   ;;   (add-hook 'python-mode-hook 'anaconda-mode)
-  ;;   (add-hook 'python-mode-hook 'anaconda-eldoc-mode)
-  ;;   (add-to-list 'python-shell-extra-pythonpaths "/home/rrudakov/Work/QAAutotesting/src")
-  ;;   (add-to-list 'python-shell-extra-pythonpaths "/home/rrudakov/Work/allure-pytest"))
+  ;;   (add-hook 'python-mode-hook 'anaconda-eldoc-mode))
 #+END_SRC
 ***** Python language server
 #+BEGIN_SRC emacs-lisp
@@ -1778,13 +1800,11 @@ But there is no backward compatibility.
 ***** Auto completeon
 #+BEGIN_SRC emacs-lisp
   ;; (use-package company-anaconda
-  ;;   :ensure t
   ;;   :after anaconda-mode
   ;;   :config
   ;;   (eval-after-load "company"
   ;;     '(add-to-list 'company-backends 'company-anaconda)))
   ;; (use-package company-jedi
-  ;;   :ensure t
   ;;   :config
   ;;   (defun company-jedi-setup ()
   ;;     (add-to-list 'company-backends 'company-jedi))
@@ -1799,13 +1819,17 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
   (use-package isortify
     :config
+    (setq isortify-line-width 79
+          isortify-multi-line-output 3
+          isortify-trailing-comma t)
     (add-hook 'python-mode-hook 'isortify-mode))
 #+END_SRC
 ***** Format code
 #+BEGIN_SRC emacs-lisp
   (use-package blacken
     :config
-    (setq blacken-line-length 79)
+    (setq blacken-line-length 79
+          blacken-allow-py36 t)
     (add-hook 'python-mode-hook 'blacken-mode))
 #+END_SRC
 ***** Tox
@@ -1837,7 +1861,7 @@ But there is no backward compatibility.
 ***** TypeScript
 #+BEGIN_SRC emacs-lisp
   (use-package tide
-    :after company
+    :after (typescript-mode company flycheck)
     :config
     (defun setup-tide-mode ()
       (interactive)
@@ -1850,6 +1874,8 @@ But there is no backward compatibility.
 
     ;; aligns annotation to the right hand side
     (setq company-tooltip-align-annotations t)
+    (setq tide-sort-completions-by-kind t
+          tide-completion-detailed t)
 
     ;; formats the buffer before saving
     (add-hook 'before-save-hook 'tide-format-before-save)
@@ -1899,6 +1925,10 @@ But there is no backward compatibility.
 **** Groovy
 #+BEGIN_SRC emacs-lisp
   (use-package groovy-mode)
+#+END_SRC
+*** Debugger
+#+BEGIN_SRC emacs-lisp
+  (use-package realgud)
 #+END_SRC
 *** Funny
 **** Speed type
