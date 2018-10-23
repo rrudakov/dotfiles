@@ -859,7 +859,7 @@ Replace for i-search or swiper
                           ("\\`\\*helm.*?\\*\\'" :regexp t :align t :size 0.4)
                           (compilation-mode :select t :align t :size 0.4)
                           (help-mode :select t :align t :size 0.4)
-                          ))
+                          (magit-status-mode :select t :align t :size 0.4)))
     (shackle-mode))
 #+END_SRC
 *** Rainbow delimiters
@@ -905,7 +905,6 @@ Replace for i-search or swiper
     :config
     (setq projectile-completion-system 'helm)
     (add-to-list 'projectile-globally-ignored-files "*.log")
-    (setq projectile-enable-caching t)
     (setq projectile-mode-line '(:eval (format " [%s]" (projectile-project-name))))
     (projectile-mode +1))
 #+END_SRC
@@ -1490,14 +1489,15 @@ But there is no backward compatibility.
 #+END_SRC
 **** Evaluate source code
 #+BEGIN_SRC emacs-lisp
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((emacs-lisp . t)
-       (python . t)
-       (sql . t)
-       (shell . t)
-       (haskell . t)))
-    (setq org-confirm-babel-evaluate t)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (python . t)
+     (sql . t)
+     (shell . t)
+     (haskell . t)))
+  (setq org-confirm-babel-evaluate t
+        org-export-use-babel nil)
 
   (use-package ob-async)
 #+END_SRC
@@ -1622,7 +1622,7 @@ But there is no backward compatibility.
     :config
     (push 'company-lsp company-backends)
     ;; (setf company-lsp-async t)
-    (setq company-lsp-enable-snippet t
+    (setq company-lsp-enable-snippet nil
           company-lsp-cache-candidates 'auto))
 #+END_SRC
 **** Java
@@ -1816,6 +1816,7 @@ But there is no backward compatibility.
   ;;   (add-hook 'python-mode-hook 'jedi:setup))
 #+END_SRC
 ***** Import management
+****** Automatically sort imports
 #+BEGIN_SRC emacs-lisp
   (use-package isortify
     :config
