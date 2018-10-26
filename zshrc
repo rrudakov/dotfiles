@@ -86,7 +86,7 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' rehash true
 zstyle ':completion:*' use-compctl false
 setopt completealiases
-export EDITOR=vim
 export QT_STYLE_OVERRIDE=adwaita-dark
+export EDITOR=emacsclient
 
 #export PATH="$HOME/.yarn/bin:$PATH"

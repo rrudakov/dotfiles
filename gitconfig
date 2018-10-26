@@ -3,7 +3,7 @@
 	email = rrudakov@protonmail.com
 	signingkey = FB43E281457C5165
 [core]
-	editor = vim
+	editor = emacsclient
 	pager = cat
 [alias]
 	hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short --oneline --decorate --color=always
