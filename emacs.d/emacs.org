@@ -79,6 +79,18 @@
             (rest-str   (substring string 1)))
         (concat (capitalize first-char) rest-str))))
 #+END_SRC
+*** Remove all whitespaces and newline characters between words
+#+BEGIN_SRC emacs-lisp
+  (defun rr/remove-spaces ()
+    "Remove all spaces and newline characters."
+    (interactive)
+    (while (or (equal " " (string (char-before (point))))
+               (equal "\n" (string (char-before (point)))))
+      (backward-char))
+    (while (or (equal " " (string (char-after (point))))
+               (equal "\n" (string (char-after (point)))))
+      (delete-char 1)))
+#+END_SRC
 ** Configuration
 *** Start emacs server
 #+BEGIN_SRC emacs-lisp
@@ -583,6 +595,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   (rr/spaceline-theme)
 
   (spaceline-compile)
+
+  (set-face-attribute 'spaceline-python-venv nil
+                      :foreground "#b8bb26" :distant-foreground "#d3869b")
 #+END_SRC
 ***** Moody
 Quiet interesting package. But i need more time to set it up the way I want.
@@ -857,7 +872,9 @@ Replace for i-search or swiper
     (setq helm-display-function 'pop-to-buffer)
     (setq shackle-rules '(
                           ("\\`\\*helm.*?\\*\\'" :regexp t :align t :size 0.4)
+                          ("\\`\\*Org\sSrc.*?\\*\\'" :regexp t :align right :size 0.4)
                           (compilation-mode :select t :align t :size 0.4)
+                          ("*compilation*" :select t :align t :size 0.4)
                           (help-mode :select t :align t :size 0.4)
                           (magit-status-mode :select t :align t :size 0.4)))
     (shackle-mode))
@@ -1140,7 +1157,7 @@ And even org-babel integration:
         org-cycle-separator-lines 0
         org-tags-column -100
         org-startup-indented t
-        org-src-window-setup 'current-window
+        org-src-window-setup 'other-window
         org-catch-invisible-edits 'show-and-error
         org-return-follows-link t
         org-startup-with-inline-images nil
@@ -1612,7 +1629,10 @@ But there is no backward compatibility.
   (use-package lsp-ui
     :after lsp-mode
     :config
-    (setq lsp-ui-sideline-update-mode 'point)
+    (setq lsp-ui-sideline-update-mode 'point
+          lsp-ui-doc-enable nil
+          lsp-ui-sideline-show-hover nil
+          lsp-ui-sideline-ignore-duplicate t)
     (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 #+END_SRC
 ***** Completeon
