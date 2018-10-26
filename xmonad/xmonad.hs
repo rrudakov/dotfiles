@@ -59,6 +59,22 @@ myNormalBorderColor  = "#282828"
 myFocusedBorderColor :: String
 myFocusedBorderColor = "#928374"
 
+-- | Spotify play toggle command
+spotifyPlayToggle :: String
+spotifyPlayToggle = "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause"
+
+-- | Spotify next song command
+spotifyNext :: String
+spotifyNext = "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next"
+
+-- | Spotify previous song command
+spotifyPrevious :: String
+spotifyPrevious = "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous"
+
+-- | Spotify stop command
+spotifyStop :: String
+spotifyStop = "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Stop"
+
 -- | Settings for ssh prompt
 myPromptConfig :: XPConfig
 myPromptConfig = XPC
@@ -154,10 +170,10 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
     , ((0                 , xF86XK_AudioLowerVolume), spawn "pactl set-sink-mute @DEFAULT_SINK@ false ; pactl set-sink-volume @DEFAULT_SINK@ -5%")
     , ((0                 , xF86XK_AudioRaiseVolume), spawn "pactl set-sink-mute @DEFAULT_SINK@ false ; pactl set-sink-volume @DEFAULT_SINK@ +5%")
     , ((0                 , xF86XK_AudioMute       ), spawn "pactl set-sink-mute @DEFAULT_SINK@ toggle")
-    -- , ((0                 , xF86XK_AudioPlay       ), spawn "ncmpcpp toggle")
-    -- , ((0                 , xF86XK_AudioNext       ), spawn "ncmpcpp next")
-    -- , ((0                 , xF86XK_AudioPrev       ), spawn "ncmpcpp prev")
-    -- , ((0                 , xF86XK_AudioStop       ), spawn "ncmpcpp stop")
+    , ((0                 , xF86XK_AudioPlay       ), spawn spotifyPlayToggle)
+    , ((0                 , xF86XK_AudioNext       ), spawn spotifyNext)
+    , ((0                 , xF86XK_AudioPrev       ), spawn spotifyPrevious)
+    , ((0                 , xF86XK_AudioStop       ), spawn spotifyStop)
     -- , ((0                 , xK_Print               ), spawn "scrot '%F_%H%M%S_$wx$h.png' -e 'mv $f ~/screenshots/'")
   , ((0, xK_Print), spawn "xfce4-screenshooter")
   ] <>
