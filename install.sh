@@ -9,7 +9,7 @@
 ############### Variables:
 
 dir=${HOME}/dotfiles
-files="Xresources emacs.d/init.el emacs.d/emacs.org tmux.conf vimrc xmonad/xmonad.hs xmobarrc xprofile gitconfig stalonetrayrc zshrc zshenv aliasrc config/dunst/dunstrc"
+files="Xresources emacs.d/init.el emacs.d/emacs.org emacs.d/custom/google-java-format.el emacs.d/templates/default-java.el tmux.conf vimrc xmonad/xmonad.hs xmobarrc xprofile gitconfig stalonetrayrc zshrc zshenv aliasrc config/dunst/dunstrc"
 
 ###############
 
@@ -20,7 +20,7 @@ cd ${dir}
 echo "...done"
 
 echo "Create directories"
-mkdir -p .xmonad .emacs.d/custom .config/dunst
+mkdir -p .xmonad .emacs.d/custom .config/dunst .emacs.d/templates
 echo "...done"
 
 # Move any existing dotfiles to ~/dotfiles_old, then creating symlinks

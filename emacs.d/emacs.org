@@ -617,6 +617,41 @@ Good, but has performance problems
   ;;   (setq highlight-indent-guides-method 'character
   ;;         highlight-indent-guides-character ?\x258F))
 #+END_SRC
+*** Smooth scrolling
+#+BEGIN_SRC emacs-lisp
+  (setq
+   ;; scroll N lines to screen edge
+   scroll-margin 2
+
+   ;; only 'jump' when moving this far off the screen
+   scroll-conservatively 10000
+
+   ;; ensure when we move outside the screen we always recenter
+   ;; (less hassle than attempting to make all jumping commands call recenter)
+   scroll-conservatively scroll-margin
+
+   ;; keyboard scroll one line at a time
+   scroll-step 1
+   ;; mouse scroll N lines
+   mouse-wheel-scroll-amount '(6 ((shift) . 1))
+   ;; don't accelerate scrolling
+   mouse-wheel-progressive-speed nil
+
+   ;; preserve line/column (nicer page up/down)
+   scroll-preserve-screen-position t
+   ;; Move the cursor to top/bottom even if the screen is viewing top/bottom (for page up/down)
+   scroll-error-top-bottom t
+
+   ;; center after going to the next error
+   next-error-recenter (quote (4))
+
+   ;; Always redraw immediately when scrolling,
+   ;; more responsive and doesn't hang!
+   ;; http://emacs.stackexchange.com/a/31427/2418
+   fast-but-imprecise-scrolling nil
+   jit-lock-defer-time 0
+   )
+#+END_SRC
 *** SQL
 **** Emacs database interface
 #+BEGIN_SRC emacs-lisp
@@ -1646,6 +1681,7 @@ But there is no backward compatibility.
           company-lsp-cache-candidates 'auto))
 #+END_SRC
 **** Java
+***** lsp-mode setup
 #+BEGIN_SRC emacs-lisp
   (require 'cc-mode)
 
@@ -1662,6 +1698,20 @@ But there is no backward compatibility.
   (add-hook 'java-mode-hook (lambda () (local-set-key (kbd "C-c C-f") 'google-java-format-buffer)))
   (add-hook 'java-mode-hook (lambda ()
                               (setq c-basic-offset 2)))
+#+END_SRC
+***** Expand snippet for new class
+#+BEGIN_SRC emacs-lisp
+  (setq auto-insert-query nil)
+  (setq auto-insert-directory (expand-file-name "templates/" user-emacs-directory))
+  (add-hook 'find-file-hook 'auto-insert)
+  (auto-insert-mode 1)
+
+  (add-to-list 'auto-insert-alist
+               '("\\.java" . ["default-java.el"
+                              (lambda () (yas-expand-snippet
+                                     (buffer-string)
+                                     (point-min)
+                                     (point-max)))]))
 #+END_SRC
 **** Haskell
 ***** Intero
