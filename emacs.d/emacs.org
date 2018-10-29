@@ -91,6 +91,17 @@
                (equal "\n" (string (char-after (point)))))
       (delete-char 1)))
 #+END_SRC
+*** Advice for read dir-locals when buffer changed
+#+BEGIN_SRC emacs-lisp
+  (defun rr/update-dir-local ()
+    "Update local variables if it is not minibuffer."
+    (when (not (minibuffer-window-active-p (frame-selected-window)))
+      (hack-local-variables)))
+
+  (defadvice select-window (after rr/upd-dir-local activate)
+    "Update local variables after call `select-window' function."
+    (rr/update-dir-local))
+#+END_SRC
 ** Configuration
 *** Start emacs server
 #+BEGIN_SRC emacs-lisp
@@ -617,41 +628,6 @@ Good, but has performance problems
   ;;   (setq highlight-indent-guides-method 'character
   ;;         highlight-indent-guides-character ?\x258F))
 #+END_SRC
-*** Smooth scrolling
-#+BEGIN_SRC emacs-lisp
-  (setq
-   ;; scroll N lines to screen edge
-   scroll-margin 2
-
-   ;; only 'jump' when moving this far off the screen
-   scroll-conservatively 10000
-
-   ;; ensure when we move outside the screen we always recenter
-   ;; (less hassle than attempting to make all jumping commands call recenter)
-   scroll-conservatively scroll-margin
-
-   ;; keyboard scroll one line at a time
-   scroll-step 1
-   ;; mouse scroll N lines
-   mouse-wheel-scroll-amount '(6 ((shift) . 1))
-   ;; don't accelerate scrolling
-   mouse-wheel-progressive-speed nil
-
-   ;; preserve line/column (nicer page up/down)
-   scroll-preserve-screen-position t
-   ;; Move the cursor to top/bottom even if the screen is viewing top/bottom (for page up/down)
-   scroll-error-top-bottom t
-
-   ;; center after going to the next error
-   next-error-recenter (quote (4))
-
-   ;; Always redraw immediately when scrolling,
-   ;; more responsive and doesn't hang!
-   ;; http://emacs.stackexchange.com/a/31427/2418
-   fast-but-imprecise-scrolling nil
-   jit-lock-defer-time 0
-   )
-#+END_SRC
 *** SQL
 **** Emacs database interface
 #+BEGIN_SRC emacs-lisp
@@ -825,6 +801,7 @@ Show more offten used completeons first
           helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
           helm-ff-file-name-history-use-recentf t
           helm-echo-input-in-header-line t
+          helm-buffer-max-length 40
           helm-inherit-input-method nil)
 
 
@@ -1657,6 +1634,7 @@ But there is no backward compatibility.
     (setq lsp-eldoc-render-all nil
           lsp-highlight-symbol-at-point nil
           lsp-inhibit-message t
+          lsp-response-timeout 60
           lsp-message-project-root-warning t)
     (require 'lsp-imenu)
     (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
