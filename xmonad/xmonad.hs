@@ -2,9 +2,9 @@
 {-# LANGUAGE UnicodeSyntax #-}
 {-# OPTIONS_GHC -Wall #-}
 import           Data.List
+import qualified Data.Map                        as M
 import           Data.Monoid
 import           Graphics.X11.ExtraTypes.XF86
-import qualified Data.Map                        as M
 import           System.Exit
 import           System.IO
 import           XMonad
@@ -297,29 +297,25 @@ main ∷ IO ()
 main = do
   xmproc ← spawnPipe "$HOME/.local/bin/xmobar"
   launch $ ewmh $ withUrgencyHook NoUrgencyHook
-  -- launch $ withUrgencyHook NoUrgencyHook
-         XConfig {
-      -- simple stuff
-      terminal           = myTerminal,
-      focusFollowsMouse  = myFocusFollowsMouse,
-      clickJustFocuses   = myClickJustFocuses,
-      borderWidth        = myBorderWidth,
-      modMask            = myModMask,
-      workspaces         = myWorkspaces,
-      normalBorderColor  = myNormalBorderColor,
-      focusedBorderColor = myFocusedBorderColor,
-      rootMask           = myRootMask,
-      clientMask         = myClientMask,
-
-      -- key bindings
-      keys               = myKeys,
-      mouseBindings      = myMouseBindings,
-
-      -- hooks, layouts
-      manageHook         = myManageHook <+> flashHook <+> manageDocks,
-      layoutHook         = myLayout,
-      handleEventHook    = myEventHook <+> ewmhDesktopsEventHook <+> fullscreenEventHook <+> perWindowKbdLayout,
-      logHook            = dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
+    XConfig
+    { terminal           = myTerminal
+    , focusFollowsMouse  = myFocusFollowsMouse
+    , clickJustFocuses   = myClickJustFocuses
+    , borderWidth        = myBorderWidth
+    , modMask            = myModMask
+    , workspaces         = myWorkspaces
+    , normalBorderColor  = myNormalBorderColor
+    , focusedBorderColor = myFocusedBorderColor
+    , rootMask           = myRootMask
+    , clientMask         = myClientMask
+    -- key bindings
+    , keys               = myKeys
+    , mouseBindings      = myMouseBindings
+    -- hooks, layouts
+    , manageHook         = myManageHook <+> flashHook <+> manageDocks
+    , layoutHook         = myLayout
+    , handleEventHook    = myEventHook <+> ewmhDesktopsEventHook <+> fullscreenEventHook <+> perWindowKbdLayout
+    , logHook            = dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
         { ppOutput          = hPutStrLn xmproc
         , ppCurrent         = xmobarColor "#b16286" "#3c3836" . wrap " " " "
         , ppTitle           = xmobarColor "#d79921" "" . shorten 60
@@ -327,9 +323,10 @@ main = do
         , ppHiddenNoWindows = xmobarColor "#504945" ""
         , ppUrgent          = xmobarColor "#fabd2f" "#fb4934" . wrap " " " "
         , ppSep             = " "
-        , ppLayout          = xmobarColor "#ebdbb2" "" },
-      startupHook        = myStartupHook,
-      handleExtraArgs    = \ xs theConf → case xs of
+        , ppLayout          = xmobarColor "#ebdbb2" ""
+        }
+    , startupHook        = myStartupHook
+    , handleExtraArgs    = \ xs theConf → case xs of
                                             [] → return theConf
                                             _ → fail ("unrecognized flags:" <> show xs)
-       }
+    }
