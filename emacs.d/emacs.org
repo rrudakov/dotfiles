@@ -108,6 +108,20 @@
     "Remove trailing whitespace before insert newline."
     (delete-trailing-whitespace))
 #+END_SRC
+*** Replace org-link with description of if empty its address
+#+BEGIN_SRC emacs-lisp
+  (defun rr/org-replace-link-by-link-description ()
+    "Replace an org link by its description or if empty its address."
+    (interactive)
+    (if (org-in-regexp org-bracket-link-regexp 1)
+        (save-excursion
+          (let ((remove (list (match-beginning 0) (match-end 0)))
+                (description (if (match-end 3)
+                                 (org-match-string-no-properties 3)
+                               (org-match-string-no-properties 1))))
+            (apply 'delete-region remove)
+            (insert description)))))
+#+END_SRC
 ** Configuration
 *** Start emacs server
 #+BEGIN_SRC emacs-lisp
@@ -914,7 +928,8 @@ Replace for i-search or swiper
                           ("*compilation*" :select t :align t :size 0.4)
                           (help-mode :select t :align t :size 0.4)
                           (magit-status-mode :select t :align t :size 0.4)
-                          (magit-diff-mode :select nil :align right :size 0.5)))
+                          (magit-diff-mode :select nil :align right :size 0.5)
+                          (magit-revision-mode :select t :align right :size 0.5)))
     (shackle-mode))
 #+END_SRC
 *** Rainbow delimiters
@@ -2050,6 +2065,7 @@ But there is no backward compatibility.
   ;;                                (interactive)
   ;;                                (org-call-with-arg 'org-todo "DONE")))
   (global-set-key "\C-cm" 'org-agenda-month-view)
+  (add-hook 'org-mode-hook (lambda () (local-set-key (kbd "C-c u") 'rr/org-replace-link-by-link-description)))
 #+END_SRC
 *** Imenu list
 #+BEGIN_SRC emacs-lisp
