@@ -108,6 +108,36 @@
     "Remove trailing whitespace before insert newline."
     (delete-trailing-whitespace))
 #+END_SRC
+*** Replace org-link with description of if empty its address
+#+BEGIN_SRC emacs-lisp
+  (defun rr/org-replace-link-by-link-description ()
+    "Replace an org link by its description or if empty its address."
+    (interactive)
+    (if (org-in-regexp org-bracket-link-regexp 1)
+        (save-excursion
+          (let ((remove (list (match-beginning 0) (match-end 0)))
+                (description (if (match-end 3)
+                                 (org-match-string-no-properties 3)
+                               (org-match-string-no-properties 1))))
+            (apply 'delete-region remove)
+            (insert description)))))
+#+END_SRC
+*** Smart toggle flycheck error list window
+#+BEGIN_SRC emacs-lisp
+  (defun rr/flycheck-list-smart-toggle ()
+    "Toggle flycheck error list buffer."
+    (interactive)
+    (if (equal (buffer-name) flycheck-error-list-buffer)
+        (quit-window)
+      (if (member flycheck-error-list-buffer
+                  (mapcar 'buffer-name
+                          (mapcar 'window-buffer (window-list))))
+          (dolist (window (window-list))
+            (when (equal flycheck-error-list-buffer
+                         (buffer-name (window-buffer window)))
+              (quit-window t window)))
+        (flycheck-list-errors))))
+#+END_SRC
 ** Configuration
 *** Start emacs server
 #+BEGIN_SRC emacs-lisp
@@ -907,14 +937,16 @@ Replace for i-search or swiper
   (use-package shackle
     :config
     (setq helm-display-function 'pop-to-buffer)
-    (setq shackle-rules '(
-                          ("\\`\\*helm.*?\\*\\'" :regexp t :align t :size 0.4)
-                          ("\\`\\*Org\sSrc.*?\\*\\'" :regexp t :align right :size 0.4)
-                          (compilation-mode :select t :align t :size 0.4)
-                          ("*compilation*" :select t :align t :size 0.4)
-                          (help-mode :select t :align t :size 0.4)
-                          (magit-status-mode :select t :align t :size 0.4)
-                          (magit-diff-mode :select nil :align right :size 0.5)))
+    (setq shackle-rules
+          '(("\\`\\*helm.*?\\*\\'" :regexp t :align t :size 0.4)
+            ("\\`\\*Org\sSrc.*?\\*.*\\'" :regexp t :align right :size 0.4)
+            (compilation-mode :select t :align t :size 0.4)
+            ("*compilation*" :select t :align t :size 0.4)
+            (help-mode :select t :align t :size 0.4)
+            (magit-status-mode :select t :align t :size 0.4)
+            (magit-diff-mode :select nil :align right :size 0.5)
+            (magit-revision-mode :select t :align right :size 0.5)
+            (flycheck-error-list-mode :select t :align right :size 0.3)))
     (shackle-mode))
 #+END_SRC
 *** Rainbow delimiters
@@ -982,6 +1014,7 @@ Replace for i-search or swiper
   (use-package flycheck
     :config
     (add-hook 'after-init-hook #'global-flycheck-mode)
+    (global-set-key (kbd "C-'") #'rr/flycheck-list-smart-toggle)
 
     (when (fboundp 'define-fringe-bitmap)
       (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
@@ -1030,8 +1063,7 @@ Replace for i-search or swiper
 
     (setq-default flycheck-disabled-checkers
                   (append flycheck-disabled-checkers
-                          '(python-flake8)))
-    )
+                          '(python-flake8))))
 #+END_SRC
 **** Show errors in posframe
 #+BEGIN_SRC emacs-lisp
@@ -1039,7 +1071,7 @@ Replace for i-search or swiper
     :after flycheck
     :config
     (setq flycheck-posframe-info-prefix "\u25B6 ")
-    (setq flycheck-posframe-warning-prefix "\u25CF ")
+    (setq flycheck-posframe-warning-prefix "\u0021 ")
     (setq flycheck-posframe-error-prefix "\u203C ")
     (set-face-attribute 'flycheck-posframe-info-face nil :inherit 'info)
     (set-face-attribute 'flycheck-posframe-warning-face nil :inherit 'warning)
@@ -1672,6 +1704,7 @@ But there is no backward compatibility.
 #+END_SRC
 *** Languages
 **** LSP mode
+***** Common setup
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
     :config
@@ -1698,8 +1731,7 @@ But there is no backward compatibility.
     :after company
     :config
     (push 'company-lsp company-backends)
-    ;; (setf company-lsp-async t)
-    (setq company-lsp-enable-snippet nil
+    (setq company-lsp-enable-snippet t
           company-lsp-cache-candidates 'auto))
 #+END_SRC
 **** Java
@@ -2050,8 +2082,9 @@ But there is no backward compatibility.
   ;;                                (interactive)
   ;;                                (org-call-with-arg 'org-todo "DONE")))
   (global-set-key "\C-cm" 'org-agenda-month-view)
+  (add-hook 'org-mode-hook (lambda () (local-set-key (kbd "C-c u") 'rr/org-replace-link-by-link-description)))
 #+END_SRC
-*** Imenu list
+*** COMMENT Imenu list
 #+BEGIN_SRC emacs-lisp
   (use-package imenu-list
     :config
