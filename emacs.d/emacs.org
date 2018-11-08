@@ -937,6 +937,7 @@ Replace for i-search or swiper
   (use-package shackle
     :config
     (setq helm-display-function 'pop-to-buffer)
+<<<<<<< variant A
     (setq shackle-rules
           '(("\\`\\*helm.*?\\*\\'" :regexp t :align t :size 0.4)
             ("\\`\\*Org\sSrc.*?\\*.*\\'" :regexp t :align right :size 0.4)
@@ -947,6 +948,17 @@ Replace for i-search or swiper
             (magit-diff-mode :select nil :align right :size 0.5)
             (magit-revision-mode :select t :align right :size 0.5)
             (flycheck-error-list-mode :select t :align right :size 0.3)))
+>>>>>>> variant B
+    (setq shackle-rules '(
+                          ("\\`\\*helm.*?\\*\\'" :regexp t :align t :size 0.4)
+                          ("\\`\\*Org\sSrc.*?\\*\\'" :regexp t :align right :size 0.4)
+                          (compilation-mode :select t :align t :size 0.4)
+                          ("*compilation*" :select t :align t :size 0.4)
+                          (help-mode :select t :align t :size 0.4)
+                          (magit-status-mode :select t :align t :size 0.4)
+                          (magit-diff-mode :select nil :align right :size 0.5)
+                          (magit-revision-mode :select t :align right :size 0.5)))
+======= end
     (shackle-mode))
 #+END_SRC
 *** Rainbow delimiters
