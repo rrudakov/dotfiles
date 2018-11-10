@@ -1594,6 +1594,7 @@ But there is no backward compatibility.
      (python . t)
      (sql . t)
      (shell . t)
+     (sqlite . t)
      (haskell . t)))
   (setq org-confirm-babel-evaluate t
         org-export-use-babel nil)
