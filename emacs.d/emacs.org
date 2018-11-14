@@ -155,13 +155,10 @@ Unordered lists with separator '::'
 #+BEGIN_SRC emacs-lisp
 (setq gnutls-min-prime-bits 4096)
 #+END_SRC
-**** Highlight expression in parens
-#+BEGIN_SRC emacs-lisp
-(setq show-paren-style 'expression)
-#+END_SRC
 **** Highlight matching parens
 #+BEGIN_SRC emacs-lisp
-(show-paren-mode 2)
+(show-paren-mode t)
+(setq show-paren-style 'parenthesis)
 #+END_SRC
 **** Indicate empty lines at the end of the window in the left fringe
 #+BEGIN_SRC emacs-lisp
@@ -205,7 +202,7 @@ Good choices:
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
 #+END_SRC
-**** Sen specific browser to open links
+**** Set specific browser to open links
 #+BEGIN_SRC emacs-lisp
 (setq browse-url-browser-function 'browse-url-firefox)
 #+END_SRC
@@ -241,7 +238,7 @@ Good choices:
 
 (setq-default
  bidi-display-reordering nil ; disable bidirectional text for tiny performance boost
- blink-matching-paren nil    ; don't blink--too distracting
+ ;; blink-matching-paren nil    ; don't blink--too distracting
  cursor-in-non-selected-windows nil  ; hide cursors in other windows
  frame-inhibit-implied-resize t
  ;; remove continuation arrow on right fringe
@@ -340,7 +337,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
 (setq epa-pinentry-mode 'loopback)
 #+END_SRC
-**** Prettify symbols
+**** COMMENT Prettify symbols
 #+BEGIN_SRC emacs-lisp
 (global-prettify-symbols-mode)
 #+END_SRC
@@ -406,7 +403,10 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 **** Show trailing whitespace
 #+BEGIN_SRC emacs-lisp
-(add-hook 'prog-mode-hook (lambda () (interactive) (setq show-trailing-whitespace 1)))
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (interactive)
+            (setq show-trailing-whitespace 1)))
 #+END_SRC
 **** Set minimal height of window
 #+BEGIN_SRC emacs-lisp
@@ -670,41 +670,26 @@ Quiet interesting package. But i need more time to set it up the way I want.
 ;;   (moody-replace-mode-line-buffer-identification)
 ;;   (moody-replace-vc-mode))
 #+END_SRC
-**** Highlight indentation
+**** COMMENT Highlight indentation
 Good, but has performance problems
 #+BEGIN_SRC emacs-lisp
-;; (use-package highlight-indent-guides
-;;   :config
-;;   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-;;   (setq highlight-indent-guides-method 'character
-;;         highlight-indent-guides-character ?\x258F))
+(use-package highlight-indent-guides
+  :config
+  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+  (setq highlight-indent-guides-method 'character
+        highlight-indent-guides-character ?\x258F))
 #+END_SRC
 *** SQL
-**** Emacs database interface
+**** COMMENT Emacs database interface
 #+BEGIN_SRC emacs-lisp
-;; (use-package edbi)
-;; (use-package company-edbi)
-#+END_SRC
-**** Emacs database connection over clojure
-#+BEGIN_SRC emacs-lisp
-(use-package ejc-sql
-  :config
-  (ejc-create-connection
-   "blogdb"
-   :classpath "~/.m2/repository/postgresql/postgresql/9.3-1102.jdbc41/postgresql-9.3-1102.jdbc41.jar"
-   :classname "org.postgresql.Driver"
-   :subprotocol "postgresql"
-   :subname "//localhost:5432/blogdb"
-   :user "blog"
-   :password "123456"))
+(use-package edbi)
+(use-package company-edbi)
 #+END_SRC
 **** Make PostgreSQL default
 #+BEGIN_SRC emacs-lisp
 (eval-after-load "sql"
   '(progn
-     (sql-set-product 'postgres)
-     )
-  )
+     (sql-set-product 'postgres)))
 #+END_SRC
 **** Indentation
 #+BEGIN_SRC emacs-lisp
@@ -719,13 +704,19 @@ Good, but has performance problems
           (lambda ()
             (toggle-truncate-lines t)))
 #+END_SRC
+**** Auto format SQL
+#+BEGIN_SRC emacs-lisp
+(use-package sqlformat
+  :config
+  (add-hook 'sql-mode-hook 'sqlformat-mode))
+#+END_SRC
 *** Which key
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
   :config
   (which-key-mode))
 #+END_SRC
-*** Undo tree
+*** COMMENT Undo tree
 #+BEGIN_SRC emacs-lisp
 (use-package undo-tree
   :config
@@ -739,8 +730,7 @@ Good, but has performance problems
                                               (undo-tree-visualizer-selection-mode)))
   (global-undo-tree-mode 1))
 #+END_SRC
-*** Autocomplete
-**** YASnippet
+*** YASnippet
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
   :config
@@ -748,6 +738,7 @@ Good, but has performance problems
   (setq yas-indent-line 'fixed)
   (add-hook 'prog-mode-hook #'yas-minor-mode))
 #+END_SRC
+*** Autocomplete
 **** Common
 #+BEGIN_SRC emacs-lisp
 (use-package company
@@ -806,7 +797,7 @@ Show more offten used completeons first
   (add-to-list 'company-backends 'company-tern)
   (setq company-tooltip-align-annotations t))
 #+END_SRC
-**** Solve company and yasnippet conflict
+**** COMMENT Solve company and yasnippet conflict
 #+BEGIN_SRC emacs-lisp
 (defun company-yasnippet-or-completion ()
   "Solve company yasnippet conflicts."
@@ -854,6 +845,7 @@ Show more offten used completeons first
         helm-ff-file-name-history-use-recentf t
         helm-echo-input-in-header-line t
         helm-buffer-max-length 40
+        helm-ff-delete-files-function 'helm-delete-marked-files-async
         helm-inherit-input-method nil)
 
 
@@ -924,12 +916,17 @@ Replace for i-search or swiper
 (use-package smartparens-config
   :ensure smartparens
   :config
-  (progn
-    (show-smartparens-global-mode t))
+  (smartparens-global-mode t)
+  (show-smartparens-global-mode t)
+
+  (setq sp-show-pair-from-inside t
+        smartparens-strict-mode t)
 
   (add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
   (add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
-  (add-hook 'org-mode-hook 'turn-on-smartparens-strict-mode))
+  (add-hook 'org-mode-hook 'turn-on-smartparens-strict-mode)
+  :bind
+  ("M-]" . 'sp-unwrap-sexp))
 #+END_SRC
 *** Popup windows settings
 **** Shackle
@@ -940,6 +937,7 @@ Replace for i-search or swiper
   (setq shackle-rules
         '(("\\`\\*helm.*?\\*\\'" :regexp t :align t :size 0.4)
           ("\\`\\*Org\sSrc.*?\\*.*\\'" :regexp t :align right :size 0.4)
+          ("\\`\\*Org-Babel\sError\sOutput\\*'" :regexp t align t :size 0.4)
           (compilation-mode :select t :align t :size 0.4)
           ("*compilation*" :select t :align t :size 0.4)
           (help-mode :select t :align t :size 0.4)
@@ -1228,7 +1226,7 @@ And even org-babel integration:
 #+BEGIN_SRC emacs-lisp
 (add-hook 'org-mode-hook 'turn-on-font-lock)
 (add-hook 'org-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
-;; (add-hook 'org-mode-hook (lambda () (setq truncate-lines nil)))
+
 (setq org-startup-folded 'content ;; overview | content | all | showeverything
       org-cycle-separator-lines 0
       org-tags-column -100
@@ -1236,12 +1234,14 @@ And even org-babel integration:
       org-adapt-indentation t
       ;; org-src-preserve-indentation t
       org-edit-src-content-indentation 0
+      org-use-sub-superscripts nil
+      org-export-with-sub-superscripts nil
       org-src-window-setup 'other-window
       org-catch-invisible-edits 'show-and-error
       org-return-follows-link t
       org-startup-with-inline-images nil
       org-cycle-include-plain-lists t
-      org-hide-emphasis-markers t
+      org-hide-emphasis-markers nil
       org-insert-heading-respect-content t
       ;; org-M-RET-may-split-line nil
       org-list-use-circular-motion t
@@ -1251,12 +1251,14 @@ And even org-babel integration:
       org-image-actual-width 500
       org-export-with-drawers t
       org-export-with-properties t)
+
 (setq org-link-frame-setup
       '((vm . vm-visit-folder-other-frame)
         (vm-imap . vm-visit-imap-folder-other-frame)
         (gnus . org-gnus-no-new-news)
         (file . find-file)
         (wl . wl-other-frame)))
+
 (org-display-inline-images)
 (add-to-list 'org-modules 'org-habit)
 (add-hook 'mail-mode-hook 'turn-on-orgtbl)
@@ -1664,6 +1666,12 @@ But there is no backward compatibility.
   (mu4e-alert-set-default-style 'libnotify)
   (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
   (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
+#+END_SRC
+*** COMMENT Activity watch
+#+BEGIN_SRC emacs-lisp
+(use-package activity-watch-mode
+  :config
+  (global-activity-watch-mode))
 #+END_SRC
 *** Languages
 **** LSP mode
