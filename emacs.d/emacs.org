@@ -138,6 +138,15 @@ Unordered lists with separator '::'
             (quit-window t window)))
       (flycheck-list-errors))))
 #+END_SRC
+*** Htmlize message body if it composed using org-mode
+#+BEGIN_SRC emacs-lisp
+(defun rr/htmlize-mail ()
+  "Htmlize message before sending."
+  (interactive)
+  (message-goto-body)
+  (mu4e-compose-mode)
+  (org-mime-htmlize))
+#+END_SRC
 ** Configuration
 *** Start emacs server
 #+BEGIN_SRC emacs-lisp
@@ -1014,22 +1023,42 @@ Replace for i-search or swiper
   (add-hook 'after-init-hook #'global-flycheck-mode)
   (global-set-key (kbd "C-'") #'rr/flycheck-list-smart-toggle)
 
+  ;; (when (fboundp 'define-fringe-bitmap)
+  ;;   (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
+  ;;     (vector #b00000000
+  ;;             #b00000000
+  ;;             #b00000000
+  ;;             #b00000000
+  ;;             #b00000000
+  ;;             #b00000000
+  ;;             #b00000000
+  ;;             #b00011100
+  ;;             #b00111110
+  ;;             #b00111110
+  ;;             #b00111110
+  ;;             #b00011100
+  ;;             #b00000000
+  ;;             #b00000000
+  ;;             #b00000000
+  ;;             #b00000000
+  ;;             #b00000000)))
+
   (when (fboundp 'define-fringe-bitmap)
     (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
       (vector #b00000000
               #b00000000
               #b00000000
               #b00000000
-              #b00000000
-              #b00000000
-              #b00000000
-              #b00011100
-              #b00111110
-              #b00111110
-              #b00111110
-              #b00011100
-              #b00000000
-              #b00000000
+              #b10000000
+              #b11000000
+              #b11100000
+              #b11110000
+              #b11111000
+              #b11111000
+              #b11110000
+              #b11100000
+              #b11000000
+              #b10000000
               #b00000000
               #b00000000
               #b00000000)))
@@ -1083,10 +1112,19 @@ Replace for i-search or swiper
   :config
   (global-set-key (kbd "C-x g") 'magit-status)
   (setq magit-completing-read-function 'helm--completing-read-default)
-  (add-hook 'focus-in-hook 'rr/refresh-vc-state)
-  (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state))
+
+  (setq magit-revision-insert-related-refs 'all
+        magit-revision-use-hash-sections 'quick)
+
+  (setq vc-handled-backends (delq 'Git vc-handled-backends))
+
+  (add-hook 'focus-in-hook #'git-gutter:update-all-windows)
+  (add-hook 'magit-post-refresh-hook #'git-gutter:update-all-windows)
+  ;; (add-hook 'focus-in-hook 'rr/refresh-vc-state)
+  ;; (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state)
+  )
 #+END_SRC
-**** Highlight diff
+**** COMMENT Highlight diff
 #+BEGIN_SRC emacs-lisp
 (use-package diff-hl
   :init
@@ -1096,6 +1134,50 @@ Replace for i-search or swiper
   (add-hook 'vc-dir-mode-hook 'turn-on-diff-hl-mode)
   (add-hook 'after-save-hook 'diff-hl-update)
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
+#+END_SRC
+**** GIT gutter
+#+BEGIN_SRC emacs-lisp
+(use-package git-gutter-fringe
+  :config
+  (defun rr/git-gutter-local ()
+    "Enable `git-gutter-mode' in non-remote buffers."
+    (when (and (buffer-file-name)
+               (not (file-remote-p (buffer-file-name))))
+      (git-gutter-mode +1)))
+
+  (add-hook 'text-mode-hook #'rr/git-gutter-local)
+  (add-hook 'prog-mode-hook #'rr/git-gutter-local)
+  (add-hook 'conf-mode-hook #'rr/git-gutter-local)
+
+  (setq-default fringes-outside-margins t)
+
+  (set-face-attribute 'git-gutter-fr:added nil
+                      :background (face-attribute 'default :background))
+
+  (set-face-attribute 'git-gutter-fr:deleted nil
+                      :background (face-attribute 'default :background))
+
+  (set-face-attribute 'git-gutter-fr:modified nil
+                      :background (face-attribute 'default :background))
+
+  (setq git-gutter-fr:side 'right-fringe)
+
+  (fringe-helper-define 'git-gutter-fr:added '(center repeated)
+    "XXXXXXXX")
+
+  (fringe-helper-define 'git-gutter-fr:modified '(center repeated)
+    "XXXXXXXX")
+
+  (fringe-helper-define 'git-gutter-fr:deleted 'bottom
+    ".......X"
+    ".......X"
+    "......XX"
+    ".....XXX"
+    "....XXXX"
+    "...XXXXX"
+    "..XXXXXX"
+    ".XXXXXXX"
+    "XXXXXXXX"))
 #+END_SRC
 *** Multiple cursors
 #+BEGIN_SRC emacs-lisp
@@ -1498,8 +1580,8 @@ But there is no backward compatibility.
 (use-package org-mime
   :config
   (add-hook 'message-mode-hook
-          (lambda ()
-            (local-set-key (kbd "C-c M-o") 'org-mime-htmlize)))
+            (lambda ()
+              (local-set-key (kbd "C-c M-o") 'org-mime-htmlize)))
   (add-hook 'org-mode-hook
             (lambda ()
               (local-set-key (kbd "C-c M-o") 'org-mime-org-buffer-htmlize)))
@@ -1592,7 +1674,8 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
 (require 'smtpmail)
 
-(setq message-send-mail-function 'smtpmail-send-it
+(setq send-mail-function 'smtpmail-send-it
+      message-send-mail-function 'smtpmail-send-it
       starttls-use-gnutls t
       mu4e-sent-messages-behavior 'sent
       mu4e-drafts-folder "/Drafts"
@@ -1636,7 +1719,8 @@ But there is no backward compatibility.
 (setq mu4e-reply-to-address "Roman.Rudakov@bsc-ideas.com")
 
 (require 'org-mu4e)
-(setq org-mu4e-convert-to-html t)
+(setq org-mu4e-convert-to-html nil)
+(add-hook 'message-send-hook 'rr/htmlize-mail)
 
 (setq mu4e-html2text-command "w3m -dump -T text/html")
 (setq mu4e-html-renderer 'w3m)
@@ -1854,8 +1938,8 @@ But there is no backward compatibility.
 #+END_SRC
 ***** Default interpreter
 #+BEGIN_SRC emacs-lisp
-;; (setq python-shell-interpreter "ipython"
-;;       python-shell-interpreter-args "-i --simple-prompt")
+(setq python-shell-interpreter "python"
+      python-shell-interpreter-args "-i")
 #+END_SRC
 ***** Elpy
 #+BEGIN_SRC emacs-lisp
