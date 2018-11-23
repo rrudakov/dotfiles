@@ -945,8 +945,10 @@ Replace for i-search or swiper
   (setq helm-display-function 'pop-to-buffer)
   (setq shackle-rules
         '(("\\`\\*helm.*?\\*\\'" :regexp t :align t :size 0.4)
-          ("\\`\\*Org\sSrc.*?\\*.*\\'" :regexp t :align right :size 0.4)
+          ("\\`\\*Org\sSrc.*?\\*.*\\'" :regexp t :align right :size 80)
           ("\\`\\*Org-Babel\sError\sOutput\\*'" :regexp t align t :size 0.4)
+          ("*Shell Command Output*" :select t :align t :size 0.4)
+          ("*Async Shell Command*" :select t :align t :size 0.4)
           (compilation-mode :select t :align t :size 0.4)
           ("*compilation*" :select t :align t :size 0.4)
           (help-mode :select t :align t :size 0.4)
