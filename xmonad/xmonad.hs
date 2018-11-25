@@ -19,6 +19,7 @@ import           XMonad.Hooks.UrgencyHook
 import           XMonad.Layout.Grid
 import           XMonad.Layout.LayoutModifier
 import           XMonad.Layout.NoBorders
+import           XMonad.Layout.Renamed
 import           XMonad.Prompt
 import           XMonad.Prompt.Shell
 import           XMonad.Prompt.Ssh
@@ -147,7 +148,7 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
     -- Deincrement the number of windows in the master area
   , ((modm, xK_period), sendMessage (IncMasterN (-1)))
     -- Scratch pads
-  , ((modm, xK_v), namedScratchpadAction scratchpads "htop")
+  -- , ((modm, xK_v), namedScratchpadAction scratchpads "htop")
   , ((modm .|. shiftMask, xK_t), namedScratchpadAction scratchpads "telegram")
   , ((modm .|. shiftMask, xK_m), namedScratchpadAction scratchpads "spotify")
   , ((modm .|. shiftMask, xK_s), namedScratchpadAction scratchpads "slack")
@@ -217,19 +218,26 @@ myMouseBindings XConfig {XMonad.modMask = modm} = M.fromList
 
     -- you may also bind events to the mouse scroll wheel (button4 and button5)
     ]
-
 -- | Set layouts
-myLayout ∷ ModifiedLayout
-  AvoidStruts
+myLayout ::
+  ModifiedLayout AvoidStruts
   (Choose
-    (ModifiedLayout (ConfigurableBorder Ambiguity) Tall)
+    (ModifiedLayout
+      (ConfigurableBorder Ambiguity) (ModifiedLayout Rename Tall))
     (Choose
-      (ModifiedLayout WithBorder Full)
-      (ModifiedLayout (ConfigurableBorder Ambiguity) Grid)))
+      (ModifiedLayout WithBorder (ModifiedLayout Rename Full))
+      (ModifiedLayout
+        (ConfigurableBorder Ambiguity) (ModifiedLayout Rename Grid))))
   Window
-myLayout = avoidStruts $ lessBorders Screen tiled ||| noBorders Full ||| lessBorders Screen Grid
-    where
-      tiled = Tall 1 (3/100) (1/2)
+myLayout =
+  avoidStruts $
+  lessBorders Screen tiled ||| noBorders full ||| lessBorders Screen grid
+  where
+    tiled = renamed [Replace "[T]"] $ Tall 1 (3 / 100) (1 / 2)
+    full = renamed [Replace "[F]"] Full
+    grid = renamed [Replace "[G]"] Grid
+
+
 
 -- |Scratchpads definitions
 -- RationalRect arguments
@@ -262,9 +270,7 @@ myManageHook = composeAll [ className =? "Firefox"        --> doShift "2"
 
 -- | Fullscreen flash
 flashHook ∷ ManageHook
-flashHook = composeOne [
-                isFullscreen -?> doFullFloat
-               ]
+flashHook = composeOne [isFullscreen -?> doFullFloat]
 
 myEventHook ∷ Event → X Data.Monoid.All
 myEventHook = docksEventHook
@@ -317,13 +323,13 @@ main = do
     , handleEventHook    = myEventHook <+> ewmhDesktopsEventHook <+> fullscreenEventHook <+> perWindowKbdLayout
     , logHook            = dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
         { ppOutput          = hPutStrLn xmproc
-        , ppCurrent         = xmobarColor "#b16286" "#3c3836" . wrap " " " "
-        , ppTitle           = xmobarColor "#d79921" "" . shorten 60
+        , ppCurrent         = xmobarColor "#fabd2f" "#3c3836" . wrap " " " "
+        , ppTitle           = xmobarColor "#928374" "" . shorten 60
         , ppHidden          = xmobarColor "#ebdbb2" ""
         , ppHiddenNoWindows = xmobarColor "#504945" ""
-        , ppUrgent          = xmobarColor "#fabd2f" "#fb4934" . wrap " " " "
-        , ppSep             = " "
-        , ppLayout          = xmobarColor "#ebdbb2" ""
+        , ppUrgent          = xmobarColor "#fabd2f" "#cc241d" . wrap " " " "
+        , ppSep             = "  "
+        , ppLayout          = xmobarColor "#98971a" ""
         }
     , startupHook        = myStartupHook
     , handleExtraArgs    = \ xs theConf → case xs of
