@@ -166,12 +166,12 @@ Unordered lists with separator '::'
 #+END_SRC
 **** Highlight matching parens
 #+BEGIN_SRC emacs-lisp
-(show-paren-mode t)
+(show-paren-mode nil)
 (setq show-paren-style 'parenthesis)
 #+END_SRC
-**** Indicate empty lines at the end of the window in the left fringe
+**** Do not indicate empty lines at the end of the window in the left fringe
 #+BEGIN_SRC emacs-lisp
-(set-default 'indicate-empty-lines t)
+(set-default 'indicate-empty-lines nil)
 #+END_SRC
 **** Enable y/n answers instead of yes/no
 #+BEGIN_SRC emacs-lisp
@@ -256,7 +256,6 @@ Good choices:
  highlight-nonselected-windows nil
  image-animate-loop t
  indicate-buffer-boundaries nil
- indicate-empty-lines nil
  max-mini-window-height 0.3
  mode-line-default-help-echo nil ; disable mode-line mouseovers
  mouse-yank-at-point t           ; middle-click paste at point, not at click
@@ -438,6 +437,11 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 ***** Shell
 #+BEGIN_SRC emacs-lisp
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+#+END_SRC
+**** Kill compilation window when quit
+#+BEGIN_SRC emacs-lisp
+(add-hook 'compilation-mode-hook
+          (lambda () (local-set-key (kbd "q") 'kill-buffer-and-window)))
 #+END_SRC
 *** Theme
 **** All the icons
@@ -945,17 +949,18 @@ Replace for i-search or swiper
   (setq helm-display-function 'pop-to-buffer)
   (setq shackle-rules
         '(("\\`\\*helm.*?\\*\\'" :regexp t :align t :size 0.4)
-          ("\\`\\*Org\sSrc.*?\\*.*\\'" :regexp t :align right :size 80)
-          ("\\`\\*Org-Babel\sError\sOutput\\*'" :regexp t align t :size 0.4)
-          ("*Shell Command Output*" :select t :align t :size 0.4)
-          ("*Async Shell Command*" :select t :align t :size 0.4)
           (compilation-mode :select t :align t :size 0.4)
+          ("\\`\\*Org\sSrc.*?\\*.*\\'" :regexp t :align right :size 100)
+          ("\\`\\*Org-Babel\sError\sOutput\\*.*\\'" :regexp t align t :size 0.4)
           ("*compilation*" :select t :align t :size 0.4)
+          ("*Async Shell Command*" :select t :align t :size 0.4)
+          ("*Shell Command Output*" :select t :align t :size 0.4)
           (help-mode :select t :align t :size 0.4)
           (magit-status-mode :select t :align t :size 0.4)
           (magit-diff-mode :select nil :align right :size 0.5)
           (magit-revision-mode :select t :align right :size 0.5)
-          (flycheck-error-list-mode :select t :align right :size 0.3)))
+          (flycheck-error-list-mode :select t :align right :size 0.3)
+          (inferior-python-mode :select t :align t :size 0.4)))
   (shackle-mode))
 #+END_SRC
 *** Rainbow delimiters
@@ -1771,7 +1776,62 @@ But there is no backward compatibility.
         lsp-response-timeout 60
         lsp-message-project-root-warning t)
   (require 'lsp-imenu)
-  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
+  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
+
+  (setq lsp-print-io nil)
+
+  ;; ;; dir containing Microsoft.Python.LanguageServer.dll
+  ;; (setq ms-pyls-dir (expand-file-name "~/Soft/Microsoft/python-language-server/output/bin/Release/"))
+
+  ;; ;; this gets called when we do lsp-describe-thing-at-point in lsp-methods.el
+  ;; ;; we remove all of the "&nbsp;" entities that MS PYLS adds
+  ;; ;; this is mostly harmless for other language servers
+  ;; (defun render-markup-content (kind content)
+  ;;   (message kind)
+  ;;   (replace-regexp-in-string "&nbsp;" " " content))
+  ;; (setq lsp-render-markdown-markup-content #'render-markup-content)
+
+  ;; ;; it's crucial that we send the correct Python version to MS PYLS, else it returns no docs in many cases
+  ;; ;; furthermore, we send the current Python's (can be virtualenv) sys.path as searchPaths
+  ;; (defun get-python-ver-and-syspath (workspace-root)
+  ;;   "return list with pyver-string and json-encoded list of python search paths."
+  ;;   (let ((python (executable-find python-shell-interpreter))
+  ;;         (ver "import sys; print(f\"{sys.version_info[0]}.{sys.version_info[1]}\");")
+  ;;         (sp (concat "import json; sys.path.insert(0, '" workspace-root "'); print(json.dumps(sys.path))")))
+  ;;     (with-temp-buffer
+  ;;       (call-process python nil t nil "-c" (concat ver sp))
+  ;;       (subseq (split-string (buffer-string) "\n") 0 2))))
+
+  ;; ;; I based most of this on the vs.code implementation:
+  ;; ;; https://github.com/Microsoft/vscode-python/blob/master/src/client/activation/languageServer/languageServer.ts#L219
+  ;; ;; (it still took quite a while to get right, but here we are!)
+  ;; (defun ms-pyls-extra-init-params (workspace)
+  ;;   (destructuring-bind (pyver pysyspath) (get-python-ver-and-syspath (lsp--workspace-root workspace))
+  ;;     `(:interpreter (
+  ;;                     :properties (
+  ;;                                  :InterpreterPath ,(executable-find python-shell-interpreter)
+  ;;                                                   :DatabasePath ,ms-pyls-dir
+  ;;                                                   :Version ,pyver))
+  ;;                    ;; preferredFormat "markdown" or "plaintext"
+  ;;                    ;; experiment to find what works best -- over here mostly plaintext
+  ;;                    :displayOptions (
+  ;;                                     :preferredFormat "plaintext"
+  ;;                                                      :trimDocumentationLines :json-false
+  ;;                                                      :maxDocumentationLineLength 0
+  ;;                                                      :trimDocumentationText :json-false
+  ;;                                                      :maxDocumentationTextLength 0)
+  ;;                    :searchPaths ,(json-read-from-string pysyspath))))
+
+  ;; (lsp-define-stdio-client lsp-python "python"
+  ;;                          #'ffip-get-project-root-directory
+  ;;                          `("dotnet" ,(concat ms-pyls-dir "Microsoft.Python.LanguageServer.dll"))
+  ;;                          :extra-init-params #'ms-pyls-extra-init-params)
+
+  ;; ;; lsp-python-enable is created by macro above
+  ;; (add-hook 'python-mode-hook
+  ;;           (lambda ()
+  ;;             (lsp-python-enable)))
+  )
 
 (use-package lsp-ui
   :after lsp-mode
@@ -1801,7 +1861,10 @@ But there is no backward compatibility.
   :config
   (add-hook 'java-mode-hook 'lsp-java-enable)
   (add-hook 'java-mode-hook 'flycheck-mode)
-  (add-hook 'java-mode-hook 'company-mode))
+  (add-hook 'java-mode-hook 'company-mode)
+
+  (add-to-list 'lsp-java-vmargs "-javaagent:/home/rrudakov/.m2/repository/org/projectlombok/lombok/1.16.20/lombok-1.16.20.jar")
+  (add-to-list 'lsp-java-vmargs "-Xbootclasspath/a:/home/rrudakov/.m2/repository/org/projectlombok/lombok/1.16.20/lombok-1.16.20.jar "))
   ;; (add-hook 'java-mode-hook (lambda () (lsp-ui-flycheck-enable t)))
 
 (require 'google-java-format)
