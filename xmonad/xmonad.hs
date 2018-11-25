@@ -34,11 +34,11 @@ myTerminal = "urxvt"
 
 -- | Set focus follow mouse
 myFocusFollowsMouse ∷ Bool
-myFocusFollowsMouse = True
+myFocusFollowsMouse = False
 
 -- | Set click just focuses
 myClickJustFocuses ∷ Bool
-myClickJustFocuses = False
+myClickJustFocuses = True
 
 -- | Set border width
 myBorderWidth ∷ Dimension
