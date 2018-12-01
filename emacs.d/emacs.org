@@ -1317,7 +1317,11 @@ And even org-babel integration:
 (add-hook 'org-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
 
 (setq org-startup-folded 'content ;; overview | content | all | showeverything
-      org-cycle-separator-lines 0
+      org-cycle-separator-lines 2
+      org-special-ctrl-a/e t
+      org-special-ctrl-k t
+      org-ctrl-k-protect-subtree t
+      org-imenu-depth 3
       org-tags-column -100
       org-startup-indented t
       org-adapt-indentation t
