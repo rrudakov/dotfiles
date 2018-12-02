@@ -1121,9 +1121,8 @@ Replace for i-search or swiper
 
   (add-hook 'focus-in-hook #'git-gutter:update-all-windows)
   (add-hook 'magit-post-refresh-hook #'git-gutter:update-all-windows)
-  ;; (add-hook 'focus-in-hook 'rr/refresh-vc-state)
-  ;; (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state)
-  )
+  (add-hook 'focus-in-hook 'rr/refresh-vc-state)
+  (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state))
 #+END_SRC
 **** COMMENT Highlight diff
 #+BEGIN_SRC emacs-lisp
