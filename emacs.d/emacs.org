@@ -147,6 +147,15 @@ Unordered lists with separator '::'
   (mu4e-compose-mode)
   (org-mime-htmlize))
 #+END_SRC
+*** Update vc-state in all buffers
+#+BEGIN_SRC emacs-lisp
+(defun rr/refresh-vc-state ()
+  "Refresh `vc-state' on all buffers."
+  (dolist (buff (buffer-list))
+    (with-current-buffer buff
+      (when (vc-mode)
+        (vc-refresh-state)))))
+#+END_SRC
 ** Configuration
 *** Start emacs server
 #+BEGIN_SRC emacs-lisp
@@ -541,17 +550,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
                  (`suspicious  ""))))
     (propertize text)))
 #+END_SRC
-****** Update vc-state in all buffers
-#+BEGIN_SRC emacs-lisp
-(defun rr/refresh-vc-state ()
-  "Refresh vc-state on all buffers."
-  (dolist (buff (buffer-list))
-    (with-current-buffer buff
-      (when (vc-mode)
-        (progn
-          (vc-refresh-state)
-          (diff-hl-update))))))
-#+END_SRC
 ***** Spaceline
 ****** Faces
 #+BEGIN_SRC emacs-lisp
@@ -583,12 +581,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
       (t 'rr/spaceline-unmodified)))
     ('(highlight . nil) 'powerline-inactive1)
     (_ 'error)))
-
-;; (set-face-attribute 'mode-line nil
-;;                     :box '(:line-width 6 :color "#665c54"))
-
-;; (set-face-attribute 'mode-line-inactive nil
-;;                     :box '(:line-width 6 :color "#3c3836"))
 #+END_SRC
 ****** Common configuration
 #+BEGIN_SRC emacs-lisp
@@ -670,14 +662,14 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 (set-face-attribute 'spaceline-python-venv nil
                     :foreground "#b8bb26" :distant-foreground "#d3869b")
 #+END_SRC
-***** Moody
+***** COMMENT Moody
 Quiet interesting package. But i need more time to set it up the way I want.
 #+BEGIN_SRC emacs-lisp
-;; (use-package moody
-;;   :config
-;;   (setq x-underline-at-descent-line t)
-;;   (moody-replace-mode-line-buffer-identification)
-;;   (moody-replace-vc-mode))
+(use-package moody
+  :config
+  (setq x-underline-at-descent-line t)
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode))
 #+END_SRC
 **** COMMENT Highlight indentation
 Good, but has performance problems
@@ -839,10 +831,6 @@ Show more offten used completeons first
   :config
   (require 'helm)
   (require 'helm-config)
-
-  ;; (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-  ;; (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
-  ;; (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
 
   (when (executable-find "curl")
     (setq helm-google-suggest-use-curl-p t))
@@ -1026,26 +1014,6 @@ Replace for i-search or swiper
   (add-hook 'after-init-hook #'global-flycheck-mode)
   (global-set-key (kbd "C-'") #'rr/flycheck-list-smart-toggle)
 
-  ;; (when (fboundp 'define-fringe-bitmap)
-  ;;   (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
-  ;;     (vector #b00000000
-  ;;             #b00000000
-  ;;             #b00000000
-  ;;             #b00000000
-  ;;             #b00000000
-  ;;             #b00000000
-  ;;             #b00000000
-  ;;             #b00011100
-  ;;             #b00111110
-  ;;             #b00111110
-  ;;             #b00111110
-  ;;             #b00011100
-  ;;             #b00000000
-  ;;             #b00000000
-  ;;             #b00000000
-  ;;             #b00000000
-  ;;             #b00000000)))
-
   (when (fboundp 'define-fringe-bitmap)
     (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
       (vector #b00000000
@@ -1057,11 +1025,11 @@ Replace for i-search or swiper
               #b11100000
               #b11110000
               #b11111000
-              #b11111000
               #b11110000
               #b11100000
               #b11000000
               #b10000000
+              #b00000000
               #b00000000
               #b00000000
               #b00000000)))
@@ -1169,7 +1137,6 @@ Replace for i-search or swiper
     "XXXXXXXX")
 
   (fringe-helper-define 'git-gutter-fr:deleted 'bottom
-    ".......X"
     ".......X"
     "......XX"
     ".....XXX"
@@ -1770,62 +1737,7 @@ But there is no backward compatibility.
         lsp-response-timeout 60
         lsp-message-project-root-warning t)
   (require 'lsp-imenu)
-  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
-
-  (setq lsp-print-io nil)
-
-  ;; ;; dir containing Microsoft.Python.LanguageServer.dll
-  ;; (setq ms-pyls-dir (expand-file-name "~/Soft/Microsoft/python-language-server/output/bin/Release/"))
-
-  ;; ;; this gets called when we do lsp-describe-thing-at-point in lsp-methods.el
-  ;; ;; we remove all of the "&nbsp;" entities that MS PYLS adds
-  ;; ;; this is mostly harmless for other language servers
-  ;; (defun render-markup-content (kind content)
-  ;;   (message kind)
-  ;;   (replace-regexp-in-string "&nbsp;" " " content))
-  ;; (setq lsp-render-markdown-markup-content #'render-markup-content)
-
-  ;; ;; it's crucial that we send the correct Python version to MS PYLS, else it returns no docs in many cases
-  ;; ;; furthermore, we send the current Python's (can be virtualenv) sys.path as searchPaths
-  ;; (defun get-python-ver-and-syspath (workspace-root)
-  ;;   "return list with pyver-string and json-encoded list of python search paths."
-  ;;   (let ((python (executable-find python-shell-interpreter))
-  ;;         (ver "import sys; print(f\"{sys.version_info[0]}.{sys.version_info[1]}\");")
-  ;;         (sp (concat "import json; sys.path.insert(0, '" workspace-root "'); print(json.dumps(sys.path))")))
-  ;;     (with-temp-buffer
-  ;;       (call-process python nil t nil "-c" (concat ver sp))
-  ;;       (subseq (split-string (buffer-string) "\n") 0 2))))
-
-  ;; ;; I based most of this on the vs.code implementation:
-  ;; ;; https://github.com/Microsoft/vscode-python/blob/master/src/client/activation/languageServer/languageServer.ts#L219
-  ;; ;; (it still took quite a while to get right, but here we are!)
-  ;; (defun ms-pyls-extra-init-params (workspace)
-  ;;   (destructuring-bind (pyver pysyspath) (get-python-ver-and-syspath (lsp--workspace-root workspace))
-  ;;     `(:interpreter (
-  ;;                     :properties (
-  ;;                                  :InterpreterPath ,(executable-find python-shell-interpreter)
-  ;;                                                   :DatabasePath ,ms-pyls-dir
-  ;;                                                   :Version ,pyver))
-  ;;                    ;; preferredFormat "markdown" or "plaintext"
-  ;;                    ;; experiment to find what works best -- over here mostly plaintext
-  ;;                    :displayOptions (
-  ;;                                     :preferredFormat "plaintext"
-  ;;                                                      :trimDocumentationLines :json-false
-  ;;                                                      :maxDocumentationLineLength 0
-  ;;                                                      :trimDocumentationText :json-false
-  ;;                                                      :maxDocumentationTextLength 0)
-  ;;                    :searchPaths ,(json-read-from-string pysyspath))))
-
-  ;; (lsp-define-stdio-client lsp-python "python"
-  ;;                          #'ffip-get-project-root-directory
-  ;;                          `("dotnet" ,(concat ms-pyls-dir "Microsoft.Python.LanguageServer.dll"))
-  ;;                          :extra-init-params #'ms-pyls-extra-init-params)
-
-  ;; ;; lsp-python-enable is created by macro above
-  ;; (add-hook 'python-mode-hook
-  ;;           (lambda ()
-  ;;             (lsp-python-enable)))
-  )
+  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
 
 (use-package lsp-ui
   :after lsp-mode
@@ -2009,50 +1921,6 @@ But there is no backward compatibility.
   (add-hook 'elpy-mode-hook 'flycheck-mode)
   (add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode 0))))
 #+END_SRC
-***** Anaconda mode
-#+BEGIN_SRC emacs-lisp
-;; (use-package anaconda-mode
-;;   :config
-;;   (add-hook 'python-mode-hook 'anaconda-mode)
-;;   (add-hook 'python-mode-hook 'anaconda-eldoc-mode))
-#+END_SRC
-***** Python language server
-#+BEGIN_SRC emacs-lisp
-;; (lsp-define-stdio-client lsp-python "python"
-;;                          #'projectile-project-root
-;;                          '("pyls"))
-
-;; ;; make sure this is activated when python-mode is activated
-;; ;; lsp-python-enable is created by macro above
-;; (add-hook 'python-mode-hook
-;;           (lambda ()
-;;             (lsp-python-enable)))
-
-;; (defun lsp-set-cfg ()
-;;   (let ((lsp-cfg `(:pyls (:configurationSources ("flake8")))))
-;;     ;; TODO: check lsp--cur-workspace here to decide per server / project
-;;     (lsp--set-configuration lsp-cfg)))
-
-;; (add-hook 'lsp-after-initialize-hook 'lsp-set-cfg)
-#+END_SRC
-***** Auto completeon
-#+BEGIN_SRC emacs-lisp
-;; (use-package company-anaconda
-;;   :after anaconda-mode
-;;   :config
-;;   (eval-after-load "company"
-;;     '(add-to-list 'company-backends 'company-anaconda)))
-;; (use-package company-jedi
-;;   :config
-;;   (defun company-jedi-setup ()
-;;     (add-to-list 'company-backends 'company-jedi))
-;;   (add-hook 'python-mode-hook 'company-jedi-setup)
-;;   (setq jedi:complete-on-dot t)
-;;   ;; (add-hook 'python-mode-hook (lambda ()
-;;   ;;                               (hack-local-variables)
-;;   ;;                               (venv-workon project-venv-name)))
-;;   (add-hook 'python-mode-hook 'jedi:setup))
-#+END_SRC
 ***** Import management
 ****** Automatically sort imports
 #+BEGIN_SRC emacs-lisp
@@ -2189,12 +2057,7 @@ But there is no backward compatibility.
 (global-set-key (kbd "<f5>") 'org-clock-goto)
 (global-set-key (kbd "<f6>") 'org-clock-in)
 (global-set-key (kbd "<f7>") 'org-clock-out)
-;; (global-set-key (kbd "<f7>") (lambda ()
-;;                                (interactive)
-;;                                (org-call-with-arg 'org-todo "PAUSED")))
-;; (global-set-key (kbd "<f8>") (lambda ()
-;;                                (interactive)
-;;                                (org-call-with-arg 'org-todo "DONE")))
+
 (add-hook 'org-agenda-mode (lambda () local-set-key (kbd "C-c m") 'org-agenda-month-view))
 (add-hook 'org-mode-hook (lambda () (local-set-key (kbd "C-c u") 'rr/org-replace-link-by-link-description)))
 #+END_SRC
