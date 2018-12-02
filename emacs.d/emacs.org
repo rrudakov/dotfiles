@@ -203,7 +203,7 @@ Good choices:
      ;; if e.g. ℕ called DOUBLE-STRUCK CAPITAL N is not covered by our font
      ;; it will be displayed as placeholder-box,
      ;; because fallback for our font is now... our font :)
-     ;; (set-fontset-font font-set nil my-font)
+     (set-fontset-font font-set nil my-font)
      )
    font-sets))
 #+END_SRC
@@ -444,10 +444,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
           (lambda () (local-set-key (kbd "q") 'kill-buffer-and-window)))
 #+END_SRC
 *** Theme
-**** All the icons
-#+BEGIN_SRC emacs-lisp
-(use-package all-the-icons)
-#+END_SRC
 **** Color scheme
 #+BEGIN_SRC emacs-lisp
 (use-package gruvbox-theme
@@ -485,27 +481,27 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
       (pcase (vc-state (buffer-file-name))
         (`up-to-date
          (concat
-          (propertize (all-the-icons-octicon "git-branch")
-                      'face `(:inherit mode-line :family ,(all-the-icons-octicon-family) :height 1.2)
+          (propertize ""
+                      'face `(:inherit mode-line :height 1.2)
                       'display '(raise -0.1))
           (propertize (format " %s" branch) 'face `(:inherit mode-line))))
         (`edited
          (concat
-          (propertize (all-the-icons-octicon "git-branch")
-                      'face `(:inherit mode-line :foreground "#87afaf" :family ,(all-the-icons-octicon-family) :height 1.2)
+          (propertize ""
+                      'face `(:inherit mode-line :foreground "#87afaf" :height 1.2)
                       'display '(raise -0.1))
           (propertize (format " %s" branch) 'face `(:inherit mode-line :foreground "#87afaf"))))
         (`added
          (concat
-          (propertize (all-the-icons-octicon "git-branch")
-                      'face `(:inherit mode-line :foreground "#b8bb26" :family ,(all-the-icons-octicon-family) :height 1.2)
+          (propertize ""
+                      'face `(:inherit mode-line :foreground "#b8bb26" :height 1.2)
                       'display '(raise -0.1))
           (propertize (format " %s" branch) 'face `(:inherit mode-line :foreground "#b8bb26"))))
         (`unregistered " ??")
         (`removed
          (concat
-          (propertize (all-the-icons-octicon "git-branch")
-                      'face `(:inherit mode-line :foreground "#fb4934" :family ,(all-the-icons-octicon-family) :height 1.2)
+          (propertize ""
+                      'face `(:inherit mode-line :foreground "#fb4934" :height 1.2)
                       'display '(raise -0.1))
           (propertize (format " %s" branch) 'face `(:inherit mode-line :foreground "#fb4934"))))
         (`needs-merge " Con")
@@ -519,7 +515,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   "Show SVN status."
   (let ((revision (cadr (split-string vc-mode "-"))))
     (concat
-     (propertize (format " %s" (all-the-icons-faicon "cloud")) 'face `(:height 1.2) 'display '(raise -0.1))
+     (propertize " " 'face `(:height 1.2) 'display '(raise -0.1))
      (propertize (format " · %s" revision) 'face `(:height 0.9)))))
 #+END_SRC
 ****** Flycheck status
@@ -1123,8 +1119,6 @@ Replace for i-search or swiper
   (setq magit-revision-insert-related-refs 'all
         magit-revision-use-hash-sections 'quick)
 
-  (setq vc-handled-backends (delq 'Git vc-handled-backends))
-
   (add-hook 'focus-in-hook #'git-gutter:update-all-windows)
   (add-hook 'magit-post-refresh-hook #'git-gutter:update-all-windows)
   ;; (add-hook 'focus-in-hook 'rr/refresh-vc-state)
@@ -1561,9 +1555,6 @@ But there is no backward compatibility.
 (set-face-attribute 'org-block nil :background
                     (color-darken-name
                      (face-attribute 'default :background) 3))
-
-(setq org-src-block-faces '(("emacs-lisp" (:background "#1d2021"))
-                            ("python" (:background "#1d2021"))))
 #+END_SRC
 **** Alerts
 #+BEGIN_SRC emacs-lisp
