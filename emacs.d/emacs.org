@@ -925,6 +925,12 @@ Replace for i-search or swiper
   :bind
   ("M-]" . 'sp-unwrap-sexp))
 #+END_SRC
+*** Workspaces
+#+BEGIN_SRC emacs-lisp
+(use-package eyebrowse
+  :config
+  (eyebrowse-mode t))
+#+END_SRC
 *** Popup windows settings
 **** Shackle
 #+BEGIN_SRC emacs-lisp
