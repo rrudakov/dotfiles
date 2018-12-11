@@ -1742,22 +1742,18 @@ But there is no backward compatibility.
         lsp-inhibit-message t
         lsp-response-timeout 60
         lsp-message-project-root-warning t)
-  (require 'lsp-imenu)
   (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
 
 (use-package lsp-ui
-  :after lsp-mode
   :config
   (setq lsp-ui-sideline-update-mode 'point
         lsp-ui-doc-enable nil
         lsp-ui-sideline-show-hover nil
-        lsp-ui-sideline-ignore-duplicate t)
-  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+        lsp-ui-sideline-ignore-duplicate t))
 #+END_SRC
 ***** Completeon
 #+BEGIN_SRC emacs-lisp
 (use-package company-lsp
-  :after company
   :config
   (push 'company-lsp company-backends)
   (setq company-lsp-enable-snippet t
@@ -1769,15 +1765,12 @@ But there is no backward compatibility.
 (require 'cc-mode)
 
 (use-package lsp-java
-  :requires (lsp-ui-flycheck lsp-ui-sideline)
+  :after lsp
   :config
-  (add-hook 'java-mode-hook 'lsp-java-enable)
-  (add-hook 'java-mode-hook 'flycheck-mode)
-  (add-hook 'java-mode-hook 'company-mode)
+  (add-hook 'java-mode-hook 'lsp)
 
   (add-to-list 'lsp-java-vmargs "-javaagent:/home/rrudakov/.m2/repository/org/projectlombok/lombok/1.16.20/lombok-1.16.20.jar")
   (add-to-list 'lsp-java-vmargs "-Xbootclasspath/a:/home/rrudakov/.m2/repository/org/projectlombok/lombok/1.16.20/lombok-1.16.20.jar "))
-  ;; (add-hook 'java-mode-hook (lambda () (lsp-ui-flycheck-enable t)))
 
 (require 'google-java-format)
 
