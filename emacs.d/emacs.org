@@ -156,6 +156,15 @@ Unordered lists with separator '::'
       (when (vc-mode)
         (vc-refresh-state)))))
 #+END_SRC
+*** Python split string
+#+BEGIN_SRC emacs-lisp
+(defun rr/python-split-string ()
+  "Split python string, insert newline and indent."
+  (interactive)
+  (insert-before-markers "\"")
+  (insert-before-markers "\"")
+  (backward-char))
+#+END_SRC
 ** Configuration
 *** Start emacs server
 #+BEGIN_SRC emacs-lisp
@@ -336,7 +345,8 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 **** Settings for tramp-mode
 #+BEGIN_SRC emacs-lisp
 (setq tramp-terminal-type "tramp"
-      tramp-default-method "ssh")
+      tramp-default-method "ssh"
+      explicit-shell-file-name "/bin/bash")
 #+END_SRC
 **** Set default input method
 #+BEGIN_SRC emacs-lisp
@@ -435,7 +445,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
       ediff-split-window-function 'split-window-horizontally)
 #+END_SRC
 **** Ansi colors
-***** Compilation buffer
+***** COMMENT Compilation buffer
 #+BEGIN_SRC emacs-lisp
 (require 'ansi-color)
 (defun colorize-compilation-buffer ()
@@ -1948,6 +1958,11 @@ But there is no backward compatibility.
 ***** Editing requirements files
 #+BEGIN_SRC emacs-lisp
 (use-package pip-requirements)
+#+END_SRC
+***** Custom bindings
+#+BEGIN_SRC emacs-lisp
+(add-hook 'python-mode-hook (lambda ()
+                              (local-set-key (kbd "C-c j") 'rr/python-split-string)))
 #+END_SRC
 **** JSON
 #+BEGIN_SRC emacs-lisp
