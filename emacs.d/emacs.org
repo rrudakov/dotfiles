@@ -346,7 +346,17 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
 (setq tramp-terminal-type "tramp"
       tramp-default-method "ssh"
-      explicit-shell-file-name "/bin/bash")
+      explicit-shell-file-name "/bin/bash"
+      tramp-completion-reread-directory-timeout nil)
+
+(setq vc-ignore-dir-regexp
+      (format "\\(%s\\)\\|\\(%s\\)"
+              vc-ignore-dir-regexp
+              tramp-file-name-regexp))
+
+(setq tramp-verbose 1)
+
+(add-to-list 'tramp-remote-path 'tramp-own-remote-path)
 #+END_SRC
 **** Set default input method
 #+BEGIN_SRC emacs-lisp
@@ -461,6 +471,10 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
 (add-hook 'compilation-mode-hook
           (lambda () (local-set-key (kbd "q") 'kill-buffer-and-window)))
+#+END_SRC
+**** Confirm kill emacs
+#+BEGIN_SRC emacs-lisp
+(setq confirm-kill-emacs 'y-or-n-p)
 #+END_SRC
 *** Theme
 **** Color scheme
@@ -1751,6 +1765,7 @@ But there is no backward compatibility.
         lsp-highlight-symbol-at-point nil
         lsp-inhibit-message t
         lsp-response-timeout 60
+        lsp-prefer-flymake nil
         lsp-message-project-root-warning t)
   (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
 
