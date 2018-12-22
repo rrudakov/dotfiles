@@ -344,19 +344,21 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 **** Settings for tramp-mode
 #+BEGIN_SRC emacs-lisp
-(setq tramp-terminal-type "tramp"
-      tramp-default-method "ssh"
-      explicit-shell-file-name "/bin/bash"
-      tramp-completion-reread-directory-timeout nil)
+  (require 'tramp)
 
-(setq vc-ignore-dir-regexp
-      (format "\\(%s\\)\\|\\(%s\\)"
-              vc-ignore-dir-regexp
-              tramp-file-name-regexp))
+  (setq tramp-terminal-type "tramp"
+        tramp-default-method "ssh"
+        explicit-shell-file-name "/bin/bash"
+        tramp-completion-reread-directory-timeout nil)
 
-(setq tramp-verbose 1)
+  (setq vc-ignore-dir-regexp
+        (format "\\(%s\\)\\|\\(%s\\)"
+                vc-ignore-dir-regexp
+                tramp-file-name-regexp))
 
-(add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+  (setq tramp-verbose 1)
+
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
 #+END_SRC
 **** Set default input method
 #+BEGIN_SRC emacs-lisp
@@ -1997,7 +1999,7 @@ But there is no backward compatibility.
 ***** TypeScript
 #+BEGIN_SRC emacs-lisp
 (use-package tide
-  :after (typescript-mode company flycheck)
+  :after (company flycheck)
   :config
   (defun setup-tide-mode ()
     (interactive)
