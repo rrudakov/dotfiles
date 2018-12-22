@@ -344,21 +344,26 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 **** Settings for tramp-mode
 #+BEGIN_SRC emacs-lisp
-  (require 'tramp)
+(require 'tramp)
 
-  (setq tramp-terminal-type "tramp"
-        tramp-default-method "ssh"
-        explicit-shell-file-name "/bin/bash"
-        tramp-completion-reread-directory-timeout nil)
+(setq tramp-terminal-type "tramp"
+      tramp-default-method "ssh"
+      explicit-shell-file-name "/bin/bash"
+      tramp-completion-reread-directory-timeout nil)
 
-  (setq vc-ignore-dir-regexp
-        (format "\\(%s\\)\\|\\(%s\\)"
-                vc-ignore-dir-regexp
-                tramp-file-name-regexp))
+(setq vc-ignore-dir-regexp
+      (format "\\(%s\\)\\|\\(%s\\)"
+              vc-ignore-dir-regexp
+              tramp-file-name-regexp))
 
-  (setq tramp-verbose 1)
+(setq tramp-verbose 1)
 
-  (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+(add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+
+;; (add-hook 'find-file-hook
+;;           (lambda ()
+;;             (when (tramp-tramp-file-p (buffer-file-name))
+;;               (flycheck-mode))))
 #+END_SRC
 **** Set default input method
 #+BEGIN_SRC emacs-lisp
@@ -934,6 +939,30 @@ Replace for i-search or swiper
   (setq helm-swoop-pre-input-function
         (lambda () "")))
 #+END_SRC
+**** Helm flx
+#+BEGIN_SRC emacs-lisp
+(use-package helm-flx
+  :after helm
+  :config
+  (helm-flx-mode +1)
+  (setq helm-flx-for-helm-find-files t
+      helm-flx-for-helm-locate t))
+#+END_SRC
+**** Google search using helm
+#+BEGIN_SRC emacs-lisp
+(use-package helm-google
+  :config
+  (setq helm-google-default-engine 'searx)
+  (global-set-key (kbd "C-h C--") 'helm-google))
+#+END_SRC
+**** Helm flycheck
+#+BEGIN_SRC emacs-lisp
+(use-package helm-flycheck
+  :after flycheck
+  :config
+  (eval-after-load 'flycheck
+    '(define-key flycheck-mode-map (kbd "C-c ! h") 'helm-flycheck)))
+#+END_SRC
 *** Smartparens
 #+BEGIN_SRC emacs-lisp
 (use-package smartparens-config
@@ -1123,6 +1152,17 @@ Replace for i-search or swiper
   (add-hook 'magit-post-refresh-hook #'git-gutter:update-all-windows)
   (add-hook 'focus-in-hook 'rr/refresh-vc-state)
   (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state))
+#+END_SRC
+**** Work with forges
+#+BEGIN_SRC emacs-lisp
+(use-package forge
+  :config
+  (add-to-list 'forge-alist
+               '("git.eoadm.com" "git.eoadm.com/api/v4"
+                 "git.eoadm.com" forge-gitlab-repository))
+  (add-to-list 'forge-alist
+               '("178.62.208.194" "178.62.208.194/api/v4"
+                 "178.62.208.194" forge-gitlab-repository)))
 #+END_SRC
 **** COMMENT Highlight diff
 #+BEGIN_SRC emacs-lisp
@@ -2019,14 +2059,13 @@ But there is no backward compatibility.
   (add-hook 'before-save-hook 'tide-format-before-save)
 
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
-  (add-hook 'js2-mode-hook #'setup-tide-mode)
   ;; configure javascript-tide checker to run after your default javascript checker
   (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append))
 #+END_SRC
 **** WEB
 #+BEGIN_SRC emacs-lisp
 (use-package web-mode
-  :after smartparens tide
+  :after tide
   :config
   (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
@@ -2039,9 +2078,10 @@ But there is no backward compatibility.
   (add-to-list 'auto-mode-alist '("\\.jinja2\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
   (add-hook 'web-mode-hook
-            (lambda ()
-              (when (string-equal "tsx" (file-name-extension buffer-file-name))
-                (setup-tide-mode))))
+          (lambda ()
+            (when (string-equal "tsx" (file-name-extension buffer-file-name))
+              (setup-tide-mode))))
+
   ;; enable typescript-tslint checker
   (flycheck-add-mode 'typescript-tslint 'web-mode)
 
@@ -2053,6 +2093,7 @@ But there is no backward compatibility.
   ;; configure jsx-tide checker to run after your default jsx checker
   (flycheck-add-mode 'javascript-eslint 'web-mode)
   (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
+
   (setq web-mode-markup-indent-offset 2
         web-mode-css-indent-offset 2
         web-mode-code-indent-offset 2
