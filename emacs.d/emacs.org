@@ -693,15 +693,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 (set-face-attribute 'spaceline-python-venv nil
                     :foreground "#b8bb26" :distant-foreground "#d3869b")
 #+END_SRC
-***** COMMENT Moody
-Quiet interesting package. But i need more time to set it up the way I want.
-#+BEGIN_SRC emacs-lisp
-(use-package moody
-  :config
-  (setq x-underline-at-descent-line t)
-  (moody-replace-mode-line-buffer-identification)
-  (moody-replace-vc-mode))
-#+END_SRC
 **** COMMENT Highlight indentation
 Good, but has performance problems
 #+BEGIN_SRC emacs-lisp
