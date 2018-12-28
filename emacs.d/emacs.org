@@ -615,7 +615,7 @@ No more ugly line splitting
             (`finished
              (if flycheck-current-errors
                  (let-alist (flycheck-count-errors flycheck-current-errors)
-                   (if .error
+                   (if .warning
                        (let ((sum (or .warning 0)))
                          (propertize
                           (format "• %s" sum)
@@ -638,7 +638,7 @@ No more ugly line splitting
             (`finished
              (if flycheck-current-errors
                  (let-alist (flycheck-count-errors flycheck-current-errors)
-                   (if .error
+                   (if .info
                        (let ((sum (or .info 0)))
                          (propertize
                           (format "• %s" sum)
@@ -699,6 +699,7 @@ No more ugly line splitting
       ('(highlight . nil) 'powerline-inactive1)
       (_ 'error)))
 
+  (setq powerline-default-separator 'nil)
   (setq spaceline-window-numbers-unicode t)
   (setq spaceline-face-func 'rr/spaceline-face)
 
@@ -758,8 +759,6 @@ No more ugly line splitting
         auto-compile
         ((buffer-id remote-host)
          :priority 5
-         :tight-left t
-         :tight-right t
          :face 'rr/buffer-id)
         (point-position line-column)
         (buffer-position :priority 0)
