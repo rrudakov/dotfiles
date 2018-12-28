@@ -479,6 +479,11 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 (add-hook 'compilation-mode-hook
           (lambda () (local-set-key (kbd "q") 'kill-buffer-and-window)))
 #+END_SRC
+**** Unclassified settings
+No more ugly line splitting
+#+BEGIN_SRC emacs-lisp
+(setq-default truncate-lines t)
+#+END_SRC
 **** Confirm kill emacs
 #+BEGIN_SRC emacs-lisp
 (setq confirm-kill-emacs 'y-or-n-p)
@@ -488,7 +493,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
 (use-package gruvbox-theme
   :config
-  (load-theme 'gruvbox-dark-medium t))
+  (load-theme 'gruvbox-dark-soft t))
 #+END_SRC
 **** Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
@@ -580,118 +585,213 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
                  (`interrupted (propertize "! Interrupted" 'face `(:inherit mode-line :foreground "#fb4934")))
                  (`suspicious  ""))))
     (propertize text)))
+
+(defun rr/flycheck-errors-text ()
+  "Text for modeline with flycheck errors counter."
+  (let* ((text
+          (pcase flycheck-last-status-change
+            (`finished (if flycheck-current-errors
+                           (let-alist (flycheck-count-errors flycheck-current-errors)
+                             (if .error
+                                 (let ((sum (or .error 0)))
+                                   (propertize
+                                    (format "• %s" sum)
+                                    'face `(:inherit mode-line :foreground "#fb4934")))
+                               (propertize
+                                "• ✓"
+                                'face `(:inherit mode-line :foreground "#fb4934"))))))
+            (`running (propertize "• ?" 'face `(:inherit mode-line :foreground "#87afaf")))
+            (`no-checker (propertize "• 🔒" 'face `(:inherit mode-line)))
+            (`not-checked (propertize "•  " 'face `(:inherit mode-line)))
+            (`errored (propertize "• x" 'face `(:inherit mode-line :foreground "#fb4934")))
+            (`interrupted (propertize "• !" 'face `(:inherit mode-line :foreground "#fb4934")))
+            (`suspicious "• "))))
+    (propertize text)))
+
+(defun rr/flycheck-warnings-text ()
+  "Text for modeline with flycheck warnings counter."
+  (let* ((text
+          (pcase flycheck-last-status-change
+            (`finished
+             (if flycheck-current-errors
+                 (let-alist (flycheck-count-errors flycheck-current-errors)
+                   (if .error
+                       (let ((sum (or .warning 0)))
+                         (propertize
+                          (format "• %s" sum)
+                          'face `(:inherit mode-line :foreground "#fe8019")))
+                     (propertize
+                      "• ✓"
+                      'face `(:inherit mode-line :foreground "#fe8019"))))))
+            (`running (propertize "• ?" 'face `(:inherit mode-line :foreground "#fe8019")))
+            (`no-checker "")
+            (`not-checked "")
+            (`errored "")
+            (`interrupted "")
+            (`suspicious ""))))
+    (propertize text)))
+
+(defun rr/flycheck-infos-text ()
+  "Text for modeline with flycheck infos counter."
+  (let* ((text
+          (pcase flycheck-last-status-change
+            (`finished
+             (if flycheck-current-errors
+                 (let-alist (flycheck-count-errors flycheck-current-errors)
+                   (if .error
+                       (let ((sum (or .info 0)))
+                         (propertize
+                          (format "• %s" sum)
+                          'face `(:inherit mode-line :foreground "#fabd2f")))
+                     (propertize
+                      "• ✓"
+                      'face `(:inherit mode-line :foreground "#fabd2f"))))))
+            (`running (propertize "• ?" 'face `(:inherit mode-line :foreground "#fabd2f")))
+            (`no-checker "")
+            (`not-checked "")
+            (`errored "")
+            (`interrupted "")
+            (`suspicious ""))))
+    (propertize text)))
 #+END_SRC
 ***** Spaceline
-****** Faces
-#+BEGIN_SRC emacs-lisp
-(defface rr/spaceline-unmodified
-  '((t :inherit 'spaceline-unmodified :foreground "#87afaf" :background "#665c54"))
-  "Face for unmodified buffer in the mode-line.")
-
-(defface rr/spaceline-modified
-  '((t :inherit 'spaceline-modified :foreground "#d75f5f" :background "#665c54"))
-  "Face for modified buffer in the mode-line.")
-
-(defface rr/spaceline-read-only
-  '((t :inherit 'spaceline-read-only :foreground "#d787af" :background "#665c54"))
-  "Face for read-only buffer in the mode-line.")
-
-(defun rr/spaceline-face (face active)
-  "For spaceline-face-func get FACE and ACTIVE."
-  (pcase (cons face active)
-    ('(face1 . t)   'mode-line)
-    ('(face1 . nil) 'mode-line-inactive)
-    ('(face2 . t)   'mode-line)
-    ('(face2 . nil) 'mode-line-inactive)
-    ('(line . t)    'mode-line)
-    ('(line . nil)  'mode-line-inactive)
-    ('(highlight . t)
-     (cond
-      (buffer-read-only 'rr/spaceline-read-only)
-      ((buffer-modified-p) 'rr/spaceline-modified)
-      (t 'rr/spaceline-unmodified)))
-    ('(highlight . nil) 'powerline-inactive1)
-    (_ 'error)))
-#+END_SRC
-****** Common configuration
+****** Custom configuration
 #+BEGIN_SRC emacs-lisp
 (use-package spaceline
   :config
-  (setq powerline-height 36)
-  (setq powerline-default-separator 'alternate)
+  (defface rr/spaceline-unmodified
+    '((t :inherit 'spaceline-unmodified :foreground "#87afaf" :background "#282828"))
+    "Face for unmodified buffer in the mode-line.")
+
+  (defface rr/spaceline-modified
+    '((t :inherit 'spaceline-modified :foreground "#d75f5f" :background "#282828"))
+    "Face for modified buffer in the mode-line.")
+
+  (defface rr/spaceline-read-only
+    '((t :inherit 'spaceline-read-only :foreground "#d787af" :background "#282828"))
+    "Face for read-only buffer in the mode-line.")
+
+  (set-face-attribute 'mode-line nil
+                      :background "#282828"
+                      ;; :foreground "#d3869b"
+                      :box '(:line-width 6 :color "#282828"))
+
+  (set-face-attribute 'mode-line-inactive nil
+                      :box '(:line-width 6 :color "#3c3836"))
+
+  (set-face-attribute 'powerline-inactive1 nil
+                      :box '(:line-width 6 :color "#3c3836"))
+
+  (defun rr/spaceline-face (face active)
+    "For spaceline-face-func get FACE and ACTIVE."
+    (pcase (cons face active)
+      ('(face1 . t)   'mode-line)
+      ('(face1 . nil) 'mode-line-inactive)
+      ('(face2 . t)   'mode-line)
+      ('(face2 . nil) 'mode-line-inactive)
+      ('(line . t)    'mode-line)
+      ('(line . nil)  'mode-line-inactive)
+      ('(highlight . t)
+       (cond
+        (buffer-read-only 'rr/spaceline-read-only)
+        ((buffer-modified-p) 'rr/spaceline-modified)
+        (t 'rr/spaceline-unmodified)))
+      ('(highlight . nil) 'powerline-inactive1)
+      (_ 'error)))
+
   (setq spaceline-window-numbers-unicode t)
-  (setq spaceline-face-func 'rr/spaceline-face))
-#+END_SRC
-****** Custom theme
-#+BEGIN_SRC emacs-lisp
-(require 'spaceline-config)
+  (setq spaceline-face-func 'rr/spaceline-face)
 
-;; Define custom segments
-(spaceline-define-segment rr/version-control
-  "Show VC status."
-  (when vc-mode
-    (cond
-     ((string-match "Git[:-]" vc-mode) (rr/modeline-git-vc))
-     ((string-match "SVN-" vc-mode) (rr/modeline-svn-vc))
-     (t (propertize (format "%s" vc-mode)))))
-  :enabled t)
+  (require 'spaceline-config)
 
-(spaceline-define-segment rr/flycheck-status
-  "Print current flycheck status."
-  (when (and (bound-and-true-p flycheck-mode))
-    (format "%s " (rr/flycheck-status-text)))
-  :enabled t)
+  ;; Define custom segments
+  (spaceline-define-segment rr/version-control
+    "Show VC status."
+    (when vc-mode
+      (cond
+       ((string-match "Git[:-]" vc-mode) (rr/modeline-git-vc))
+       ((string-match "SVN-" vc-mode) (rr/modeline-svn-vc))
+       (t (propertize (format "%s" vc-mode)))))
+    :enabled t)
 
-(spaceline-define-segment rr/modified
-  "Buffer status."
-  "•"
-  :enabled t)
+  (spaceline-define-segment rr/flycheck-errors
+    "Print current flycheck errors."
+    (when (and (bound-and-true-p flycheck-mode))
+      (format "%s" (rr/flycheck-errors-text)))
+    :enabled t)
 
-;; My custom theme
-(defun rr/spaceline-theme (&rest additional-segments)
-  "Apply my spaceline theme ADDITIONAL-SEGMENTS are inserted on the right."
-  (spaceline-install
-    `(((rr/modified
-        workspace-number
-        window-number)
-       :fallback evil-state
-       :face highlight-face
-       :priority 0
-       ;; :tight-left t
-       ;; :tight-right t
-       )
-      (anzu :priority 4)
-      auto-compile
-      ((buffer-id remote-host)
-       :priority 5)
-      (point-position line-column)
-      (buffer-position :priority 0)
-      (process :when active)
-      (mu4e-alert-segment :when active)
-      (erc-track :when active)
-      (org-pomodoro :when active)
-      (org-clock :when active))
-    `(which-function
-      (python-pyvenv :fallback python-pyenv)
-      purpose
-      (battery :when active)
-      (selection-info :priority 2)
-      input-method
-      (buffer-encoding-abbrev :priority 3)
-      (global :when active)
-      ,@additional-segments
-      (rr/version-control :when active :priority 7)
-      major-mode
-      (rr/flycheck-status :when active)))
+  (spaceline-define-segment rr/flycheck-warnings
+    "Print current flycheck warnings."
+    (when (and (bound-and-true-p flycheck-mode))
+      (format "%s" (rr/flycheck-warnings-text)))
+    :enabled t)
 
-  (setq-default mode-line-format '("%e" (:eval (spaceline-ml-main)))))
+  (spaceline-define-segment rr/flycheck-infos
+    "Print current flycheck infos."
+    (when (and (bound-and-true-p flycheck-mode))
+      (format "%s" (rr/flycheck-infos-text)))
+    :enabled t)
 
-(rr/spaceline-theme)
+  (spaceline-define-segment rr/modified
+    "Buffer status."
+    "•"
+    :enabled t)
 
-(spaceline-compile)
+  (defface rr/buffer-id
+    '((t :foreground "#d3869b"))
+    "Face for buffer id in spaceline.")
 
-(set-face-attribute 'spaceline-python-venv nil
-                    :foreground "#b8bb26" :distant-foreground "#d3869b")
+  ;; My custom theme
+  (defun rr/spaceline-theme (&rest additional-segments)
+    "Apply my spaceline theme ADDITIONAL-SEGMENTS are inserted on the right."
+    (spaceline-install
+      `(((rr/modified
+          workspace-number
+          window-number)
+         :fallback evil-state
+         :face highlight-face
+         :priority 0
+         ;; :tight-left t
+         ;; :tight-right t
+         )
+        (anzu :priority 4)
+        auto-compile
+        ((buffer-id remote-host)
+         :priority 5
+         :tight-left t
+         :tight-right t
+         :face 'rr/buffer-id)
+        (point-position line-column)
+        (buffer-position :priority 0)
+        (process :when active)
+        (mu4e-alert-segment :when active)
+        (erc-track :when active)
+        (org-pomodoro :when active)
+        (org-clock :when active))
+      `(which-function
+        (python-pyvenv :fallback python-pyenv)
+        purpose
+        (battery :when active)
+        (selection-info :priority 2)
+        input-method
+        (buffer-encoding-abbrev :priority 3)
+        (global :when active)
+        ,@additional-segments
+        (rr/version-control :when active :priority 7)
+        major-mode
+        ((rr/flycheck-errors rr/flycheck-warnings rr/flycheck-infos)
+         :when active
+         :priority 89)))
+
+    (setq-default mode-line-format '("%e" (:eval (spaceline-ml-main)))))
+
+  (rr/spaceline-theme)
+
+  (spaceline-compile)
+
+  (set-face-attribute 'spaceline-python-venv nil
+                      :foreground "#b8bb26"
+                      :distant-foreground "#d3869b"))
 #+END_SRC
 **** COMMENT Highlight indentation
 Good, but has performance problems
@@ -701,6 +801,12 @@ Good, but has performance problems
   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
   (setq highlight-indent-guides-method 'character
         highlight-indent-guides-character ?\x258F))
+#+END_SRC
+*** Smooth scrolling
+#+BEGIN_SRC emacs-lisp
+(setq scroll-conservatively 20
+      scroll-margin 10
+      scroll-preserve-screen-position t)
 #+END_SRC
 *** SQL
 **** COMMENT Emacs database interface
@@ -738,6 +844,15 @@ Good, but has performance problems
 (use-package which-key
   :config
   (which-key-mode))
+#+END_SRC
+*** Replace built-in help
+#+BEGIN_SRC emacs-lisp
+(use-package helpful
+  :config
+  (global-set-key (kbd "C-h f") #'helpful-callable)
+
+  (global-set-key (kbd "C-h v") #'helpful-variable)
+  (global-set-key (kbd "C-h k") #'helpful-key))
 #+END_SRC
 *** COMMENT Undo tree
 #+BEGIN_SRC emacs-lisp
@@ -978,6 +1093,70 @@ Replace for i-search or swiper
   (eyebrowse-mode t))
 #+END_SRC
 *** Popup windows settings
+**** COMMENT Purpose
+#+BEGIN_SRC emacs-lisp
+(use-package window-purpose
+  :config
+  (defun maybe-display-shackle (buffer alist)
+    (and (shackle-display-buffer-condition buffer alist)
+         (shackle-display-buffer-action buffer alist)))
+
+  (setq purpose-action-sequences
+        '((switch-to-buffer
+           . (purpose-display-reuse-window-buffer
+              purpose-display-reuse-window-purpose
+              maybe-display-shackle
+              purpose-display-maybe-same-window
+              purpose-display-maybe-other-window
+              purpose-display-maybe-other-frame
+              purpose-display-maybe-pop-up-window
+              purpose-display-maybe-pop-up-frame))
+
+          (prefer-same-window
+           . (purpose-display-maybe-same-window
+              maybe-display-shackle
+              purpose-display-reuse-window-buffer
+              purpose-display-reuse-window-purpose
+              purpose-display-maybe-other-window
+              purpose-display-maybe-other-frame
+              purpose-display-maybe-pop-up-window
+              purpose-display-maybe-pop-up-frame))
+
+          (force-same-window
+           . (purpose-display-maybe-same-window
+              maybe-display-shackle))
+
+          (prefer-other-window
+           . (purpose-display-reuse-window-buffer
+              purpose-display-reuse-window-purpose
+              maybe-display-shackle
+              purpose-display-maybe-other-window
+              purpose-display-maybe-pop-up-window
+              purpose-display-maybe-other-frame
+              purpose-display-maybe-pop-up-frame
+              purpose-display-maybe-same-window))
+
+          (prefer-other-frame
+           . (purpose-display-reuse-window-buffer-other-frame
+              purpose-display-reuse-window-purpose-other-frame
+              maybe-display-shackle
+              purpose-display-maybe-other-frame
+              purpose-display-maybe-pop-up-frame
+              purpose-display-maybe-other-window
+              purpose-display-maybe-pop-up-window
+              purpose-display-reuse-window-buffer
+              purpose-display-reuse-window-purpose
+              purpose-display-maybe-same-window))))
+
+  (setq purpose-user-mode-purposes
+        '((flycheck-error-list-mode . bottom)
+          (messages-buffer-mode     . bottom)
+          (helpful-mode             . bottom)
+          (compilation-mode         . bottom)
+          (inferior-emacs-lisp-mode . bottom)))
+
+  (purpose-compile-user-configuration))
+#+END_SRC
 **** Shackle
 #+BEGIN_SRC emacs-lisp
 (use-package shackle
@@ -992,6 +1171,7 @@ Replace for i-search or swiper
           ("*Async Shell Command*" :select t :align t :size 0.4)
           ("*Shell Command Output*" :select t :align t :size 0.4)
           (help-mode :select t :align t :size 0.4)
+          (helpful-mode :select t :align t :size 0.4)
           (magit-status-mode :select t :align t :size 0.4)
           (magit-diff-mode :select nil :align right :size 0.5)
           (magit-revision-mode :select t :align right :size 0.5)
@@ -1131,18 +1311,24 @@ Replace for i-search or swiper
 *** Version control
 **** GIT
 #+BEGIN_SRC emacs-lisp
-(use-package magit
-  :config
-  (global-set-key (kbd "C-x g") 'magit-status)
-  (setq magit-completing-read-function 'helm--completing-read-default)
+  (use-package magit
+    :config
+    (global-set-key (kbd "C-x g") 'magit-status)
+    (setq magit-completing-read-function 'helm--completing-read-default)
 
-  (setq magit-revision-insert-related-refs 'all
-        magit-revision-use-hash-sections 'quick)
+    (setq magit-revision-insert-related-refs 'all
+          magit-revision-use-hash-sections 'quick)
 
-  (add-hook 'focus-in-hook #'git-gutter:update-all-windows)
-  (add-hook 'magit-post-refresh-hook #'git-gutter:update-all-windows)
-  (add-hook 'focus-in-hook 'rr/refresh-vc-state)
-  (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state))
+    (setq magit-diff-highlight-hunk-region-functions '(magit-diff-highlight-hunk-region-dim-outside))
+
+    (setq magit-fetch-arguments '("--prune"))
+
+    (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+
+    (add-hook 'focus-in-hook #'git-gutter:update-all-windows)
+    (add-hook 'magit-post-refresh-hook #'git-gutter:update-all-windows)
+    (add-hook 'focus-in-hook 'rr/refresh-vc-state)
+    (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state))
 #+END_SRC
 **** Work with forges
 #+BEGIN_SRC emacs-lisp
