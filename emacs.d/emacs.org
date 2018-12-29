@@ -565,27 +565,6 @@ No more ugly line splitting
 #+END_SRC
 ****** Flycheck status
 #+BEGIN_SRC emacs-lisp
-(defun rr/flycheck-status-text ()
-  (let* ((text (pcase flycheck-last-status-change
-                 (`finished (if flycheck-current-errors
-                                (let-alist (flycheck-count-errors flycheck-current-errors)
-                                  (if .error
-                                      (let ((sum (or .error 0)))
-                                        (propertize (format "◉ %s Error%s" sum (if (eq 1 sum) "" "s")) 'face `(:inherit mode-line :foreground "#fb4934")))
-                                    (if .warning
-                                        (let ((sum (or .warning 0)))
-                                          (propertize (format "◉ %s Warning%s" sum (if (eq 1 sum) "" "s")) 'face `(:inherit mode-line :foreground "#fe8019")))
-                                      (let ((sum (or .info 0)))
-                                            (propertize (format "◉ %s Info%s" sum (if (eq 1 sum) "" "s")) 'face `(:inherit mode-line :foreground "#fabd2f"))))))
-                              (propertize "✓ No Issues" 'face `(:inherit mode-line :foreground "#afaf00"))))
-                 (`running     (propertize "☕ Running" 'face `(:inherit mode-line :foreground "#87afaf")))
-                 (`no-checker  (propertize "○ No Checker" 'face `(:inherit mode-line)))
-                 (`not-checked (propertize "🔒 Disabled" 'face' `(:inherit mode-line)))
-                 (`errored     (propertize "◉ Error" 'face `(:inherit mode-line :foreground "#fb4934")))
-                 (`interrupted (propertize "! Interrupted" 'face `(:inherit mode-line :foreground "#fb4934")))
-                 (`suspicious  ""))))
-    (propertize text)))
-
 (defun rr/flycheck-errors-text ()
   "Text for modeline with flycheck errors counter."
   (let* ((text
@@ -677,9 +656,6 @@ No more ugly line splitting
                       :box '(:line-width 6 :color "#282828"))
 
   (set-face-attribute 'mode-line-inactive nil
-                      :box '(:line-width 6 :color "#3c3836"))
-
-  (set-face-attribute 'powerline-inactive1 nil
                       :box '(:line-width 6 :color "#3c3836"))
 
   (defun rr/spaceline-face (face active)
