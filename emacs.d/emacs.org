@@ -696,7 +696,7 @@ No more ugly line splitting
         (buffer-read-only 'rr/spaceline-read-only)
         ((buffer-modified-p) 'rr/spaceline-modified)
         (t 'rr/spaceline-unmodified)))
-      ('(highlight . nil) 'powerline-inactive1)
+      ('(highlight . nil) 'mode-line-inactive)
       (_ 'error)))
 
   (setq powerline-default-separator 'nil)
@@ -739,7 +739,7 @@ No more ugly line splitting
     :enabled t)
 
   (defface rr/buffer-id
-    '((t :foreground "#d3869b"))
+    '((t :inherit 'face-default :foreground "#d3869b"))
     "Face for buffer id in spaceline.")
 
   ;; My custom theme
@@ -758,8 +758,7 @@ No more ugly line splitting
         (anzu :priority 4)
         auto-compile
         ((buffer-id remote-host)
-         :priority 5
-         :face 'rr/buffer-id)
+         :priority 5)
         (point-position line-column)
         (buffer-position :priority 0)
         (process :when active)
