@@ -527,26 +527,26 @@ No more ugly line splitting
         (`up-to-date
          (concat
           (propertize ""
-                      'face `(:inherit mode-line :height 1.2)
+                      'face `(:inherit mode-line)
                       'display '(raise -0.1))
           (propertize (format " %s" branch) 'face `(:inherit mode-line))))
         (`edited
          (concat
           (propertize ""
-                      'face `(:inherit mode-line :foreground "#87afaf" :height 1.2)
+                      'face `(:inherit mode-line :foreground "#87afaf")
                       'display '(raise -0.1))
           (propertize (format " %s" branch) 'face `(:inherit mode-line :foreground "#87afaf"))))
         (`added
          (concat
           (propertize ""
-                      'face `(:inherit mode-line :foreground "#b8bb26" :height 1.2)
+                      'face `(:inherit mode-line :foreground "#b8bb26")
                       'display '(raise -0.1))
           (propertize (format " %s" branch) 'face `(:inherit mode-line :foreground "#b8bb26"))))
         (`unregistered " ??")
         (`removed
          (concat
           (propertize ""
-                      'face `(:inherit mode-line :foreground "#fb4934" :height 1.2)
+                      'face `(:inherit mode-line :foreground "#fb4934")
                       'display '(raise -0.1))
           (propertize (format " %s" branch) 'face `(:inherit mode-line :foreground "#fb4934"))))
         (`needs-merge " Con")
@@ -714,9 +714,11 @@ No more ugly line splitting
     "•"
     :enabled t)
 
-  (defface rr/buffer-id
-    '((t :inherit 'face-default :foreground "#d3869b"))
-    "Face for buffer id in spaceline.")
+  (set-face-attribute 'mode-line-buffer-id nil
+                      :foreground "#d3869b")
+
+  (set-face-attribute 'mode-line-buffer-id-inactive nil
+                      :foreground "#d3869b")
 
   ;; My custom theme
   (defun rr/spaceline-theme (&rest additional-segments)
