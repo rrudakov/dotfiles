@@ -652,7 +652,6 @@ No more ugly line splitting
 
   (set-face-attribute 'mode-line nil
                       :background "#282828"
-                      ;; :foreground "#d3869b"
                       :box '(:line-width 6 :color "#282828"))
 
   (set-face-attribute 'mode-line-inactive nil
@@ -966,6 +965,9 @@ Show more offten used completeons first
 
   (set-face-attribute 'helm-source-header nil
                       :box '(:line-width -1 :style released-button))
+
+  (set-face-attribute 'helm-minibuffer-prompt nil
+                      :background (face-attribute 'header-line :background))
   (helm-mode 1))
 #+END_SRC
 **** Tramp
