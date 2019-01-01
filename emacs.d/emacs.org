@@ -484,6 +484,10 @@ No more ugly line splitting
 #+BEGIN_SRC emacs-lisp
 (setq-default truncate-lines t)
 #+END_SRC
+**** Save minibuffer history between sessions
+#+BEGIN_SRC emacs-lisp
+(savehist-mode t)
+#+END_SRC
 **** Confirm kill emacs
 #+BEGIN_SRC emacs-lisp
 (setq confirm-kill-emacs 'y-or-n-p)
@@ -1047,6 +1051,10 @@ Replace for i-search or swiper
   (eval-after-load 'flycheck
     '(define-key flycheck-mode-map (kbd "C-c ! h") 'helm-flycheck)))
 #+END_SRC
+**** Helm org rifle
+#+begin_src emacs-lisp
+(use-package helm-org-rifle)
+#+end_src
 *** Smartparens
 #+BEGIN_SRC emacs-lisp
 (use-package smartparens-config
@@ -1864,6 +1872,18 @@ But there is no backward compatibility.
   :config
   (setq jiralib-url "https://jira.eoadm.com"))
 #+END_SRC
+**** Add org headings to recent
+#+begin_src emacs-lisp
+(use-package org-recent-headings
+  :config
+  (require 'org-recent-headings)
+  (push 'worf-goto org-recent-headings-advise-functions)
+  (setq helm-mini-default-sources '(helm-source-buffers-list
+                                    helm-source-recentf
+                                    helm-source-org-recent-headings
+                                    helm-source-buffer-not-found))
+  (org-recent-headings-mode))
+#+end_src
 *** Email
 **** Sending email
 #+BEGIN_SRC emacs-lisp
