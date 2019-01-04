@@ -573,16 +573,20 @@ No more ugly line splitting
   "Text for modeline with flycheck errors counter."
   (let* ((text
           (pcase flycheck-last-status-change
-            (`finished (if flycheck-current-errors
-                           (let-alist (flycheck-count-errors flycheck-current-errors)
-                             (if .error
-                                 (let ((sum (or .error 0)))
-                                   (propertize
-                                    (format "• %s" sum)
-                                    'face `(:inherit mode-line :foreground "#fb4934")))
-                               (propertize
-                                "• ✓"
-                                'face `(:inherit mode-line :foreground "#fb4934"))))))
+            (`finished
+             (if flycheck-current-errors
+                 (let-alist (flycheck-count-errors flycheck-current-errors)
+                   (if .error
+                       (let ((sum (or .error 0)))
+                         (propertize
+                          (format "• %s" sum)
+                          'face `(:inherit mode-line :foreground "#fb4934")))
+                     (propertize
+                      "• ✓"
+                      'face `(:inherit mode-line :foreground "#fb4934"))))
+               (propertize
+                "• ✓"
+                'face `(:inherit mode-line :foreground "#fb4934"))))
             (`running (propertize "• ?" 'face `(:inherit mode-line :foreground "#87afaf")))
             (`no-checker (propertize "• 🔒" 'face `(:inherit mode-line)))
             (`not-checked (propertize "•  " 'face `(:inherit mode-line)))
@@ -605,7 +609,10 @@ No more ugly line splitting
                           'face `(:inherit mode-line :foreground "#fe8019")))
                      (propertize
                       "• ✓"
-                      'face `(:inherit mode-line :foreground "#fe8019"))))))
+                      'face `(:inherit mode-line :foreground "#fe8019"))))
+               (propertize
+                "• ✓"
+                'face `(:inherit mode-line :foreground "#fe8019"))))
             (`running (propertize "• ?" 'face `(:inherit mode-line :foreground "#fe8019")))
             (`no-checker "")
             (`not-checked "")
@@ -628,7 +635,10 @@ No more ugly line splitting
                           'face `(:inherit mode-line :foreground "#fabd2f")))
                      (propertize
                       "• ✓"
-                      'face `(:inherit mode-line :foreground "#fabd2f"))))))
+                      'face `(:inherit mode-line :foreground "#fabd2f"))))
+               (propertize
+                "• ✓"
+                'face `(:inherit mode-line :foreground "#fabd2f"))))
             (`running (propertize "• ?" 'face `(:inherit mode-line :foreground "#fabd2f")))
             (`no-checker "")
             (`not-checked "")
@@ -726,16 +736,13 @@ No more ugly line splitting
   ;; My custom theme
   (defun rr/spaceline-theme (&rest additional-segments)
     "Apply my spaceline theme ADDITIONAL-SEGMENTS are inserted on the right."
-    (spaceline-install
+    (spaceline-compile
       `(((rr/modified
           workspace-number
           window-number)
          :fallback evil-state
          :face highlight-face
-         :priority 0
-         ;; :tight-left t
-         ;; :tight-right t
-         )
+         :priority 0)
         (anzu :priority 4)
         auto-compile
         ((buffer-id remote-host)
@@ -765,8 +772,6 @@ No more ugly line splitting
     (setq-default mode-line-format '("%e" (:eval (spaceline-ml-main)))))
 
   (rr/spaceline-theme)
-
-  (spaceline-compile)
 
   (set-face-attribute 'spaceline-python-venv nil
                       :foreground "#b8bb26"
@@ -862,17 +867,16 @@ Good, but has performance problems
   :config
   (add-hook 'after-init-hook 'global-company-mode)
   (setq company-dabbrev-downcase nil
-        company-sort-by-occurrence t)
+        company-transformers nil)
   (setq-default company-idle-delay .2
-                company-minimum-prefix-length 2
-                company-require-match nil
+                company-minimum-prefix-length 1
                 company-tooltip-align-annotations t)
   (add-to-list 'company-backends 'company-dabbrev-code)
   (add-to-list 'company-backends 'company-yasnippet)
   (add-to-list 'company-backends 'company-files)
   (add-to-list 'company-backends 'company-elisp))
 #+END_SRC
-**** Statistic
+**** COMMENT Statistic
 Show more offten used completeons first
 #+BEGIN_SRC emacs-lisp
 (use-package company-statistics
@@ -913,22 +917,6 @@ Show more offten used completeons first
   :config
   (add-to-list 'company-backends 'company-tern)
   (setq company-tooltip-align-annotations t))
-#+END_SRC
-**** COMMENT Solve company and yasnippet conflict
-#+BEGIN_SRC emacs-lisp
-(defun company-yasnippet-or-completion ()
-  "Solve company yasnippet conflicts."
-  (interactive)
-  (let ((yas-fallback-behavior
-         (apply 'company-complete-common nil)))
-    (yas-expand)))
-
-(add-hook 'company-mode-hook
-          (lambda ()
-            (substitute-key-definition
-             'company-complete-common
-             'company-yasnippet-or-completion
-             company-active-map)))
 #+END_SRC
 *** Paradox
 #+BEGIN_SRC emacs-lisp
@@ -1053,7 +1041,8 @@ Replace for i-search or swiper
 #+END_SRC
 **** Helm org rifle
 #+begin_src emacs-lisp
-(use-package helm-org-rifle)
+(use-package helm-org-rifle
+  :bind (("C-x c o" . helm-org-rifle-agenda-files)))
 #+end_src
 *** Smartparens
 #+BEGIN_SRC emacs-lisp
@@ -1269,6 +1258,10 @@ Replace for i-search or swiper
       :fringe-bitmap bitmap
       :fringe-face 'flycheck-fringe-info))
 
+  (add-hook 'flycheck-mode-hook (lambda ()
+                                  (when (and (bound-and-true-p lsp-mode)
+                                             (equal (lsp-buffer-language) "python"))
+                                    (setq-local flycheck-checker 'python-pylint))))
   (setq-default flycheck-disabled-checkers
                 (append flycheck-disabled-checkers
                         '(javascript-jshint)))
@@ -1292,7 +1285,9 @@ Replace for i-search or swiper
   (set-face-attribute 'flycheck-posframe-info-face nil :inherit 'info)
   (set-face-attribute 'flycheck-posframe-warning-face nil :inherit 'warning)
   (set-face-attribute 'flycheck-posframe-error-face nil :inherit 'error)
-  (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
+  (add-hook 'flycheck-mode-hook #'(lambda ()
+                                    (unless (bound-and-true-p lsp-mode)
+                                      (flycheck-posframe-mode)))))
 #+END_SRC
 *** Version control
 **** GIT
@@ -1512,11 +1507,11 @@ And even org-babel integration:
 (add-hook 'org-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
 
 (setq org-startup-folded 'content ;; overview | content | all | showeverything
-      org-cycle-separator-lines 2
+      org-cycle-separator-lines 1
       org-special-ctrl-a/e t
       org-special-ctrl-k t
       org-ctrl-k-protect-subtree t
-      org-imenu-depth 3
+      org-imenu-depth 4
       org-tags-column -100
       org-startup-indented t
       org-adapt-indentation t
@@ -1884,6 +1879,10 @@ But there is no backward compatibility.
                                     helm-source-buffer-not-found))
   (org-recent-headings-mode))
 #+end_src
+**** Edit program comments and strings using Org-mode
+#+begin_src emacs-lisp
+(use-package poporg)
+#+end_src
 *** Email
 **** Sending email
 #+BEGIN_SRC emacs-lisp
@@ -1991,15 +1990,15 @@ But there is no backward compatibility.
   (setq lsp-ui-sideline-update-mode 'point
         lsp-ui-doc-enable nil
         lsp-ui-sideline-show-hover nil
-        lsp-ui-sideline-ignore-duplicate t))
+        lsp-ui-sideline-ignore-duplicate t
+        lsp-ui-flycheck-list-position 'right))
 #+END_SRC
-***** Completeon
+***** Completion
 #+BEGIN_SRC emacs-lisp
 (use-package company-lsp
   :config
   (push 'company-lsp company-backends)
-  (setq company-lsp-enable-snippet t
-        company-lsp-cache-candidates 'auto))
+  (setq company-lsp-enable-snippet t))
 #+END_SRC
 **** Java
 ***** lsp-mode setup
@@ -2143,17 +2142,18 @@ But there is no backward compatibility.
 **** Python
 ***** Virtualenv
 #+BEGIN_SRC emacs-lisp
-(use-package virtualenvwrapper
-  :config
-  (venv-initialize-interactive-shells)
-  (venv-initialize-eshell))
+;; (use-package virtualenvwrapper
+;;   :config
+;;   (venv-initialize-interactive-shells)
+;;   (venv-initialize-eshell))
+(use-package pyvenv)
 #+END_SRC
 ***** Default interpreter
 #+BEGIN_SRC emacs-lisp
 (setq python-shell-interpreter "python"
       python-shell-interpreter-args "-i")
 #+END_SRC
-***** Elpy
+***** COMMENT Elpy
 #+BEGIN_SRC emacs-lisp
 (use-package elpy
   :config
@@ -2162,6 +2162,19 @@ But there is no backward compatibility.
   (add-hook 'elpy-mode-hook 'flycheck-mode)
   (add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode 0))))
 #+END_SRC
+***** Microsoft LSP python server setup
+#+begin_src emacs-lisp
+(use-package ms-python
+  :after pyvenv
+  :config
+  (defun rr/python-enable-lsp (path)
+    "Set virtualenv to PATH then activate lsp-mode."
+    (unless (equal pyvenv-virtual-env-name path)
+      (pyvenv-workon path))
+
+    (unless (bound-and-true-p lsp-mode)
+      (lsp))))
+#+end_src
 ***** Import management
 ****** Automatically sort imports
 #+BEGIN_SRC emacs-lisp
