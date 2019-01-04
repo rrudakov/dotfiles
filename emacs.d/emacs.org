@@ -488,6 +488,10 @@ No more ugly line splitting
 #+BEGIN_SRC emacs-lisp
 (savehist-mode t)
 #+END_SRC
+**** Increase max lines in messages buffer
+#+begin_src emacs-lisp
+(setq message-log-max 5000)
+#+end_src
 **** Confirm kill emacs
 #+BEGIN_SRC emacs-lisp
 (setq confirm-kill-emacs 'y-or-n-p)
@@ -866,10 +870,10 @@ Good, but has performance problems
 (use-package company
   :config
   (add-hook 'after-init-hook 'global-company-mode)
-  (setq company-dabbrev-downcase nil
-        company-transformers nil)
+  (setq company-dabbrev-downcase nil)
+  (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
   (setq-default company-idle-delay .2
-                company-minimum-prefix-length 1
+                company-minimum-prefix-length 2
                 company-tooltip-align-annotations t)
   (add-to-list 'company-backends 'company-dabbrev-code)
   (add-to-list 'company-backends 'company-yasnippet)
