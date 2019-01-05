@@ -1537,7 +1537,8 @@ And even org-babel integration:
       org-fontify-done-headline t
       org-image-actual-width 500
       org-export-with-drawers t
-      org-export-with-properties t)
+      org-export-with-properties t
+      org-use-speed-commands t)
 
 (setq org-link-frame-setup
       '((vm . vm-visit-folder-other-frame)
@@ -1672,70 +1673,24 @@ But there is no backward compatibility.
 (setq org-clock-out-remove-zero-time-clocks t)
 (setq org-clock-report-include-clocking-task t)
 
-(defun rr/set-progress (last)
-  "Set PROGRESS state if LAST is different."
-  (when (not (string-equal last "PROGRESS"))
-    (let ()
-      (remove-hook 'org-after-todo-state-change-hook 'rr/start-clock)
-      "PROGRESS")))
+(setq org-clock-in-switch-to-state "PROGRESS")
 
-(add-hook 'org-clock-in-hook
-          (lambda ()
-            (add-hook 'org-after-todo-state-change-hook 'rr/start-clock)))
+(setq non-clocking-states '("WAITING" "DONE" "TODO" "CANCELED"))
 
-(setq org-clock-in-switch-to-state 'rr/set-progress)
-
-(setq non-clocking-states '("WAITING" "DONE"))
-
-(defun rr/ido-non-clocking-state ()
+(defun rr/read-non-clocking-state ()
   "Prompt to select non-clocking state."
   (interactive)
-  (message "%s" (ido-completing-read "Select state: " non-clocking-states)))
+  (message "%s" (completing-read "Select state: " non-clocking-states)))
 
 (defun rr/after-clock-stop (last)
   "Change TASK state after clock stop depends on LAST state."
   (when (not (or (string-equal last "WAITING")
                  (string-equal last "DONE")
-                 (string-equal last "TODO")))
-    (let ()
-      (remove-hook 'org-after-todo-state-change-hook 'rr/stop-clock)
-      (if (y-or-n-p "Current task DONE? ")
-            "DONE"
-          "WAITING"))))
-
-(add-hook 'org-clock-out-hook
-          (lambda ()
-            (add-hook 'org-after-todo-state-change-hook 'rr/stop-clock)))
+                 (string-equal last "TODO")
+                 (string-equal last "CANCELED")))
+    (rr/read-non-clocking-state)))
 
 (setq org-clock-out-switch-to-state 'rr/after-clock-stop)
-
-(defun rr/stop-clock ()
-  "Stop clock if task state changed to WAITING or DONE."
-  (when (and (org-clocking-p)
-             (or (string-equal org-state "WAITING")
-                 (string-equal org-state "DONE")
-                 (string-equal org-state "TODO"))
-             (< (point) org-clock-marker)
-             (> (save-excursion (outline-next-heading) (point))
-                org-clock-marker))
-    (let ((org-log-note-clock-out nil)
-          (org-clock-out-switch-to-state nil))
-      (org-clock-out))))
-
-(add-hook 'org-after-todo-state-change-hook 'rr/stop-clock)
-
-(defun rr/start-clock ()
-  "Start clock if task state changed to PROGRESS."
-  (if (org-clocking-p)
-      (when (and (string-equal org-state "PROGRESS")
-                 (not (string-equal (nth 4 (org-heading-components)) org-clock-heading)))
-        (let ((org-clock-in-switch-to-state nil))
-          (org-clock-in)))
-    (when (string-equal org-state "PROGRESS")
-      (let ((org-clock-in-switch-to-state nil))
-        (org-clock-in)))))
-
-(add-hook 'org-after-todo-state-change-hook 'rr/start-clock)
 #+END_SRC
 **** Appearance
 ***** Org bullets
@@ -2319,8 +2274,6 @@ But there is no backward compatibility.
 (global-set-key "\C-cb" 'org-switchb)
 
 (global-set-key (kbd "<f5>") 'org-clock-goto)
-(global-set-key (kbd "<f6>") 'org-clock-in)
-(global-set-key (kbd "<f7>") 'org-clock-out)
 
 (add-hook 'org-agenda-mode (lambda () local-set-key (kbd "C-c m") 'org-agenda-month-view))
 (add-hook 'org-mode-hook (lambda () (local-set-key (kbd "C-c u") 'rr/org-replace-link-by-link-description)))
