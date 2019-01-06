@@ -1293,6 +1293,12 @@ Replace for i-search or swiper
                                     (unless (bound-and-true-p lsp-mode)
                                       (flycheck-posframe-mode)))))
 #+END_SRC
+*** Highlight TODO item
+#+begin_src emacs-lisp
+(use-package hl-todo
+  :config
+  (global-hl-todo-mode))
+#+end_src
 *** Version control
 **** GIT
 #+BEGIN_SRC emacs-lisp
@@ -1380,6 +1386,12 @@ Replace for i-search or swiper
     ".XXXXXXX"
     "XXXXXXXX"))
 #+END_SRC
+**** Show TODO items in magit buffer
+#+begin_src emacs-lisp
+(use-package magit-todos
+  :config
+  (add-hook 'prog-mode-hook 'magit-todos-mode))
+#+end_src
 *** Multiple cursors
 #+BEGIN_SRC emacs-lisp
 (use-package multiple-cursors
