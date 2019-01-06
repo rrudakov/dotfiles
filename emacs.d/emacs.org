@@ -1518,6 +1518,7 @@ And even org-babel integration:
       org-imenu-depth 4
       org-tags-column -100
       org-startup-indented t
+      org-startup-shrink-all-tables t
       org-adapt-indentation t
       ;; org-src-preserve-indentation t
       org-edit-src-content-indentation 0
