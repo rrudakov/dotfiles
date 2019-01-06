@@ -741,12 +741,12 @@ No more ugly line splitting
   (defun rr/spaceline-theme (&rest additional-segments)
     "Apply my spaceline theme ADDITIONAL-SEGMENTS are inserted on the right."
     (spaceline-compile
-      `(((rr/modified
-          workspace-number
+      `(((workspace-number
           window-number)
          :fallback evil-state
          :face highlight-face
-         :priority 0)
+         :priority 100
+         :separator "|")
         (anzu :priority 4)
         auto-compile
         ((buffer-id remote-host)
@@ -1173,9 +1173,23 @@ Replace for i-search or swiper
 #+END_SRC
 *** Windows navigation
 #+BEGIN_SRC emacs-lisp
-(use-package ace-window
+;; (use-package ace-window
+;;   :config
+;;   (global-set-key (kbd "M-o") 'ace-window))
+(use-package winum
   :config
-  (global-set-key (kbd "M-o") 'ace-window))
+  (setq winum-auto-setup-mode-line nil)
+  (winum-mode)
+  (global-set-key (kbd "M-1") 'winum-select-window-1)
+  (global-set-key (kbd "M-2") 'winum-select-window-2)
+  (global-set-key (kbd "M-3") 'winum-select-window-3)
+  (global-set-key (kbd "M-4") 'winum-select-window-4)
+  (global-set-key (kbd "M-5") 'winum-select-window-5)
+  (global-set-key (kbd "M-6") 'winum-select-window-6)
+  (global-set-key (kbd "M-7") 'winum-select-window-7)
+  (global-set-key (kbd "M-8") 'winum-select-window-8)
+  (global-set-key (kbd "M-9") 'winum-select-window-9)
+  (global-set-key (kbd "M-0") 'winum-select-window-0))
 #+END_SRC
 *** Dired
 #+BEGIN_SRC emacs-lisp
