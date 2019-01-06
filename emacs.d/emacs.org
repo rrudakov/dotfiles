@@ -1176,6 +1176,7 @@ Replace for i-search or swiper
 ;; (use-package ace-window
 ;;   :config
 ;;   (global-set-key (kbd "M-o") 'ace-window))
+;; TODO: spaceline settings
 (use-package winum
   :config
   (setq winum-auto-setup-mode-line nil)
