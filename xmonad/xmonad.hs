@@ -1,5 +1,4 @@
-{-# LANGUAGE LambdaCase    #-}
-{-# LANGUAGE UnicodeSyntax #-}
+{-# LANGUAGE LambdaCase #-}
 {-# OPTIONS_GHC -Wall #-}
 import           Data.List
 import qualified Data.Map                        as M
@@ -28,28 +27,27 @@ import           XMonad.Util.NamedScratchpad
 import           XMonad.Util.Run                 (spawnPipe)
 
 -- | Set default terminal emulator
-myTerminal ∷ String
--- myTerminal = "gnome-terminal"
+myTerminal :: String
 myTerminal = "urxvt"
 
 -- | Set focus follow mouse
-myFocusFollowsMouse ∷ Bool
+myFocusFollowsMouse :: Bool
 myFocusFollowsMouse = False
 
 -- | Set click just focuses
-myClickJustFocuses ∷ Bool
+myClickJustFocuses :: Bool
 myClickJustFocuses = True
 
 -- | Set border width
-myBorderWidth ∷ Dimension
+myBorderWidth :: Dimension
 myBorderWidth = 1
 
 -- | Set super key as default modificator
-myModMask ∷ KeyMask
+myModMask :: KeyMask
 myModMask = mod4Mask
 
 -- | My work spaces
-myWorkspaces ∷ [WorkspaceId]
+myWorkspaces :: [WorkspaceId]
 myWorkspaces = map show [1 .. 9 :: Int]
 
 -- | Set unfocused windows border color
@@ -62,47 +60,76 @@ myFocusedBorderColor = "#928374"
 
 -- | Spotify play toggle command
 spotifyPlayToggle :: String
-spotifyPlayToggle = "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.PlayPause"
+spotifyPlayToggle =
+  mconcat
+    [ "dbus-send "
+    , "--print-reply "
+    , "--dest=org.mpris.MediaPlayer2.spotify "
+    , "/org/mpris/MediaPlayer2 "
+    , "org.mpris.MediaPlayer2.Player.PlayPause"
+    ]
 
 -- | Spotify next song command
 spotifyNext :: String
-spotifyNext = "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Next"
+spotifyNext =
+  mconcat
+    [ "dbus-send "
+    , "--print-reply "
+    , "--dest=org.mpris.MediaPlayer2.spotify "
+    , "/org/mpris/MediaPlayer2 "
+    , "org.mpris.MediaPlayer2.Player.Next"
+    ]
 
 -- | Spotify previous song command
 spotifyPrevious :: String
-spotifyPrevious = "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous"
+spotifyPrevious =
+  mconcat
+    [ "dbus-send "
+    , "--print-reply "
+    , "--dest=org.mpris.MediaPlayer2.spotify "
+    , "/org/mpris/MediaPlayer2 "
+    , "org.mpris.MediaPlayer2.Player.Previous"
+    ]
 
 -- | Spotify stop command
 spotifyStop :: String
-spotifyStop = "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Stop"
+spotifyStop =
+  mconcat
+    [ "dbus-send "
+    , "--print-reply "
+    , "--dest=org.mpris.MediaPlayer2.spotify "
+    , "/org/mpris/MediaPlayer2 "
+    , "org.mpris.MediaPlayer2.Player.Stop"
+    ]
 
 -- | Settings for ssh prompt
 myPromptConfig :: XPConfig
-myPromptConfig = XPC
-  { font                = "xft:Source Code Variable:size=10:bold:antialias=true"
-  , bgColor             = "#282828"
-  , fgColor             = "#ebdbb2"
-  , fgHLight            = "black"
-  , bgHLight            = "gray"
-  , borderColor         = "#C5C8C6"
-  , promptBorderWidth   = 0
-  , promptKeymap        = defaultXPKeymap
-  , completionKey       = (0, xK_Tab)
-  , changeModeKey       = xK_grave
-  , position            = Bottom
-  , height              = 30
-  , historySize         = 256
-  , historyFilter       = id
-  , defaultText         = []
-  , autoComplete        = Nothing
-  , showCompletionOnTab = False
-  , searchPredicate     = isPrefixOf
-  , alwaysHighlight     = True
-  , maxComplRows        = Nothing
-  }
+myPromptConfig =
+  XPC
+    { font = "xft:Source Code Variable:size=10:bold:antialias=true"
+    , bgColor = "#282828"
+    , fgColor = "#ebdbb2"
+    , fgHLight = "black"
+    , bgHLight = "gray"
+    , borderColor = "#C5C8C6"
+    , promptBorderWidth = 0
+    , promptKeymap = defaultXPKeymap
+    , completionKey = (0, xK_Tab)
+    , changeModeKey = xK_grave
+    , position = Bottom
+    , height = 30
+    , historySize = 256
+    , historyFilter = id
+    , defaultText = []
+    , autoComplete = Nothing
+    , showCompletionOnTab = False
+    , searchPredicate = isPrefixOf
+    , alwaysHighlight = True
+    , maxComplRows = Nothing
+    }
 
 -- | My keybindings
-myKeys ∷ XConfig Layout → M.Map (KeyMask, KeySym) (X ())
+myKeys :: XConfig Layout -> M.Map (KeyMask, KeySym) (X ())
 myKeys conf@XConfig {XMonad.modMask = modm} =
   M.fromList $
     -- launch a terminal
@@ -162,19 +189,29 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
     -- Quit xmonad
   , ((modm .|. shiftMask, xK_q), io exitSuccess)
     -- Restart xmonad
-  , ((modm, xK_q), spawn  "if type /usr/local/bin/xmonad-session; then xmonad-session --recompile && xmonad-session --restart; else xmessage xmonad-session not in \\$PATH: \"$PATH\"; fi")
+  , ( (modm, xK_q)
+    , spawn $
+      mconcat
+        [ "if type /usr/local/bin/xmonad-session; then "
+        , "xmonad-session --recompile && xmonad-session --restart; "
+        , "else xmessage xmonad-session not in \\$PATH: \"$PATH\"; fi"
+        ])
     --, ((modm              , xK_q     ), spawn "stack exec xmonad -- --recompile && stack exec xmonad -- --restart")
   , ((modm, xK_b), sendMessage ToggleStruts)
   , ((modm, xK_BackSpace), focusUrgent)
     -- Run xmessage with a summary of the default keybindings (useful for beginners)
     -- , ((modMask .|. shiftMask, xK_slash ), spawn ("echo \"" ++ help ++ "\" | xmessage -file -"))
-    , ((0                 , xF86XK_AudioLowerVolume), spawn "pactl set-sink-mute @DEFAULT_SINK@ false ; pactl set-sink-volume @DEFAULT_SINK@ -5%")
-    , ((0                 , xF86XK_AudioRaiseVolume), spawn "pactl set-sink-mute @DEFAULT_SINK@ false ; pactl set-sink-volume @DEFAULT_SINK@ +5%")
-    , ((0                 , xF86XK_AudioMute       ), spawn "pactl set-sink-mute @DEFAULT_SINK@ toggle")
-    , ((0                 , xF86XK_AudioPlay       ), spawn spotifyPlayToggle)
-    , ((0                 , xF86XK_AudioNext       ), spawn spotifyNext)
-    , ((0                 , xF86XK_AudioPrev       ), spawn spotifyPrevious)
-    , ((0                 , xF86XK_AudioStop       ), spawn spotifyStop)
+  , ( (0, xF86XK_AudioLowerVolume)
+    , spawn
+        "pactl set-sink-mute @DEFAULT_SINK@ false ; pactl set-sink-volume @DEFAULT_SINK@ -5%")
+  , ( (0, xF86XK_AudioRaiseVolume)
+    , spawn
+        "pactl set-sink-mute @DEFAULT_SINK@ false ; pactl set-sink-volume @DEFAULT_SINK@ +5%")
+  , ((0, xF86XK_AudioMute), spawn "pactl set-sink-mute @DEFAULT_SINK@ toggle")
+  , ((0, xF86XK_AudioPlay), spawn spotifyPlayToggle)
+  , ((0, xF86XK_AudioNext), spawn spotifyNext)
+  , ((0, xF86XK_AudioPrev), spawn spotifyPrevious)
+  , ((0, xF86XK_AudioStop), spawn spotifyStop)
     -- , ((0                 , xK_Print               ), spawn "scrot '%F_%H%M%S_$wx$h.png' -e 'mv $f ~/screenshots/'")
   , ((0, xK_Print), spawn "xfce4-screenshooter")
   ] <>
@@ -183,41 +220,40 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
     -- mod-shift-[1..9], Move client to workspace N
     --
   [ ((m .|. modm, k), windows $ f i)
-  | (i, k) ← zip (XMonad.workspaces conf) [xK_1 .. xK_9]
-  , (f, m) ← [(W.greedyView, 0), (W.shift, shiftMask)]
+  | (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_9]
+  , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]
   ] <>
     --
     -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
     -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
     --
   [ ((m .|. modm, key), screenWorkspace sc >>= flip whenJust (windows . f))
-  | (key, sc) ← zip [xK_w, xK_e, xK_r] [0 ..]
-  , (f, m) ← [(W.view, 0), (W.shift, shiftMask)]
+  | (key, sc) <- zip [xK_w, xK_e, xK_r] [0 ..]
+  , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]
   ]
   where
-    toggleCopyToAll = wsContainingCopies >>= \case
-      [] → windows copyToAll
-      _ → killAllOtherCopies
+    toggleCopyToAll =
+      wsContainingCopies >>= \case
+        [] -> windows copyToAll
+        _ -> killAllOtherCopies
 
 
 ------------------------------------------------------------------------
 -- | Mouse bindings: default actions bound to mouse events
-myMouseBindings ∷ XConfig Layout → M.Map (KeyMask, Button) (Window → X ())
-myMouseBindings XConfig {XMonad.modMask = modm} = M.fromList
-
+myMouseBindings :: XConfig Layout -> M.Map (KeyMask, Button) (Window -> X ())
+myMouseBindings XConfig {XMonad.modMask = modm} =
+  M.fromList
     -- mod-button1, Set the window to floating mode and move by dragging
-    [ ((modm, button1), \ w → focus w >> mouseMoveWindow w
-                              >> windows W.shiftMaster)
-
+    [ ( (modm, button1)
+      , \w -> focus w >> mouseMoveWindow w >> windows W.shiftMaster)
     -- mod-button2, Raise the window to the top of the stack
-    , ((modm, button2), \ w → focus w >> windows W.shiftMaster)
-
+    , ((modm, button2), \w -> focus w >> windows W.shiftMaster)
     -- mod-button3, Set the window to floating mode and resize by dragging
-    , ((modm, button3), \ w → focus w >> mouseResizeWindow w
-                              >> windows W.shiftMaster)
-
+    , ( (modm, button3)
+      , \w -> focus w >> mouseResizeWindow w >> windows W.shiftMaster)
     -- you may also bind events to the mouse scroll wheel (button4 and button5)
     ]
+
 -- | Set layouts
 myLayout ::
   ModifiedLayout AvoidStruts
@@ -242,52 +278,78 @@ myLayout =
 -- |Scratchpads definitions
 -- RationalRect arguments
 -- From left, From top, width, heigh
-scratchpads ∷ [NamedScratchpad]
+scratchpads :: [NamedScratchpad]
 scratchpads =
-  [ NS "htop" "gnome-terminal -- htop" (title =? "htop") (customFloating $ W.RationalRect (1/6) (1/6) (2/3) (2/3))
-  , NS "telegram" "telegram-desktop" (className =? "TelegramDesktop") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
-  , NS "spotify" "spotify" (appName =? "spotify") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
-  , NS "wire" "wire-desktop" (appName =? "wire") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
-  , NS "slack" "slack" (appName =? "slack") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
-  , NS "skype" "skypeforlinux" (className =? "Skype") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
-  , NS "mattermost" "mattermost-desktop" (appName =? "mattermost") (customFloating $ W.RationalRect (1/10) (1/8) (4/5) (3/4))
+  [ NS
+      "telegram"
+      "telegram-desktop"
+      (className =? "TelegramDesktop")
+      (customFloating $ W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
+  , NS
+      "spotify"
+      "spotify"
+      (appName =? "spotify")
+      (customFloating $ W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
+  , NS
+      "wire"
+      "wire-desktop"
+      (appName =? "wire")
+      (customFloating $ W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
+  , NS
+      "slack"
+      "slack"
+      (appName =? "slack")
+      (customFloating $ W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
+  , NS
+      "skype"
+      "skypeforlinux"
+      (className =? "Skype")
+      (customFloating $ W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
+  , NS
+      "mattermost"
+      "mattermost-desktop"
+      (appName =? "mattermost")
+      (customFloating $ W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
   ]
 
 -- | Set hooks for applications
-myManageHook ∷ Query (Endo WindowSet)
-myManageHook = composeAll [ className =? "Firefox"        --> doShift "2"
-                          , className =? "Google-chrome"  --> doShift "5"
-                          , className =? "MPlayer"        --> doFloat
-                          , resource  =? "desktop_window" --> doIgnore
-                          , resource  =? "kdesktop"       --> doIgnore
-                          , className =? "xfce4-notifyd"  --> doIgnore
-                          , className =? "rdesktop"       --> doFullFloat
-                          , className =? "Nm-openconnect-auth-dialog" --> doCenterFloat
-                          , title =? "capture" --> customFloating (W.RationalRect (1/5) (1/5) (3/5) (3/5))
+myManageHook :: Query (Endo WindowSet)
+myManageHook =
+  composeAll
+    [ className =? "Firefox" --> doShift "2"
+    , className =? "Google-chrome" --> doShift "5"
+    , className =? "MPlayer" --> doFloat
+    , resource =? "desktop_window" --> doIgnore
+    , resource =? "kdesktop" --> doIgnore
+    , className =? "xfce4-notifyd" --> doIgnore
+    , className =? "rdesktop" --> doFullFloat
+    , className =? "Nm-openconnect-auth-dialog" --> doCenterFloat
+    , title =? "capture" -->
+      customFloating (W.RationalRect (1 / 5) (1 / 5) (3 / 5) (3 / 5))
                           -- scratchpads
-                          , namedScratchpadManageHook scratchpads
-                          ]
+    , namedScratchpadManageHook scratchpads
+    ]
 
 -- | Fullscreen flash
-flashHook ∷ ManageHook
+flashHook :: ManageHook
 flashHook = composeOne [isFullscreen -?> doFullFloat]
 
-myEventHook ∷ Event → X Data.Monoid.All
+myEventHook :: Event -> X Data.Monoid.All
 myEventHook = docksEventHook
 
 -- | Make java GUI working
-myStartupHook ∷ X ()
+myStartupHook :: X ()
 myStartupHook = setWMName "LG3D"
 
 ------------------------------------------------------------------------
 -- Event Masks:
 
 -- | The client events that xmonad is interested in
-myClientMask ∷ EventMask
+myClientMask :: EventMask
 myClientMask = structureNotifyMask .|. enterWindowMask .|. propertyChangeMask
 
 -- | The root events that xmonad is interested in
-myRootMask ∷ EventMask
+myRootMask :: EventMask
 myRootMask =
   substructureRedirectMask .|.
   substructureNotifyMask .|.
@@ -299,40 +361,49 @@ myRootMask =
 ------------------------------------------------------------------------
 
 -- | Run xmonad with xmobar
-main ∷ IO ()
+main :: IO ()
 main = do
-  xmproc ← spawnPipe "$HOME/.local/bin/xmobar"
-  launch $ ewmh $ withUrgencyHook NoUrgencyHook
-    XConfig
-    { terminal           = myTerminal
-    , focusFollowsMouse  = myFocusFollowsMouse
-    , clickJustFocuses   = myClickJustFocuses
-    , borderWidth        = myBorderWidth
-    , modMask            = myModMask
-    , workspaces         = myWorkspaces
-    , normalBorderColor  = myNormalBorderColor
-    , focusedBorderColor = myFocusedBorderColor
-    , rootMask           = myRootMask
-    , clientMask         = myClientMask
-    -- key bindings
-    , keys               = myKeys
-    , mouseBindings      = myMouseBindings
-    -- hooks, layouts
-    , manageHook         = myManageHook <+> flashHook <+> manageDocks
-    , layoutHook         = myLayout
-    , handleEventHook    = myEventHook <+> ewmhDesktopsEventHook <+> fullscreenEventHook <+> perWindowKbdLayout
-    , logHook            = dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $ xmobarPP
-        { ppOutput          = hPutStrLn xmproc
-        , ppCurrent         = xmobarColor "#fabd2f" "#3c3836" . wrap " " " "
-        , ppTitle           = xmobarColor "#928374" "" . shorten 60
-        , ppHidden          = xmobarColor "#ebdbb2" ""
-        , ppHiddenNoWindows = xmobarColor "#504945" ""
-        , ppUrgent          = xmobarColor "#fabd2f" "#cc241d" . wrap " " " "
-        , ppSep             = "  "
-        , ppLayout          = xmobarColor "#98971a" ""
+  xmproc <- spawnPipe "$HOME/.local/bin/xmobar"
+  launch $
+    ewmh $
+    withUrgencyHook
+      NoUrgencyHook
+      XConfig
+        { terminal = myTerminal
+        , focusFollowsMouse = myFocusFollowsMouse
+        , clickJustFocuses = myClickJustFocuses
+        , borderWidth = myBorderWidth
+        , modMask = myModMask
+        , workspaces = myWorkspaces
+        , normalBorderColor = myNormalBorderColor
+        , focusedBorderColor = myFocusedBorderColor
+        , rootMask = myRootMask
+        , clientMask = myClientMask
+        -- key bindings
+        , keys = myKeys
+        , mouseBindings = myMouseBindings
+        -- hooks, layouts
+        , manageHook = myManageHook <+> flashHook <+> manageDocks
+        , layoutHook = myLayout
+        , handleEventHook =
+            myEventHook <+>
+            ewmhDesktopsEventHook <+> fullscreenEventHook <+> perWindowKbdLayout
+        , logHook =
+            dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $
+            xmobarPP
+              { ppOutput = hPutStrLn xmproc
+              , ppCurrent = xmobarColor "#fabd2f" "#3c3836" . wrap " " " "
+              , ppTitle = xmobarColor "#928374" "" . shorten 60
+              , ppHidden = xmobarColor "#ebdbb2" ""
+              , ppHiddenNoWindows = xmobarColor "#504945" ""
+              , ppUrgent = xmobarColor "#fabd2f" "#cc241d" . wrap " " " "
+              , ppSep = "  "
+              , ppLayout = xmobarColor "#98971a" ""
+              }
+        , startupHook = myStartupHook
+        , handleExtraArgs =
+            \xs theConf ->
+              case xs of
+                [] -> return theConf
+                _  -> fail ("unrecognized flags:" <> show xs)
         }
-    , startupHook        = myStartupHook
-    , handleExtraArgs    = \ xs theConf → case xs of
-                                            [] → return theConf
-                                            _ → fail ("unrecognized flags:" <> show xs)
-    }
