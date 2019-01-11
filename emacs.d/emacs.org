@@ -462,12 +462,14 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
       ediff-split-window-function 'split-window-horizontally)
 #+END_SRC
 **** Ansi colors
-***** COMMENT Compilation buffer
+***** Compilation buffer
 #+BEGIN_SRC emacs-lisp
 (require 'ansi-color)
 (defun colorize-compilation-buffer ()
-  (let ((inhibit-read-only t))
-    (ansi-color-apply-on-region (point-min) (point-max))))
+  (toggle-read-only)
+  (ansi-color-apply-on-region compilation-filter-start (point))
+  (toggle-read-only))
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 #+END_SRC
 ***** Shell
@@ -1982,10 +1984,9 @@ But there is no backward compatibility.
 (require 'cc-mode)
 
 (use-package lsp-java
-  :after lsp
+  :after lsp-mode
   :config
   (add-hook 'java-mode-hook 'lsp)
-
   (add-to-list 'lsp-java-vmargs "-javaagent:/home/rrudakov/.m2/repository/org/projectlombok/lombok/1.16.20/lombok-1.16.20.jar")
   (add-to-list 'lsp-java-vmargs "-Xbootclasspath/a:/home/rrudakov/.m2/repository/org/projectlombok/lombok/1.16.20/lombok-1.16.20.jar "))
 
