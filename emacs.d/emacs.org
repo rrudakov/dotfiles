@@ -1446,7 +1446,8 @@ Colorize color names in buffers
 #+BEGIN_SRC emacs-lisp
 (use-package rainbow-mode
   :config
-  (setq rainbow-x-colors-major-mode-list '(web-mode python-mode)))
+  (add-to-list 'rainbow-x-colors-major-mode-list 'web-mode)
+  (add-to-list 'rainbow-x-colors-major-mode-list 'python-mode))
 #+END_SRC
 *** CSV
 Major mode for work with CSV files
@@ -1552,7 +1553,9 @@ And even org-babel integration:
       org-image-actual-width 500
       org-export-with-drawers t
       org-export-with-properties t
-      org-use-speed-commands t)
+      org-use-speed-commands t
+      org-enforce-todo-dependencies t
+      org-enforce-todo-checkbox-dependencies t)
 
 (setq org-link-frame-setup
       '((vm . vm-visit-folder-other-frame)
@@ -1578,7 +1581,6 @@ And even org-babel integration:
                                "~/Org/work"
                                "~/Org/mobile")))
 (setq org-directory "~/Org")
-(setq org-enforce-todo-dependencies t)
 (setq org-agenda-restore-windows-after-quit t)
 #+END_SRC
 **** Capture settings
@@ -1650,7 +1652,7 @@ U+2610 ☐ ballot box
 But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
 (setq org-todo-keywords
-      '((sequence "TODO(t)" "PROGRESS(p)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+      '((sequence "TODO(t)" "PROGRESS(p)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c@)")))
 #+END_SRC
 **** Mark task as DONE if all subtasks are DONE
 #+BEGIN_SRC emacs-lisp
@@ -1679,10 +1681,11 @@ But there is no backward compatibility.
 #+END_SRC
 **** Clock settings
 #+BEGIN_SRC emacs-lisp
-(setq org-clock-persist 'history)
+(setq org-clock-persist t)
 (org-clock-persistence-insinuate)
 (setq org-log-into-drawer t)
 (setq org-log-done nil)
+(setq org-log-repeat nil)
 (setq org-clock-out-when-done t)
 (setq org-clock-out-remove-zero-time-clocks t)
 (setq org-clock-report-include-clocking-task t)
@@ -2012,8 +2015,8 @@ But there is no backward compatibility.
 (use-package intero
   :after flycheck
   :config
+  (intero-global-mode)
   (add-hook 'haskell-mode-hook 'company-mode)
-  (add-hook 'haskell-mode-hook 'intero-mode)
   (flycheck-add-next-checker 'intero '(warning . haskell-hlint))
   (custom-set-variables
    '(haskell-stylish-on-save t))
@@ -2022,7 +2025,7 @@ But there is no backward compatibility.
               (set (make-local-variable 'company-backends)
                    (append '((company-capf company-dabbrev-code))
                            company-backends))))
-  ;; (add-hook 'haskell-mode-hook 'turn-on-haskell-unicode-input-method)
+
   (setq haskell-tags-on-save t)
   (setq tags-revert-without-query t)
   (setq haskell-indentation-electric-flag t)
@@ -2075,7 +2078,7 @@ But there is no backward compatibility.
   (global-set-key (kbd "C-c h h") #'hasky-stack-package-action)
   (global-set-key (kbd "C-c h i") #'hasky-stack-new))
 #+END_SRC
-***** Hasklig
+***** Ligatures support
 #+begin_src emacs-lisp
 (use-package hasklig-mode
   :hook (haskell-mode))
@@ -2120,16 +2123,16 @@ But there is no backward compatibility.
 **** Python
 ***** Virtualenv
 #+BEGIN_SRC emacs-lisp
-;; (use-package virtualenvwrapper
-;;   :config
-;;   (venv-initialize-interactive-shells)
-;;   (venv-initialize-eshell))
-(use-package pyvenv)
+(use-package pyvenv
+  ;; Set `pyvenv-workon' to the absolute path for the current venv in a .dir-locals.el
+  :hook (python-mode . pyvenv-mode)
+  ;; (add-hook 'pyvenv-post-activate-hooks 'lsp)
+  )
 #+END_SRC
 ***** Default interpreter
 #+BEGIN_SRC emacs-lisp
-(setq python-shell-interpreter "python"
-      python-shell-interpreter-args "-i")
+(setq python-shell-interpreter "ipython"
+      python-shell-interpreter-args "--simple-prompt -i")
 #+END_SRC
 ***** COMMENT Elpy
 #+BEGIN_SRC emacs-lisp
