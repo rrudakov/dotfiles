@@ -45,6 +45,15 @@ C-p p s s	Projectile ag search
 C-c C-j Switch to term-line-mode, which you can then treat like a normal emacs buffer (move, yank, etc)
 C-c C-k Return to term-char-mode, which will act like a traditional ansi-term
 #+END_SRC
+*** Highlight text in buffer (hi-lock-mode)
+#+begin_src text
+M-s h w         hi-lock-write-interactive-patterns
+M-s h u         unhighlight-regexp
+M-s h r         highlight-regexp
+M-s h p         highlight-phrase
+M-s h l         highlight-lines-matching-regexp
+M-s h f         hi-lock-find-patterns
+#+end_src
 ** Useful commands
 *** Org-mode
 **** Lint document
@@ -962,12 +971,21 @@ Show more offten used completeons first
   (global-set-key (kbd "C-x b") 'helm-mini)
   (global-set-key (kbd "C-x C-f") 'helm-find-files)
 
+  (add-hook 'eshell-mode-hook
+            (lambda ()
+              (eshell-cmpl-initialize)
+              (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
+              (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))
+
+
+
   (set-face-attribute 'helm-source-header nil
                       :box '(:line-width -1 :style released-button))
 
   (set-face-attribute 'helm-minibuffer-prompt nil
                       :background (face-attribute 'header-line :background))
-  (helm-mode 1))
+  (helm-mode 1)
+  (helm-adaptive-mode 1))
 #+END_SRC
 **** Tramp
 #+BEGIN_SRC emacs-lisp
