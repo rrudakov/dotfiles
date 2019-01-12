@@ -54,6 +54,10 @@ M-s h p         highlight-phrase
 M-s h l         highlight-lines-matching-regexp
 M-s h f         hi-lock-find-patterns
 #+end_src
+*** Helm
+#+begin_src text
+C-c i   insert current file path
+#+end_src
 ** Useful commands
 *** Org-mode
 **** Lint document
@@ -502,6 +506,14 @@ No more ugly line splitting
 **** Increase max lines in messages buffer
 #+begin_src emacs-lisp
 (setq message-log-max 5000)
+#+end_src
+**** Fix helm issue
+#+begin_src emacs-lisp
+(setq x-wait-for-event-timeout nil)
+#+end_src
+**** Enable recursive minibuffers
+#+begin_src emacs-lisp
+(setq enable-recursive-minibuffers t)
 #+end_src
 **** Confirm kill emacs
 #+BEGIN_SRC emacs-lisp
@@ -1162,6 +1174,7 @@ Replace for i-search or swiper
 (use-package shackle
   :config
   (setq helm-display-function 'pop-to-buffer)
+  (setq helm-show-completion-display-function 'pop-to-buffer)
   (setq shackle-rules
         '(("\\`\\*helm.*?\\*\\'" :regexp t :align t :size 0.4)
           (compilation-mode :select t :align t :size 0.4)
@@ -1656,9 +1669,9 @@ And even org-babel integration:
 **** Tag list
 #+BEGIN_SRC emacs-lisp
 (setq org-tag-alist '((:startgroup . nil)
-                      ("@critical" . ?C)
-                      ("@medium" . ?M)
-                      ("@low" . ?L)
+                      ("@critical")
+                      ("@medium")
+                      ("@low")
                       (:endgroup . nil)))
 #+END_SRC
 **** Keywords list
