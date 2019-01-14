@@ -1,3 +1,4 @@
+[[ $TERM == "tramp" ]] && unsetopt zle && PS1='$ ' && return
 [[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ ' && return
 HISTSIZE=10000
 SAVEHIST=10000

@@ -15,34 +15,34 @@
 3. Install [[http://projects.haskell.org/xmobar/][xmobar]]:
    1. Clone git repository:
       #+BEGIN_EXAMPLE
-        git clone git://github.com/jaor/xmobar
+      git clone git://github.com/jaor/xmobar
       #+END_EXAMPLE
    2. Modify flags in ~stack.yaml~:
       #+BEGIN_EXAMPLE
-        flags:
-          xmobar:
-            with_threaded: true
-            with_utf8: true
-            with_xft: true
-            with_xpm: true
+      flags:
+        xmobar:
+          with_threaded: true
+          with_utf8: true
+          with_xft: true
+          with_xpm: true
       #+END_EXAMPLE
    3. Run ~stack install~
 4. Add ~$HOME/.local/bin~ to ~PATH~ variable
 5. Make next script and put it in ~/usr/local/bin/xmonad~:
    #+BEGIN_SRC bash
-     #!/bin/bash
-     stack exec $HOME/.local/bin/xmonad -- $@
+   #!/bin/bash
+   stack exec $HOME/.local/bin/xmonad -- $@
    #+END_SRC
    Make sure it executable.
 6. In case of using sddm create ~/usr/share/xsessions/xmonad.desktop~:
 #+BEGIN_EXAMPLE
-  [Desktop Entry]
-  Encoding=UTF-8
-  Type=Application
-  Exec=/usr/local/bin/xmonad
-  TryExec=/usr/local/bin/xmonad
-  DesktopNames=XMonad
-  Name=XMonad
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Exec=/usr/local/bin/xmonad
+TryExec=/usr/local/bin/xmonad
+DesktopNames=XMonad
+Name=XMonad
 #+END_EXAMPLE
 #+BEGIN_EXAMPLE
 [Desktop Entry]

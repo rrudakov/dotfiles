@@ -1,22 +1,22 @@
-* My Emacs configuration
-** Keybindings
-*** Common
+#+TITLE: My Emacs configuration
+* Keybindings
+** Common
 #+BEGIN_SRC text
 M-:	Eval command
 C-x t   Switch to ansi-terminal or create new
 C-x T   Create new ansi-terminal
 #+END_SRC
-*** Python
+** Python
 #+BEGIN_SRC text
 C-c C-r r Refactoring commands
 M-m       Go to begining of line with indentation
 #+END_SRC
-*** Haskell
+** Haskell
 #+BEGIN_SRC text
 M-q	reformats the current declaration. When inside a comment, it fills the current paragraph instead, like the standard M-q
 C-M-\	reformats the current region
 #+END_SRC
-*** Org-mode
+** Org-mode
 #+BEGIN_SRC text
 C-c ^		Sort headlines
 C-c / 		Prompt to make sparce-tree
@@ -29,23 +29,23 @@ C-c +		Sum all numbers in current column
 C-c C-x p	Insert property
 C-c C-x C-d	Display time summaries for each subtree in the current buffer
 #+END_SRC
-**** Agenda view
+*** Agenda view
 #+BEGIN_SRC text
 p	Previous period
 n	Next period
 .	Today
 F	Follow mode
 #+END_SRC
-*** Projectile
+** Projectile
 #+BEGIN_EXAMPLE
 C-p p s s	Projectile ag search
 #+END_EXAMPLE
-*** Terminal
+** Terminal
 #+BEGIN_SRC text
 C-c C-j Switch to term-line-mode, which you can then treat like a normal emacs buffer (move, yank, etc)
 C-c C-k Return to term-char-mode, which will act like a traditional ansi-term
 #+END_SRC
-*** Highlight text in buffer (hi-lock-mode)
+** Highlight text in buffer (hi-lock-mode)
 #+begin_src text
 M-s h w         hi-lock-write-interactive-patterns
 M-s h u         unhighlight-regexp
@@ -54,36 +54,39 @@ M-s h p         highlight-phrase
 M-s h l         highlight-lines-matching-regexp
 M-s h f         hi-lock-find-patterns
 #+end_src
-*** Helm
+** Helm
 #+begin_src text
 C-c i   insert current file path
 #+end_src
-** Useful commands
-*** Org-mode
-**** Lint document
+
+* Useful commands
+** Org-mode
+*** Lint document
 #+BEGIN_SRC text
 org-lint
 #+END_SRC
-*** Magit
+** Magit
 #+BEGIN_SRC text
 magit-blame
 #+END_SRC
-** Syntax help
-*** Org-mode
-**** Unordered lists
+
+* Syntax help
+** Org-mode
+*** Unordered lists
 #+BEGIN_SRC text
 Start with '-', '+' or '*' (star not recommended)
 #+END_SRC
-**** Ordered lists
+*** Ordered lists
 #+BEGIN_SRC text
 Starts with '1.' or '1)'
 #+END_SRC
-**** Description list
+*** Description list
 #+BEGIN_SRC text
 Unordered lists with separator '::'
 #+END_SRC
-** Useful functions
-*** Capitalize first char
+
+* Useful functions
+** Capitalize first char
 #+BEGIN_SRC emacs-lisp
 (defun rr/capitalize-first-char (&optional string)
   "Capitalize only the first character of the input STRING."
@@ -92,7 +95,7 @@ Unordered lists with separator '::'
           (rest-str   (substring string 1)))
       (concat (capitalize first-char) rest-str))))
 #+END_SRC
-*** Remove all whitespaces and newline characters between words
+** Remove all whitespaces and newline characters between words
 #+BEGIN_SRC emacs-lisp
 (defun rr/remove-spaces ()
   "Remove all spaces and newline characters."
@@ -104,7 +107,7 @@ Unordered lists with separator '::'
              (equal "\n" (string (char-after (point)))))
     (delete-char 1)))
 #+END_SRC
-*** Advice for read dir-locals when buffer changed
+** Advice for read dir-locals when buffer changed
 #+BEGIN_SRC emacs-lisp
 (defun rr/update-dir-local ()
   "Update local variables if it is not minibuffer."
@@ -115,13 +118,13 @@ Unordered lists with separator '::'
   "Update local variables after call `select-window' function."
   (rr/update-dir-local))
 #+END_SRC
-*** COMMENT Remove whitespaces before insert newline
+** COMMENT Remove whitespaces before insert newline
 #+BEGIN_SRC emacs-lisp
 (defadvice newline (before rr/remove-spaces activate)
   "Remove trailing whitespace before insert newline."
   (delete-trailing-whitespace))
 #+END_SRC
-*** Replace org-link with description of if empty its address
+** Replace org-link with description of if empty its address
 #+BEGIN_SRC emacs-lisp
 (defun rr/org-replace-link-by-link-description ()
   "Replace an org link by its description or if empty its address."
@@ -135,7 +138,7 @@ Unordered lists with separator '::'
           (apply 'delete-region remove)
           (insert description)))))
 #+END_SRC
-*** Smart toggle flycheck error list window
+** Smart toggle flycheck error list window
 #+BEGIN_SRC emacs-lisp
 (defun rr/flycheck-list-smart-toggle ()
   "Toggle flycheck error list buffer."
@@ -151,7 +154,7 @@ Unordered lists with separator '::'
             (quit-window t window)))
       (flycheck-list-errors))))
 #+END_SRC
-*** Htmlize message body if it composed using org-mode
+** Htmlize message body if it composed using org-mode
 #+BEGIN_SRC emacs-lisp
 (defun rr/htmlize-mail ()
   "Htmlize message before sending."
@@ -160,7 +163,7 @@ Unordered lists with separator '::'
   (mu4e-compose-mode)
   (org-mime-htmlize))
 #+END_SRC
-*** Update vc-state in all buffers
+** Update vc-state in all buffers
 #+BEGIN_SRC emacs-lisp
 (defun rr/refresh-vc-state ()
   "Refresh `vc-state' on all buffers."
@@ -169,7 +172,7 @@ Unordered lists with separator '::'
       (when (vc-mode)
         (vc-refresh-state)))))
 #+END_SRC
-*** Python split string
+** Python split string
 #+BEGIN_SRC emacs-lisp
 (defun rr/python-split-string ()
   "Split python string, insert newline and indent."
@@ -178,41 +181,42 @@ Unordered lists with separator '::'
   (insert-before-markers "\"")
   (backward-char))
 #+END_SRC
-** Configuration
-*** Start emacs server
+
+* Configuration
+** Start emacs server
 #+BEGIN_SRC emacs-lisp
 (server-start)
 #+END_SRC
-*** COMMENT Load my secret tokens
+** COMMENT Load my secret tokens
 #+BEGIN_SRC emacs-lisp
 (require 'mysecret)
 #+END_SRC
-*** Common
+** Common
 :PROPERTIES:
 :VISIBILITY: folded
 :END:
-**** Increase performance
+*** Increase performance
 #+BEGIN_SRC emacs-lisp
 (setq gnutls-min-prime-bits 4096)
 #+END_SRC
-**** Highlight matching parens
+*** Highlight matching parens
 #+BEGIN_SRC emacs-lisp
 (show-paren-mode nil)
 (setq show-paren-style 'parenthesis)
 #+END_SRC
-**** Do not indicate empty lines at the end of the window in the left fringe
+*** Do not indicate empty lines at the end of the window in the left fringe
 #+BEGIN_SRC emacs-lisp
 (set-default 'indicate-empty-lines nil)
 #+END_SRC
-**** Enable y/n answers instead of yes/no
+*** Enable y/n answers instead of yes/no
 #+BEGIN_SRC emacs-lisp
 (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
-**** Highlight current line
+*** Highlight current line
 #+BEGIN_SRC emacs-lisp
 (global-hl-line-mode 1)
 #+END_SRC
-**** Set default font
+*** Set default font
 Good choices:
 + [[https://slackbuilds.org/repository/14.2/system/Iosevka/][Iosevka]]
 + [[https://github.com/mozilla/Fira][Fira Mono]]
@@ -238,15 +242,15 @@ Good choices:
      )
    font-sets))
 #+END_SRC
-**** Open files ends with "rc" in conf-unix-mode
+*** Open files ends with "rc" in conf-unix-mode
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
 #+END_SRC
-**** Set specific browser to open links
+*** Set specific browser to open links
 #+BEGIN_SRC emacs-lisp
 (setq browse-url-browser-function 'browse-url-firefox)
 #+END_SRC
-**** Use UTF-8 as default coding system
+*** Use UTF-8 as default coding system
 #+BEGIN_SRC emacs-lisp
 (when (fboundp 'set-charset-priority)
   (set-charset-priority 'unicode))
@@ -257,7 +261,7 @@ Good choices:
 (setq locale-coding-system   'utf-8)
 (setq-default buffer-file-coding-system 'utf-8)
 #+END_SRC
-**** Some useful settings
+*** Some useful settings
 #+BEGIN_SRC emacs-lisp
 (setq-default
  ad-redefinition-action 'accept   ; silence advised function warnings
@@ -311,7 +315,7 @@ Good choices:
 
 (setq save-interprogmam-kill-before-paste t)
 #+END_SRC
-**** Be quiet at startup
+*** Be quiet at startup
 #+BEGIN_SRC emacs-lisp
 (advice-add #'display-startup-echo-area-message :override #'ignore)
 (setq inhibit-startup-message t
@@ -319,7 +323,7 @@ Good choices:
       initial-major-mode 'fundamental-mode
       initial-scratch-message nil)
 #+END_SRC
-**** More reliable inter-window border
+*** More reliable inter-window border
 The native border "consumes" a pixel of the fringe on righter-most splits,
 'window-divider' does not. Available since Emacs 25.1.
 #+BEGIN_SRC emacs-lisp
@@ -328,20 +332,20 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
               window-divider-default-right-width 1)
 (window-divider-mode +1)
 #+END_SRC
-**** Relegate tooltips to echo area only
+*** Relegate tooltips to echo area only
 #+BEGIN_SRC emacs-lisp
 (tooltip-mode -1)
 #+END_SRC
-**** Disable menu bar
+*** Disable menu bar
 #+BEGIN_SRC emacs-lisp
 (menu-bar-mode -1)
 #+END_SRC
-**** Disable toolbar
+*** Disable toolbar
 #+BEGIN_SRC emacs-lisp
 (when (fboundp 'tool-bar-mode)
   (tool-bar-mode -1))
 #+END_SRC
-**** Graphic mode settings
+*** Graphic mode settings
 #+BEGIN_SRC emacs-lisp
 (defvar my-ui-fringe-size '4 "Default fringe width.")
 
@@ -355,7 +359,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   ;; (push (cons 'right-fringe my-ui-fringe-size) default-frame-alist)
   )
 #+END_SRC
-**** Settings for tramp-mode
+*** Settings for tramp-mode
 #+BEGIN_SRC emacs-lisp
 (require 'tramp)
 
@@ -378,41 +382,37 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 ;;             (when (tramp-tramp-file-p (buffer-file-name))
 ;;               (flycheck-mode))))
 #+END_SRC
-**** Set default input method
+*** Set default input method
 #+BEGIN_SRC emacs-lisp
 (setq default-input-method "russian-computer")
 #+END_SRC
-**** Replace selected text on input
+*** Replace selected text on input
 #+BEGIN_SRC emacs-lisp
 (delete-selection-mode)
 #+END_SRC
-**** Disabled commands
+*** Disabled commands
 #+BEGIN_SRC emacs-lisp
 (setq disabled-command-function nil)
 #+END_SRC
-**** EPA
+*** EPA
 #+BEGIN_SRC emacs-lisp
 (setq epa-pinentry-mode 'loopback)
 #+END_SRC
-**** COMMENT Prettify symbols
-#+BEGIN_SRC emacs-lisp
-(global-prettify-symbols-mode)
-#+END_SRC
-**** Default mode
+*** Default mode
 #+BEGIN_SRC emacs-lisp
 (setq-default major-mode 'text-mode)
 #+END_SRC
-**** Fill column
+*** Fill column
 #+BEGIN_SRC emacs-lisp
 (setq-default fill-column 79)
 (add-hook 'text-mode-hook 'auto-fill-mode)
 #+END_SRC
-**** Auto revert changes
+*** Auto revert changes
 #+BEGIN_SRC emacs-lisp
 (global-auto-revert-mode 1)
 (setq auto-revert-verbose nil)
 #+END_SRC
-**** Ibuffer
+*** Ibuffer
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (setq ibuffer-saved-filter-groups
@@ -439,43 +439,43 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 ;; Don't ask for confirmation to delete marked buffers
 (setq ibuffer-expert t)
 #+END_SRC
-**** Use package default settings
+*** Use package default settings
 #+BEGIN_SRC emacs-lisp
 (setq-default use-package-always-ensure t)
 #+END_SRC
-**** Recent files
+*** Recent files
 #+BEGIN_SRC emacs-lisp
 (require 'recentf)
 (setq recentf-max-saved-items 200
       recentf-max-menu-items 15)
 (recentf-mode)
 #+END_SRC
-**** Imenu
+*** Imenu
 #+BEGIN_SRC emacs-lisp
 (setq imenu-auto-rescan t)
 #+END_SRC
-**** Single line horizontal scrolling
+*** Single line horizontal scrolling
 #+BEGIN_SRC emacs-lisp
 (setq auto-hscroll-mode t)
 #+END_SRC
-**** Show trailing whitespace
+*** Show trailing whitespace
 #+BEGIN_SRC emacs-lisp
 (add-hook 'prog-mode-hook
           (lambda ()
             (interactive)
             (setq show-trailing-whitespace 1)))
 #+END_SRC
-**** Set minimal height of window
+*** Set minimal height of window
 #+BEGIN_SRC emacs-lisp
 (setq window-min-height 10)
 #+END_SRC
-**** Ediff settings
+*** Ediff settings
 #+BEGIN_SRC emacs-lisp
 (setq ediff-window-setup-function 'ediff-setup-windows-plain
       ediff-split-window-function 'split-window-horizontally)
 #+END_SRC
-**** Ansi colors
-***** Compilation buffer
+*** Ansi colors
+**** Compilation buffer
 #+BEGIN_SRC emacs-lisp
 (require 'ansi-color)
 (defun colorize-compilation-buffer ()
@@ -485,48 +485,48 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 #+END_SRC
-***** Shell
+**** Shell
 #+BEGIN_SRC emacs-lisp
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 #+END_SRC
-**** Kill compilation window when quit
+*** Kill compilation window when quit
 #+BEGIN_SRC emacs-lisp
 (add-hook 'compilation-mode-hook
           (lambda () (local-set-key (kbd "q") 'kill-buffer-and-window)))
 #+END_SRC
-**** Unclassified settings
+*** Unclassified settings
 No more ugly line splitting
 #+BEGIN_SRC emacs-lisp
 (setq-default truncate-lines t)
 #+END_SRC
-**** Save minibuffer history between sessions
+*** Save minibuffer history between sessions
 #+BEGIN_SRC emacs-lisp
 (savehist-mode t)
 #+END_SRC
-**** Increase max lines in messages buffer
+*** Increase max lines in messages buffer
 #+begin_src emacs-lisp
 (setq message-log-max 5000)
 #+end_src
-**** Fix helm issue
+*** Fix helm issue
 #+begin_src emacs-lisp
 (setq x-wait-for-event-timeout nil)
 #+end_src
-**** Enable recursive minibuffers
+*** Enable recursive minibuffers
 #+begin_src emacs-lisp
 (setq enable-recursive-minibuffers t)
 #+end_src
-**** Confirm kill emacs
+*** Confirm kill emacs
 #+BEGIN_SRC emacs-lisp
 (setq confirm-kill-emacs 'y-or-n-p)
 #+END_SRC
-*** Theme
-**** Color scheme
+** Theme
+*** Color scheme
 #+BEGIN_SRC emacs-lisp
 (use-package gruvbox-theme
   :config
   (load-theme 'gruvbox-dark-soft t))
 #+END_SRC
-**** Highlight symbol at point
+*** Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
 (use-package highlight-symbol
   :config
@@ -546,9 +546,9 @@ No more ugly line splitting
   (global-set-key (kbd "M-n") 'highlight-symbol-next)
   (global-set-key (kbd "M-p") 'highlight-symbol-prev))
 #+END_SRC
-**** Modeline
-***** Custom functions
-****** Git status
+*** Modeline
+**** Custom functions
+***** Git status
 #+BEGIN_SRC emacs-lisp
 (defun rr/modeline-git-vc ()
   "Show GIT status."
@@ -585,7 +585,7 @@ No more ugly line splitting
         (`ignored " Ign")
         (_ " Unk")))))
 #+END_SRC
-****** SVN status
+***** SVN status
 #+BEGIN_SRC emacs-lisp
 (defun rr/modeline-svn-vc ()
   "Show SVN status."
@@ -594,7 +594,7 @@ No more ugly line splitting
      (propertize " " 'face `(:height 1.2) 'display '(raise -0.1))
      (propertize (format " · %s" revision) 'face `(:height 0.9)))))
 #+END_SRC
-****** Flycheck status
+***** Flycheck status
 #+BEGIN_SRC emacs-lisp
 (defun rr/flycheck-errors-text ()
   "Text for modeline with flycheck errors counter."
@@ -674,8 +674,8 @@ No more ugly line splitting
             (`suspicious ""))))
     (propertize text)))
 #+END_SRC
-***** Spaceline
-****** Custom configuration
+**** Spaceline
+***** Custom configuration
 #+BEGIN_SRC emacs-lisp
 (use-package spaceline
   :config
@@ -770,7 +770,7 @@ No more ugly line splitting
          :fallback evil-state
          :face highlight-face
          :priority 100
-         :separator "|")
+         :separator " ")
         (anzu :priority 4)
         auto-compile
         ((buffer-id remote-host)
@@ -805,7 +805,7 @@ No more ugly line splitting
                       :foreground "#b8bb26"
                       :distant-foreground "#d3869b"))
 #+END_SRC
-**** COMMENT Highlight indentation
+*** COMMENT Highlight indentation
 Good, but has performance problems
 #+BEGIN_SRC emacs-lisp
 (use-package highlight-indent-guides
@@ -814,50 +814,50 @@ Good, but has performance problems
   (setq highlight-indent-guides-method 'character
         highlight-indent-guides-character ?\x258F))
 #+END_SRC
-*** Smooth scrolling
+** Smooth scrolling
 #+BEGIN_SRC emacs-lisp
 (setq scroll-conservatively 20
       scroll-margin 10
       scroll-preserve-screen-position t)
 #+END_SRC
-*** SQL
-**** COMMENT Emacs database interface
+** SQL
+*** COMMENT Emacs database interface
 #+BEGIN_SRC emacs-lisp
 (use-package edbi)
 (use-package company-edbi)
 #+END_SRC
-**** Make PostgreSQL default
+*** Make PostgreSQL default
 #+BEGIN_SRC emacs-lisp
 (eval-after-load "sql"
   '(progn
      (sql-set-product 'postgres)))
 #+END_SRC
-**** Indentation
+*** Indentation
 #+BEGIN_SRC emacs-lisp
 (use-package sql-indent
   :config
   (eval-after-load "sql"
     '(load-library "sql-indent")))
 #+END_SRC
-**** Disable line breaking
+*** Disable line breaking
 #+BEGIN_SRC emacs-lisp
 (add-hook 'sql-interactive-mode-hook
           (lambda ()
             (toggle-truncate-lines t)))
 #+END_SRC
-**** Auto format SQL
+*** Auto format SQL
 #+BEGIN_SRC emacs-lisp
 (use-package sqlformat
   :config
   (add-hook 'sql-mode-hook 'sqlformat-mode))
 #+END_SRC
-*** Which key
+** Which key
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
   :config
   (which-key-mode))
 #+END_SRC
-*** Replace built-in help
+** Replace built-in help
 #+BEGIN_SRC emacs-lisp
 (use-package helpful
   :config
@@ -866,7 +866,7 @@ Good, but has performance problems
   (global-set-key (kbd "C-h v") #'helpful-variable)
   (global-set-key (kbd "C-h k") #'helpful-key))
 #+END_SRC
-*** COMMENT Undo tree
+** COMMENT Undo tree
 #+BEGIN_SRC emacs-lisp
 (use-package undo-tree
   :config
@@ -880,7 +880,7 @@ Good, but has performance problems
                                               (undo-tree-visualizer-selection-mode)))
   (global-undo-tree-mode 1))
 #+END_SRC
-*** YASnippet
+** YASnippet
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
   :config
@@ -888,8 +888,8 @@ Good, but has performance problems
   (setq yas-indent-line 'fixed)
   (add-hook 'prog-mode-hook #'yas-minor-mode))
 #+END_SRC
-*** Autocomplete
-**** Common
+** Autocomplete
+*** Common
 #+BEGIN_SRC emacs-lisp
 (use-package company
   :config
@@ -904,27 +904,27 @@ Good, but has performance problems
   (add-to-list 'company-backends 'company-files)
   (add-to-list 'company-backends 'company-elisp))
 #+END_SRC
-**** COMMENT Statistic
+*** COMMENT Statistic
 Show more offten used completeons first
 #+BEGIN_SRC emacs-lisp
 (use-package company-statistics
   :config
   (company-statistics-mode))
 #+END_SRC
-**** Quick help
+*** Quick help
 #+BEGIN_SRC emacs-lisp
 (use-package company-quickhelp
   :config
   (company-quickhelp-mode 1))
 #+END_SRC
-**** Languages
-***** LaTeX
+*** Languages
+**** LaTeX
 #+BEGIN_SRC emacs-lisp
 (use-package company-auctex
   :config
   (company-auctex-init))
 #+END_SRC
-***** WEB
+**** WEB
 #+BEGIN_SRC emacs-lisp
 (use-package company-web
   :config
@@ -932,13 +932,13 @@ Show more offten used completeons first
   (add-to-list 'company-backends 'company-web-jade)
   (add-to-list 'company-backends 'company-web-slim))
 #+END_SRC
-***** Shell
+**** Shell
 #+BEGIN_SRC emacs-lisp
 (use-package company-shell
   :config
   (add-to-list 'company-backends 'company-shell))
 #+END_SRC
-***** JavaScript
+**** JavaScript
 #+BEGIN_SRC emacs-lisp
 (use-package company-tern
   :after tern
@@ -946,7 +946,7 @@ Show more offten used completeons first
   (add-to-list 'company-backends 'company-tern)
   (setq company-tooltip-align-annotations t))
 #+END_SRC
-*** Paradox
+** Paradox
 #+BEGIN_SRC emacs-lisp
 (use-package paradox
   :config
@@ -956,8 +956,8 @@ Show more offten used completeons first
    paradox-execute-asynchronously t
    paradox-hide-wiki-packages t))
 #+END_SRC
-*** Helm
-**** Config
+** Helm
+*** Config
 #+BEGIN_SRC emacs-lisp
 (use-package helm
   :config
@@ -999,13 +999,13 @@ Show more offten used completeons first
   (helm-mode 1)
   (helm-adaptive-mode 1))
 #+END_SRC
-**** Tramp
+*** Tramp
 #+BEGIN_SRC emacs-lisp
 (use-package helm-tramp
   :config
   (define-key global-map (kbd "C-c s") 'helm-tramp))
 #+END_SRC
-**** Swoop
+*** Swoop
 Replace for i-search or swiper
 #+BEGIN_SRC emacs-lisp
 (use-package helm-swoop
@@ -1052,7 +1052,7 @@ Replace for i-search or swiper
   (setq helm-swoop-pre-input-function
         (lambda () "")))
 #+END_SRC
-**** Helm flx
+*** Helm flx
 #+BEGIN_SRC emacs-lisp
 (use-package helm-flx
   :after helm
@@ -1061,14 +1061,14 @@ Replace for i-search or swiper
   (setq helm-flx-for-helm-find-files t
       helm-flx-for-helm-locate t))
 #+END_SRC
-**** Google search using helm
+*** Google search using helm
 #+BEGIN_SRC emacs-lisp
 (use-package helm-google
   :config
   (setq helm-google-default-engine 'searx)
   (global-set-key (kbd "C-h C--") 'helm-google))
 #+END_SRC
-**** Helm flycheck
+*** Helm flycheck
 #+BEGIN_SRC emacs-lisp
 (use-package helm-flycheck
   :after flycheck
@@ -1076,12 +1076,12 @@ Replace for i-search or swiper
   (eval-after-load 'flycheck
     '(define-key flycheck-mode-map (kbd "C-c ! h") 'helm-flycheck)))
 #+END_SRC
-**** Helm org rifle
+*** Helm org rifle
 #+begin_src emacs-lisp
 (use-package helm-org-rifle
   :bind (("C-x c o" . helm-org-rifle-agenda-files)))
 #+end_src
-*** Smartparens
+** Smartparens
 #+BEGIN_SRC emacs-lisp
 (use-package smartparens-config
   :ensure smartparens
@@ -1098,14 +1098,14 @@ Replace for i-search or swiper
   :bind
   ("M-]" . 'sp-unwrap-sexp))
 #+END_SRC
-*** Workspaces
+** Workspaces
 #+BEGIN_SRC emacs-lisp
 (use-package eyebrowse
   :config
   (eyebrowse-mode t))
 #+END_SRC
-*** Popup windows settings
-**** COMMENT Purpose
+** Popup windows settings
+*** COMMENT Purpose
 #+BEGIN_SRC emacs-lisp
 (use-package window-purpose
   :config
@@ -1169,7 +1169,7 @@ Replace for i-search or swiper
 
   (purpose-compile-user-configuration))
 #+END_SRC
-**** Shackle
+*** Shackle
 #+BEGIN_SRC emacs-lisp
 (use-package shackle
   :config
@@ -1192,26 +1192,26 @@ Replace for i-search or swiper
           (inferior-python-mode :select t :align t :size 0.4)))
   (shackle-mode))
 #+END_SRC
-*** Rainbow delimiters
+** Rainbow delimiters
 #+BEGIN_SRC emacs-lisp
 (use-package rainbow-delimiters
   :config
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 #+END_SRC
-*** Anzu
+** Anzu
 #+BEGIN_SRC emacs-lisp
 (use-package anzu
   :config
   (global-anzu-mode +1)
   (setq anzu-cons-mode-line-p nil))
 #+END_SRC
-*** Windows navigation
+** Windows navigation
 #+BEGIN_SRC emacs-lisp
 (use-package ace-window
   :config
   (global-set-key (kbd "M-o") 'ace-window))
 #+END_SRC
-*** Dired
+** Dired
 #+BEGIN_SRC emacs-lisp
 (use-package dired+
   :config
@@ -1226,8 +1226,8 @@ Replace for i-search or swiper
 ;; automatically refresh dired buffer on changes
 (add-hook 'dired-mode-hook 'auto-revert-mode)
 #+END_SRC
-*** Projectile
-**** Basic setup
+** Projectile
+*** Basic setup
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
   :init
@@ -1238,21 +1238,21 @@ Replace for i-search or swiper
   (setq projectile-mode-line '(:eval (format " [%s]" (projectile-project-name))))
   (projectile-mode +1))
 #+END_SRC
-**** Helm projectile
+*** Helm projectile
 #+BEGIN_SRC emacs-lisp
 (use-package helm-projectile
   :config
   (helm-projectile-on)
   (setq projectile-switch-project-action 'helm-projectile))
 #+END_SRC
-*** Htmlize
+** Htmlize
 #+BEGIN_SRC emacs-lisp
 (use-package htmlize
   :config
   (setq org-html-htmlize-output-type 'inline-css))
 #+END_SRC
-*** Syntax check
-**** Flycheck
+** Syntax check
+*** Flycheck
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
   :config
@@ -1312,7 +1312,7 @@ Replace for i-search or swiper
                 (append flycheck-disabled-checkers
                         '(python-flake8))))
 #+END_SRC
-**** Show errors in posframe
+*** Show errors in posframe
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck-posframe
   :after flycheck
@@ -1327,14 +1327,14 @@ Replace for i-search or swiper
                                     (unless (bound-and-true-p lsp-mode)
                                       (flycheck-posframe-mode)))))
 #+END_SRC
-*** Highlight TODO item
+** Highlight TODO item
 #+begin_src emacs-lisp
 (use-package hl-todo
   :config
   (global-hl-todo-mode))
 #+end_src
-*** Version control
-**** GIT
+** Version control
+*** GIT
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :config
@@ -1355,7 +1355,7 @@ Replace for i-search or swiper
     (add-hook 'focus-in-hook 'rr/refresh-vc-state)
     (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state))
 #+END_SRC
-**** Work with forges
+*** Work with forges
 #+BEGIN_SRC emacs-lisp
 (use-package forge
   :config
@@ -1366,7 +1366,7 @@ Replace for i-search or swiper
                '("178.62.208.194" "178.62.208.194/api/v4"
                  "178.62.208.194" forge-gitlab-repository)))
 #+END_SRC
-**** COMMENT Highlight diff
+*** COMMENT Highlight diff
 #+BEGIN_SRC emacs-lisp
 (use-package diff-hl
   :init
@@ -1377,7 +1377,7 @@ Replace for i-search or swiper
   (add-hook 'after-save-hook 'diff-hl-update)
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
 #+END_SRC
-**** GIT gutter
+*** GIT gutter
 #+BEGIN_SRC emacs-lisp
 (use-package git-gutter-fringe
   :config
@@ -1420,13 +1420,13 @@ Replace for i-search or swiper
     ".XXXXXXX"
     "XXXXXXXX"))
 #+END_SRC
-**** Show TODO items in magit buffer
+*** Show TODO items in magit buffer
 #+begin_src emacs-lisp
 (use-package magit-todos
   :config
   (add-hook 'prog-mode-hook 'magit-todos-mode))
 #+end_src
-*** Multiple cursors
+** Multiple cursors
 #+BEGIN_SRC emacs-lisp
 (use-package multiple-cursors
   :config
@@ -1436,13 +1436,13 @@ Replace for i-search or swiper
   (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
   (global-set-key (kbd "C-c d") 'mc/skip-to-next-like-this))
 #+END_SRC
-*** Expand region
+** Expand region
 #+BEGIN_SRC emacs-lisp
 (use-package expand-region
   :config
   (global-set-key (kbd "C-=") 'er/expand-region))
 #+END_SRC
-*** Search and grep utilities
+** Search and grep utilities
 #+BEGIN_SRC emacs-lisp
 (use-package wgrep
   :config
@@ -1453,7 +1453,7 @@ Replace for i-search or swiper
 (use-package ag
   :after wgrep-ag)
 #+END_SRC
-*** Terminal emulator
+** Terminal emulator
 #+BEGIN_SRC emacs-lisp
 (use-package sane-term
   :config
@@ -1472,7 +1472,7 @@ Replace for i-search or swiper
          (term-char-mode)))))
   (add-hook 'term-mode-hook (lambda () (setq-local global-hl-line-mode nil))))
 #+END_SRC
-*** Rainbow mode
+** Rainbow mode
 #+BEGIN_QUOTE
 Colorize color names in buffers
 #+END_QUOTE
@@ -1482,28 +1482,21 @@ Colorize color names in buffers
   (add-to-list 'rainbow-x-colors-major-mode-list 'web-mode)
   (add-to-list 'rainbow-x-colors-major-mode-list 'python-mode))
 #+END_SRC
-*** CSV
+** CSV
 Major mode for work with CSV files
 #+BEGIN_SRC emacs-lisp
 (use-package csv-mode)
 #+END_SRC
-*** Log files
+** Log files
 #+BEGIN_SRC emacs-lisp
 (use-package vlf)
-
 (use-package logview)
-;; (use-package log4j-mode
-;;   :disabled t
-;;   :init
-;;   (add-hook #'log4j-mode-hook #'view-mode)
-;;   (add-hook #'log4j-mode-hook #'read-only-mode)
-;;   (add-hook #'log4j-mode-hook 'eos/turn-on-hl-line))
 #+END_SRC
-*** Nginx
+** Nginx
 #+BEGIN_SRC emacs-lisp
 (use-package nginx-mode)
 #+END_SRC
-*** REST client
+** REST client
 Quite interesting package. I think it will be replace for Postman for me.
 #+BEGIN_SRC emacs-lisp
 (use-package restclient)
@@ -1522,37 +1515,35 @@ And even org-babel integration:
    'org-babel-load-languages
    '((restclient . t))))
 #+END_SRC
-*** PDF tools
+** PDF tools
 #+BEGIN_SRC emacs-lisp
 (use-package pdf-tools
   :config
   (pdf-tools-install))
 #+END_SRC
-*** Gitignore templates
+** Gitignore templates
 #+BEGIN_SRC emacs-lisp
 (use-package gitignore-templates)
 #+END_SRC
-*** Volatile highlight
+** Volatile highlight
 #+BEGIN_SRC emacs-lisp
 (use-package volatile-highlights
   :config
   (volatile-highlights-mode t))
 #+END_SRC
-*** Highlight numbers
+** Highlight numbers
 #+BEGIN_SRC emacs-lisp
 (use-package highlight-numbers
   :config
   (add-hook 'prog-mode-hook 'highlight-numbers-mode))
 #+END_SRC
-*** Regexps
+** Regexps
 #+BEGIN_SRC emacs-lisp
 (use-package re-builder
-  :bind (("C-c R" . re-builder))
-  :config
-  (setq reb-re-syntax 'string))
+  :bind (("C-c R" . re-builder)))
 #+END_SRC
-*** Org
-**** Some tweaks
+** Org
+*** Some tweaks
 #+BEGIN_SRC emacs-lisp
 (add-hook 'org-mode-hook 'turn-on-font-lock)
 (add-hook 'org-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
@@ -1603,12 +1594,12 @@ And even org-babel integration:
 (add-hook 'mail-mode-hook 'turn-on-orgstruct)
 (add-to-list 'flycheck-checkers 'org-lint)
 #+END_SRC
-**** Effort estimates
+*** Effort estimates
 #+BEGIN_SRC emacs-lisp
 (setq org-global-properties '(("Effort_ALL" . "0 0:30 1:00 2:00 4:00 6:00 8:00 16:00")))
 (setq org-columns-default-format "%40ITEM(Task) %17Effort(Estimated Effort){:} %CLOCKSUM")
 #+END_SRC
-**** Agenda settings
+*** Agenda settings
 #+BEGIN_SRC emacs-lisp
 (setq org-agenda-files (quote ("~/Org/"
                                "~/Org/work"
@@ -1616,7 +1607,7 @@ And even org-babel integration:
 (setq org-directory "~/Org")
 (setq org-agenda-restore-windows-after-quit t)
 #+END_SRC
-**** Capture settings
+*** Capture settings
 #+BEGIN_SRC emacs-lisp
 (setq org-default-notes-file (concat org-directory "/notes.org"))
 
@@ -1666,7 +1657,7 @@ And even org-babel integration:
   (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
     (org-capture)))
 #+END_SRC
-**** Tag list
+*** Tag list
 #+BEGIN_SRC emacs-lisp
 (setq org-tag-alist '((:startgroup . nil)
                       ("@critical")
@@ -1674,7 +1665,7 @@ And even org-babel integration:
                       ("@low")
                       (:endgroup . nil)))
 #+END_SRC
-**** Keywords list
+*** Keywords list
 Maybe it's a good idea to use unicode symbols for TODO keywords:
 #+BEGIN_EXAMPLE
 U+2714 ✔ heavy check mark
@@ -1687,7 +1678,7 @@ But there is no backward compatibility.
 (setq org-todo-keywords
       '((sequence "TODO(t)" "PROGRESS(p)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c@)")))
 #+END_SRC
-**** Mark task as DONE if all subtasks are DONE
+*** Mark task as DONE if all subtasks are DONE
 #+BEGIN_SRC emacs-lisp
 (defun org-summary-todo (n-done n-not-done)
   "Switch entry to DONE when all subentries are done, to TODO otherwise."
@@ -1696,14 +1687,14 @@ But there is no backward compatibility.
 
 (add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
 #+END_SRC
-**** Custom keywords faces
+*** Custom keywords faces
 #+BEGIN_SRC emacs-lisp
 (setq org-todo-keyword-faces
       '(("PROGRESS" . (:foreground "#458588" :weight bold))
         ("WAITING" . (:foreground "#d65d0e" :weight bold))
         ("CANCELLED" . (:foreground "#a89984" :weight bold))))
 #+END_SRC
-**** Handle local file links by extension
+*** Handle local file links by extension
 #+BEGIN_SRC emacs-lisp
 (setq org-file-apps
       '((auto-mode . emacs)
@@ -1712,7 +1703,7 @@ But there is no backward compatibility.
         ("\\.mm\\'" . default)
         ("\\.pdf\\'" . default)))
 #+END_SRC
-**** Clock settings
+*** Clock settings
 #+BEGIN_SRC emacs-lisp
 (setq org-clock-persist t)
 (org-clock-persistence-insinuate)
@@ -1742,8 +1733,8 @@ But there is no backward compatibility.
 
 (setq org-clock-out-switch-to-state 'rr/after-clock-stop)
 #+END_SRC
-**** Appearance
-***** Org bullets
+*** Appearance
+**** Org bullets
 #+BEGIN_SRC emacs-lisp
 (use-package org-bullets
   :init
@@ -1752,7 +1743,7 @@ But there is no backward compatibility.
   :config
   (add-hook 'org-mode-hook #'org-bullets-mode))
 #+END_SRC
-***** Org source code
+**** Org source code
 #+BEGIN_SRC emacs-lisp
 (setq org-src-fontify-natively t)
 
@@ -1761,28 +1752,28 @@ But there is no backward compatibility.
                     (color-darken-name
                      (face-attribute 'default :background) 2))
 #+END_SRC
-**** Alerts
+*** Alerts
 #+BEGIN_SRC emacs-lisp
 (use-package org-alert
   :config
   (setq org-alert-enable t)
   (setq alert-default-style 'libnotify))
 #+END_SRC
-**** Markdown export
+*** Markdown export
 #+BEGIN_SRC emacs-lisp
 (require 'ox-md nil t)
 (eval-after-load "org"
   '(require 'ox-gfm nil t))
 #+END_SRC
-**** Confluence export
+*** Confluence export
 #+BEGIN_SRC emacs-lisp
 (require 'ox-confluence)
 #+END_SRC
-**** Slack export
+*** Slack export
 #+BEGIN_SRC emacs-lisp
 (use-package ox-slack)
 #+END_SRC
-**** Org-mime
+*** Org-mime
 #+BEGIN_SRC emacs-lisp
 (use-package org-mime
   :config
@@ -1808,7 +1799,7 @@ But there is no backward compatibility.
   (setq org-mime-export-options
         '(:section-numbers nil :with-author nil :with-toc nil)))
 #+END_SRC
-**** LaTeX export
+*** LaTeX export
 #+BEGIN_SRC emacs-lisp
 (require 'ox-latex)
 (setq org-latex-inputenc-alist '(("utf8" . "utf8x")))
@@ -1845,7 +1836,7 @@ But there is no backward compatibility.
                ("\\paragraph{%s}" . "\\paragraph*{%s}")
                ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 #+END_SRC
-**** Evaluate source code
+*** Evaluate source code
 #+BEGIN_SRC emacs-lisp
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -1860,23 +1851,23 @@ But there is no backward compatibility.
 
 (use-package ob-async)
 #+END_SRC
-**** Manage passwords using org-mode
+*** Manage passwords using org-mode
 #+BEGIN_SRC emacs-lisp
 (use-package org-password-manager
   :config
   (add-hook 'org-mode-hook 'org-password-manager-key-bindings))
 #+END_SRC
-**** Google calendar sync
+*** Google calendar sync
 #+BEGIN_SRC emacs-lisp
 (use-package org-gcal)
 #+END_SRC
-**** JIRA integration for Org-mode
+*** JIRA integration for Org-mode
 #+BEGIN_SRC emacs-lisp
 (use-package org-jira
   :config
   (setq jiralib-url "https://jira.eoadm.com"))
 #+END_SRC
-**** Add org headings to recent
+*** Add org headings to recent
 #+begin_src emacs-lisp
 (use-package org-recent-headings
   :config
@@ -1888,12 +1879,12 @@ But there is no backward compatibility.
                                     helm-source-buffer-not-found))
   (org-recent-headings-mode))
 #+end_src
-**** Edit program comments and strings using Org-mode
+*** Edit program comments and strings using Org-mode
 #+begin_src emacs-lisp
 (use-package poporg)
 #+end_src
-*** Email
-**** Sending email
+** Email
+*** Sending email
 #+BEGIN_SRC emacs-lisp
 (require 'smtpmail)
 
@@ -1966,7 +1957,7 @@ But there is no backward compatibility.
   (define-key mu4e-headers-mode-map "s" 'helm-mu)
   (define-key mu4e-view-mode-map "s" 'helm-mu))
 #+END_SRC
-**** Alerts
+*** Alerts
 #+BEGIN_SRC emacs-lisp
 (use-package mu4e-alert
   :config
@@ -1974,15 +1965,15 @@ But there is no backward compatibility.
   (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
   (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
 #+END_SRC
-*** COMMENT Activity watch
+** COMMENT Activity watch
 #+BEGIN_SRC emacs-lisp
 (use-package activity-watch-mode
   :config
   (global-activity-watch-mode))
 #+END_SRC
-*** Languages
-**** LSP mode
-***** Common setup
+** Languages
+*** LSP mode
+**** Common setup
 #+BEGIN_SRC emacs-lisp
 (use-package lsp-mode
   :config
@@ -2002,15 +1993,15 @@ But there is no backward compatibility.
         lsp-ui-sideline-ignore-duplicate t
         lsp-ui-flycheck-list-position 'right))
 #+END_SRC
-***** Completion
+**** Completion
 #+BEGIN_SRC emacs-lisp
 (use-package company-lsp
   :config
   (push 'company-lsp company-backends)
   (setq company-lsp-enable-snippet t))
 #+END_SRC
-**** Java
-***** lsp-mode setup
+*** Java
+**** lsp-mode setup
 #+BEGIN_SRC emacs-lisp
 (require 'cc-mode)
 
@@ -2027,7 +2018,7 @@ But there is no backward compatibility.
 (add-hook 'java-mode-hook (lambda ()
                             (setq c-basic-offset 2)))
 #+END_SRC
-***** Expand snippet for new class
+**** Expand snippet for new class
 #+BEGIN_SRC emacs-lisp
 (setq auto-insert-query nil)
 (setq auto-insert-directory (expand-file-name "templates/" user-emacs-directory))
@@ -2041,8 +2032,8 @@ But there is no backward compatibility.
                                    (point-min)
                                    (point-max)))]))
 #+END_SRC
-**** Haskell
-***** Intero
+*** Haskell
+**** Intero
 #+BEGIN_SRC emacs-lisp
 (use-package intero
   :after flycheck
@@ -2063,7 +2054,7 @@ But there is no backward compatibility.
   (setq haskell-indentation-electric-flag t)
   (add-hook 'haskell-mode-hook 'haskell-auto-insert-module-template))
 #+END_SRC
-***** Align rules
+**** Align rules
 #+BEGIN_SRC emacs-lisp
 (add-hook 'align-load-hook
           (lambda ()
@@ -2092,17 +2083,17 @@ But there is no backward compatibility.
                            (regexp . "\\(\\s-+\\)\\(<-\\|←\\)\\s-+")
                            (modes quote (haskell-mode literate-haskell-mode))))))
 #+END_SRC
-***** Haskell doc mode
+**** Haskell doc mode
 #+BEGIN_SRC emacs-lisp
 (add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
 #+END_SRC
-***** Indentation
+**** Indentation
 #+BEGIN_SRC emacs-lisp
 (use-package hindent
   :config
   (add-hook 'haskell-mode-hook #'hindent-mode))
 #+END_SRC
-***** Stack interface
+**** Stack interface
 #+BEGIN_SRC emacs-lisp
 (use-package hasky-stack
   :config
@@ -2110,13 +2101,13 @@ But there is no backward compatibility.
   (global-set-key (kbd "C-c h h") #'hasky-stack-package-action)
   (global-set-key (kbd "C-c h i") #'hasky-stack-new))
 #+END_SRC
-***** Ligatures support
+**** Ligatures support
 #+begin_src emacs-lisp
 (use-package hasklig-mode
   :hook (haskell-mode))
 #+end_src
-**** LaTeX
-***** AucTEX tweaks
+*** LaTeX
+**** AucTEX tweaks
 #+BEGIN_SRC emacs-lisp
 (setq TeX-auto-save t)
 (setq TeX-parse-self t)
@@ -2152,8 +2143,8 @@ But there is no backward compatibility.
 (add-hook 'LaTeX-mode-hook (lambda ()
                              (TeX-fold-mode 1)))
 #+END_SRC
-**** Python
-***** Virtualenv
+*** Python
+**** Virtualenv
 #+BEGIN_SRC emacs-lisp
 (use-package pyvenv
   ;; Set `pyvenv-workon' to the absolute path for the current venv in a .dir-locals.el
@@ -2161,12 +2152,12 @@ But there is no backward compatibility.
   ;; (add-hook 'pyvenv-post-activate-hooks 'lsp)
   )
 #+END_SRC
-***** Default interpreter
+**** Default interpreter
 #+BEGIN_SRC emacs-lisp
 (setq python-shell-interpreter "ipython"
       python-shell-interpreter-args "--simple-prompt -i")
 #+END_SRC
-***** COMMENT Elpy
+**** COMMENT Elpy
 #+BEGIN_SRC emacs-lisp
 (use-package elpy
   :config
@@ -2175,7 +2166,7 @@ But there is no backward compatibility.
   (add-hook 'elpy-mode-hook 'flycheck-mode)
   (add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode 0))))
 #+END_SRC
-***** Microsoft LSP python server setup
+**** Microsoft LSP python server setup
 #+begin_src emacs-lisp
 (use-package ms-python
   :after pyvenv
@@ -2188,8 +2179,8 @@ But there is no backward compatibility.
     (unless (bound-and-true-p lsp-mode)
       (lsp))))
 #+end_src
-***** Import management
-****** Automatically sort imports
+**** Import management
+***** Automatically sort imports
 #+BEGIN_SRC emacs-lisp
 (use-package isortify
   :config
@@ -2198,7 +2189,7 @@ But there is no backward compatibility.
         isortify-trailing-comma t)
   (add-hook 'python-mode-hook 'isortify-mode))
 #+END_SRC
-***** Format code
+**** Format code
 #+BEGIN_SRC emacs-lisp
 (use-package blacken
   :config
@@ -2206,23 +2197,23 @@ But there is no backward compatibility.
         blacken-allow-py36 t)
   (add-hook 'python-mode-hook 'blacken-mode))
 #+END_SRC
-***** Tox
+**** Tox
 #+BEGIN_SRC emacs-lisp
 (use-package tox
   :config
   (setq tox-runner 'py.test)
   (global-set-key "\C-ct" 'tox-current-class))
 #+END_SRC
-***** Editing requirements files
+**** Editing requirements files
 #+BEGIN_SRC emacs-lisp
 (use-package pip-requirements)
 #+END_SRC
-***** Custom bindings
+**** Custom bindings
 #+BEGIN_SRC emacs-lisp
 (add-hook 'python-mode-hook (lambda ()
                               (local-set-key (kbd "C-c j") 'rr/python-split-string)))
 #+END_SRC
-**** JSON
+*** JSON
 #+BEGIN_SRC emacs-lisp
 (use-package json-mode
   :config
@@ -2230,14 +2221,14 @@ But there is no backward compatibility.
   (setq json-reformat:indent-width 2)
   (setq json-reformat:pretty-string? t))
 #+END_SRC
-**** YAML
+*** YAML
 #+BEGIN_SRC emacs-lisp
 (use-package yaml-mode
   :config
   (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
 #+END_SRC
-**** JavaScript
-***** TypeScript
+*** JavaScript
+**** TypeScript
 #+BEGIN_SRC emacs-lisp
 (use-package tide
   :after (company flycheck)
@@ -2263,7 +2254,7 @@ But there is no backward compatibility.
   ;; configure javascript-tide checker to run after your default javascript checker
   (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append))
 #+END_SRC
-**** WEB
+*** WEB
 #+BEGIN_SRC emacs-lisp
 (use-package web-mode
   :after tide
@@ -2302,25 +2293,25 @@ But there is no backward compatibility.
         web-mode-enable-auto-closing t
         web-mode-enable-css-colorization t))
 #+END_SRC
-**** Groovy
+*** Groovy
 #+BEGIN_SRC emacs-lisp
 (use-package groovy-mode)
 #+END_SRC
-*** Debugger
+** Debugger
 #+BEGIN_SRC emacs-lisp
 (use-package realgud)
 #+END_SRC
-*** Funny
-**** Speed type
+** Funny
+*** Speed type
 #+BEGIN_SRC emacs-lisp
 (use-package speed-type)
 #+END_SRC
-*** Set keybindings
-**** Common
+** Set keybindings
+*** Common
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "M-[") 'align)
 #+END_SRC
-**** Org
+*** Org
 #+BEGIN_SRC emacs-lisp
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
@@ -2331,11 +2322,4 @@ But there is no backward compatibility.
 
 (add-hook 'org-agenda-mode (lambda () local-set-key (kbd "C-c m") 'org-agenda-month-view))
 (add-hook 'org-mode-hook (lambda () (local-set-key (kbd "C-c u") 'rr/org-replace-link-by-link-description)))
-#+END_SRC
-*** COMMENT Imenu list
-#+BEGIN_SRC emacs-lisp
-(use-package imenu-list
-  :config
-  (global-set-key (kbd "C-'") #'imenu-list-smart-toggle)
-  (setq imenu-list-focus-after-activation t))
 #+END_SRC
