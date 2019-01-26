@@ -1366,17 +1366,6 @@ Replace for i-search or swiper
                '("178.62.208.194" "178.62.208.194/api/v4"
                  "178.62.208.194" forge-gitlab-repository)))
 #+END_SRC
-*** COMMENT Highlight diff
-#+BEGIN_SRC emacs-lisp
-(use-package diff-hl
-  :init
-  (setq-default fringes-outside-margins t)
-  :config
-  (add-hook 'prog-mode-hook 'turn-on-diff-hl-mode)
-  (add-hook 'vc-dir-mode-hook 'turn-on-diff-hl-mode)
-  (add-hook 'after-save-hook 'diff-hl-update)
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
-#+END_SRC
 *** GIT gutter
 #+BEGIN_SRC emacs-lisp
 (use-package git-gutter-fringe
