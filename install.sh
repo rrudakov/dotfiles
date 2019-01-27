@@ -9,7 +9,7 @@
 ############### Variables:
 
 dir=${HOME}/dotfiles
-files="Xresources emacs.d/init.el emacs.d/emacs.org emacs.d/custom/google-java-format.el emacs.d/templates/default-java.el tmux.conf vimrc xmonad/xmonad.hs xmobarrc xprofile gitconfig stalonetrayrc zshrc zshenv aliasrc config/dunst/dunstrc"
+files="Xresources emacs.d/init.el emacs.d/emacs.org emacs.d/custom/google-java-format.el emacs.d/templates/default-java.el tmux.conf vimrc xmonad/xmonad.hs xmobarrc xprofile gitconfig stalonetrayrc zshrc zshenv bashrc bash_profile aliasrc config/dunst/dunstrc"
 
 ###############
 

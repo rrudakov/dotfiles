@@ -323,10 +323,13 @@ myManageHook =
     , resource =? "kdesktop" --> doIgnore
     , className =? "xfce4-notifyd" --> doIgnore
     , className =? "rdesktop" --> doFullFloat
+    , title =? "Media viewer" --> doFullFloat
     , className =? "Nm-openconnect-auth-dialog" --> doCenterFloat
     , title =? "capture" -->
       customFloating (W.RationalRect (1 / 5) (1 / 5) (3 / 5) (3 / 5))
-                          -- scratchpads
+    , className =? "vlc" -->
+      customFloating (W.RationalRect (1 / 6) (1 / 6) (2 / 3) (2 / 3))
+    -- scratchpads
     , namedScratchpadManageHook scratchpads
     ]
 

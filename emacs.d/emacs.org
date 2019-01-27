@@ -820,6 +820,15 @@ Good, but has performance problems
       scroll-margin 10
       scroll-preserve-screen-position t)
 #+END_SRC
+** Shell settings
+#+begin_src emacs-lisp
+(add-hook 'shell-mode-hook (lambda () (company-mode -1)))
+(setq comint-scroll-to-bottom-on-input t
+      comint-move-point-for-output t
+      comint-prompt-read-only t
+      comint-input-ignoredups t
+      comint-completion-addsuffix t)
+#+end_src
 ** SQL
 *** COMMENT Emacs database interface
 #+BEGIN_SRC emacs-lisp
@@ -1079,7 +1088,15 @@ Replace for i-search or swiper
 *** Helm org rifle
 #+begin_src emacs-lisp
 (use-package helm-org-rifle
+  :after helm
   :bind (("C-x c o" . helm-org-rifle-agenda-files)))
+#+end_src
+*** Helm xref
+#+begin_src emacs-lisp
+(use-package helm-xref
+  :after helm
+  :config
+  (setq xref-show-xrefs-function 'helm-xref-show-xrefs))
 #+end_src
 ** Smartparens
 #+BEGIN_SRC emacs-lisp
@@ -1183,6 +1200,7 @@ Replace for i-search or swiper
           ("*compilation*" :select t :align t :size 0.4)
           ("*Async Shell Command*" :select t :align t :size 0.4)
           ("*Shell Command Output*" :select t :align t :size 0.4)
+          (shell-mode :select t :align t :size 0.4)
           (help-mode :select t :align t :size 0.4)
           (helpful-mode :select t :align t :size 0.4)
           (magit-status-mode :select t :align t :size 0.4)
@@ -1960,6 +1978,12 @@ But there is no backward compatibility.
   :config
   (global-activity-watch-mode))
 #+END_SRC
+** Auto set indentation settings
+#+begin_src emacs-lisp
+(use-package dtrt-indent
+  :config
+  (dtrt-indent-global-mode))
+#+end_src
 ** Languages
 *** LSP mode
 **** Common setup
@@ -1990,22 +2014,55 @@ But there is no backward compatibility.
   (setq company-lsp-enable-snippet t))
 #+END_SRC
 *** Java
+**** Common setup
+#+begin_src emacs-lisp
+(require 'cc-mode)
+(require 'google-java-format)
+
+(add-hook 'java-mode-hook
+          (lambda ()
+            (local-set-key (kbd "C-c C-f") 'google-java-format-buffer)))
+(add-hook 'java-mode-hook
+          (lambda ()
+            (setq c-basic-offset 2)))
+
+(defconst rr/java-style
+  '((c-comment-only-line-offset 0 . 0)
+    (c-offsets-alist
+     (inline-open . 0)
+     (topmost-intro-cont . +)
+     (statement-block-intro . +)
+     (knr-argdecl-intro . 5)
+     (substatement-open . +)
+     (substatement-label . +)
+     (label . +)
+     (statement-case-open . +)
+     (statement-cont . +)
+     (arglist-intro . ++)
+     (arglist-close . c-lineup-arglist)
+     (case-label . +)
+     (access-label . 0)
+     (inher-cont . c-lineup-java-inher)
+     (func-decl-cont . c-lineup-java-throws)))
+  "My Java style.")
+
+(c-add-style "BSC" rr/java-style)
+
+(defun rr/java-indent-setup ()
+  "Apply my java settings."
+  (c-set-style "BSC")
+  (c-toggle-auto-newline 1))
+
+(add-hook 'java-mode-hook 'rr/java-indent-setup)
+#+end_src
 **** lsp-mode setup
 #+BEGIN_SRC emacs-lisp
-(require 'cc-mode)
-
 (use-package lsp-java
   :after lsp-mode
   :config
   (add-hook 'java-mode-hook 'lsp)
   (add-to-list 'lsp-java-vmargs "-javaagent:/home/rrudakov/.m2/repository/org/projectlombok/lombok/1.16.20/lombok-1.16.20.jar")
   (add-to-list 'lsp-java-vmargs "-Xbootclasspath/a:/home/rrudakov/.m2/repository/org/projectlombok/lombok/1.16.20/lombok-1.16.20.jar "))
-
-(require 'google-java-format)
-
-(add-hook 'java-mode-hook (lambda () (local-set-key (kbd "C-c C-f") 'google-java-format-buffer)))
-(add-hook 'java-mode-hook (lambda ()
-                            (setq c-basic-offset 2)))
 #+END_SRC
 **** Expand snippet for new class
 #+BEGIN_SRC emacs-lisp
@@ -2155,7 +2212,7 @@ But there is no backward compatibility.
   (add-hook 'elpy-mode-hook 'flycheck-mode)
   (add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode 0))))
 #+END_SRC
-**** Microsoft LSP python server setup
+**** COMMENT Microsoft LSP python server setup
 #+begin_src emacs-lisp
 (use-package ms-python
   :after pyvenv

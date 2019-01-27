@@ -20,3 +20,11 @@
 	program = gpg2
 [commit]
 	gpgsign = true
+[gitlab]
+	user = rrudakov
+[github]
+	user = beriya
+[gitlab "178.62.208.194/api/v4"]
+	user = rrudakov
+[gitlab "git.eoadm.com/api/v4"]
+	user = rrudakov
