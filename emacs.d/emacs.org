@@ -185,7 +185,9 @@ Unordered lists with separator '::'
 * Configuration
 ** Start emacs server
 #+BEGIN_SRC emacs-lisp
-(server-start)
+(require 'server)
+(unless (server-running-p)
+  (server-start))
 #+END_SRC
 ** COMMENT Load my secret tokens
 #+BEGIN_SRC emacs-lisp
@@ -854,12 +856,6 @@ Good, but has performance problems
           (lambda ()
             (toggle-truncate-lines t)))
 #+END_SRC
-*** Auto format SQL
-#+BEGIN_SRC emacs-lisp
-(use-package sqlformat
-  :config
-  (add-hook 'sql-mode-hook 'sqlformat-mode))
-#+END_SRC
 ** Which key
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
@@ -1277,6 +1273,11 @@ Replace for i-search or swiper
   (add-hook 'after-init-hook #'global-flycheck-mode)
   (global-set-key (kbd "C-'") #'rr/flycheck-list-smart-toggle)
 
+  (setq flycheck-check-syntax-automatically '(save
+                                              idle-change
+                                              new-line
+                                              mode-enabled))
+
   (when (fboundp 'define-fringe-bitmap)
     (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
       (vector #b00000000
@@ -1354,24 +1355,25 @@ Replace for i-search or swiper
 ** Version control
 *** GIT
 #+BEGIN_SRC emacs-lisp
-  (use-package magit
-    :config
-    (global-set-key (kbd "C-x g") 'magit-status)
-    (setq magit-completing-read-function 'helm--completing-read-default)
+(use-package magit
+  :config
+  (global-set-key (kbd "C-x g") 'magit-status)
+  (global-magit-file-mode)
+  (setq magit-completing-read-function 'helm--completing-read-default)
 
-    (setq magit-revision-insert-related-refs 'all
-          magit-revision-use-hash-sections 'quick)
+  (setq magit-revision-insert-related-refs 'all
+        magit-revision-use-hash-sections 'quick)
 
-    (setq magit-diff-highlight-hunk-region-functions '(magit-diff-highlight-hunk-region-dim-outside))
+  (setq magit-diff-highlight-hunk-region-functions '(magit-diff-highlight-hunk-region-dim-outside))
 
-    (setq magit-fetch-arguments '("--prune"))
+  (setq magit-fetch-arguments '("--prune"))
 
-    (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+  (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
 
-    (add-hook 'focus-in-hook #'git-gutter:update-all-windows)
-    (add-hook 'magit-post-refresh-hook #'git-gutter:update-all-windows)
-    (add-hook 'focus-in-hook 'rr/refresh-vc-state)
-    (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state))
+  (add-hook 'focus-in-hook #'git-gutter:update-all-windows)
+  (add-hook 'magit-post-refresh-hook #'git-gutter:update-all-windows)
+  (add-hook 'focus-in-hook 'rr/refresh-vc-state)
+  (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state))
 #+END_SRC
 *** Work with forges
 #+BEGIN_SRC emacs-lisp
@@ -2273,11 +2275,32 @@ But there is no backward compatibility.
   :config
   (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
 #+END_SRC
+*** WEB
+#+BEGIN_SRC emacs-lisp
+(use-package web-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.jinja2\\'" . web-mode))
+
+  (setq web-mode-markup-indent-offset 2
+        web-mode-css-indent-offset 2
+        web-mode-code-indent-offset 2
+        web-mode-enable-auto-pairing t
+        web-mode-enable-auto-closing t
+        web-mode-enable-css-colorization t))
+#+END_SRC
 *** JavaScript
 **** TypeScript
 #+BEGIN_SRC emacs-lisp
 (use-package tide
-  :after (company flycheck)
+  :after (company flycheck web-mode)
   :config
   (defun setup-tide-mode ()
     (interactive)
@@ -2298,27 +2321,13 @@ But there is no backward compatibility.
 
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
   ;; configure javascript-tide checker to run after your default javascript checker
-  (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append))
-#+END_SRC
-*** WEB
-#+BEGIN_SRC emacs-lisp
-(use-package web-mode
-  :after tide
-  :config
-  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.jinja2\\'" . web-mode))
+  (flycheck-add-next-checker 'javascript-eslint 'javascript-tide 'append)
+
   (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
   (add-hook 'web-mode-hook
-          (lambda ()
-            (when (string-equal "tsx" (file-name-extension buffer-file-name))
-              (setup-tide-mode))))
+            (lambda ()
+              (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                (setup-tide-mode))))
 
   ;; enable typescript-tslint checker
   (flycheck-add-mode 'typescript-tslint 'web-mode)
@@ -2330,15 +2339,19 @@ But there is no backward compatibility.
                 (setup-tide-mode))))
   ;; configure jsx-tide checker to run after your default jsx checker
   (flycheck-add-mode 'javascript-eslint 'web-mode)
-  (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
-
-  (setq web-mode-markup-indent-offset 2
-        web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2
-        web-mode-enable-auto-pairing t
-        web-mode-enable-auto-closing t
-        web-mode-enable-css-colorization t))
+  (flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append))
 #+END_SRC
+**** Angular support
+#+begin_src emacs-lisp
+(use-package ng2-mode
+  :after tide
+  :config
+  (require 'ng2-mode)
+  (require 'flycheck)
+  (require 'tide)
+  (flycheck-add-mode 'typescript-tide 'ng2-ts-mode)
+  (add-to-list 'auto-mode-alist '("\\.component.html" . ng2-html-mode)))
+#+end_src
 *** Groovy
 #+BEGIN_SRC emacs-lisp
 (use-package groovy-mode)
