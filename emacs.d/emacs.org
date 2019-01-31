@@ -1765,7 +1765,7 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
 (use-package org-alert
   :config
-  (setq org-alert-enable t)
+  (org-alert-enable)
   (setq alert-default-style 'libnotify))
 #+END_SRC
 *** Markdown export
