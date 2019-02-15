@@ -815,15 +815,6 @@ Good, but has performance problems
   (setq highlight-indent-guides-method 'character
         highlight-indent-guides-character ?\x258F))
 #+END_SRC
-*** Auto dim insctive windows
-#+begin_src emacs-lisp
-(use-package auto-dim-other-buffers
-  :config
-  (add-hook 'after-init-hook
-            (lambda ()
-              (when (fboundp 'auto-dim-other-buffers-mode)
-                (auto-dim-other-buffers-mode t)))))
-#+end_src
 ** Smooth scrolling
 #+BEGIN_SRC emacs-lisp
 (setq scroll-conservatively 20
@@ -1305,7 +1296,8 @@ Replace for i-search or swiper
 (use-package flycheck
   :config
   (add-hook 'after-init-hook #'global-flycheck-mode)
-  (global-set-key (kbd "C-'") #'rr/flycheck-list-smart-toggle)
+  ;; (global-set-key (kbd "C-'") #'rr/flycheck-list-smart-toggle)
+  (global-set-key (kbd "C-'") 'helm-flycheck)
 
   (setq flycheck-check-syntax-automatically '(save
                                               idle-change
@@ -1814,6 +1806,7 @@ But there is no backward compatibility.
   (setq appt-time-msg-list nil)
   (org-agenda-to-appt))
 
+(setq appt-display-duration 30)
 ;; Update after emacs start
 (rr/org-agenda-to-appt)
 
@@ -2306,7 +2299,11 @@ But there is no backward compatibility.
   :config
   (setq blacken-line-length 79
         blacken-allow-py36 t)
-  (add-hook 'python-mode-hook 'blacken-mode))
+  ;; (add-hook 'python-mode-hook 'blacken-mode)
+  )
+(use-package py-yapf
+  :config
+  (add-hook 'python-mode-hook 'py-yapf-enable-on-save))
 #+END_SRC
 **** Tox
 #+BEGIN_SRC emacs-lisp
