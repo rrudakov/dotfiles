@@ -1108,9 +1108,13 @@ Replace for i-search or swiper
   (setq sp-show-pair-from-inside t
         smartparens-strict-mode t)
 
+  (setq sp-highlight-pair-overlay nil)
+
   (add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
   (add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
   (add-hook 'org-mode-hook 'turn-on-smartparens-strict-mode)
+  (sp-local-pair 'java-mode "{" nil :post-handlers '(("||\n[i]" "RET")))
+  (sp-local-pair 'java-mode "/*" "*/" :post-handlers '(("* ||\n[i]" "RET")))
   :bind
   ("M-]" . 'sp-unwrap-sexp))
 #+END_SRC
@@ -2071,6 +2075,13 @@ But there is no backward compatibility.
   :config
   (eldoc-box-hover-mode))
 #+end_src
+*** Google c-style
+#+begin_src emacs-lisp
+(use-package google-c-style
+  :config
+  (add-hook 'c-mode-common-hook 'google-set-c-style)
+   (add-hook 'c-mode-common-hook 'google-make-newline-indent))
+#+end_src
 *** Java
 **** Common setup
 #+begin_src emacs-lisp
@@ -2083,35 +2094,6 @@ But there is no backward compatibility.
 (add-hook 'java-mode-hook
           (lambda ()
             (setq c-basic-offset 2)))
-
-(defconst rr/java-style
-  '((c-comment-only-line-offset 0 . 0)
-    (c-offsets-alist
-     (inline-open . 0)
-     (topmost-intro-cont . +)
-     (statement-block-intro . +)
-     (knr-argdecl-intro . 5)
-     (substatement-open . +)
-     (substatement-label . +)
-     (label . +)
-     (statement-case-open . +)
-     (statement-cont . +)
-     (arglist-intro . ++)
-     (arglist-close . c-lineup-arglist)
-     (case-label . +)
-     (access-label . 0)
-     (inher-cont . c-lineup-java-inher)
-     (func-decl-cont . c-lineup-java-throws)))
-  "My Java style.")
-
-(c-add-style "BSC" rr/java-style)
-
-(defun rr/java-indent-setup ()
-  "Apply my java settings."
-  (c-set-style "BSC")
-  (c-toggle-auto-newline 1))
-
-(add-hook 'java-mode-hook 'rr/java-indent-setup)
 #+end_src
 **** lsp-mode setup
 #+BEGIN_SRC emacs-lisp
