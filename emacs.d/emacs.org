@@ -473,8 +473,10 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 *** Ediff settings
 #+BEGIN_SRC emacs-lisp
-(setq ediff-window-setup-function 'ediff-setup-windows-plain
-      ediff-split-window-function 'split-window-horizontally)
+(use-package ediff
+  :config
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain
+        ediff-split-window-function 'split-window-horizontally))
 #+END_SRC
 *** Ansi colors
 **** Compilation buffer
@@ -503,8 +505,16 @@ No more ugly line splitting
 #+END_SRC
 *** Save minibuffer history between sessions
 #+BEGIN_SRC emacs-lisp
-(savehist-mode t)
+(use-package savehist
+  :config
+  (savehist-mode t)
+  (add-to-list 'savehist-additional-variables 'kill-ring))
 #+END_SRC
+*** Kill-ring
+Save stuff you’ve copied in other applications to the emacs kill-ring.
+#+begin_src emacs-lisp
+(setq save-interprogram-paste-before-kill t)
+#+end_src
 *** Increase max lines in messages buffer
 #+begin_src emacs-lisp
 (setq message-log-max 5000)
@@ -524,9 +534,12 @@ No more ugly line splitting
 ** Theme
 *** Color scheme
 #+BEGIN_SRC emacs-lisp
-(use-package gruvbox-theme
+;; (use-package gruvbox-theme
+;;   :config
+;;   (load-theme 'gruvbox-dark-medium t))
+(use-package zenburn-theme
   :config
-  (load-theme 'gruvbox-dark-hard t))
+  (load-theme 'zenburn t))
 #+END_SRC
 *** Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
@@ -682,23 +695,23 @@ No more ugly line splitting
 (use-package spaceline
   :config
   (defface rr/spaceline-unmodified
-    '((t :inherit 'spaceline-unmodified :foreground "#87afaf" :background "#665c54"))
+    '((t :inherit 'spaceline-unmodified :foreground "#87afaf" :background "#2B2B2B"))
     "Face for unmodified buffer in the mode-line.")
 
   (defface rr/spaceline-modified
-    '((t :inherit 'spaceline-modified :foreground "#d75f5f" :background "#665c54"))
+    '((t :inherit 'spaceline-modified :foreground "#d75f5f" :background "#2B2B2B"))
     "Face for modified buffer in the mode-line.")
 
   (defface rr/spaceline-read-only
-    '((t :inherit 'spaceline-read-only :foreground "#d787af" :background "#665c54"))
+    '((t :inherit 'spaceline-read-only :foreground "#d787af" :background "#2B2B2B"))
     "Face for read-only buffer in the mode-line.")
 
-  (set-face-attribute 'mode-line nil
-                      :background "#665c54"
-                      :box '(:line-width 6 :color "#665c54"))
+  ;; (set-face-attribute 'mode-line nil
+  ;;                     :background "#2B2B2B"
+  ;;                     :box '(:line-width 6 :color "#2B2B2B"))
 
-  (set-face-attribute 'mode-line-inactive nil
-                      :box '(:line-width 6 :color "#3c3836"))
+  ;; (set-face-attribute 'mode-line-inactive nil
+  ;;                     :box '(:line-width 6 :color "#3c3836"))
 
   (defun rr/spaceline-face (face active)
     "For spaceline-face-func get FACE and ACTIVE."
@@ -717,7 +730,8 @@ No more ugly line splitting
       ('(highlight . nil) 'mode-line-inactive)
       (_ 'error)))
 
-  (setq powerline-default-separator 'nil)
+  (setq powerline-default-separator 'arrow-fade)
+  (setq powerline-height 32)
   (setq spaceline-window-numbers-unicode nil)
   (setq spaceline-face-func 'rr/spaceline-face)
 
@@ -756,11 +770,11 @@ No more ugly line splitting
     "•"
     :enabled t)
 
-  (set-face-attribute 'mode-line-buffer-id nil
-                      :foreground "#d3869b")
+  ;; (set-face-attribute 'mode-line-buffer-id nil
+  ;;                     :foreground "#d3869b")
 
-  (set-face-attribute 'mode-line-buffer-id-inactive nil
-                      :foreground "#d3869b")
+  ;; (set-face-attribute 'mode-line-buffer-id-inactive nil
+  ;;                     :foreground "#d3869b")
 
   ;; My custom theme
   (defun rr/spaceline-theme (&rest additional-segments)
@@ -802,9 +816,10 @@ No more ugly line splitting
 
   (rr/spaceline-theme)
 
-  (set-face-attribute 'spaceline-python-venv nil
-                      :foreground "#b8bb26"
-                      :distant-foreground "#d3869b"))
+  ;; (set-face-attribute 'spaceline-python-venv nil
+  ;;                     :foreground "#b8bb26"
+  ;;                     :distant-foreground "#d3869b")
+  )
 #+END_SRC
 *** COMMENT Highlight indentation
 Good, but has performance problems
@@ -815,7 +830,7 @@ Good, but has performance problems
   (setq highlight-indent-guides-method 'character
         highlight-indent-guides-character ?\x258F))
 #+END_SRC
-** Smooth scrolling
+** COMMENT Smooth scrolling
 #+BEGIN_SRC emacs-lisp
 (setq scroll-conservatively 20
       scroll-margin 10
@@ -995,11 +1010,11 @@ Show more offten used completeons first
 
 
 
-  (set-face-attribute 'helm-source-header nil
-                      :box '(:line-width -1 :style released-button))
+  ;; (set-face-attribute 'helm-source-header nil
+  ;;                     :box '(:line-width -1 :style released-button))
 
-  (set-face-attribute 'helm-minibuffer-prompt nil
-                      :background (face-attribute 'header-line :background))
+  ;; (set-face-attribute 'helm-minibuffer-prompt nil
+  ;;                     :background (face-attribute 'header-line :background))
   (helm-mode 1)
   (helm-adaptive-mode 1))
 #+END_SRC
@@ -1122,6 +1137,9 @@ Replace for i-search or swiper
 #+BEGIN_SRC emacs-lisp
 (use-package eyebrowse
   :config
+  (setq eyebrowse-wrap-around t
+        eyebrowse-new-workspace t
+        eyebrowse-switch-back-and-forth t)
   (eyebrowse-mode t))
 #+END_SRC
 ** Popup windows settings
@@ -1255,6 +1273,7 @@ Replace for i-search or swiper
   (winum-mode))
 #+END_SRC
 ** Dired
+*** Common settings
 #+BEGIN_SRC emacs-lisp
 (use-package dired+
   :config
@@ -1269,6 +1288,13 @@ Replace for i-search or swiper
 ;; automatically refresh dired buffer on changes
 (add-hook 'dired-mode-hook 'auto-revert-mode)
 #+END_SRC
+*** Show git information in dired
+#+begin_src emacs-lisp
+(use-package dired-git-info
+  :config
+  (with-eval-after-load 'dired
+    (define-key dired-mode-map ")" 'dired-git-info-mode)))
+#+end_src
 ** Projectile
 *** Basic setup
 #+BEGIN_SRC emacs-lisp
@@ -1581,6 +1607,12 @@ And even org-babel integration:
 (use-package re-builder
   :bind (("C-c R" . re-builder)))
 #+END_SRC
+** Password store
+#+begin_src emacs-lisp
+(use-package password-store
+  :config
+  (setq password-store-password-length 12))
+#+end_src
 ** Org
 *** Some tweaks
 #+BEGIN_SRC emacs-lisp
@@ -1640,8 +1672,11 @@ And even org-babel integration:
 #+END_SRC
 *** Agenda settings
 #+BEGIN_SRC emacs-lisp
-(setq org-agenda-files (quote ("~/Org/"
-                               "~/Org/work"
+(setq org-agenda-files (quote ("~/Org/other.org"
+                               "~/Org/home.org"
+                               "~/Org/notes.org"
+                               "~/Org/work/tasks.org"
+                               "~/Org/work/bsc.org"
                                "~/Org/mobile")))
 (setq org-directory "~/Org")
 (setq org-agenda-restore-windows-after-quit t)
@@ -2038,7 +2073,8 @@ But there is no backward compatibility.
 #+begin_src emacs-lisp
 (use-package dtrt-indent
   :config
-  (dtrt-indent-global-mode))
+  (setq dtrt-indent-verbosity 0)
+  (add-hook 'prog-mode-hook 'dtrt-indent-mode))
 #+end_src
 ** Languages
 *** LSP mode
@@ -2294,6 +2330,14 @@ But there is no backward compatibility.
   (setq tox-runner 'py.test)
   (global-set-key "\C-ct" 'tox-current-class))
 #+END_SRC
+**** Sphinx doc
+#+begin_src emacs-lisp
+(use-package sphinx-doc
+  :config
+  (add-hook 'python-mode-hook (lambda ()
+                                (require 'sphinx-doc)
+                                (sphinx-doc-mode t))))
+#+end_src
 **** Editing requirements files
 #+BEGIN_SRC emacs-lisp
 (use-package pip-requirements)
