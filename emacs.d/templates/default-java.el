@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 BSC Msc, LLC
+ * Copyright 2018 BSC Msc, LLC
  *
  * This file is part of the AuTe Framework project
  *

@@ -52,10 +52,14 @@ URxvt*saveLines: 5000
 URxvt.font: xft:Source Code Variable:size=10:medium:antialias=true
 URxvt.boldFont: xft:Source Code Variable:size=10:bold:antialias=true
 
-! URxvt.shading: 10
-! URxvt.transparent: true
-
+URxvt.internalBorder: 0
+URxvt.jumpScroll: true
+URxvt.secondaryScroll: true
 URxvt.scrollBar: false
+URxvt.scrollTtyKeypress: true
+URxvt.scrollWithBuffer: true
+URxvt*urlLauncher: /usr/bin/firefox
+
 ! scrollbar style - rxvt (default), plain (most compact), next, or xterm
 !URxvt.scrollstyle: plain
 
@@ -74,85 +78,45 @@ URxvt.perl-ext-common: default,matcher,selection-to-clipboard
 URxvt.url-launcher: /usr/bin/xdg-open
 URxvt.matcher.button: 1
 
-! -----------------------------------------------------------------------------
-! File: gruvbox-dark.xresources
-! Description: Retro groove colorscheme generalized
-! Author: morhetz <morhetz@gmail.com>
-! Source: https://github.com/morhetz/gruvbox-generalized
-! Last Modified: 6 Sep 2014
-! -----------------------------------------------------------------------------
+URxvt*inheritPixmap: false
+URxvt*transparent: false
+! URxvt*shading: 0 to 99 darkens, 101 to 200 lightens
+URxvt*shading: 100
 
-! hard contrast: *background: #1d2021
-*background: #282828
-! soft contrast: *background: #32302f
-*foreground: #ebdbb2
-! Black + DarkGrey
-*color0:  #282828
-*color8:  #928374
-! DarkRed + Red
-*color1:  #cc241d
-*color9:  #fb4934
-! DarkGreen + Green
-*color2:  #98971a
-*color10: #b8bb26
-! DarkYellow + Yellow
-*color3:  #d79921
-*color11: #fabd2f
-! DarkBlue + Blue
-*color4:  #458588
-*color12: #83a598
-! DarkMagenta + Magenta
-*color5:  #b16286
-*color13: #d3869b
-! DarkCyan + Cyan
-*color6:  #689d6a
-*color14: #8ec07c
-! LightGrey + White
-*color7:  #a89984
-*color15: #ebdbb2
+! Zenburn color-scheme                                                                                                         
+URxvt*background: #3F3F3F                                                                                                      
+URxvt*foreground: #DCDCCC                                                                                                      
+URxvt*cursorColor: #DCDCCC                                                                                                     
+URxvt*cursorColor2: #FFFFEF                                                                                                    
+URxvt*colorUL: #8CD0D3                                                                                                         
+URxvt*underlineColor: #F0DFAF                                                                                                  
+URxvt*colorBD: #E0CF9F                                                                                                         
+URxvt*colorIT: #656555                
 
-! -----------------------------------------------------------------------------
-! File: gruvbox-urxvt256.xresources
-! Description: Retro groove colorscheme generalized
-! Author: morhetz <morhetz@gmail.com>
-! Source: https://github.com/morhetz/gruvbox-generalized
-! Last Modified: 13 Dec 2013
-! -----------------------------------------------------------------------------
-
-URxvt.color24:  #076678
-URxvt.color66:  #427b58
-URxvt.color88:  #9d0006
-URxvt.color96:  #8f3f71
-URxvt.color100: #79740e
-URxvt.color108: #8ec07c
-URxvt.color109: #83a598
-URxvt.color130: #af3a03
-URxvt.color136: #b57614
-URxvt.color142: #b8bb26
-URxvt.color167: #fb4934
-URxvt.color175: #d3869b
-URxvt.color208: #fe8019
-URxvt.color214: #fabd2f
-URxvt.color223: #ebdbb2
-URxvt.color228: #f2e5bc
-URxvt.color229: #fbf1c7
-URxvt.color230: #f9f5d7
-URxvt.color234: #1d2021
-URxvt.color235: #282828
-URxvt.color236: #32302f
-URxvt.color237: #3c3836
-URxvt.color239: #504945
-URxvt.color241: #665c54
-URxvt.color243: #7c6f64
-URxvt.color244: #928374
-URxvt.color245: #928374
-URxvt.color246: #a89984
-URxvt.color248: #bdae93
-URxvt.color250: #d5c4a1
-
-URxvt.colorIT:      #87af5f
-URxvt.colorBD:      #d7d7d7
-URxvt.colorUL:      #87afd7
+!! black dark/light                                                                                                            
+URxvt*color0: #3F3F3F                                                                                                          
+URxvt*color8: #5F5F5F                                                                                                          
+!! red dark/light                                                                                                              
+URxvt*color1: #BC8383                                                                                                          
+URxvt*color9: #CC9393                                                                                                          
+!! green dark/light                                                                                                            
+URxvt*color2: #5F7F5F                                                                                                          
+URxvt*color10: #7F9F7F                                                                                                         
+!! yellow dark/light                                                                                                           
+URxvt*color3: #E0CF9F                                                                                                          
+URxvt*color11: #F0DFAF                                                                                                         
+!! blue dark/light                                                                                                             
+URxvt*color4: #7CB8BB                                                                                                          
+URxvt*color12: #8CD0D3                                                                                                         
+!! magenta dark/light                                                                                                          
+URxvt*color5: #DC8CC3                                                                                                          
+URxvt*color13: #DC8CC3                                                                                                         
+!! cyan dark/light                                                                                                             
+URxvt*color6: #93E0E3                                                                                                          
+URxvt*color14: #93E0E3                                                                                                         
+!! white dark/light                                                                                                            
+URxvt*color7: #DCDCCC                                                                                                          
+URxvt*color15: #FFFFFF
 
 !XLock
 XLock.mode: blank

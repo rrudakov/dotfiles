@@ -213,7 +213,7 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
   , ((0, xF86XK_AudioPrev), spawn spotifyPrevious)
   , ((0, xF86XK_AudioStop), spawn spotifyStop)
     -- , ((0                 , xK_Print               ), spawn "scrot '%F_%H%M%S_$wx$h.png' -e 'mv $f ~/screenshots/'")
-  , ((0, xK_Print), spawn "xfce4-screenshooter")
+  , ((0, xK_Print), spawn "flameshot gui")
   ] <>
     --
     -- mod-[1..9], Switch to workspace N
