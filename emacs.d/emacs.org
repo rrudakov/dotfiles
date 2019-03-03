@@ -909,7 +909,8 @@ Good, but has performance problems
 (use-package company
   :config
   (add-hook 'after-init-hook 'global-company-mode)
-  (setq company-dabbrev-downcase nil)
+  (setq company-dabbrev-downcase nil
+        company-tooltip-flip-when-above t)
   (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
   (setq-default company-idle-delay .2
                 company-minimum-prefix-length 2
@@ -958,8 +959,7 @@ Show more offten used completeons first
 (use-package company-tern
   :after tern
   :config
-  (add-to-list 'company-backends 'company-tern)
-  (setq company-tooltip-align-annotations t))
+  (add-to-list 'company-backends 'company-tern))
 #+END_SRC
 ** Paradox
 #+BEGIN_SRC emacs-lisp
