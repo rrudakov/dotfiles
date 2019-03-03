@@ -527,6 +527,10 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 #+begin_src emacs-lisp
 (setq enable-recursive-minibuffers t)
 #+end_src
+*** Large files treshold
+#+begin_src emacs-lisp
+(setq large-file-warning-threshold (* 100 1024 1024))
+#+end_src
 *** Confirm kill emacs
 #+BEGIN_SRC emacs-lisp
 (setq confirm-kill-emacs 'y-or-n-p)

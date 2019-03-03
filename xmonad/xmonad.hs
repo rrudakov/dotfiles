@@ -5,7 +5,6 @@ import qualified Data.Map                        as M
 import           Data.Monoid
 import           Graphics.X11.ExtraTypes.XF86
 import           System.Exit
-import           System.IO
 import           XMonad
 import           XMonad.Actions.CopyWindow
 import           XMonad.Hooks.DynamicLog
@@ -24,7 +23,6 @@ import           XMonad.Prompt.Shell
 import           XMonad.Prompt.Ssh
 import qualified XMonad.StackSet                 as W
 import           XMonad.Util.NamedScratchpad
-import           XMonad.Util.Run                 (spawnPipe)
 
 -- | Set default terminal emulator
 myTerminal :: String
@@ -134,19 +132,17 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
   M.fromList $
     -- launch a terminal
   [ ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
-    -- launch rofi
-    --, ((modm,               xK_p     ), spawn "rofi -show run")
+    -- launch command prompt
   , ((modm, xK_p), shellPrompt myPromptConfig)
     -- launch ssh prompt
   , ((modm, xK_s), sshPrompt myPromptConfig)
-    -- launchn gmrun
-  , ((modm .|. shiftMask, xK_p), spawn "gmrun")
     -- close focused window
   , ((modm .|. shiftMask, xK_c), kill)
      -- Rotate through the available layout algorithms
   , ((modm, xK_space), sendMessage NextLayout)
     --  Reset the layouts on the current workspace to default
   , ((modm .|. shiftMask, xK_space), setLayout $ XMonad.layoutHook conf)
+    -- Lock screen
   , ((modm .|. shiftMask, xK_x), spawn "i3lock-wrapper")
     -- Resize viewed windows to the correct size
   , ((modm, xK_n), refresh)
@@ -174,15 +170,14 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
   , ((modm, xK_comma), sendMessage (IncMasterN 1))
     -- Deincrement the number of windows in the master area
   , ((modm, xK_period), sendMessage (IncMasterN (-1)))
-    -- Scratch pads
-  -- , ((modm, xK_v), namedScratchpadAction scratchpads "htop")
+    -- Scratchpads
   , ((modm .|. shiftMask, xK_t), namedScratchpadAction scratchpads "telegram")
   , ((modm .|. shiftMask, xK_m), namedScratchpadAction scratchpads "spotify")
   , ((modm .|. shiftMask, xK_s), namedScratchpadAction scratchpads "slack")
   , ((modm, xK_u), namedScratchpadAction scratchpads "wire")
   , ((modm .|. shiftMask, xK_b), namedScratchpadAction scratchpads "skype")
   , ((modm, xK_y), namedScratchpadAction scratchpads "mattermost")
-    -- Toggle copy to all
+    -- Toggle copy to all workspaces
   , ((modm, xK_a), toggleCopyToAll)
     -- Org capture
   , ((modm, xK_c), spawn "emacsclient -ne \"(make-capture-frame)\"")
@@ -196,11 +191,9 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
         , "xmonad-session --recompile && xmonad-session --restart; "
         , "else xmessage xmonad-session not in \\$PATH: \"$PATH\"; fi"
         ])
-    --, ((modm              , xK_q     ), spawn "stack exec xmonad -- --recompile && stack exec xmonad -- --restart")
-  , ((modm, xK_b), sendMessage ToggleStruts)
+    -- Select urgent workspace
   , ((modm, xK_BackSpace), focusUrgent)
-    -- Run xmessage with a summary of the default keybindings (useful for beginners)
-    -- , ((modMask .|. shiftMask, xK_slash ), spawn ("echo \"" ++ help ++ "\" | xmessage -file -"))
+    -- Multimedia keys
   , ( (0, xF86XK_AudioLowerVolume)
     , spawn
         "pactl set-sink-mute @DEFAULT_SINK@ false ; pactl set-sink-volume @DEFAULT_SINK@ -5%")
@@ -212,7 +205,7 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
   , ((0, xF86XK_AudioNext), spawn spotifyNext)
   , ((0, xF86XK_AudioPrev), spawn spotifyPrevious)
   , ((0, xF86XK_AudioStop), spawn spotifyStop)
-    -- , ((0                 , xK_Print               ), spawn "scrot '%F_%H%M%S_$wx$h.png' -e 'mv $f ~/screenshots/'")
+    -- Run screenshoter
   , ((0, xK_Print), spawn "flameshot gui")
   ] <>
     --
@@ -254,7 +247,7 @@ myMouseBindings XConfig {XMonad.modMask = modm} =
     -- you may also bind events to the mouse scroll wheel (button4 and button5)
     ]
 
--- | Set layouts
+-- | Set layouts, rename to shorter names
 myLayout ::
   ModifiedLayout AvoidStruts
   (Choose
@@ -363,50 +356,66 @@ myRootMask =
 
 ------------------------------------------------------------------------
 
--- | Run xmonad with xmobar
+-- | Run xmonad
 main :: IO ()
-main = do
-  xmproc <- spawnPipe "$HOME/.local/bin/xmobar"
-  launch $
-    ewmh $
-    withUrgencyHook
-      NoUrgencyHook
-      XConfig
-        { terminal = myTerminal
-        , focusFollowsMouse = myFocusFollowsMouse
-        , clickJustFocuses = myClickJustFocuses
-        , borderWidth = myBorderWidth
-        , modMask = myModMask
-        , workspaces = myWorkspaces
-        , normalBorderColor = myNormalBorderColor
-        , focusedBorderColor = myFocusedBorderColor
-        , rootMask = myRootMask
-        , clientMask = myClientMask
+main = launch =<< statusBar myBar myPP toggleStrutsKey myConfig
+
+-- | Command for running status bar
+myBar :: String
+myBar = "xmobar"
+
+myPP :: PP
+myPP =
+  namedScratchpadFilterOutWorkspacePP $
+  xmobarPP
+    { ppCurrent = xmobarColor "#fabd2f" "#3c3836" . wrap " " " "
+    , ppTitle = xmobarColor "#928374" "" . shorten 60
+    , ppHidden = xmobarColor "#ebdbb2" ""
+    , ppHiddenNoWindows = xmobarColor "#504945" ""
+    , ppUrgent = xmobarColor "#fabd2f" "#cc241d" . wrap " " " "
+    , ppSep = "  "
+    , ppLayout = xmobarColor "#98971a" ""
+    }
+
+toggleStrutsKey :: XConfig l -> (KeyMask, KeySym)
+toggleStrutsKey XConfig {XMonad.modMask = modMask'} = (modMask', xK_b)
+
+myConfig ::
+  XConfig
+  (ModifiedLayout AvoidStruts
+    (Choose
+      (ModifiedLayout
+        (ConfigurableBorder Ambiguity)
+        (ModifiedLayout Rename Tall))
+      (Choose
+        (ModifiedLayout WithBorder
+          (ModifiedLayout Rename Full))
+        (ModifiedLayout
+          (ConfigurableBorder Ambiguity)
+          (ModifiedLayout Rename Grid)))))
+myConfig =
+  ewmh $
+  withUrgencyHook
+    NoUrgencyHook
+    def
+      { terminal = myTerminal
+      , focusFollowsMouse = myFocusFollowsMouse
+      , clickJustFocuses = myClickJustFocuses
+      , borderWidth = myBorderWidth
+      , modMask = myModMask
+      , workspaces = myWorkspaces
+      , normalBorderColor = myNormalBorderColor
+      , focusedBorderColor = myFocusedBorderColor
+      , rootMask = myRootMask
+      , clientMask = myClientMask
         -- key bindings
-        , keys = myKeys
-        , mouseBindings = myMouseBindings
+      , keys = myKeys
+      , mouseBindings = myMouseBindings
         -- hooks, layouts
-        , manageHook = myManageHook <+> flashHook <+> manageDocks
-        , layoutHook = myLayout
-        , handleEventHook =
-            myEventHook <+>
-            ewmhDesktopsEventHook <+> fullscreenEventHook <+> perWindowKbdLayout
-        , logHook =
-            dynamicLogWithPP . namedScratchpadFilterOutWorkspacePP $
-            xmobarPP
-              { ppOutput = hPutStrLn xmproc
-              , ppCurrent = xmobarColor "#fabd2f" "#3c3836" . wrap " " " "
-              , ppTitle = xmobarColor "#928374" "" . shorten 60
-              , ppHidden = xmobarColor "#ebdbb2" ""
-              , ppHiddenNoWindows = xmobarColor "#504945" ""
-              , ppUrgent = xmobarColor "#fabd2f" "#cc241d" . wrap " " " "
-              , ppSep = "  "
-              , ppLayout = xmobarColor "#98971a" ""
-              }
-        , startupHook = myStartupHook
-        , handleExtraArgs =
-            \xs theConf ->
-              case xs of
-                [] -> return theConf
-                _  -> fail ("unrecognized flags:" <> show xs)
-        }
+      , manageHook = myManageHook <+> flashHook <+> manageDocks
+      , layoutHook = myLayout
+      , handleEventHook =
+          myEventHook <+>
+          ewmhDesktopsEventHook <+> fullscreenEventHook <+> perWindowKbdLayout
+      , startupHook = myStartupHook
+      }
