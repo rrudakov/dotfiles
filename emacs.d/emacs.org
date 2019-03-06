@@ -5,6 +5,7 @@
 M-:	Eval command
 C-x t   Switch to ansi-terminal or create new
 C-x T   Create new ansi-terminal
+M-\     delete-horizontal-space
 #+END_SRC
 ** Python
 #+BEGIN_SRC text
@@ -1321,6 +1322,7 @@ Replace for i-search or swiper
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
   :config
+  (setq flycheck-idle-change-delay 2)
   (add-hook 'after-init-hook #'global-flycheck-mode)
   ;; (global-set-key (kbd "C-'") #'rr/flycheck-list-smart-toggle)
   (global-set-key (kbd "C-'") 'helm-flycheck)
@@ -1604,6 +1606,12 @@ And even org-babel integration:
 (use-package password-store
   :config
   (setq password-store-password-length 12))
+
+(use-package password-store-otp)
+
+(use-package pass)
+
+(use-package helm-pass)
 #+end_src
 ** Org
 *** Some tweaks
@@ -2080,7 +2088,10 @@ But there is no backward compatibility.
         lsp-response-timeout 60
         lsp-prefer-flymake nil
         lsp-message-project-root-warning t)
-  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
+  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
+  (add-hook 'python-mode-hook
+            #'(lambda ()
+                (setq-local lsp-enable-snippet nil))))
 
 (use-package lsp-ui
   :config
@@ -2441,6 +2452,10 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
 (use-package realgud)
 #+END_SRC
+** Create GIF screencasts
+#+begin_src emacs-lisp
+(use-package gif-screencast)
+#+end_src
 ** Funny
 *** Speed type
 #+BEGIN_SRC emacs-lisp
