@@ -356,7 +356,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   (scroll-bar-mode -1)
   (setq-default line-spacing 0)
   ;; buffer name  in frame title
-  (setq-default frame-title-format '("RR Emacs"))
+  (setq frame-title-format '("" "%b @ Emacs " emacs-version))
   ;; standardize fringe width
   ;; (push (cons 'left-fringe  my-ui-fringe-size) default-frame-alist)
   ;; (push (cons 'right-fringe my-ui-fringe-size) default-frame-alist)
@@ -1012,6 +1012,10 @@ Show more offten used completeons first
 
   ;; (set-face-attribute 'helm-minibuffer-prompt nil
   ;;                     :background (face-attribute 'header-line :background))
+
+  (setq helm-display-function #'helm-display-buffer-in-own-frame)
+  (setq helm-show-completion-display-function #'helm-display-buffer-in-own-frame)
+
   (helm-mode 1)
   (helm-adaptive-mode 1))
 #+END_SRC
@@ -1109,6 +1113,16 @@ Replace for i-search or swiper
 #+begin_src emacs-lisp
 (use-package helm-lsp)
 #+end_src
+*** Show helm in separate frame
+#+begin_src emacs-lisp
+;; (use-package helm-posframe
+;;   :config
+;;   (setq helm-posframe-width 120
+;;         helm-posframe-height 30)
+;;   (setq helm-posframe-poshandler 'posframe-poshandler-frame-center)
+
+;;   (helm-posframe-enable))
+#+end_src
 ** Smartparens
 #+BEGIN_SRC emacs-lisp
 (use-package smartparens-config
@@ -1132,12 +1146,16 @@ Replace for i-search or swiper
 #+END_SRC
 ** Workspaces
 #+BEGIN_SRC emacs-lisp
-(use-package eyebrowse
+;; (use-package eyebrowse
+;;   :config
+;;   (setq eyebrowse-wrap-around t
+;;         eyebrowse-new-workspace t
+;;         eyebrowse-switch-back-and-forth t)
+;;   (eyebrowse-mode t))
+(use-package perspective
   :config
-  (setq eyebrowse-wrap-around t
-        eyebrowse-new-workspace t
-        eyebrowse-switch-back-and-forth t)
-  (eyebrowse-mode t))
+  (setq persp-initial-frame-name "Org")
+  (persp-mode))
 #+END_SRC
 ** Popup windows settings
 *** COMMENT Purpose
@@ -1208,11 +1226,8 @@ Replace for i-search or swiper
 #+BEGIN_SRC emacs-lisp
 (use-package shackle
   :config
-  (setq helm-display-function 'pop-to-buffer)
-  (setq helm-show-completion-display-function 'pop-to-buffer)
   (setq shackle-rules
-        '(("\\`\\*helm.*?\\*\\'" :regexp t :align t :size 0.4)
-          (compilation-mode :select t :align t :size 0.4)
+        '((compilation-mode :select t :align t :size 0.4)
           ("\\`\\*Org\sSrc.*?\\*.*\\'" :regexp t :align right :size 100)
           ("\\`\\*Org-Babel\sError\sOutput\\*.*\\'" :regexp t align t :size 0.4)
           ("*compilation*" :select t :align t :size 0.4)
@@ -2282,31 +2297,9 @@ But there is no backward compatibility.
 #+END_SRC
 **** Default interpreter
 #+BEGIN_SRC emacs-lisp
-(setq python-shell-interpreter "ipython"
+(setq python-shell-interpreter "python"
       python-shell-interpreter-args "--simple-prompt -i")
 #+END_SRC
-**** COMMENT Elpy
-#+BEGIN_SRC emacs-lisp
-(use-package elpy
-  :config
-  (elpy-enable)
-  (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-  (add-hook 'elpy-mode-hook 'flycheck-mode)
-  (add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode 0))))
-#+END_SRC
-**** COMMENT Microsoft LSP python server setup
-#+begin_src emacs-lisp
-(use-package ms-python
-  :after pyvenv
-  :config
-  (defun rr/python-enable-lsp (path)
-    "Set virtualenv to PATH then activate lsp-mode."
-    (unless (equal pyvenv-virtual-env-name path)
-      (pyvenv-workon path))
-
-    (unless (bound-and-true-p lsp-mode)
-      (lsp))))
-#+end_src
 **** Import management
 ***** Automatically sort imports
 #+BEGIN_SRC emacs-lisp

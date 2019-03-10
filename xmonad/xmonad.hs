@@ -1,4 +1,5 @@
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE LambdaCase       #-}
 {-# OPTIONS_GHC -Wall #-}
 import           Data.List
 import qualified Data.Map                        as M
@@ -318,6 +319,8 @@ myManageHook =
     , className =? "rdesktop" --> doFullFloat
     , title =? "Media viewer" --> doFullFloat
     , className =? "Nm-openconnect-auth-dialog" --> doCenterFloat
+    , title =? "Helm" -->
+      customFloating (W.RationalRect (1 / 5) (1 / 5) (3 / 5) (3 / 5))
     , title =? "capture" -->
       customFloating (W.RationalRect (1 / 5) (1 / 5) (3 / 5) (3 / 5))
     , className =? "vlc" -->
