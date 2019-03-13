@@ -9,6 +9,7 @@ import           System.Exit
 import           XMonad
 import           XMonad.Actions.CopyWindow
 import           XMonad.Hooks.DynamicLog
+import           XMonad.Hooks.DynamicProperty
 import           XMonad.Hooks.EwmhDesktops
 import           XMonad.Hooks.ManageDocks
 import           XMonad.Hooks.ManageHelpers
@@ -282,7 +283,7 @@ scratchpads =
   , NS
       "spotify"
       "spotify"
-      (appName =? "spotify")
+      (className =? "Spotify")
       (customFloating $ W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
   , NS
       "wire"
@@ -334,7 +335,12 @@ flashHook :: ManageHook
 flashHook = composeOne [isFullscreen -?> doFullFloat]
 
 myEventHook :: Event -> X Data.Monoid.All
-myEventHook = docksEventHook
+myEventHook =
+  docksEventHook <+>
+  dynamicPropertyChange
+    "WM_NAME"
+    (className =? "Spotify" -->
+     customFloating (W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4)))
 
 -- | Make java GUI working
 myStartupHook :: X ()
