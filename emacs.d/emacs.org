@@ -989,6 +989,7 @@ Show more offten used completeons first
         helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
         helm-ff-file-name-history-use-recentf t
         helm-echo-input-in-header-line nil
+        helm-display-header-line nil
         helm-buffer-max-length 40
         helm-ff-delete-files-function 'helm-delete-marked-files-async
         helm-inherit-input-method nil)
@@ -1019,12 +1020,6 @@ Show more offten used completeons first
   (setq helm-display-function #'pop-to-buffer)
   (setq helm-show-completion-display-function #'pop-to-buffer)
 
-  (add-to-list 'helm-commands-using-frame 'completion-at-point)
-  (add-to-list 'helm-commands-using-frame 'helm-mini)
-  (add-to-list 'helm-commands-using-frame 'helm-M-x)
-  (add-to-list 'helm-commands-using-frame 'helm-show-kill-ring)
-  (add-to-list 'helm-commands-using-frame 'helm-find-files)
-
   (helm-mode 1)
   (helm-adaptive-mode 1))
 #+END_SRC
@@ -1032,8 +1027,7 @@ Show more offten used completeons first
 #+BEGIN_SRC emacs-lisp
 (use-package helm-tramp
   :config
-  (define-key global-map (kbd "C-c s") 'helm-tramp)
-  (add-to-list 'helm-commands-using-frame 'helm-tramp))
+  (define-key global-map (kbd "C-c s") 'helm-tramp))
 #+END_SRC
 *** Swoop
 Replace for i-search or swiper
@@ -1122,17 +1116,6 @@ Replace for i-search or swiper
 *** Help lsp integration
 #+begin_src emacs-lisp
 (use-package helm-lsp)
-#+end_src
-*** Show helm in separate frame
-#+begin_src emacs-lisp
-;; (use-package helm-posframe
-;;   :config
-;;   (setq helm-posframe-width 120
-;;         helm-posframe-height 30)
-;;   (setq helm-posframe-poshandler 'posframe-poshandler-frame-center)
-
-;;   ;; (helm-posframe-enable)
-;;   )
 #+end_src
 ** Smartparens
 #+BEGIN_SRC emacs-lisp
@@ -1336,8 +1319,7 @@ Replace for i-search or swiper
 (use-package helm-projectile
   :config
   (helm-projectile-on)
-  (setq projectile-switch-project-action 'helm-projectile)
-  (add-to-list 'helm-commands-using-frame 'helm-projectile))
+  (setq projectile-switch-project-action 'helm-projectile))
 #+END_SRC
 ** Htmlize
 #+BEGIN_SRC emacs-lisp
@@ -2031,7 +2013,7 @@ But there is no backward compatibility.
 
 (require 'mu4e)
 
-(setq mu4e-maildir (expand-file-name "~/Maildir/BSC"))
+(setq mu4e-maildir (expand-file-name "~/.mail/BSC"))
 (setq mu4e-trash-folder  "/Deleted Items")
 
 ;; mu4e-get-mail-command "mbsync BSC"
@@ -2172,8 +2154,8 @@ But there is no backward compatibility.
   :after lsp-mode
   :config
   (add-hook 'java-mode-hook 'lsp)
-  (add-to-list 'lsp-java-vmargs "-javaagent:/home/rrudakov/.m2/repository/org/projectlombok/lombok/1.16.20/lombok-1.16.20.jar")
-  (add-to-list 'lsp-java-vmargs "-Xbootclasspath/a:/home/rrudakov/.m2/repository/org/projectlombok/lombok/1.16.20/lombok-1.16.20.jar "))
+  (add-to-list 'lsp-java-vmargs "-javaagent:/home/rrudakov/.m2/repository/org/projectlombok/lombok/1.18.6/lombok-1.18.6.jar")
+  (add-to-list 'lsp-java-vmargs "-Xbootclasspath/a:/home/rrudakov/.m2/repository/org/projectlombok/lombok/1.18.6/lombok-1.18.6.jar"))
 #+END_SRC
 **** Expand snippet for new class
 #+BEGIN_SRC emacs-lisp
@@ -2311,8 +2293,7 @@ But there is no backward compatibility.
 #+END_SRC
 **** Default interpreter
 #+BEGIN_SRC emacs-lisp
-(setq python-shell-interpreter "python"
-      python-shell-interpreter-args "--simple-prompt -i")
+(setq python-shell-interpreter "python")
 #+END_SRC
 **** Import management
 ***** Automatically sort imports
