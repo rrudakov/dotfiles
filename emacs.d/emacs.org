@@ -842,6 +842,11 @@ Good, but has performance problems
       comint-input-ignoredups t
       comint-completion-addsuffix t)
 #+end_src
+** EShell settings
+#+begin_src emacs-lisp
+(setq eshell-scroll-to-bottom-on-input t
+      eshell-scroll-to-bottom-on-output t)
+#+end_src
 ** SQL
 *** COMMENT Emacs database interface
 #+BEGIN_SRC emacs-lisp
@@ -1228,7 +1233,8 @@ Replace for i-search or swiper
           ("*compilation*" :select t :align t :size 0.4)
           ("*Async Shell Command*" :select t :align t :size 0.4)
           ("*Shell Command Output*" :select t :align t :size 0.4)
-          (shell-mode :select t :align t :size 0.4)
+          ("\\`\\*e?shell.*\\'" :regexp t :select t :popup t :align t :size 0.4)
+          (comint-mode :select t :align t :size 0.4)
           (help-mode :select t :align t :size 0.4)
           (helpful-mode :select t :align t :size 0.4)
           (magit-status-mode :select t :align t :size 0.4)
