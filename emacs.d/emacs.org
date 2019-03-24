@@ -993,7 +993,7 @@ Show more offten used completeons first
         helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
         helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
         helm-ff-file-name-history-use-recentf t
-        helm-echo-input-in-header-line nil
+        helm-echo-input-in-header-line t
         helm-display-header-line nil
         helm-buffer-max-length 40
         helm-ff-delete-files-function 'helm-delete-marked-files-async
@@ -1077,6 +1077,10 @@ Replace for i-search or swiper
   ;; Optional face for line numbers
   ;; Face name is `helm-swoop-line-number-face`
   (setq helm-swoop-use-line-number-face t)
+
+  (setq helm-swoop-split-with-multiple-windows nil
+        helm-swoop-split-direction 'split-window-vertically
+        helm-swoop-split-window-function 'helm-default-display-buffer)
 
   (setq helm-swoop-pre-input-function
         (lambda () "")))
@@ -1229,7 +1233,7 @@ Replace for i-search or swiper
         '(("\\`\\*helm.*?\\*\\'" :regexp t :align t :size 0.4)
           (compilation-mode :select t :align t :size 0.4)
           ("\\`\\*Org\sSrc.*?\\*.*\\'" :regexp t :align right :size 100)
-          ("\\`\\*Org-Babel\sError\sOutput\\*.*\\'" :regexp t align t :size 0.4)
+          ("\\`\\*Org-Babel\sError\sOutput\\*.*\\'" :regexp t :align t :size 0.4)
           ("*compilation*" :select t :align t :size 0.4)
           ("*Async Shell Command*" :select t :align t :size 0.4)
           ("*Shell Command Output*" :select t :align t :size 0.4)
@@ -1238,10 +1242,11 @@ Replace for i-search or swiper
           (help-mode :select t :align t :size 0.4)
           (helpful-mode :select t :align t :size 0.4)
           (magit-status-mode :select t :align t :size 0.4)
+          (magit-refs-mode :select t :same t :align t :size 0.4)
           (magit-diff-mode :select nil :align right :size 0.5)
           (magit-revision-mode :select t :align right :size 0.5)
           (flycheck-error-list-mode :select t :align right :size 0.3)
-          (inferior-python-mode :select t :align t :size 0.4)))
+          (inferior-python-mode :select t :popup t :align t :size 0.4)))
   (shackle-mode))
 #+END_SRC
 ** Rainbow delimiters
