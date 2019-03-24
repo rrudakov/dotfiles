@@ -12,6 +12,7 @@ sysmodmap=/etc/X11/xinit/.Xmodmap
 [ -f $usermodmap ] && /usr/bin/xmodmap $usermodmap
 
 export GDK_USE_XFT=1
+compton &
 stalonetray &
 nitrogen --restore &
 nm-applet &
