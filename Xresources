@@ -51,8 +51,8 @@ URxvt*saveLines: 5000
 
 !URxvt.font: -*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-1
 !URxvt.boldFont: -*-terminus-bold-*-*-*-12-*-*-*-*-*-iso10646-1
-URxvt.font: xft:Source Code Variable:size=10:medium:antialias=true
-URxvt.boldFont: xft:Source Code Variable:size=10:bold:antialias=true
+URxvt.font: xft:Fira Code:size=10:medium:antialias=true
+URxvt.boldFont: xft:Fira Code:size=10:bold:antialias=true
 
 URxvt.internalBorder: 0
 URxvt.jumpScroll: true

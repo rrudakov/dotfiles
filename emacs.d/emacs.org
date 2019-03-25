@@ -226,7 +226,7 @@ Good choices:
 + [[https://github.com/adobe-fonts/source-code-pro][SourceCodePro]] :: Currently used
 + [[https://slackbuilds.org/repository/14.2/system/hack-font-ttf/][Hack]]
 #+BEGIN_SRC emacs-lisp
-(let ((my-font "Fira Code-10")
+(let ((my-font "Fira Code Medium-10")
       (font-sets '("fontset-default"
                    "fontset-standard"
                    "fontset-startup")))
