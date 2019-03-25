@@ -226,7 +226,7 @@ Good choices:
 + [[https://github.com/adobe-fonts/source-code-pro][SourceCodePro]] :: Currently used
 + [[https://slackbuilds.org/repository/14.2/system/hack-font-ttf/][Hack]]
 #+BEGIN_SRC emacs-lisp
-(let ((my-font "Source Code Variable-10")
+(let ((my-font "Fira Code-10")
       (font-sets '("fontset-default"
                    "fontset-standard"
                    "fontset-startup")))
@@ -635,7 +635,8 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
                 "• ✓"
                 'face `(:inherit mode-line :foreground "#CC9393"))))
             (`running (propertize "• ?" 'face `(:inherit mode-line :foreground "#CC9393")))
-            (`no-checker (propertize "• 🔒" 'face `(:inherit mode-line)))
+            (`no-checker (propertize "• " 'face `(:inherit mode-line)))
+            ;; (`no-checker (propertize "• 🔒" 'face `(:inherit mode-line)))
             (`not-checked (propertize "•  " 'face `(:inherit mode-line)))
             (`errored (propertize "• x" 'face `(:inherit mode-line :foreground "#CC9393")))
             (`interrupted (propertize "• !" 'face `(:inherit mode-line :foreground "#CC9393")))
@@ -2251,7 +2252,7 @@ But there is no backward compatibility.
   (global-set-key (kbd "C-c h h") #'hasky-stack-package-action)
   (global-set-key (kbd "C-c h i") #'hasky-stack-new))
 #+END_SRC
-**** Ligatures support
+**** COMMENT Ligatures support
 #+begin_src emacs-lisp
 (use-package hasklig-mode
   :hook (haskell-mode))

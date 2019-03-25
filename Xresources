@@ -5,7 +5,9 @@ Xft.hinting: 1
 Xft.hintstyle: hintslight
 Xft.lcdfilter: lcddefault
 Xft.rgba: rgb
-! Emacs.FontBackend: xft
+
+Emacs.FontBackend: xft
+Emacs.Font: Fira Code-10:medium
 
 XTerm*faceName: xft:Source Code Variable:size=10:antialias=true
 XTerm*loginShell: true
