@@ -28,7 +28,7 @@ import           XMonad.Util.NamedScratchpad
 
 -- | Set default terminal emulator
 myTerminal :: String
-myTerminal = "urxvt"
+myTerminal = "alacritty"
 
 -- | Set focus follow mouse
 myFocusFollowsMouse :: Bool

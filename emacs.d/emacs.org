@@ -226,7 +226,7 @@ Good choices:
 + [[https://github.com/adobe-fonts/source-code-pro][SourceCodePro]] :: Currently used
 + [[https://slackbuilds.org/repository/14.2/system/hack-font-ttf/][Hack]]
 #+BEGIN_SRC emacs-lisp
-(let ((my-font "Fira Code Medium-10")
+(let ((my-font "Source Code Variable-10")
       (font-sets '("fontset-default"
                    "fontset-standard"
                    "fontset-startup")))
@@ -854,6 +854,28 @@ Good, but has performance problems
 (use-package edbi)
 (use-package company-edbi)
 #+END_SRC
+*** EJC
+#+begin_src emacs-lisp
+(use-package ejc-sql
+  :config
+  (ejc-set-rows-limit nil)
+  (setq ejc-org-mode-show-results nil)
+  (add-hook 'ejc-sql-minor-mode-hook
+            (lambda ()
+              (auto-complete-mode t)
+              (ejc-ac-setup)))
+
+  ;; Define connections
+  (ejc-create-connection
+   "Test"
+   :classpath "/home/rrudakov/.m2/repository/org/postgresql/postgresql/42.2.5/postgresql-42.2.5.jar"
+   :dbtype "postgresql"
+   :dbname "blogdb"
+   :host "localhost"
+   :port "5432"
+   :user "bloguser"
+   :password "123456"))
+#+end_src
 *** Make PostgreSQL default
 #+BEGIN_SRC emacs-lisp
 (eval-after-load "sql"
@@ -1956,6 +1978,22 @@ But there is no backward compatibility.
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                ("\\paragraph{%s}" . "\\paragraph*{%s}")
                ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+(add-to-list 'org-latex-classes
+             '("org-article-en"
+               "\\documentclass[11pt,a4paper]{article}
+  \\usepackage{dejavu}
+  \\usepackage[english]{babel}
+  \\usepackage{geometry}
+  \\geometry{a4paper}
+  \\geometry{left=2cm,right=1cm,top=1cm,bottom=1cm,includeheadfoot,headheight=1.2cm}
+  \\renewcommand*\\familydefault{\\sfdefault}
+  \\renewcommand*\\ttdefault{cmvtt}"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 #+END_SRC
 *** Evaluate source code
 #+BEGIN_SRC emacs-lisp
@@ -2114,7 +2152,10 @@ But there is no backward compatibility.
   (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
   (add-hook 'python-mode-hook
             #'(lambda ()
-                (setq-local lsp-enable-snippet nil))))
+                (setq-local lsp-enable-snippet nil)))
+  (require 'lsp-clients)
+  (setq lsp-rust-clippy-preference "on")
+  (add-hook 'rust-mode-hook 'lsp))
 
 (use-package lsp-ui
   :config
@@ -2252,7 +2293,7 @@ But there is no backward compatibility.
   (global-set-key (kbd "C-c h h") #'hasky-stack-package-action)
   (global-set-key (kbd "C-c h i") #'hasky-stack-new))
 #+END_SRC
-**** COMMENT Ligatures support
+**** Ligatures support
 #+begin_src emacs-lisp
 (use-package hasklig-mode
   :hook (haskell-mode))
@@ -2448,6 +2489,11 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
 (use-package groovy-mode)
 #+END_SRC
+*** Rust
+**** Rust-mode
+#+begin_src emacs-lisp
+(use-package rust-mode)
+#+end_src
 ** Debugger
 #+BEGIN_SRC emacs-lisp
 (use-package realgud)

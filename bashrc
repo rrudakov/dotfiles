@@ -11,6 +11,7 @@ shopt -s checkwinsize
 
 # Enable completion
 source /usr/share/bash-completion/bash_completion
+source /etc/bash_completion.d/rustup.bash-completion
 
 # Set propmt
 export PS1='\[\e[32m\u\]\[\e[0m\]@\[\e[34m\h\] \[\e[33m\w\]\n\[\e[33m\]\[\e[1m\]$ \[\e[0m\]'
@@ -37,6 +38,9 @@ export QT_STYLE_OVERRIDE=adwaita-dark
 
 # Add local bin directory to PATH
 export PATH="$HOME/.local/bin:$PATH"
+
+# Add cargo bin to PATH
+export PATH="$HOME/.cargo/bin:$PATH"
 
 # Set up virtualenvwrapper
 export WORKON_HOME="$HOME/.virtualenvs"
