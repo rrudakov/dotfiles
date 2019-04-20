@@ -59,6 +59,10 @@ M-s h f         hi-lock-find-patterns
 #+begin_src text
 C-c i   insert current file path
 #+end_src
+** Dired
+#+begin_src text
+C-x C-j dired-jump (Jump to directory of the current buffer)
+#+end_src
 
 * Useful commands
 ** Org-mode
@@ -70,6 +74,41 @@ org-lint
 #+BEGIN_SRC text
 magit-blame
 #+END_SRC
+
+* External configuration example
+** Define databases connections
+#+begin_src emacs-lisp :tangle no
+(require 'cl-lib)
+(require 'ejc-sql)
+
+(cl-defun rr/create-postgres-connection (name &key hostname dbname username password)
+  "Defun postgresql connection with given NAME for ejc package.
+
+Required information is HOSTNAME, DBNAME, USERNAME and PASSWORD"
+  (ejc-create-connection
+   name
+   :classpath "/home/rrudakov/.m2/repository/org/postgresql/postgresql/42.2.5/postgresql-42.2.5.jar"
+   :dbtype "postgresql"
+   :dbname dbname
+   :host hostname
+   :port "5432"
+   :user username
+   :password password))
+
+;; Define connections
+(defun rr/setup-connections ()
+  "Setup all database connections."
+  (progn
+    (rr/create-postgres-connection
+     "Connection_name"
+     :hostname "localhost"
+     :dbname "database_name"
+     :username "username"
+     :password "password")
+    ))
+
+(provide 'databases)
+#+end_src
 
 * Syntax help
 ** Org-mode
@@ -107,17 +146,6 @@ Unordered lists with separator '::'
   (while (or (equal " " (string (char-after (point))))
              (equal "\n" (string (char-after (point)))))
     (delete-char 1)))
-#+END_SRC
-** Advice for read dir-locals when buffer changed
-#+BEGIN_SRC emacs-lisp
-(defun rr/update-dir-local ()
-  "Update local variables if it is not minibuffer."
-  (when (not (minibuffer-window-active-p (frame-selected-window)))
-    (hack-local-variables)))
-
-(defadvice select-window (after rr/upd-dir-local activate)
-  "Update local variables after call `select-window' function."
-  (rr/update-dir-local))
 #+END_SRC
 ** COMMENT Remove whitespaces before insert newline
 #+BEGIN_SRC emacs-lisp
@@ -241,8 +269,7 @@ Good choices:
      ;; if e.g. ℕ called DOUBLE-STRUCK CAPITAL N is not covered by our font
      ;; it will be displayed as placeholder-box,
      ;; because fallback for our font is now... our font :)
-     (set-fontset-font font-set nil my-font)
-     )
+     (set-fontset-font font-set nil my-font))
    font-sets))
 #+END_SRC
 *** Open files ends with "rc" in conf-unix-mode
@@ -377,6 +404,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
               tramp-file-name-regexp))
 
 (setq tramp-verbose 1)
+(setq auto-revert-remote-files nil)
 
 (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
 
@@ -479,7 +507,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   (setq ediff-window-setup-function 'ediff-setup-windows-plain
         ediff-split-window-function 'split-window-horizontally))
 #+END_SRC
-*** Ansi colors
+*** ANSI colors
 **** Compilation buffer
 #+BEGIN_SRC emacs-lisp
 (require 'ansi-color)
@@ -508,8 +536,15 @@ No more ugly line splitting
 #+BEGIN_SRC emacs-lisp
 (use-package savehist
   :config
-  (savehist-mode t)
-  (add-to-list 'savehist-additional-variables 'kill-ring))
+  (setq savehist-save-minibuffer-history t)
+  (setq savehist-additional-variables
+        '(kill-ring
+          search-ring
+          regexp-search-ring
+          shell-command-history
+          Info-history-list
+          register-alist))
+  (savehist-mode t))
 #+END_SRC
 *** Kill-ring
 Save stuff you’ve copied in other applications to the emacs kill-ring.
@@ -848,33 +883,34 @@ Good, but has performance problems
 (setq eshell-scroll-to-bottom-on-input t
       eshell-scroll-to-bottom-on-output t)
 #+end_src
+** Spell checking
+#+begin_src emacs-lisp
+(use-package ispell
+  :config
+  (setq ispell-program-name "aspell")
+  (add-hook 'text-mode-hook 'flyspell-mode))
+#+end_src
 ** SQL
 *** COMMENT Emacs database interface
 #+BEGIN_SRC emacs-lisp
 (use-package edbi)
 (use-package company-edbi)
 #+END_SRC
-*** EJC
+*** Emacs clojure database client
 #+begin_src emacs-lisp
 (use-package ejc-sql
   :config
-  (ejc-set-rows-limit nil)
+  (ejc-set-rows-limit 500)
   (setq ejc-org-mode-show-results nil)
+
   (add-hook 'ejc-sql-minor-mode-hook
             (lambda ()
               (auto-complete-mode t)
               (ejc-ac-setup)))
 
   ;; Define connections
-  (ejc-create-connection
-   "Test"
-   :classpath "/home/rrudakov/.m2/repository/org/postgresql/postgresql/42.2.5/postgresql-42.2.5.jar"
-   :dbtype "postgresql"
-   :dbname "blogdb"
-   :host "localhost"
-   :port "5432"
-   :user "bloguser"
-   :password "123456"))
+  (require 'databases)
+  (rr/setup-connections))
 #+end_src
 *** Make PostgreSQL default
 #+BEGIN_SRC emacs-lisp
@@ -932,11 +968,12 @@ Good, but has performance problems
   (setq yas-indent-line 'fixed)
   (add-hook 'prog-mode-hook #'yas-minor-mode))
 #+END_SRC
-** Autocomplete
+** Auto complete
 *** Common
 #+BEGIN_SRC emacs-lisp
 (use-package company
   :config
+  (setq company-global-modes '(not org-mode markdown-mode))
   (add-hook 'after-init-hook 'global-company-mode)
   (setq company-dabbrev-downcase nil
         company-tooltip-flip-when-above t)
@@ -1001,7 +1038,7 @@ Show more offten used completeons first
    paradox-hide-wiki-packages t))
 #+END_SRC
 ** Helm
-*** Config
+*** Configuration
 #+BEGIN_SRC emacs-lisp
 (use-package helm
   :config
@@ -1261,10 +1298,12 @@ Replace for i-search or swiper
           ("*Async Shell Command*" :select t :align t :size 0.4)
           ("*Shell Command Output*" :select t :align t :size 0.4)
           ("\\`\\*e?shell.*\\'" :regexp t :select t :popup t :align t :size 0.4)
+          (ejc-result-mode :select t :popup t :align t :size 0.5)
           (comint-mode :select t :align t :size 0.4)
           (help-mode :select t :align t :size 0.4)
           (helpful-mode :select t :align t :size 0.4)
-          (magit-status-mode :select t :align t :size 0.4)
+          (magit-status-mode :select t :align t :size 0.4 :inhibit-window-quit t)
+          (magit-log-mode :same t :inhibit-window-quit t)
           (magit-refs-mode :select t :same t :align t :size 0.4)
           (magit-diff-mode :select nil :align right :size 0.5)
           (magit-revision-mode :select t :align right :size 0.5)
@@ -1313,12 +1352,11 @@ Replace for i-search or swiper
         winum-ignored-buffers '(" *which-key*"))
   (winum-mode))
 #+END_SRC
-** Dired
+** Dried
 *** Common settings
 #+BEGIN_SRC emacs-lisp
 (use-package dired+
   :config
-  (require 'dired+)
   (setq dired-listing-switches "--group-directories-first -alh"
         dired-dwim-target t            ; if another Dired buffer is visible in another window, use that directory as target for Rename/Copy
         dired-recursive-copies 'always         ; "always" means no asking
@@ -1368,7 +1406,6 @@ Replace for i-search or swiper
   :config
   (setq flycheck-idle-change-delay 2)
   (add-hook 'after-init-hook #'global-flycheck-mode)
-  ;; (global-set-key (kbd "C-'") #'rr/flycheck-list-smart-toggle)
   (global-set-key (kbd "C-'") 'helm-flycheck)
 
   (setq flycheck-check-syntax-automatically '(save
@@ -1409,10 +1446,6 @@ Replace for i-search or swiper
       :fringe-bitmap bitmap
       :fringe-face 'flycheck-fringe-info))
 
-  (add-hook 'flycheck-mode-hook (lambda ()
-                                  (when (and (bound-and-true-p lsp-mode)
-                                             (equal (lsp-buffer-language) "python"))
-                                    (setq-local flycheck-checker 'python-pylint))))
   (setq-default flycheck-disabled-checkers
                 (append flycheck-disabled-checkers
                         '(javascript-jshint)))
@@ -1594,7 +1627,17 @@ Major mode for work with CSV files
 ** Log files
 #+BEGIN_SRC emacs-lisp
 (use-package vlf)
-(use-package logview)
+(use-package logview
+  :config
+  (setq logview-additional-level-mappings
+        '(("Python" . ((error       "CRITICAL")
+                       (error       "ERROR")
+                       (warning     "WARNING")
+                       (information "INFO")
+                       (debug       "DEBUG")))))
+
+  (setq logview-additional-submodes
+        '(("Python" (format . "TIMESTAMP LEVEL - [NAME]:") (levels . "Python")))))
 #+END_SRC
 ** Nginx
 #+BEGIN_SRC emacs-lisp
@@ -1724,7 +1767,14 @@ And even org-babel integration:
                                "~/Org/work/bsc.org"
                                "~/Org/mobile")))
 (setq org-directory "~/Org")
-(setq org-agenda-restore-windows-after-quit t)
+(setq org-agenda-restore-windows-after-quit t
+      org-agenda-compact-blocks t
+      org-agenda-archives-mode t
+      org-agenda-start-with-follow-mode t
+      org-agenda-follow-indirect t
+      org-agenda-window-setup 'only-window
+      org-agenda-span 'week
+      org-agenda-show-future-repeats 'next)
 #+END_SRC
 *** Capture settings
 #+BEGIN_SRC emacs-lisp
@@ -2148,22 +2198,24 @@ But there is no backward compatibility.
         lsp-inhibit-message t
         lsp-response-timeout 60
         lsp-prefer-flymake nil
-        lsp-message-project-root-warning t)
-  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
-  (add-hook 'python-mode-hook
-            #'(lambda ()
-                (setq-local lsp-enable-snippet nil)))
+        lsp-message-project-root-warning t
+        lsp-keep-workspace-alive nil
+        lsp-enable-folding t)
   (require 'lsp-clients)
   (setq lsp-rust-clippy-preference "on")
-  (add-hook 'rust-mode-hook 'lsp))
+  (add-hook 'rust-mode-hook 'lsp)
+
+  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
 
 (use-package lsp-ui
   :config
-  (setq lsp-ui-sideline-update-mode 'point
+  (setq lsp-ui-sideline-update-mode 'line
         lsp-ui-doc-enable nil
         lsp-ui-sideline-show-hover nil
         lsp-ui-sideline-ignore-duplicate t
-        lsp-ui-flycheck-list-position 'right))
+        lsp-ui-flycheck-list-position 'bottom
+        lsp-ui-flycheck-live-reporting nil)
+  (flycheck-add-next-checker 'lsp-ui '(warning . python-pylint)))
 #+END_SRC
 **** Completion
 #+BEGIN_SRC emacs-lisp
@@ -2339,10 +2391,8 @@ But there is no backward compatibility.
 **** Virtualenv
 #+BEGIN_SRC emacs-lisp
 (use-package pyvenv
-  ;; Set `pyvenv-workon' to the absolute path for the current venv in a .dir-locals.el
-  :hook (python-mode . pyvenv-mode)
-  ;; (add-hook 'pyvenv-post-activate-hooks 'lsp)
-  )
+  :config
+  (pyvenv-tracking-mode))
 #+END_SRC
 **** Default interpreter
 #+BEGIN_SRC emacs-lisp
