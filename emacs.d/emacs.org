@@ -1302,7 +1302,7 @@ Replace for i-search or swiper
           (comint-mode :select t :align t :size 0.4)
           (help-mode :select t :align t :size 0.4)
           (helpful-mode :select t :align t :size 0.4)
-          (magit-status-mode :select t :align t :size 0.4 :inhibit-window-quit t)
+          (magit-status-mode :popup t :select t :align t :size 0.4)
           (magit-log-mode :same t :inhibit-window-quit t)
           (magit-refs-mode :select t :same t :align t :size 0.4)
           (magit-diff-mode :select nil :align right :size 0.5)
@@ -1486,7 +1486,6 @@ Replace for i-search or swiper
   :config
   (global-set-key (kbd "C-x g") 'magit-status)
   (global-magit-file-mode)
-  (setq magit-completing-read-function 'helm--completing-read-default)
 
   (setq magit-revision-insert-related-refs 'all
         magit-revision-use-hash-sections 'quick)
@@ -1495,14 +1494,17 @@ Replace for i-search or swiper
 
   (setq magit-fetch-arguments '("--prune"))
 
-  ;; (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
-  (setq magit-display-buffer-function 'display-buffer)
-
   (add-hook 'focus-in-hook #'git-gutter:update-all-windows)
   (add-hook 'magit-post-refresh-hook #'git-gutter:update-all-windows)
   (add-hook 'focus-in-hook 'rr/refresh-vc-state)
   (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state))
 #+END_SRC
+*** Transient
+#+begin_src emacs-lisp
+(use-package transient
+  :config
+  (setq transient-show-popup nil))
+#+end_src
 *** Work with forges
 #+BEGIN_SRC emacs-lisp
 (use-package forge
