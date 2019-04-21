@@ -1,4 +1,5 @@
 #+TITLE: My Emacs configuration
+
 * Keybindings
 ** Common
 #+BEGIN_SRC text
@@ -1202,7 +1203,7 @@ Replace for i-search or swiper
   (add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
   (add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
   (add-hook 'org-mode-hook 'turn-on-smartparens-strict-mode)
-  (sp-local-pair 'java-mode "{" nil :post-handlers '(("||\n[i]" "RET")))
+  (sp-local-pair 'prog-mode "{" nil :post-handlers '(("||\n[i]" "RET")))
   (sp-local-pair 'java-mode "/*" "*/" :post-handlers '(("* ||\n[i]" "RET")))
   :bind
   ("M-]" . 'sp-unwrap-sexp))
@@ -2229,6 +2230,17 @@ But there is no backward compatibility.
             #'(lambda ()
                 (setq-local company-lsp-enable-snippet nil))))
 #+END_SRC
+**** Folding
+#+begin_src emacs-lisp
+(use-package origami
+  :config
+  (global-origami-mode))
+
+(use-package lsp-origami
+  :after origami
+  :config
+  (add-hook 'origami-mode-hook #'lsp-origami-mode))
+#+end_src
 *** Code documentation
 #+begin_src emacs-lisp
 (use-package eldoc-box
@@ -2420,7 +2432,8 @@ But there is no backward compatibility.
   )
 (use-package py-yapf
   :config
-  (add-hook 'python-mode-hook 'py-yapf-enable-on-save))
+  ;; (add-hook 'python-mode-hook 'py-yapf-enable-on-save)
+  )
 #+END_SRC
 **** Tox
 #+BEGIN_SRC emacs-lisp
