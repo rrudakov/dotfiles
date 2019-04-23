@@ -6,10 +6,10 @@
 set nocompatible
 
 " Показывать положение курсора всё время.
-set ruler		
+set ruler
 
 " Показывать незавершённые команды в статусбаре
-set showcmd		
+set showcmd
 
 " Включаем нумерацию строк
 " set nu
@@ -33,7 +33,7 @@ set scrolloff=7
 
 " Выключаем надоедливый звонок
 set novisualbell
-set t_vb= 
+set t_vb=
 
 " Поддержка мыши
 set mouse-=a "запретить визуальный режим при выделении мышью
@@ -88,7 +88,7 @@ set backupdir=~/.vimbak/
 nmap yy yy:silent .w !xclip<cr>
 vmap y y:silent '<,'> w !xclip<cr>
 
-set t_Co=256 
+set t_Co=256
 set modeline
 
 " let base16colorspace=256
@@ -96,17 +96,12 @@ filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
-Plugin 'chriskempson/base16-vim'
-Plugin 'morhetz/gruvbox'
+Plugin 'Zenburn'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
 
 syntax enable
 " set termguicolors
-set background=dark    " Setting dark mode
-let g:gruvbox_italic=1
-let g:gruvbox_contrast_dark='hard'
-let g:gruvbox_invert_selection=0
-colorscheme gruvbox
+colorscheme zenburn 
 " colorscheme base16-tomorrow-night

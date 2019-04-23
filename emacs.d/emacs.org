@@ -1303,7 +1303,7 @@ Replace for i-search or swiper
           (comint-mode :select t :align t :size 0.4)
           (help-mode :select t :align t :size 0.4)
           (helpful-mode :select t :align t :size 0.4)
-          (magit-status-mode :popup t :select t :align t :size 0.4)
+          (magit-status-mode :select t :align t :size 0.4 :inhibit-window-quit t)
           (magit-log-mode :same t :inhibit-window-quit t)
           (magit-refs-mode :select t :same t :align t :size 0.4)
           (magit-diff-mode :select nil :align right :size 0.5)
@@ -2225,10 +2225,7 @@ But there is no backward compatibility.
 (use-package company-lsp
   :config
   (push 'company-lsp company-backends)
-  (setq company-lsp-enable-snippet t)
-  (add-hook 'python-mode-hook
-            #'(lambda ()
-                (setq-local company-lsp-enable-snippet nil))))
+  (setq company-lsp-enable-snippet t))
 #+END_SRC
 **** Folding
 #+begin_src emacs-lisp
