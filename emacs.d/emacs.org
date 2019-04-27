@@ -2208,6 +2208,11 @@ But there is no backward compatibility.
   (setq lsp-rust-clippy-preference "on")
   (add-hook 'rust-mode-hook 'lsp)
 
+  ;; Enable lsp for python after load dired local variables
+  (add-hook 'hack-local-variables-hook
+            (lambda () (when (and pyvenv-virtual-env
+                                  (derived-mode-p 'python-mode)) (lsp))))
+
   (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
 
 (use-package lsp-ui
@@ -2217,7 +2222,7 @@ But there is no backward compatibility.
         lsp-ui-sideline-show-hover nil
         lsp-ui-sideline-ignore-duplicate t
         lsp-ui-flycheck-list-position 'bottom
-        lsp-ui-flycheck-live-reporting nil)
+        lsp-ui-flycheck-live-reporting t)
   (flycheck-add-next-checker 'lsp-ui '(warning . python-pylint)))
 #+END_SRC
 **** Completion
@@ -2237,6 +2242,16 @@ But there is no backward compatibility.
   :after origami
   :config
   (add-hook 'origami-mode-hook #'lsp-origami-mode))
+#+end_src
+*** DAP mode
+**** Common setup
+#+begin_src emacs-lisp
+(use-package dap-mode
+  :config
+  (dap-mode 1)
+  (dap-ui-mode 1)
+
+  (require 'dap-lldb))
 #+end_src
 *** Code documentation
 #+begin_src emacs-lisp
@@ -2403,7 +2418,8 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
 (use-package pyvenv
   :config
-  (pyvenv-tracking-mode))
+  (pyvenv-tracking-mode)
+  (add-hook 'pyvenv-post-activate-hooks 'lsp))
 #+END_SRC
 **** Default interpreter
 #+BEGIN_SRC emacs-lisp
