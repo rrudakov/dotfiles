@@ -2195,6 +2195,7 @@ But there is no backward compatibility.
 **** Common setup
 #+BEGIN_SRC emacs-lisp
 (use-package lsp-mode
+  :after pyvenv
   :config
   (setq lsp-eldoc-render-all nil
         lsp-highlight-symbol-at-point nil
