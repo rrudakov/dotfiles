@@ -1,0 +1,43 @@
+[general]
+# List of accounts to be synced, separated by a comma.
+accounts = bsc
+# Controls how many accounts may be synced simultaneously
+maxsyncaccounts = 1
+
+[Account bsc]
+# Identifier for the local repository; e.g. the maildir to be synced via IMAP.
+localrepository = bsc-local
+# Identifier for the remote repository; i.e. the actual IMAP, usually non-local.
+remoterepository = bsc-remote
+# Minutes between syncs
+autorefresh = 0.5
+# Quick-syncs do not update if the only changes were to IMAP flags.
+# autorefresh=0.5 together with quick=10 yields
+# 10 quick refreshes between each full refresh, with 0.5 minutes between every 
+# refresh, regardless of type.
+quick = 10
+postsynchook = ~/.local/bin/update_mail_index
+
+[Repository bsc-local]
+# OfflineIMAP supports Maildir, GmailMaildir, and IMAP for local repositories.
+type = Maildir
+# Where should the mail be placed?
+localfolders = ~/.mail/BSC
+
+[Repository bsc-remote]
+# Remote repos can be IMAP or Gmail, the latter being a preconfigured IMAP.
+type = IMAP
+remotehost = outlook.office365.com
+remoteport = 993
+sslcacertfile = /etc/ssl/certs/ca-certificates.crt
+# Instead of closing the connection once a sync is complete, offlineimap will
+# send empty data to the server to hold the connection open. A value of 60
+# attempts to hold the connection for a minute between syncs (both quick and
+# autorefresh).This setting has no effect if autorefresh and holdconnectionopen
+# are not both set.
+keepalive = 60
+# OfflineIMAP normally closes IMAP server connections between refreshes if
+# the global option autorefresh is specified.  If you wish it to keep the
+# connection open, set this to true. This setting has no effect if autorefresh
+# is not set.
+holdconnectionopen = yes

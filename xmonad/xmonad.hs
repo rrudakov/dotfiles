@@ -1,5 +1,4 @@
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE LambdaCase       #-}
+{-# LANGUAGE LambdaCase #-}
 {-# OPTIONS_GHC -Wall #-}
 import           Data.List
 import qualified Data.Map                        as M
@@ -20,6 +19,7 @@ import           XMonad.Layout.Grid
 import           XMonad.Layout.LayoutModifier
 import           XMonad.Layout.NoBorders
 import           XMonad.Layout.Renamed
+import           XMonad.Layout.Spacing
 import           XMonad.Prompt
 import           XMonad.Prompt.Shell
 import           XMonad.Prompt.Ssh
@@ -106,7 +106,7 @@ spotifyStop =
 myPromptConfig :: XPConfig
 myPromptConfig =
   XPC
-    { font = "xft:Source Code Variable:size=10:bold:antialias=true"
+    { font = "xft:Source Code Variable:size=8:semibold:antialias=true"
     , bgColor = "#282828"
     , fgColor = "#ebdbb2"
     , fgHLight = "black"
@@ -144,8 +144,7 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
   , ((modm, xK_space), sendMessage NextLayout)
     --  Reset the layouts on the current workspace to default
   , ((modm .|. shiftMask, xK_space), setLayout $ XMonad.layoutHook conf)
-    -- Lock screen
-  , ((modm .|. shiftMask, xK_x), spawn "i3lock-wrapper")
+  , ((modm .|. shiftMask, xK_x), spawn "i3lock-fancy")
     -- Resize viewed windows to the correct size
   , ((modm, xK_n), refresh)
     -- Move focus to the next window
@@ -193,9 +192,8 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
         , "xmonad-session --recompile && xmonad-session --restart; "
         , "else xmessage xmonad-session not in \\$PATH: \"$PATH\"; fi"
         ])
-    -- Select urgent workspace
+  , ((modm, xK_b), sendMessage ToggleStruts)
   , ((modm, xK_BackSpace), focusUrgent)
-    -- Multimedia keys
   , ( (0, xF86XK_AudioLowerVolume)
     , spawn
         "pactl set-sink-mute @DEFAULT_SINK@ false ; pactl set-sink-volume @DEFAULT_SINK@ -5%")
@@ -249,26 +247,31 @@ myMouseBindings XConfig {XMonad.modMask = modm} =
     -- you may also bind events to the mouse scroll wheel (button4 and button5)
     ]
 
--- | Set layouts, rename to shorter names
+-- | Set layouts
 myLayout ::
-  ModifiedLayout AvoidStruts
-  (Choose
+  ModifiedLayout
+    Rename
     (ModifiedLayout
-      (ConfigurableBorder Ambiguity) (ModifiedLayout Rename Tall))
-    (Choose
-      (ModifiedLayout WithBorder (ModifiedLayout Rename Full))
-      (ModifiedLayout
-        (ConfigurableBorder Ambiguity) (ModifiedLayout Rename Grid))))
-  Window
+       Spacing
+       (ModifiedLayout
+          AvoidStruts
+          (Choose
+             (ModifiedLayout
+                (ConfigurableBorder Ambiguity) (ModifiedLayout Rename Tall))
+             (Choose
+                (ModifiedLayout WithBorder (ModifiedLayout Rename Full))
+                (ModifiedLayout
+                   (ConfigurableBorder Ambiguity) (ModifiedLayout Rename Grid))))))
+    Window
 myLayout =
+  renamed [CutWordsLeft 1] $
+  spacingRaw True (Border 0 10 10 10) True (Border 10 10 10 10) True $
   avoidStruts $
   lessBorders Screen tiled ||| noBorders full ||| lessBorders Screen grid
   where
     tiled = renamed [Replace "[T]"] $ Tall 1 (3 / 100) (1 / 2)
-    full = renamed [Replace "[F]"] Full
-    grid = renamed [Replace "[G]"] Grid
-
-
+    full  = renamed [Replace "[F]"] Full
+    grid  = renamed [Replace "[G]"] Grid
 
 -- |Scratchpads definitions
 -- RationalRect arguments
@@ -319,6 +322,7 @@ myManageHook =
     , className =? "xfce4-notifyd" --> doIgnore
     , className =? "rdesktop" --> doFullFloat
     , title =? "Media viewer" --> doFullFloat
+    , title =? "Unlock Keyring" --> doCenterFloat
     , className =? "Nm-openconnect-auth-dialog" --> doCenterFloat
     , title =? "Helm" -->
       customFloating (W.RationalRect (1 / 5) (1 / 5) (3 / 5) (3 / 5))
@@ -391,17 +395,19 @@ toggleStrutsKey XConfig {XMonad.modMask = modMask'} = (modMask', xK_b)
 
 myConfig ::
   XConfig
-  (ModifiedLayout AvoidStruts
-    (Choose
-      (ModifiedLayout
-        (ConfigurableBorder Ambiguity)
-        (ModifiedLayout Rename Tall))
-      (Choose
-        (ModifiedLayout WithBorder
-          (ModifiedLayout Rename Full))
-        (ModifiedLayout
-          (ConfigurableBorder Ambiguity)
-          (ModifiedLayout Rename Grid)))))
+    (ModifiedLayout
+       Rename
+       (ModifiedLayout
+          Spacing
+          (ModifiedLayout
+             AvoidStruts
+             (Choose
+                (ModifiedLayout
+                   (ConfigurableBorder Ambiguity) (ModifiedLayout Rename Tall))
+                (Choose
+                   (ModifiedLayout WithBorder (ModifiedLayout Rename Full))
+                   (ModifiedLayout
+                      (ConfigurableBorder Ambiguity) (ModifiedLayout Rename Grid)))))))
 myConfig =
   ewmh $
   withUrgencyHook

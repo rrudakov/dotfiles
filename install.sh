@@ -9,7 +9,7 @@
 ############### Variables:
 
 dir=${HOME}/dotfiles
-files="Xresources emacs.d/init.el emacs.d/emacs.org emacs.d/custom/google-java-format.el emacs.d/templates/default-java.el tmux.conf vimrc xmonad/xmonad.hs xmobarrc xprofile gitconfig stalonetrayrc zshrc zshenv aliasrc config/dunst/dunstrc config/fontconfig/fonts.conf config/alacritty/alacritty.yml"
+files="offlineimaprc Xresources emacs.d/init.el emacs.d/emacs.org emacs.d/custom/google-java-format.el emacs.d/templates/default-java.el tmux.conf vimrc xmonad/xmonad.hs xmobarrc xprofile gitconfig stalonetrayrc bashrc bash_profile zshrc zshenv aliasrc config/dunst/dunstrc config/fontconfig/fonts.conf config/alacritty/alacritty.yml"
 
 ###############
 
@@ -20,12 +20,15 @@ cd ${dir}
 echo "...done"
 
 echo "Create directories"
+mkdir -p ~/.local/bin
 mkdir -p ${HOME}/.xmonad ${HOME}/.emacs.d/custom ${HOME}/.config/dunst ${HOME}/.config/fontconfig ${HOME}/.config/alacritty ${HOME}/.emacs.d/templates
 echo "...done"
 
 # Move any existing dotfiles to ~/dotfiles_old, then creating symlinks
-
 for file in $files; do
     echo "Creating symlinks for $file in home directory"
     ln -sf ${dir}/${file} ${HOME}/.${file}
 done
+
+# Install switch monitor script
+ln -sf ${dir}/switch_monitor.sh ${HOME}/.local/bin/switch_monitor
