@@ -255,7 +255,7 @@ Good choices:
 + [[https://github.com/adobe-fonts/source-code-pro][SourceCodePro]] :: Currently used
 + [[https://slackbuilds.org/repository/14.2/system/hack-font-ttf/][Hack]]
 #+BEGIN_SRC emacs-lisp
-(let ((my-font "Source Code Variable-10")
+(let ((my-font "Source Code Variable-9")
       (font-sets '("fontset-default"
                    "fontset-standard"
                    "fontset-startup")))
@@ -900,6 +900,7 @@ Good, but has performance problems
 *** Emacs clojure database client
 #+begin_src emacs-lisp
 (use-package ejc-sql
+  :demand t
   :config
   (ejc-set-rows-limit 500)
   (setq ejc-org-mode-show-results nil)
@@ -1409,11 +1410,6 @@ Replace for i-search or swiper
   (add-hook 'after-init-hook #'global-flycheck-mode)
   (global-set-key (kbd "C-'") 'helm-flycheck)
 
-  (setq flycheck-check-syntax-automatically '(save
-                                              idle-change
-                                              new-line
-                                              mode-enabled))
-
   (when (fboundp 'define-fringe-bitmap)
     (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
       [#b10000000
@@ -1453,11 +1449,7 @@ Replace for i-search or swiper
 
   (setq-default flycheck-disabled-checkers
                 (append flycheck-disabled-checkers
-                        '(json-jsonlist)))
-
-  (setq-default flycheck-disabled-checkers
-                (append flycheck-disabled-checkers
-                        '(python-flake8))))
+                        '(json-jsonlist))))
 #+END_SRC
 *** Show errors in posframe
 #+BEGIN_SRC emacs-lisp
@@ -2116,11 +2108,14 @@ But there is no backward compatibility.
 
 (require 'mu4e)
 
+;; use mu4e for e-mail in emacs
+(setq mail-user-agent 'mu4e-user-agent)
+
+(setq mu4e-view-use-gnus t)
+
 (setq mu4e-maildir (expand-file-name "~/.mail/BSC"))
 (setq mu4e-trash-folder  "/Deleted Items")
 
-;; mu4e-get-mail-command "mbsync BSC"
-;; mu4e-update-interval 120
 (setq mu4e-headers-auto-update t
       mu4e-compose-signature-auto-include nil
       mu4e-completing-read-function 'completing-read)
@@ -2148,19 +2143,20 @@ But there is no backward compatibility.
 (setq org-mu4e-convert-to-html nil)
 (add-hook 'message-send-hook 'rr/htmlize-mail)
 
-(setq mu4e-html2text-command "w3m -dump -T text/html")
-(setq mu4e-html-renderer 'w3m)
-
 (setq mu4e-headers-fields
       '((:human-date . 25)
         (:flags . 6)
         (:from . 22)
         (:subject . nil)))
 
-(use-package mu4e-conversation
-  :after mu4e
-  :config
-  (global-mu4e-conversation-mode))
+;; Useful, but I prefer classic way
+;; (use-package mu4e-conversation
+;;   :after mu4e
+;;   :config
+;;   (global-mu4e-conversation-mode))
+
+;; Run mu4e in background after starting emacs
+(mu4e t)
 
 (use-package helm-mu
   :after (helm mu4e)
@@ -2203,28 +2199,39 @@ But there is no backward compatibility.
         lsp-response-timeout 60
         lsp-prefer-flymake nil
         lsp-message-project-root-warning t
-        lsp-keep-workspace-alive nil
+        lsp-keep-workspace-alive t
         lsp-enable-folding t)
   (require 'lsp-clients)
+
+  ;; Rust lsp settings
   (setq lsp-rust-clippy-preference "on")
   (add-hook 'rust-mode-hook 'lsp)
+
+  ;; Python lsp settings
+  (setq lsp-pyls-plugins-pylint-enabled t)
 
   ;; Enable lsp for python after load dired local variables
   (add-hook 'hack-local-variables-hook
             (lambda () (when (and pyvenv-virtual-env
-                                  (derived-mode-p 'python-mode)) (lsp))))
+                                  (derived-mode-p 'python-mode))
+                         (lsp))))
 
+  ;; (setq lsp-print-io t)
   (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
 
 (use-package lsp-ui
   :config
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
   (setq lsp-ui-sideline-update-mode 'line
         lsp-ui-doc-enable nil
         lsp-ui-sideline-show-hover nil
         lsp-ui-sideline-ignore-duplicate t
+        lsp-ui-flycheck-enable t
         lsp-ui-flycheck-list-position 'bottom
         lsp-ui-flycheck-live-reporting t)
-  (flycheck-add-next-checker 'lsp-ui '(warning . python-pylint)))
+
+  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
 #+END_SRC
 **** Completion
 #+BEGIN_SRC emacs-lisp
@@ -2286,8 +2293,8 @@ But there is no backward compatibility.
   :after lsp-mode
   :config
   (add-hook 'java-mode-hook 'lsp)
-  (add-to-list 'lsp-java-vmargs "-javaagent:/home/rrudakov/.m2/repository/org/projectlombok/lombok/1.18.6/lombok-1.18.6.jar")
-  (add-to-list 'lsp-java-vmargs "-Xbootclasspath/a:/home/rrudakov/.m2/repository/org/projectlombok/lombok/1.18.6/lombok-1.18.6.jar"))
+  (add-to-list 'lsp-java-vmargs "-javaagent:/home/rrudakov/Soft/lombok/lombok.jar")
+  (add-to-list 'lsp-java-vmargs "-Xbootclasspath/a:/home/rrudakov/Soft/lombok/lombok.jar"))
 #+END_SRC
 **** Expand snippet for new class
 #+BEGIN_SRC emacs-lisp
