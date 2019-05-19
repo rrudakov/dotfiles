@@ -1,1 +1,0 @@
-typeset -U path

@@ -11,7 +11,8 @@ shopt -s checkwinsize
 
 # Enable completion
 source /usr/share/bash-completion/bash_completion
-source /etc/bash_completion.d/rustup.bash-completion
+source /usr/share/bash-completion/completions/pass
+source $HOME/.local/share/bash_completion/completions/rustup
 
 # Set propmt
 export PS1='\[\e[32m\u\]\[\e[0m\]@\[\e[34m\h\] \[\e[33m\w\]\n\[\e[33m\]\[\e[1m\]$ \[\e[0m\]'
@@ -31,15 +32,27 @@ export LESSOPEN="| /usr/bin/source-highlight-esc.sh %s"
 # export LESS='-R '
 
 # Better fonts rendering in Java applications
-export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=lcd'
+export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=lcd -Dswing.aatext=true'
 
-# Set QT5 theme using qt5ct
+# Silent java options
+_SILENT_JAVA_OPTIONS="$_JAVA_OPTIONS"
+unset _JAVA_OPTIONS
+alias java='java "$_SILENT_JAVA_OPTIONS"'
+
+# Set QT5 theme
 export QT_STYLE_OVERRIDE=adwaita-dark
+
+# Set path for Android studio
+export ANDROID_HOME="$HOME/Android/Sdk"
+export PATH="$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools/bin:$PATH"
+
+# Set path for Texlive
+export PATH="$HOME/.local/texlive/2017/bin/x86_64-linux:$PATH"
 
 # Add local bin directory to PATH
 export PATH="$HOME/.local/bin:$PATH"
 
-# Add cargo bin to PATH
+# Add ~/.cargo/bin to PATH
 export PATH="$HOME/.cargo/bin:$PATH"
 
 # Set up virtualenvwrapper
