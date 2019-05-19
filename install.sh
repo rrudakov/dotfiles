@@ -32,3 +32,4 @@ done
 
 # Install switch monitor script
 ln -sf ${dir}/switch_monitor.sh ${HOME}/.local/bin/switch_monitor
+ln -sf ${dir}/update_mail_index.sh ${HOME}/.local/bin/update_mail_index
