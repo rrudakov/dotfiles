@@ -1,8 +1,8 @@
 [general]
 # List of accounts to be synced, separated by a comma.
-accounts = bsc
+accounts = GMail,bsc
 # Controls how many accounts may be synced simultaneously
-maxsyncaccounts = 1
+maxsyncaccounts = 3
 
 [Account bsc]
 # Identifier for the local repository; e.g. the maildir to be synced via IMAP.
@@ -40,4 +40,24 @@ keepalive = 60
 # the global option autorefresh is specified.  If you wish it to keep the
 # connection open, set this to true. This setting has no effect if autorefresh
 # is not set.
+holdconnectionopen = yes
+
+[Account GMail]
+localrepository = GMail-local
+remoterepository = GMail-remote
+autorefresh = 0.5
+quick = 10
+postsynchook = ~/.local/bin/update_mail_index
+
+[Repository GMail-local]
+type = Maildir
+localfolders = ~/.mail/GMail
+
+[Repository GMail-remote]
+type = IMAP
+remotehost = imap.gmail.com
+sslcacertfile = /etc/ssl/certs/ca-certificates.crt
+ssl_version = tls1_2
+maxconnections = 1
+keepalive = 60
 holdconnectionopen = yes

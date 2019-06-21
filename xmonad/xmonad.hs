@@ -177,7 +177,6 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
   , ((modm .|. shiftMask, xK_s), namedScratchpadAction scratchpads "slack")
   , ((modm, xK_u), namedScratchpadAction scratchpads "wire")
   , ((modm .|. shiftMask, xK_b), namedScratchpadAction scratchpads "skype")
-  , ((modm, xK_y), namedScratchpadAction scratchpads "mattermost")
     -- Toggle copy to all workspaces
   , ((modm, xK_a), toggleCopyToAll)
     -- Org capture
@@ -302,11 +301,6 @@ scratchpads =
       "skype"
       "skypeforlinux"
       (className =? "Skype")
-      (customFloating $ W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
-  , NS
-      "mattermost"
-      "mattermost-desktop"
-      (appName =? "mattermost")
       (customFloating $ W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
   ]
 
