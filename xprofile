@@ -11,6 +11,7 @@ sysmodmap=/etc/X11/xinit/.Xmodmap
 [ -f $userresources ] && /usr/bin/xrdb -merge $userresources
 [ -f $usermodmap ] && /usr/bin/xmodmap $usermodmap
 
+export PATH=$HOME/.local/bin:$PATH
 export GDK_USE_XFT=1
 export DE="xfce"
 $HOME/.local/bin/switch_monitor

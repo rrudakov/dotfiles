@@ -68,7 +68,7 @@ adjust_stalonetray $TRAY_GEOMETRY $TRAY_ICON_SIZE $TRAY_SLOT_SIZE
 # Run xrandr command
 if [ "$INTERNAL" == true ]; then
     /usr/bin/xrandr --output eDP-1 --auto --output DP-1 --off
-    /usr/bin/nitrogen --set-auto $HOME/Wallpapers/internal.jpg
+    /usr/bin/nitrogen --set-auto $HOME/Wallpapers/internal.png
 else
     /usr/bin/xrandr --output eDP-1 --off --output DP-1 --auto
     /usr/bin/nitrogen --set-auto $HOME/Wallpapers/external.png
