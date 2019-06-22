@@ -2233,7 +2233,7 @@ But there is no backward compatibility.
 ;; use mu4e for e-mail in emacs
 (setq mail-user-agent 'mu4e-user-agent)
 
-(setq mu4e-view-use-gnus t
+(setq mu4e-view-use-gnus nil
       mu4e-hide-index-messages t)
 
 (setq mu4e-maildir (expand-file-name "~/.mail/GMail"))
@@ -2254,7 +2254,10 @@ But there is no backward compatibility.
 (when (fboundp 'imagemagick-register-types)
   (imagemagick-register-types))
 
-(setq mu4e-view-prefer-html t)
+(setq mu4e-view-prefer-html nil)
+;; (setq mu4e-html2text-command "html2text -utf8 -width 72")
+(setq mu4e-html2text-command "w3m -dump -T text/html -O utf8")
+
 (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t)
 
 (setq message-kill-buffer-on-exit t)
