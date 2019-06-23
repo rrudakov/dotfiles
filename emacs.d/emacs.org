@@ -2255,8 +2255,8 @@ But there is no backward compatibility.
   (imagemagick-register-types))
 
 (setq mu4e-view-prefer-html nil)
-;; (setq mu4e-html2text-command "html2text -utf8 -width 72")
-(setq mu4e-html2text-command "w3m -dump -T text/html -O utf8")
+;; (setq mu4e-html2text-command "html2text --images-to-alt -b 72 --ignore-tables --ignore-emphasis")
+(setq mu4e-html2text-command "w3m -dump -T text/html -O utf8 -graph")
 
 (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t)
 
