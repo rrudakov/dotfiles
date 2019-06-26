@@ -918,6 +918,8 @@ Good, but has performance problems
   :commands ejc-connect
   :config
   (ejc-set-rows-limit 500)
+  (ejc-set-column-width-limit nil)
+
   (setq ejc-org-mode-show-results nil)
 
   (add-hook 'ejc-sql-minor-mode-hook

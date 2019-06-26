@@ -44,7 +44,7 @@ function adjust_stalonetray () {
 }
 
 if [ $# -eq 0 ]; then
-    if /usr/bin/xrandr --query | grep --silent '\bDP-1 connected\b'; then
+    if /usr/bin/xrandr --query | grep --silent '\bHDMI-1-1 connected\b'; then
         echo "Connected"
         DPI=163
         INTERNAL=false
@@ -67,10 +67,10 @@ adjust_stalonetray $TRAY_GEOMETRY $TRAY_ICON_SIZE $TRAY_SLOT_SIZE
 
 # Run xrandr command
 if [ "$INTERNAL" == true ]; then
-    /usr/bin/xrandr --output eDP-1 --auto --output DP-1 --off
+    /usr/bin/xrandr --output eDP-1-1 --auto --output HDMI-1-1 --off
     /usr/bin/nitrogen --set-auto $HOME/Wallpapers/internal.png
 else
-    /usr/bin/xrandr --output eDP-1 --off --output DP-1 --auto
+    /usr/bin/xrandr --output eDP-1-1 --off --output HDMI-1-1 --auto
     /usr/bin/nitrogen --set-auto $HOME/Wallpapers/external.png
 fi
 
