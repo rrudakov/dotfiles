@@ -841,12 +841,10 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
   (defun rr/spaceline-theme (&rest additional-segments)
     "Apply my spaceline theme ADDITIONAL-SEGMENTS are inserted on the right."
     (spaceline-compile
-      `(((window-number
-          workspace-number)
+      `(((window-number)
          :fallback evil-state
          :face highlight-face
-         :priority 100
-         :separator " | ")
+         :priority 100)
         (anzu :priority 4)
         auto-compile
         ((buffer-id remote-host)
@@ -867,6 +865,7 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
         (buffer-encoding-abbrev :priority 3)
         (global :when active)
         ,@additional-segments
+        (workspace-number :when active)
         (rr/version-control :when active :priority 7)
         major-mode
         ((rr/flycheck-errors rr/flycheck-warnings rr/flycheck-infos)
@@ -916,10 +915,13 @@ Good, but has performance problems
 *** Emacs clojure database client
 #+begin_src emacs-lisp
 (use-package ejc-sql
-  :commands ejc-connect
+  ;; :commands ejc-connect
   :config
-  (ejc-set-rows-limit 500)
-  (ejc-set-column-width-limit nil)
+  (defun rr/ejc-sql-connected-hook ()
+    (ejc-set-rows-limit 500)
+    (ejc-set-column-width-limit nil))
+
+  (add-hook 'ejc-sql-connected-hook 'rr/ejc-sql-connected-hook)
 
   (setq ejc-org-mode-show-results nil)
 
@@ -1066,6 +1068,7 @@ Show more offten used completeons first
   (define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
   (define-key global-map [remap execute-extended-command] 'helm-M-x)
   (define-key global-map [remap yank-pop] 'helm-show-kill-ring)
+  (define-key global-map [remap tab-to-tab-stop] 'helm-occur)
 
   (define-key lisp-interaction-mode-map [remap completion-at-point] 'helm-lisp-completion-at-point)
   (define-key emacs-lisp-mode-map       [remap completion-at-point] 'helm-lisp-completion-at-point)
@@ -1094,7 +1097,7 @@ Show more offten used completeons first
   :config
   (define-key global-map (kbd "C-c s") 'helm-tramp))
 #+END_SRC
-*** Swoop
+*** COMMENT Swoop
 Replace for i-search or swiper
 #+BEGIN_SRC emacs-lisp
 (use-package helm-swoop
@@ -1212,16 +1215,16 @@ Replace for i-search or swiper
 #+END_SRC
 ** Workspaces
 #+BEGIN_SRC emacs-lisp
-;; (use-package eyebrowse
-;;   :config
-;;   (setq eyebrowse-wrap-around t
-;;         eyebrowse-new-workspace t
-;;         eyebrowse-switch-back-and-forth t)
-;;   (eyebrowse-mode t))
-(use-package perspective
+(use-package eyebrowse
   :config
-  (setq persp-initial-frame-name "Org")
-  (persp-mode))
+  (setq eyebrowse-wrap-around t
+        eyebrowse-new-workspace t
+        eyebrowse-switch-back-and-forth t)
+  (eyebrowse-mode t))
+;; (use-package perspective
+;;   :config
+;;   (setq persp-initial-frame-name "Org")
+;;   (persp-mode))
 #+END_SRC
 ** Popup windows settings
 *** COMMENT Purpose
@@ -2227,7 +2230,7 @@ But there is no backward compatibility.
 
 (setq mu4e-drafts-folder "/[Gmail].Drafts")
 (setq mu4e-sent-folder   "/[Gmail].Sent Mail")
-(setq mu4e-trash-folder  "/[Gmail].Trash")
+(setq mu4e-trash-folder  "/[Gmail].Bin")
 
 (setq mu4e-sent-messages-behavior 'delete)
 
