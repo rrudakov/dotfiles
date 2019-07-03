@@ -280,6 +280,7 @@ Good choices:
      ;; all the characters in that range (which is the full possible range)
      (set-fontset-font font-set '(#x000000 . #x3FFFFF) my-font)
      (set-face-font 'default my-font)
+     (set-face-attribute 'default nil :weight 'semi-bold)
 
      ;; for all characters without font specification
      ;; in another words it is a setting for lack of fallback font
@@ -504,6 +505,11 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
 (setq imenu-auto-rescan t)
 #+END_SRC
+*** More convenient scrolling settings
+#+begin_src emacs-lisp
+(setq scroll-conservatively 101
+      scroll-preserve-screen-position t)
+#+end_src
 *** Single line horizontal scrolling
 #+BEGIN_SRC emacs-lisp
 (setq auto-hscroll-mode t)
