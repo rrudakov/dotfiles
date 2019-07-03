@@ -508,7 +508,8 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 *** More convenient scrolling settings
 #+begin_src emacs-lisp
 (setq scroll-conservatively 101
-      scroll-preserve-screen-position t)
+      scroll-preserve-screen-position t
+      scroll-margin 15)
 #+end_src
 *** Single line horizontal scrolling
 #+BEGIN_SRC emacs-lisp
