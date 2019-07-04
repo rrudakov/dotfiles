@@ -1708,10 +1708,24 @@ And even org-babel integration:
   (volatile-highlights-mode t))
 #+END_SRC
 ** Regexps
-#+BEGIN_SRC emacs-lisp
+Build in regex package:
+#+begin_src emacs-lisp
 (use-package re-builder
   :bind (("C-c R" . re-builder)))
-#+END_SRC
+#+end_src
+Visual Regexp package:
+#+begin_src emacs-lisp
+(use-package visual-regexp
+  :init
+  (use-package visual-regexp-steroids)
+
+  :bind (("C-c r" . vr/replace)
+         ("C-c q" . vr/query-replace))
+
+  ;; if you use multiple-cursors, this is for you:
+  :config (use-package  multiple-cursors
+            :bind ("C-c m" . vr/mc-mark)))
+#+end_src
 ** Password store
 #+begin_src emacs-lisp
 (use-package password-store
