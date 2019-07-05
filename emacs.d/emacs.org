@@ -2362,7 +2362,7 @@ But there is no backward compatibility.
         lsp-pyls-plugins-rope-completion-enabled nil
         lsp-pyls-plugins-jedi-completion-enabled t
         lsp-pyls-plugins-jedi-completion-include-params nil
-        lsp-pyls-plugins-jedi-signature-help-enabled nil)
+        lsp-pyls-plugins-jedi-signature-help-enabled t)
 
   ;; Enable lsp for python after load dired local variables
   (add-hook 'hack-local-variables-hook

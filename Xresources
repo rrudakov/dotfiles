@@ -6,6 +6,8 @@ Xft.hintstyle: hintslight
 Xft.lcdfilter: lcddefault
 Xft.rgba: rgb
 
+Xcursor.theme: Adwaita
+
 ! Emacs settings
 ! UI elements
 Emacs.menuBar: 0
