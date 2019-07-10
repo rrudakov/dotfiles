@@ -515,13 +515,17 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
 (setq auto-hscroll-mode t)
 #+END_SRC
-*** Show trailing whitespace
+*** COMMENT Show trailing whitespace
 #+BEGIN_SRC emacs-lisp
 (add-hook 'prog-mode-hook
           (lambda ()
             (interactive)
             (setq show-trailing-whitespace 1)))
 #+END_SRC
+*** Navigation by subwords
+#+begin_src emacs-lisp
+(add-hook 'prog-mode-hook 'subword-mode)
+#+end_src
 *** Set minimal height of window
 #+BEGIN_SRC emacs-lisp
 (setq window-min-height 10)
@@ -1830,11 +1834,9 @@ Visual Regexp package:
 *** Agenda settings
 #+BEGIN_SRC emacs-lisp
 (setq org-agenda-files (quote ("~/Org/other.org"
-                               "~/Org/home.org"
+                               "~/Org-mobile/home.org"
                                "~/Org/notes.org"
-                               "~/Org/work/tasks.org"
-                               "~/Org/work/bsc.org"
-                               "~/Org/mobile")))
+                               "~/Org/work/tasks.org")))
 (setq org-directory "~/Org")
 (setq org-agenda-restore-windows-after-quit t
       org-agenda-compact-blocks t
