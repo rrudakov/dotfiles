@@ -46,11 +46,11 @@ function adjust_stalonetray () {
 if [ $# -eq 0 ]; then
     if /usr/bin/xrandr --query | grep --silent '\bHDMI-1-1 connected\b'; then
         echo "Connected"
-        DPI=163
+        DPI=93
         INTERNAL=false
-        TRAY_GEOMETRY="4x1-300+4"
-        TRAY_ICON_SIZE=16
-        TRAY_SLOT_SIZE=24
+        TRAY_GEOMETRY="4x1-180+2"
+        TRAY_ICON_SIZE=12
+        TRAY_SLOT_SIZE=16
     fi
 else
     if [ $1 == "--internal" ]; then

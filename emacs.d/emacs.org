@@ -2449,8 +2449,9 @@ But there is no backward compatibility.
   :after lsp-mode
   :config
   (add-hook 'java-mode-hook 'lsp)
-  (add-to-list 'lsp-java-vmargs "-javaagent:/home/rrudakov/Soft/lombok/lombok.jar")
-  (add-to-list 'lsp-java-vmargs "-Xbootclasspath/a:/home/rrudakov/Soft/lombok/lombok.jar"))
+  ;; (add-to-list 'lsp-java-vmargs "-javaagent:/home/rrudakov/Soft/lombok/lombok.jar")
+  ;; (add-to-list 'lsp-java-vmargs "-Xbootclasspath/a:/home/rrudakov/Soft/lombok/lombok.jar")
+  )
 #+END_SRC
 **** Expand snippet for new class
 #+BEGIN_SRC emacs-lisp
@@ -2743,6 +2744,11 @@ But there is no backward compatibility.
 **** Rust-mode
 #+begin_src emacs-lisp
 (use-package rust-mode)
+#+end_src
+*** Gherkin
+**** Syntax highlighting
+#+begin_src emacs-lisp
+(use-package gherkin-mode)
 #+end_src
 ** Debugger
 #+BEGIN_SRC emacs-lisp
