@@ -498,6 +498,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   :config
   (setq recentf-max-saved-items 200
         recentf-max-menu-items 15)
+  (add-to-list 'recentf-exclude (expand-file-name "~/.emacs.d/"))
   (recentf-mode))
 
 #+END_SRC
@@ -803,7 +804,7 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
       (_ 'error)))
 
   (setq powerline-default-separator 'arrow-fade)
-  (setq powerline-height 32)
+  ;; (setq powerline-height 32)
   (setq spaceline-window-numbers-unicode nil)
   (setq spaceline-face-func 'rr/spaceline-face)
 
@@ -2415,7 +2416,8 @@ But there is no backward compatibility.
   (dap-mode 1)
   (dap-ui-mode 1)
 
-  (require 'dap-lldb))
+  (require 'dap-lldb)
+  (require 'dap-java))
 #+end_src
 *** Code documentation
 #+begin_src emacs-lisp
@@ -2443,13 +2445,20 @@ But there is no backward compatibility.
           (lambda ()
             (setq c-basic-offset 2)))
 #+end_src
+**** COMMENT Workaround for smartparens
+#+begin_src emacs-lisp
+(define-key java-mode-map "(" nil)
+(define-key java-mode-map "{" nil)
+#+end_src
 **** lsp-mode setup
 #+BEGIN_SRC emacs-lisp
 (use-package lsp-java
   :after lsp-mode
   :config
   (add-hook 'java-mode-hook 'lsp)
-  ;; (add-to-list 'lsp-java-vmargs "-javaagent:/home/rrudakov/Soft/lombok/lombok.jar")
+  (setq lsp-java-save-actions-organize-imports t
+        lsp-java-format-on-type-enabled nil)
+  (add-to-list 'lsp-java-vmargs "-javaagent:/home/rrudakov/Soft/lombok/lombok.jar")
   ;; (add-to-list 'lsp-java-vmargs "-Xbootclasspath/a:/home/rrudakov/Soft/lombok/lombok.jar")
   )
 #+END_SRC
@@ -2748,7 +2757,9 @@ But there is no backward compatibility.
 *** Gherkin
 **** Syntax highlighting
 #+begin_src emacs-lisp
-(use-package gherkin-mode)
+(use-package feature-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.story$" . feature-mode)))
 #+end_src
 ** Debugger
 #+BEGIN_SRC emacs-lisp
