@@ -271,7 +271,7 @@ Good choices:
 + [[https://github.com/adobe-fonts/source-code-pro][SourceCodePro]] :: Currently used
 + [[https://slackbuilds.org/repository/14.2/system/hack-font-ttf/][Hack]]
 #+BEGIN_SRC emacs-lisp
-(let ((my-font "Source Code Variable-9")
+(let ((my-font "Source Code Variable-10")
       (font-sets '("fontset-default"
                    "fontset-standard"
                    "fontset-startup")))
@@ -619,6 +619,23 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 ;; (use-package leuven-theme
 ;;   :config
 ;;   (load-theme 'leuven t))
+;; (use-package doom-themes
+;;   :config
+
+;;   ;; Global settings (defaults)
+;;   (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+;;         doom-themes-enable-italic t) ; if nil, italics is universally disabled
+
+;;   ;; Load the theme (doom-one, doom-molokai, etc); keep in mind that each theme
+;;   ;; may have their own settings.
+;;   (load-theme 'doom-gruvbox t)
+
+;;   ;; or for treemacs users
+;;   ;; (setq doom-themes-treemacs-theme "doom-colors") ; use the colorful treemacs theme
+;;   ;; (doom-themes-treemacs-config)
+
+;;   ;; Corrects (and improves) org-mode's native fontification.
+;;   (doom-themes-org-config))
 #+END_SRC
 *** COMMENT Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
@@ -2353,12 +2370,16 @@ But there is no backward compatibility.
         lsp-prefer-flymake nil
         lsp-message-project-root-warning t
         lsp-keep-workspace-alive t
+        lsp-file-watch-threshold nil
         lsp-enable-folding t)
   (require 'lsp-clients)
 
   ;; Rust lsp settings
   (setq lsp-rust-clippy-preference "on")
   (add-hook 'rust-mode-hook 'lsp)
+
+  ;; XML setup
+  (add-hook 'nxml-mode-hook 'lsp)
 
   ;; Python lsp settings
   (setq lsp-pyls-plugins-pylint-enabled t
@@ -2425,6 +2446,15 @@ But there is no backward compatibility.
   :config
   (eldoc-box-hover-mode))
 #+end_src
+*** Treemacs integration
+#+begin_src emacs-lisp
+(use-package treemacs
+  :config
+  (setq treemacs-no-png-images t
+        treemacs-width 50))
+(use-package lsp-treemacs)
+(use-package treemacs-projectile)
+#+end_src
 *** Google c-style
 #+begin_src emacs-lisp
 (use-package google-c-style
@@ -2445,7 +2475,7 @@ But there is no backward compatibility.
           (lambda ()
             (setq c-basic-offset 2)))
 #+end_src
-**** COMMENT Workaround for smartparens
+**** Workaround for smartparens
 #+begin_src emacs-lisp
 (define-key java-mode-map "(" nil)
 (define-key java-mode-map "{" nil)
@@ -2456,10 +2486,16 @@ But there is no backward compatibility.
   :after lsp-mode
   :config
   (add-hook 'java-mode-hook 'lsp)
-  (setq lsp-java-save-actions-organize-imports t
+  (setq lsp-java-save-actions-organize-imports nil
         lsp-java-format-on-type-enabled nil)
   (add-to-list 'lsp-java-vmargs "-javaagent:/home/rrudakov/Soft/lombok/lombok.jar")
   ;; (add-to-list 'lsp-java-vmargs "-Xbootclasspath/a:/home/rrudakov/Soft/lombok/lombok.jar")
+  ;; ;; Spring boot support
+  ;; (require 'lsp-java-boot)
+
+  ;; ;; to enable the lenses
+  ;; (add-hook 'lsp-mode-hook #'lsp-lens-mode)
+  ;; (add-hook 'java-mode-hook #'lsp-java-boot-lens-mode)
   )
 #+END_SRC
 **** Expand snippet for new class
