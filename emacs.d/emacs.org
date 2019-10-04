@@ -712,9 +712,9 @@ nil."
                 (`finished
                  (let-alist (flycheck-count-errors flycheck-current-errors)
                    (concat
-                    (propertize (format " • %s " (or .error "✓")) 'face `(:inherit 'error))
-                    (propertize (format "• %s " (or .warning "✓")) 'face `(:inherit 'warning))
-                    (propertize (format "• %s " (or .info "✓")) 'face `(:inherit 'success))
+                    (propertize (format " • %s " (or .error "✓")) 'face `(:inherit error))
+                    (propertize (format "• %s " (or .warning "✓")) 'face `(:inherit warning))
+                    (propertize (format "• %s " (or .info "✓")) 'face `(:inherit success))
                     )))
                 (`interrupted ".")
                 (`suspicious "?"))))
