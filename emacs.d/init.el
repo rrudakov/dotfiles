@@ -5,10 +5,6 @@
 
 ;;; Code:
 (require 'package)
-;; (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
-;;                     (not (gnutls-available-p))))
-;;        (url (concat (if no-ssl "http" "https") "://melpa.org/packages/")))
-;;   (add-to-list 'package-archives (cons "melpa" url) t))
 
 (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
                     (not (gnutls-available-p))))
@@ -40,10 +36,13 @@ There are two things you can do about this warning:
 
 (package-initialize)
 
+(unless package-archive-contents
+  (package-refresh-contents))
+
 (add-to-list 'load-path "~/.emacs.d/custom/")
 
 (unless (package-installed-p 'use-package)
-  (package-refresh-contents)
+  (warn "use-package is not installed, trying to install")
   (package-install 'use-package))
 
 (eval-when-compile

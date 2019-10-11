@@ -1,2 +1,4 @@
 .*.un~
 TAGS
+*.el~
+*.elc

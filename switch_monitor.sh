@@ -71,7 +71,7 @@ if [ "$INTERNAL" == true ]; then
     /usr/bin/nitrogen --set-auto $HOME/Wallpapers/internal.jpg
 else
     /usr/bin/xrandr --output eDP-1-1 --off --output HDMI-1-1 --auto
-    /usr/bin/nitrogen --set-auto $HOME/Wallpapers/external.png
+    /usr/bin/nitrogen --set-scaled $HOME/Wallpapers/external2.jpg
 fi
 
 # Recompile and restart xmonad

@@ -9,7 +9,26 @@
 ############### Variables:
 
 dir=${HOME}/dotfiles
-files="offlineimaprc Xresources emacs.d/init.el emacs.d/emacs.org emacs.d/custom/google-java-format.el emacs.d/templates/default-java.el tmux.conf vimrc xmonad/xmonad.hs xmobarrc xprofile gitconfig stalonetrayrc bashrc bash_profile aliasrc config/dunst/dunstrc config/fontconfig/fonts.conf config/alacritty/alacritty.yml"
+files="offlineimaprc \
+  Xresources \
+  emacs.d/early-init.el \
+  emacs.d/init.el \
+  emacs.d/emacs.org \
+  emacs.d/custom/google-java-format.el \
+  emacs.d/templates/default-java.el \
+  tmux.conf \
+  vimrc \
+  xmonad/xmonad.hs \
+  xmobarrc \
+  xprofile \
+  gitconfig \
+  stalonetrayrc \
+  bashrc \
+  bash_profile \
+  aliasrc \
+  config/dunst/dunstrc \
+  config/fontconfig/fonts.conf \
+  config/alacritty/alacritty.yml"
 
 ###############
 

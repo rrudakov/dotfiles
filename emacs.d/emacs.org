@@ -504,7 +504,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 *** Imenu
 #+BEGIN_SRC emacs-lisp
-(setq imenu-auto-rescan t)
+(setq imenu-auto-rescan t
+      imenu-max-item-length 160
+      imenu-max-items 100)
 #+END_SRC
 *** More convenient scrolling settings
 #+begin_src emacs-lisp
@@ -605,6 +607,10 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 *** Set tab width
 #+begin_src emacs-lisp
 (setq-default tab-width 4)
+#+end_src
+*** Show column number
+#+begin_src emacs-lisp
+(column-number-mode)
 #+end_src
 *** Confirm kill emacs
 #+BEGIN_SRC emacs-lisp
@@ -886,17 +892,21 @@ Show more offten used completeons first
   :config
   (add-to-list 'company-backends 'company-tern))
 #+END_SRC
-** Paradox
+** COMMENT Paradox
 #+BEGIN_SRC emacs-lisp
 (use-package paradox
   :config
-  (setq-default
-   paradox-column-width-package 27
-   paradox-column-width-version 13
-   paradox-execute-asynchronously t
-   paradox-spinner-type 'progress-bar
-   paradox-hide-wiki-packages t))
+  (setq-default paradox-column-width-package 27
+                paradox-column-width-version 13
+                paradox-execute-asynchronously t
+                paradox-spinner-type 'progress-bar
+                paradox-hide-wiki-packages t)
+  (paradox-enable))
 #+END_SRC
+** Flx
+#+begin_src emacs-lisp
+(use-package flx)
+#+end_src
 ** Helm
 *** Configuration
 #+BEGIN_SRC emacs-lisp
@@ -908,40 +918,39 @@ Show more offten used completeons first
   (when (executable-find "curl")
     (setq helm-google-suggest-use-curl-p t))
 
-  (setq helm-split-window-inside-p            t ; open helm buffer inside current window, not occupy whole other window
-	helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
-	helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
-	helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
-	helm-ff-file-name-history-use-recentf t
-	helm-echo-input-in-header-line t
-	helm-display-header-line nil
-	helm-buffer-max-length 40
-	helm-ff-delete-files-function 'helm-delete-marked-files-async
-	helm-inherit-input-method nil)
+  (setq helm-split-window-inside-p            nil ; open helm buffer inside current window, not occupy whole other window
+	    helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+	    helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+	    helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+	    helm-ff-file-name-history-use-recentf t
+	    helm-echo-input-in-header-line nil
+	    helm-display-header-line nil
+	    helm-buffer-max-length 40
+	    helm-ff-delete-files-function 'helm-delete-marked-files-async
+	    helm-inherit-input-method nil)
 
+  (require 'helm-files)
 
-  (define-key global-map [remap find-file] 'helm-find-files)
-  (define-key global-map [remap occur] 'helm-occur)
-  (define-key global-map [remap switch-to-buffer] 'helm-mini)
-  (define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
-  (define-key global-map [remap execute-extended-command] 'helm-M-x)
-  (define-key global-map [remap yank-pop] 'helm-show-kill-ring)
-  (define-key global-map [remap tab-to-tab-stop] 'helm-occur)
+  (with-eval-after-load 'helm
+    (define-key global-map [remap find-file] 'helm-find-files)
+    (define-key global-map [remap occur] 'helm-occur)
+    (define-key global-map [remap switch-to-buffer] 'helm-mini)
+    (define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
+    (define-key global-map [remap execute-extended-command] 'helm-M-x)
+    (define-key global-map [remap yank-pop] 'helm-show-kill-ring)
+    (define-key global-map [remap tab-to-tab-stop] 'helm-occur)
 
-  (define-key lisp-interaction-mode-map [remap completion-at-point] 'helm-lisp-completion-at-point)
-  (define-key emacs-lisp-mode-map       [remap completion-at-point] 'helm-lisp-completion-at-point)
+    (define-key lisp-interaction-mode-map [remap completion-at-point] 'helm-lisp-completion-at-point)
+    (define-key emacs-lisp-mode-map       [remap completion-at-point] 'helm-lisp-completion-at-point)
+
+    (define-key helm-find-files-map (kbd "C-i") 'helm-ff-TAB))
+
 
   (add-hook 'eshell-mode-hook
-	    (lambda ()
-	      (eshell-cmpl-initialize)
-	      (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
-	      (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))
-
-  ;; (set-face-attribute 'helm-source-header nil
-  ;;                     :box '(:line-width -1 :style released-button))
-
-  ;; (set-face-attribute 'helm-minibuffer-prompt nil
-  ;;                     :background (face-attribute 'header-line :background))
+	        (lambda ()
+	          (eshell-cmpl-initialize)
+	          (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
+	          (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))
 
   (setq helm-display-function #'pop-to-buffer)
   (setq helm-show-completion-display-function #'pop-to-buffer)
@@ -1045,14 +1054,69 @@ Replace for i-search or swiper
 #+end_src
 *** Helm lsp integration
 #+begin_src emacs-lisp
-(use-package helm-lsp)
+(use-package helm-lsp
+  :config
+  :bind (("C-x c j" . helm-lsp-workspace-symbol)))
 #+end_src
-*** Helm org
+*** COMMENT Helm org
 #+begin_src emacs-lisp
 (use-package helm-org
   :config
   (add-to-list 'helm-completing-read-handlers-alist '(org-capture . helm-org-completing-read-tags))
   (add-to-list 'helm-completing-read-handlers-alist '(org-set-tags . helm-org-completing-read-tags)))
+#+end_src
+** COMMENT Ivy
+*** Configuration
+#+begin_src emacs-lisp
+(use-package ivy
+  :config
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t)
+  (setq enable-recursive-minibuffers t)
+  (setq ivy-height 20)
+
+
+  ;; enable this if you want `swiper' to use it
+  (setq search-default-mode #'char-fold-to-regexp)
+  (global-set-key "\C-s" 'swiper)
+  (global-set-key (kbd "C-c C-r") 'ivy-resume)
+  (global-set-key (kbd "M-x") 'counsel-M-x)
+  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+  (global-set-key (kbd "C-c g") 'counsel-git)
+  (global-set-key (kbd "C-x j") 'counsel-semantic-or-imenu)
+  (global-set-key (kbd "C-c j") 'counsel-git-grep)
+  (global-set-key (kbd "C-c k") 'counsel-ag)
+  (global-set-key (kbd "C-x l") 'counsel-locate)
+  (global-set-key (kbd "C-x b") 'ivy-switch-buffer)
+  (global-set-key (kbd "M-y") 'counsel-yank-pop)
+  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+
+  (setq ivy-height-alist
+        '((counsel-evil-registers . 5)
+          (counsel-yank-pop . 10)
+          (counsel-git-log . 8)
+          (counsel--generic . 7)
+          (counsel-el . 7)))
+
+  (setq ivy-re-builders-alist
+        '((t . ivy--regex-ignore-order))))
+#+end_src
+*** Posframe
+#+begin_src emacs-lisp
+(use-package ivy-posframe
+  :config
+  (setq ivy-posframe-display-functions-alist
+      '((swiper          . nil)
+        (complete-symbol . ivy-posframe-display-at-point)
+        (t               . ivy-posframe-display-at-frame-center)))
+  (ivy-posframe-mode 1))
+#+end_src
+*** Ivy xref
+#+begin_src emacs-lisp
+(use-package ivy-xref
+  :init (if (< emacs-major-version 27)
+            (setq xref-show-xrefs-function #'ivy-xref-show-xrefs)
+          (setq xref-show-definitions-function #'ivy-xref-show-defs)))
 #+end_src
 ** Smartparens
 #+BEGIN_SRC emacs-lisp
@@ -1260,6 +1324,7 @@ Replace for i-search or swiper
   (setq projectile-keymap-prefix (kbd "C-c p"))
   :config
   (setq projectile-completion-system 'helm)
+  ;; (setq projectile-completion-system 'ivy)
   (add-to-list 'projectile-globally-ignored-files "*.log")
   (setq projectile-mode-line '(:eval (format " [%s]" (projectile-project-name))))
   (projectile-mode +1))
@@ -1271,6 +1336,12 @@ Replace for i-search or swiper
   (helm-projectile-on)
   (setq projectile-switch-project-action 'helm-projectile))
 #+END_SRC
+*** COMMENT Counsel projectile
+#+begin_src emacs-lisp
+(use-package counsel-projectile
+  :config
+  (counsel-projectile-mode))
+#+end_src
 ** Htmlize
 #+BEGIN_SRC emacs-lisp
 (use-package htmlize
@@ -1597,6 +1668,7 @@ Visual Regexp package:
 (use-package pass)
 
 (use-package helm-pass)
+;; (use-package ivy-pass)
 #+end_src
 ** Org
 *** Some tweaks
@@ -2256,8 +2328,9 @@ But there is no backward compatibility.
 	lsp-ui-flycheck-list-position 'bottom
 	lsp-ui-flycheck-live-reporting t)
 
-  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
+  ;; (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-find-references)
+  )
 #+END_SRC
 **** Completion
 #+BEGIN_SRC emacs-lisp
