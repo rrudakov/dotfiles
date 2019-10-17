@@ -262,9 +262,11 @@ Unordered lists with separator '::'
 #+END_SRC
 *** Highlight current line
 #+BEGIN_SRC emacs-lisp
-(global-hl-line-mode 1)
+(use-package hl-line
+  :config
+  (global-hl-line-mode 1))
 #+END_SRC
-*** Set default font
+*** COMMENT Set default font
 Good choices:
 + [[https://slackbuilds.org/repository/14.2/system/Iosevka/][Iosevka]]
 + [[https://github.com/mozilla/Fira][Fira Mono]]
@@ -624,9 +626,6 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 ** Theme
 *** Color scheme
 #+BEGIN_SRC emacs-lisp
-;; (use-package gruvbox-theme
-;;   :config
-;;   (load-theme 'gruvbox-dark-medium t))
 (use-package zenburn-theme
   :config
   (load-theme 'zenburn t)
@@ -636,7 +635,17 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
     (set-face-attribute 'mode-line-inactive nil :underline  line)
     (set-face-attribute 'mode-line          nil :box        nil)
     (set-face-attribute 'mode-line-inactive nil :box        nil)
-    ;; (set-face-attribute 'mode-line-inactive nil :background "#f9f2d9")
+
+    ;; Fixes for emacs 27
+    (set-face-attribute 'magit-diff-context-highlight nil :extend t)
+    (set-face-attribute 'magit-diff-removed-highlight nil :extend t)
+    (set-face-attribute 'magit-diff-added-highlight nil :extend t)
+    (set-face-attribute 'magit-diff-hunk-heading-highlight nil :extend t)
+    (set-face-attribute 'magit-diff-removed nil :extend t)
+    (set-face-attribute 'magit-diff-added nil :extend t)
+    (set-face-attribute 'magit-diff-hunk-heading nil :extend t)
+    (set-face-attribute 'magit-section-highlight nil :extend t)
+    (set-face-attribute 'magit-diff-file-heading-highlight nil :extend t)
     ))
 #+END_SRC
 *** COMMENT Highlight symbol at point
@@ -755,7 +764,9 @@ Good, but has performance problems
   :config
   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
   (setq highlight-indent-guides-method 'character
-        highlight-indent-guides-character ?\x258F))
+        highlight-indent-guides-character ?\x258F
+        highlight-indent-guides-responsive 'top)
+  )
 #+END_SRC
 ** Shell settings
 #+begin_src emacs-lisp
@@ -959,6 +970,8 @@ Show more offten used completeons first
   (setq helm-display-function #'pop-to-buffer)
   (setq helm-show-completion-display-function #'pop-to-buffer)
 
+  (set-face-attribute 'helm-source-header nil :extend t)
+  (set-face-attribute 'helm-selection nil :extend t)
   (helm-mode 1)
   (helm-adaptive-mode 1))
 #+END_SRC
@@ -1436,7 +1449,9 @@ Replace for i-search or swiper
   (setq magit-revision-insert-related-refs 'all
         magit-revision-use-hash-sections 'quick)
 
-  (setq magit-diff-highlight-hunk-region-functions '(magit-diff-highlight-hunk-region-dim-outside))
+  (setq magit-diff-highlight-hunk-region-functions
+        '(magit-diff-highlight-hunk-region-dim-outside
+          magit-diff-highlight-hunk-region-using-underlines))
 
   (setq magit-fetch-arguments '("--prune"))
 
@@ -1918,10 +1933,14 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
 (setq org-src-fontify-natively t)
 
-(require 'color)
-(set-face-attribute 'org-block nil :background
-                    (color-darken-name
-                     (face-attribute 'default :background) 2))
+;; (require 'color)
+;; (set-face-attribute 'org-block nil
+;;                     :background
+;;                     (color-darken-name
+;;                      (face-attribute 'default :background) 2)
+;;                     :extend t)
+
+(set-face-attribute 'secondary-selection nil :extend t)
 #+END_SRC
 *** Notifications
 #+begin_src emacs-lisp
@@ -2425,6 +2444,10 @@ But there is no backward compatibility.
   ;;       lsp-java-format-enabled t)
 
   (add-to-list 'lsp-java-vmargs "-javaagent:/home/rrudakov/Soft/lombok/lombok.jar")
+  (add-to-list 'lsp-java-vmargs "-noverify")
+  (add-to-list 'lsp-java-vmargs "-XX:+UseG1GC")
+  (add-to-list 'lsp-java-vmargs "-XX:+UseStringDeduplication")
+
   ;; (add-to-list 'lsp-java-vmargs "-Xbootclasspath/a:/home/rrudakov/Soft/lombok/lombok.jar")
   ;; ;; Spring boot support
   ;; (require 'lsp-java-boot)
