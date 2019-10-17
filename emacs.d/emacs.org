@@ -1449,7 +1449,6 @@ Replace for i-search or swiper
   (setq magit-revision-insert-related-refs 'all
         magit-revision-use-hash-sections 'quick)
 
-  ;; Just comment
   (setq magit-diff-highlight-hunk-region-functions
         '(magit-diff-highlight-hunk-region-dim-outside
           magit-diff-highlight-hunk-region-using-underlines))
