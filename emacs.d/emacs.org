@@ -41,6 +41,7 @@ F	Follow mode
 ** Projectile
 #+BEGIN_EXAMPLE
 C-p p s s	Projectile ag search
+C-p p s r   Projectile rg search
 #+END_EXAMPLE
 ** Terminal
 #+BEGIN_SRC text
@@ -58,7 +59,7 @@ M-s h f         hi-lock-find-patterns
 #+end_src
 ** Helm
 #+begin_src text
-C-c i   insert current file path
+C-c i   insert current file path to current buffer
 #+end_src
 ** Dired
 #+begin_src text
