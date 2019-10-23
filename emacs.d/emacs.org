@@ -248,7 +248,7 @@ Unordered lists with separator '::'
 #+begin_src emacs-lisp
 (setq load-prefer-newer t)
 #+end_src
-*** Highlight matching parens
+*** COMMENT Highlight matching parens
 #+BEGIN_SRC emacs-lisp
 (show-paren-mode nil)
 (setq show-paren-style 'parenthesis)
@@ -299,7 +299,7 @@ Good choices:
 #+END_SRC
 *** Set specific browser to open links
 #+BEGIN_SRC emacs-lisp
-(setq browse-url-browser-function 'browse-url-firefox)
+(setq browse-url-browser-function 'browse-url-chrome)
 #+END_SRC
 *** Use UTF-8 as default coding system
 #+BEGIN_SRC emacs-lisp
@@ -321,10 +321,10 @@ Good choices:
  compilation-ask-about-save nil   ; save all buffers on `compile'
  compilation-scroll-output t
  confirm-nonexistent-file-or-buffer t
- enable-recursive-minibuffers nil
  ;; keep the point out of the minibuffer
- minibuffer-prompt-properties '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt)
- ;; History & backup settings (save nothing, that's what git is for)
+ ;; minibuffer-prompt-properties '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt)
+
+;; History & backup settings (save nothing, that's what git is for)
  auto-save-default nil
  create-lockfiles nil
  history-length 1000
@@ -350,21 +350,20 @@ Good choices:
  split-width-threshold 160	 ; favor horizontal splits
  uniquify-buffer-name-style 'forward
  use-dialog-box nil              ; always avoid GUI
- visible-cursor nil
  x-stretch-cursor nil
+
  ;; defer jit font locking slightly to [try to] improve Emacs performance
  jit-lock-defer-time nil
  jit-lock-stealth-nice 0.1
  jit-lock-stealth-time 0.2
  jit-lock-stealth-verbose nil
+
  ;; `pos-tip' defaults
  pos-tip-internal-border-width 6
  pos-tip-border-width 1
  ;; no beeping or blinking please
  ring-bell-function #'ignore
  visible-bell nil)
-
-(setq save-interprogmam-kill-before-paste t)
 #+END_SRC
 *** Be quiet at startup
 #+BEGIN_SRC emacs-lisp
@@ -543,6 +542,10 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   (setq ediff-window-setup-function 'ediff-setup-windows-plain
         ediff-split-window-function 'split-window-horizontally))
 #+END_SRC
+*** Smerge
+#+begin_src emacs-lisp
+(use-package smerge-mode)
+#+end_src
 *** ANSI colors
 **** Compilation buffer
 #+BEGIN_SRC emacs-lisp
@@ -589,7 +592,7 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 #+end_src
 *** Increase max lines in messages buffer
 #+begin_src emacs-lisp
-(setq message-log-max 5000)
+(setq message-log-max 1000)
 #+end_src
 *** Fix helm issue
 #+begin_src emacs-lisp
@@ -628,6 +631,7 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 *** Color scheme
 #+BEGIN_SRC emacs-lisp
 (use-package zenburn-theme
+  :after (helm smerge-mode ediff org)
   :config
   (load-theme 'zenburn t)
   (let ((line (face-attribute 'mode-line :underline)))
@@ -638,16 +642,32 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
     (set-face-attribute 'mode-line-inactive nil :box        nil)
 
     ;; Fixes for emacs 27
-    (set-face-attribute 'magit-diff-context-highlight nil :extend t)
-    (set-face-attribute 'magit-diff-removed-highlight nil :extend t)
-    (set-face-attribute 'magit-diff-added-highlight nil :extend t)
-    (set-face-attribute 'magit-diff-hunk-heading-highlight nil :extend t)
-    (set-face-attribute 'magit-diff-removed nil :extend t)
-    (set-face-attribute 'magit-diff-added nil :extend t)
-    (set-face-attribute 'magit-diff-hunk-heading nil :extend t)
-    (set-face-attribute 'magit-section-highlight nil :extend t)
-    (set-face-attribute 'magit-diff-file-heading-highlight nil :extend t)
-    ))
+    (set-face-attribute 'helm-source-header nil :extend t)
+    (set-face-attribute 'helm-selection nil :extend t)
+
+    (set-face-attribute 'secondary-selection nil :extend t)
+    (set-face-attribute 'org-agenda-clocking nil :extend t)
+    (set-face-attribute 'diff-header nil :extend t)
+    (set-face-attribute 'diff-file-header nil :extend t)
+    (set-face-attribute 'diff-removed nil :extend t)
+    (set-face-attribute 'diff-added nil :extend t)
+    (set-face-attribute 'ediff-current-diff-A nil :extend t)
+    (set-face-attribute 'ediff-current-diff-B nil :extend t)
+    (set-face-attribute 'ediff-current-diff-C nil :extend t)
+    (set-face-attribute 'ediff-current-diff-Ancestor nil :extend t)
+    (set-face-attribute 'ediff-even-diff-A nil :extend t)
+    (set-face-attribute 'ediff-even-diff-B nil :extend t)
+    (set-face-attribute 'ediff-even-diff-C nil :extend t)
+    (set-face-attribute 'ediff-even-diff-Ancestor nil :extend t)
+    (set-face-attribute 'ediff-odd-diff-A nil :extend t)
+    (set-face-attribute 'ediff-odd-diff-B nil :extend t)
+    (set-face-attribute 'ediff-odd-diff-C nil :extend t)
+    (set-face-attribute 'ediff-odd-diff-Ancestor nil :extend t)
+
+    (set-face-attribute 'smerge-upper nil :extend t)
+    (set-face-attribute 'smerge-lower nil :extend t)
+    (set-face-attribute 'smerge-base nil :extend t)
+    (set-face-attribute 'smerge-markers nil :extend t)))
 #+END_SRC
 *** COMMENT Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
@@ -758,17 +778,6 @@ nil."
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode))
 #+end_src
-*** COMMENT Highlight indentation
-Good, but has performance problems
-#+BEGIN_SRC emacs-lisp
-(use-package highlight-indent-guides
-  :config
-  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-  (setq highlight-indent-guides-method 'character
-        highlight-indent-guides-character ?\x258F
-        highlight-indent-guides-responsive 'top)
-  )
-#+END_SRC
 ** Shell settings
 #+begin_src emacs-lisp
 (add-hook 'shell-mode-hook (lambda () (company-mode -1)))
@@ -908,7 +917,7 @@ Show more offten used completeons first
   :config
   (add-to-list 'company-backends 'company-tern))
 #+END_SRC
-** COMMENT Paradox
+** Paradox
 #+BEGIN_SRC emacs-lisp
 (use-package paradox
   :config
@@ -971,8 +980,6 @@ Show more offten used completeons first
   (setq helm-display-function #'pop-to-buffer)
   (setq helm-show-completion-display-function #'pop-to-buffer)
 
-  (set-face-attribute 'helm-source-header nil :extend t)
-  (set-face-attribute 'helm-selection nil :extend t)
   (helm-mode 1)
   (helm-adaptive-mode 1))
 #+END_SRC
@@ -1090,7 +1097,6 @@ Replace for i-search or swiper
   :config
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)
-  (setq enable-recursive-minibuffers t)
   (setq ivy-height 20)
 
 
@@ -1141,9 +1147,6 @@ Replace for i-search or swiper
 (use-package smartparens-config
   :ensure smartparens
   :config
-  (smartparens-global-mode t)
-  (show-smartparens-global-mode t)
-
   (setq sp-show-pair-from-inside t
         smartparens-strict-mode t)
 
@@ -1152,11 +1155,15 @@ Replace for i-search or swiper
   (sp-local-pair 'web-mode "%" "%" :wrap "C-%")
   (sp-local-pair 'web-mode "<" ">" :wrap "C->")
 
-  (add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
-  (add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
-  (add-hook 'org-mode-hook 'turn-on-smartparens-strict-mode)
+  ;; (add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
+  ;; (add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
+  ;; (add-hook 'org-mode-hook 'turn-on-smartparens-strict-mode)
   (sp-local-pair 'prog-mode "{" nil :post-handlers '(("||\n[i]" "RET")))
   (sp-local-pair 'java-mode "/*" "*/" :post-handlers '(("* ||\n[i]" "RET")))
+
+  (smartparens-global-strict-mode t)
+  (show-smartparens-global-mode t)
+
   :bind
   ("M-]" . 'sp-unwrap-sexp))
 #+END_SRC
@@ -1168,76 +1175,8 @@ Replace for i-search or swiper
         eyebrowse-new-workspace t
         eyebrowse-switch-back-and-forth t)
   (eyebrowse-mode t))
-;; (use-package perspective
-;;   :config
-;;   (setq persp-initial-frame-name "Org")
-;;   (persp-mode))
 #+END_SRC
 ** Popup windows settings
-*** COMMENT Purpose
-#+BEGIN_SRC emacs-lisp
-(use-package window-purpose
-  :config
-  (defun maybe-display-shackle (buffer alist)
-    (and (shackle-display-buffer-condition buffer alist)
-         (shackle-display-buffer-action buffer alist)))
-
-  (setq purpose-action-sequences
-        '((switch-to-buffer
-           . (purpose-display-reuse-window-buffer
-              purpose-display-reuse-window-purpose
-              maybe-display-shackle
-              purpose-display-maybe-same-window
-              purpose-display-maybe-other-window
-              purpose-display-maybe-other-frame
-              purpose-display-maybe-pop-up-window
-              purpose-display-maybe-pop-up-frame))
-
-          (prefer-same-window
-           . (purpose-display-maybe-same-window
-              maybe-display-shackle
-              purpose-display-reuse-window-buffer
-              purpose-display-reuse-window-purpose
-              purpose-display-maybe-other-window
-              purpose-display-maybe-other-frame
-              purpose-display-maybe-pop-up-window
-              purpose-display-maybe-pop-up-frame))
-
-          (force-same-window
-           . (purpose-display-maybe-same-window
-              maybe-display-shackle))
-
-          (prefer-other-window
-           . (purpose-display-reuse-window-buffer
-              purpose-display-reuse-window-purpose
-              maybe-display-shackle
-              purpose-display-maybe-other-window
-              purpose-display-maybe-pop-up-window
-              purpose-display-maybe-other-frame
-              purpose-display-maybe-pop-up-frame
-              purpose-display-maybe-same-window))
-
-          (prefer-other-frame
-           . (purpose-display-reuse-window-buffer-other-frame
-              purpose-display-reuse-window-purpose-other-frame
-              maybe-display-shackle
-              purpose-display-maybe-other-frame
-              purpose-display-maybe-pop-up-frame
-              purpose-display-maybe-other-window
-              purpose-display-maybe-pop-up-window
-              purpose-display-reuse-window-buffer
-              purpose-display-reuse-window-purpose
-              purpose-display-maybe-same-window))))
-
-  (setq purpose-user-mode-purposes
-        '((flycheck-error-list-mode . bottom)
-          (messages-buffer-mode     . bottom)
-          (helpful-mode             . bottom)
-          (compilation-mode         . bottom)
-          (inferior-emacs-lisp-mode . bottom)))
-
-  (purpose-compile-user-configuration))
-#+END_SRC
 *** Shackle
 #+BEGIN_SRC emacs-lisp
 (use-package shackle
@@ -1375,6 +1314,9 @@ Replace for i-search or swiper
   (add-hook 'after-init-hook #'global-flycheck-mode)
   (global-set-key (kbd "C-'") 'helm-flycheck)
 
+  (defun doom-modeline-update-flycheck-text (&optional status)
+    (setq doom-modeline--flycheck-text
+          (rr/flycheck-mode-line-status-text)))
   (when (fboundp 'define-fringe-bitmap)
     (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
       [#b10000000
@@ -1455,6 +1397,17 @@ Replace for i-search or swiper
           magit-diff-highlight-hunk-region-using-underlines))
 
   (setq magit-fetch-arguments '("--prune"))
+
+  ;; Fixes for emacs 27
+  (set-face-attribute 'magit-diff-context-highlight nil :extend t)
+  (set-face-attribute 'magit-diff-removed-highlight nil :extend t)
+  (set-face-attribute 'magit-diff-added-highlight nil :extend t)
+  (set-face-attribute 'magit-diff-hunk-heading-highlight nil :extend t)
+  (set-face-attribute 'magit-diff-removed nil :extend t)
+  (set-face-attribute 'magit-diff-added nil :extend t)
+  (set-face-attribute 'magit-diff-hunk-heading nil :extend t)
+  (set-face-attribute 'magit-section-highlight nil :extend t)
+  (set-face-attribute 'magit-diff-file-heading-highlight nil :extend t)
 
   (add-hook 'focus-in-hook #'git-gutter:update-all-windows)
   (add-hook 'magit-post-refresh-hook #'git-gutter:update-all-windows)
@@ -1709,7 +1662,7 @@ Visual Regexp package:
       org-tags-column 0
       ;; org-tags-column -100
       org-startup-folded 'content
-      org-startup-indented t
+      org-startup-indented nil          ;Return it when it will be fixed
       org-startup-shrink-all-tables t
       org-edit-src-content-indentation 0
       org-cycle-separator-lines 1
@@ -1940,8 +1893,6 @@ But there is no backward compatibility.
 ;;                     (color-darken-name
 ;;                      (face-attribute 'default :background) 2)
 ;;                     :extend t)
-
-(set-face-attribute 'secondary-selection nil :extend t)
 #+END_SRC
 *** Notifications
 #+begin_src emacs-lisp
@@ -2415,7 +2366,7 @@ But there is no backward compatibility.
 (require 'google-java-format)
 
 (add-hook 'java-mode-hook
-          (lambda () (setq-local fill-column 100)))
+          (lambda () (setq-local fill-column 160)))
 
 (add-hook 'java-mode-hook 'display-fill-column-indicator-mode)
 
@@ -2440,9 +2391,9 @@ But there is no backward compatibility.
   (setq lsp-java-save-actions-organize-imports nil
         lsp-java-format-on-type-enabled nil)
 
-  ;; (setq lsp-java-format-settings-url "file:///home/rrudakov/Work/EPAM/eclipse-java-code-style.xml"
-  ;;       lsp-java-format-settings-profile "GoogleStyle"
-  ;;       lsp-java-format-enabled t)
+  (setq lsp-java-format-settings-url "file:///home/rrudakov/Work/EPAM/eclipse-java-code-style.xml"
+        lsp-java-format-settings-profile "GoogleStyle"
+        lsp-java-format-enabled t)
 
   (add-to-list 'lsp-java-vmargs "-javaagent:/home/rrudakov/Soft/lombok/lombok.jar")
   (add-to-list 'lsp-java-vmargs "-noverify")
