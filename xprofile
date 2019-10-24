@@ -14,6 +14,8 @@ sysmodmap=/etc/X11/xinit/.Xmodmap
 export PATH=$HOME/.local/bin:$PATH
 export GDK_USE_XFT=1
 export DE="xfce"
+light-locker &
 $HOME/.local/bin/switch_monitor
+xsetroot -cursor_name left_ptr
 stalonetray &
 compton -b &

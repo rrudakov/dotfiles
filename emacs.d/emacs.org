@@ -2059,7 +2059,7 @@ But there is no backward compatibility.
 #+begin_src emacs-lisp
 (use-package poporg)
 #+end_src
-** Email
+** COMMENT Email
 *** COMMENT BSC configuration
 #+BEGIN_SRC emacs-lisp
 (require 'smtpmail)
