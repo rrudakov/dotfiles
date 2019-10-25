@@ -2364,6 +2364,7 @@ But there is no backward compatibility.
 #+begin_src emacs-lisp
 (require 'cc-mode)
 (require 'google-java-format)
+(setq google-java-format-executable "/home/rrudakov/.local/bin/google-java-format")
 
 (add-hook 'java-mode-hook
           (lambda () (setq-local fill-column 160)))
@@ -2375,7 +2376,7 @@ But there is no backward compatibility.
             (local-set-key (kbd "C-c C-f") 'google-java-format-buffer)))
 (add-hook 'java-mode-hook
           (lambda ()
-            (setq c-basic-offset 2)))
+            (setq c-basic-offset 4)))
 #+end_src
 **** Workaround for smartparens
 #+begin_src emacs-lisp
