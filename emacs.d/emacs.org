@@ -930,17 +930,17 @@ nil."
 (use-package company
   :config
   (setq company-global-modes '(not org-mode markdown-mode))
-  (add-hook 'after-init-hook 'global-company-mode)
-  (setq company-dabbrev-downcase nil
-        company-tooltip-flip-when-above t)
-  (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
+
+  (global-company-mode)
+
+  ;; (setq company-dabbrev-downcase nil
+  ;;       company-tooltip-flip-when-above t)
+
+  ;; (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
+
   (setq-default company-idle-delay .2
-                company-minimum-prefix-length 2
-                company-tooltip-align-annotations t)
-  (add-to-list 'company-backends 'company-dabbrev-code)
-  (add-to-list 'company-backends 'company-yasnippet)
-  (add-to-list 'company-backends 'company-files)
-  (add-to-list 'company-backends 'company-elisp))
+                company-minimum-prefix-length 1
+                company-tooltip-align-annotations t))
 #+END_SRC
 *** COMMENT Statistic
 Show more offten used completeons first
@@ -1214,25 +1214,37 @@ Replace for i-search or swiper
   :ensure smartparens
   :config
   (setq sp-show-pair-from-inside t
-        smartparens-strict-mode t)
+        sp-highlight-pair-overlay nil)
 
-  (setq sp-highlight-pair-overlay nil)
+  (sp-with-modes 'web-mode
+    (sp-local-pair "%" "%" :wrap "C-%")
+    (sp-local-pair "<" ">" :wrap "C->"))
 
-  (sp-local-pair 'web-mode "%" "%" :wrap "C-%")
-  (sp-local-pair 'web-mode "<" ">" :wrap "C->")
 
-  ;; (add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
-  ;; (add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
-  ;; (add-hook 'org-mode-hook 'turn-on-smartparens-strict-mode)
   (sp-local-pair 'prog-mode "{" nil :post-handlers '(("||\n[i]" "RET")))
+  (sp-local-pair 'prog-mode "[" nil :post-handlers '(("||\n[i]" "RET")))
+  (sp-local-pair 'prog-mode "(" nil :post-handlers '(("||\n[i]" "RET")))
   (sp-local-pair 'java-mode "/*" "*/" :post-handlers '(("* ||\n[i]" "RET")))
 
   (smartparens-global-strict-mode t)
   (show-smartparens-global-mode t)
 
+  (sp-with-modes 'org-mode
+    (sp-local-pair "=" "=" :wrap "C-="))
+
+  (bind-key [remap c-electric-backspace] 'sp-backward-delete-char smartparens-strict-mode-map)
+  (bind-key [remap c-electric-delete-forward] 'sp-delete-char smartparens-strict-mode-map)
+
   :bind
   ("M-]" . 'sp-unwrap-sexp))
 #+END_SRC
+** COMMENT Paredit
+#+begin_src emacs-lisp
+(use-package paredit
+  :config
+  (put 'paredit-forward-delete 'delete-selection 'supersede)
+  (add-hook 'prog-mode-hook 'enable-paredit-mode))
+#+end_src
 ** Workspaces
 #+BEGIN_SRC emacs-lisp
 (use-package eyebrowse
@@ -2810,9 +2822,15 @@ But there is no backward compatibility.
 (use-package rust-mode)
 #+end_src
 *** Clojure
+**** Clojure mode
+#+begin_src emacs-lisp
+(use-package clojure-mode)
+#+end_src
 **** CIDER
 #+begin_src emacs-lisp
-(use-package cider)
+(use-package cider
+  :config
+  (add-hook 'clojure-mode-hook #'cider-mode))
 #+end_src
 *** Gherkin
 **** Syntax highlighting
