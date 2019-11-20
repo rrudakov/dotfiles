@@ -2327,7 +2327,12 @@ But there is no backward compatibility.
   :config
   (add-hook 'java-mode-hook 'fci-mode))
 #+end_src
-** Format XML
+** XML
+*** Common settings
+#+begin_src emacs-lisp
+(setq nxml-child-indent 4 nxml-attribute-indent 4)
+#+end_src
+*** Format XML
 #+begin_src emacs-lisp
 (use-package xml-format
   :demand t
