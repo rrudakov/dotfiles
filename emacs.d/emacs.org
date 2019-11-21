@@ -1220,6 +1220,9 @@ Replace for i-search or swiper
     (sp-local-pair "%" "%" :wrap "C-%")
     (sp-local-pair "<" ">" :wrap "C->"))
 
+  (define-key smartparens-mode-map (kbd "C-c (") 'sp-wrap-round)
+  (define-key smartparens-mode-map (kbd "C-c {") 'sp-wrap-curly)
+  (define-key smartparens-mode-map (kbd "C-c [") 'sp-wrap-square)
 
   (sp-local-pair 'prog-mode "{" nil :post-handlers '(("||\n[i]" "RET")))
   (sp-local-pair 'prog-mode "[" nil :post-handlers '(("||\n[i]" "RET")))
@@ -2350,9 +2353,6 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
 (use-package lsp-mode
   :after pyvenv
-  :bind (("C-c /" . lsp-find-implementation)
-         ("C-c C-r" . lsp-rename)
-         ("C-c '" . lsp-execute-code-action))
   :config
   (setq lsp-eldoc-render-all nil
 	lsp-highlight-symbol-at-point nil
@@ -2363,6 +2363,10 @@ But there is no backward compatibility.
 	lsp-keep-workspace-alive t
 	lsp-file-watch-threshold nil
 	lsp-enable-folding t)
+
+  (define-key lsp-mode-map (kbd "C-c '") #'lsp-execute-code-action)
+  (define-key lsp-mode-map (kbd "C-c /") #'lsp-find-implementation)
+  (define-key lsp-mode-map (kbd "C-c C-r") #'lsp-rename)
 
   ;; Avoid broken italic for Fira Code font
   ;; (set-face-attribute 'lsp-face-highlight-write nil :slant 'normal :weight 'bold)
@@ -2836,6 +2840,25 @@ But there is no backward compatibility.
 (use-package cider
   :config
   (add-hook 'clojure-mode-hook #'cider-mode))
+#+end_src
+**** Clojure refactoring
+#+begin_src emacs-lisp
+(use-package clj-refactor
+  :config
+  (defun my-clojure-mode-hook ()
+    (clj-refactor-mode 1)
+    (yas-minor-mode 1) ; for adding require/use/import statements
+    ;; This choice of keybinding leaves cider-macroexpand-1 unbound
+    (cljr-add-keybindings-with-prefix "C-c C-m"))
+
+  (add-hook 'clojure-mode-hook #'my-clojure-mode-hook))
+#+end_src
+**** Clojure refactoring helm integration
+#+begin_src emacs-lisp
+(use-package cljr-helm
+  :config
+  (add-hook 'clojure-mode-hook
+            (lambda () (local-set-key (kbd "C-c C-r") 'cljr-helm))))
 #+end_src
 *** Gherkin
 **** Syntax highlighting
