@@ -1214,7 +1214,8 @@ Replace for i-search or swiper
   :ensure smartparens
   :config
   (setq sp-show-pair-from-inside t
-        sp-highlight-pair-overlay nil)
+        sp-highlight-pair-overlay nil
+        sp-wrap-respect-direction t)
 
   (sp-with-modes 'web-mode
     (sp-local-pair "%" "%" :wrap "C-%")
@@ -1223,6 +1224,11 @@ Replace for i-search or swiper
   (define-key smartparens-mode-map (kbd "C-c (") 'sp-wrap-round)
   (define-key smartparens-mode-map (kbd "C-c {") 'sp-wrap-curly)
   (define-key smartparens-mode-map (kbd "C-c [") 'sp-wrap-square)
+
+  (define-key smartparens-mode-map (kbd "C-(") 'sp-backward-slurp-sexp)
+  (define-key smartparens-mode-map (kbd "C-)") 'sp-forward-slurp-sexp)
+  (define-key smartparens-mode-map (kbd "C-}") 'sp-forward-barf-sexp)
+  (define-key smartparens-mode-map (kbd "C-{") 'sp-backward-barf-sexp)
 
   (sp-local-pair 'prog-mode "{" nil :post-handlers '(("||\n[i]" "RET")))
   (sp-local-pair 'prog-mode "[" nil :post-handlers '(("||\n[i]" "RET")))
