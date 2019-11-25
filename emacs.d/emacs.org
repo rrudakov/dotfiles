@@ -2110,7 +2110,10 @@ But there is no backward compatibility.
    (sql . t)
    (shell . t)
    (sqlite . t)
-   (haskell . t)))
+   (haskell . t)
+   (ditaa . t)
+   (plantuml . t)))
+
 (setq org-confirm-babel-evaluate t
       org-export-use-babel nil)
 
@@ -2872,6 +2875,16 @@ But there is no backward compatibility.
 (use-package feature-mode
   :config
   (add-to-list 'auto-mode-alist '("\\.story$" . feature-mode)))
+#+end_src
+*** PlantUML
+**** Major mode
+#+begin_src emacs-lisp
+(use-package plantuml-mode
+  :config
+  (setq org-plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar"
+        plantuml-default-exec-mode 'executable)
+
+  (add-to-list 'org-src-lang-modes '("plantuml" . plantuml)))
 #+end_src
 ** Debugger
 #+BEGIN_SRC emacs-lisp
