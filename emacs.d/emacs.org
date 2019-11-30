@@ -1834,10 +1834,12 @@ Visual Regexp package:
 #+END_SRC
 *** Agenda settings
 #+BEGIN_SRC emacs-lisp
-(setq org-agenda-files (quote ("~/Org/other.org"
-                               "~/Org-mobile/home.org"
-                               "~/Org/notes.org"
-                               "~/Org/work/tasks.org")))
+(setq org-agenda-files (quote ("~/Org/tasks/bsc.org"
+                               "~/Org/tasks/epam.org"
+                               "~/Org/tasks/personal.org"
+                               "~/Org/tasks/index.org"
+                               "~/Org/tasks/libertyglobal.org"
+                               "~/Org-mobile/home.org")))
 (setq org-directory "~/Org")
 (setq org-agenda-restore-windows-after-quit t
       org-agenda-compact-blocks t
@@ -1854,16 +1856,13 @@ Visual Regexp package:
 (setq org-default-notes-file (concat org-directory "/notes.org"))
 
 (setq org-capture-templates
-      '(("t" "Todo" entry (file+headline "" "Tasks")
-         "* TODO %?\n%i"
-         :clock-in t
-         :clock-resume t)
+      '(("t" "Todo" entry (file+headline "~/Org/tasks/index.org" "Unsorted tasks")
+         "* TODO %?\n%i")
         ("n" "Note" entry (file+headline "" "Notes")
          "* TODO %?\n%i")
         ("l" "Link" entry (file+headline "~/Org/links.org" "Links")
          "* %? %^L \n%T"
-         :prepend t)
-        ))
+         :prepend t)))
 
 (setq org-refile-targets
       (quote ((nil :maxlevel . 6)
