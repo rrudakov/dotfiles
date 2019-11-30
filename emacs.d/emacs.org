@@ -2431,6 +2431,7 @@ But there is no backward compatibility.
 (use-package company-lsp
   :config
   (push 'company-lsp company-backends)
+  ;; (add-hook 'company-completion-finished-hook (lambda (&rest _) (lsp-signature-activate)))
   (setq company-lsp-enable-snippet t))
 #+END_SRC
 **** Folding
@@ -2454,7 +2455,19 @@ But there is no backward compatibility.
   (dap-ui-mode 1)
 
   (require 'dap-lldb)
-  (require 'dap-java))
+  (require 'dap-java)
+  (add-hook 'dap-stopped-hook
+            (lambda (arg) (call-interactively #'dap-hydra)))
+
+  ;; Run build with args:
+  ;; -Dmaven.failsafe.debug="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1044 -Xnoagent"
+  (dap-register-debug-template "Debug external maven"
+                               (list :type "java"
+                                     :request "attach"
+                                     :hostName "localhost"
+                                     :projectName nil
+                                     :port nil))
+  )
 #+end_src
 *** Code documentation
 #+begin_src emacs-lisp
@@ -2578,9 +2591,12 @@ But there is no backward compatibility.
 #+begin_src emacs-lisp
 (use-package lsp-haskell
   :after lsp-mode
+  :load-path "/home/rrudakov/Projects/lsp-haskell"
   :config
-  (setq lsp-haskell-process-path-hie "ghcide")
-  (setq lsp-haskell-process-args-hie '())
+  ;; (setq lsp-haskell-process-path-hie "ghcide")
+  ;; (setq lsp-haskell-process-args-hie '())
+  (lsp-haskell-set-hlint-on)
+  (lsp-haskell-set-completion-snippets-on)
   (add-hook 'haskell-mode-hook #'lsp))
 #+end_src
 **** Align rules
