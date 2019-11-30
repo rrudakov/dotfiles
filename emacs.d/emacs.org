@@ -627,6 +627,16 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 (setq confirm-kill-processes nil
       confirm-kill-emacs 'y-or-n-p)
 #+END_SRC
+** Open compilation errors in same mode window
+#+begin_src emacs-lisp
+(defvar display-buffer-same-window-commands
+  '(compile-goto-error))
+
+(add-to-list 'display-buffer-alist
+             '((lambda (&rest _)
+                 (memq this-command display-buffer-same-window-commands))
+               (display-buffer-reuse-mode-window)))
+#+end_src
 ** Theme
 *** Color scheme
 #+BEGIN_SRC emacs-lisp
@@ -635,11 +645,14 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
   :config
   (load-theme 'zenburn t)
   (let ((line (face-attribute 'mode-line :underline)))
-    (set-face-attribute 'mode-line          nil :overline   line)
-    (set-face-attribute 'mode-line-inactive nil :overline   line)
-    (set-face-attribute 'mode-line-inactive nil :underline  line)
-    (set-face-attribute 'mode-line          nil :box        nil)
-    (set-face-attribute 'mode-line-inactive nil :box        nil)
+    ;; (set-face-attribute 'mode-line          nil :overline   line)
+    ;; (set-face-attribute 'mode-line-inactive nil :overline   line)
+    ;; (set-face-attribute 'mode-line-inactive nil :underline  line)
+    ;; (set-face-attribute 'mode-line          nil :box        nil)
+    ;; (set-face-attribute 'mode-line-inactive nil :box        nil)
+
+    ;; Customizations
+    (set-face-attribute 'highlight nil :background nil :foreground nil :weight 'bold)
 
     ;; Fixes for emacs 27
     (set-face-attribute 'helm-source-header nil :extend t)
@@ -668,6 +681,59 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
     (set-face-attribute 'smerge-lower nil :extend t)
     (set-face-attribute 'smerge-base nil :extend t)
     (set-face-attribute 'smerge-markers nil :extend t)))
+
+;; (use-package gruvbox-theme
+;;   :after (helm smerge-mode ediff org)
+;;   :config
+;;   (load-theme 'gruvbox-dark-soft t)
+
+;;   (require 'gruvbox-dark-soft-theme)
+
+;;   (let ((line (face-attribute 'mode-line :underline)))
+;;     (set-face-attribute 'mode-line          nil :overline   line)
+;;     (set-face-attribute 'mode-line-inactive nil :overline   line)
+;;     (set-face-attribute 'mode-line-inactive nil :underline  line)
+;;     (set-face-attribute 'mode-line          nil :box        nil)
+;;     (set-face-attribute 'mode-line-inactive nil :box        nil)
+
+;;     ;; Customizations
+;;     (set-face-attribute 'highlight nil :background nil :foreground nil :weight 'bold)
+;;     (set-face-attribute 'org-block-begin-line nil :background nil :foreground "dim gray")
+;;     (set-face-attribute 'org-block-end-line nil :background nil :foreground "dim gray")
+
+;;     (require 'color)
+;;     (set-face-attribute 'org-block nil
+;;                         :background (color-darken-name (face-attribute 'default :background) 2)
+;;                         :extend t)
+
+;;     ;; Fixes for emacs 27
+;;     (set-face-attribute 'helm-source-header nil :extend t)
+;;     (set-face-attribute 'helm-selection nil :extend t)
+
+;;     (set-face-attribute 'secondary-selection nil :extend t)
+;;     (set-face-attribute 'org-agenda-clocking nil :extend t)
+;;     (set-face-attribute 'diff-header nil :extend t)
+;;     (set-face-attribute 'diff-file-header nil :extend t)
+;;     (set-face-attribute 'diff-removed nil :extend t)
+;;     (set-face-attribute 'diff-added nil :extend t)
+;;     (set-face-attribute 'ediff-current-diff-A nil :extend t)
+;;     (set-face-attribute 'ediff-current-diff-B nil :extend t)
+;;     (set-face-attribute 'ediff-current-diff-C nil :extend t)
+;;     (set-face-attribute 'ediff-current-diff-Ancestor nil :extend t)
+;;     (set-face-attribute 'ediff-even-diff-A nil :extend t)
+;;     (set-face-attribute 'ediff-even-diff-B nil :extend t)
+;;     (set-face-attribute 'ediff-even-diff-C nil :extend t)
+;;     (set-face-attribute 'ediff-even-diff-Ancestor nil :extend t)
+;;     (set-face-attribute 'ediff-odd-diff-A nil :extend t)
+;;     (set-face-attribute 'ediff-odd-diff-B nil :extend t)
+;;     (set-face-attribute 'ediff-odd-diff-C nil :extend t)
+;;     (set-face-attribute 'ediff-odd-diff-Ancestor nil :extend t)
+
+;;     (set-face-attribute 'smerge-upper nil :extend t)
+;;     (set-face-attribute 'smerge-lower nil :extend t)
+;;     (set-face-attribute 'smerge-base nil :extend t)
+;;     (set-face-attribute 'smerge-markers nil :extend t))
+;;   )
 #+END_SRC
 *** COMMENT Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
@@ -770,7 +836,7 @@ nil."
   (setq minions-direct '(pyvenv-mode))
   (minions-mode 1))
 #+end_src
-***** Ribbons
+***** COMMENT Ribbons
 #+begin_src emacs-lisp
 (use-package moody
   :config
@@ -864,17 +930,17 @@ nil."
 (use-package company
   :config
   (setq company-global-modes '(not org-mode markdown-mode))
-  (add-hook 'after-init-hook 'global-company-mode)
-  (setq company-dabbrev-downcase nil
-        company-tooltip-flip-when-above t)
-  (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
+
+  (global-company-mode)
+
+  ;; (setq company-dabbrev-downcase nil
+  ;;       company-tooltip-flip-when-above t)
+
+  ;; (add-to-list 'company-transformers 'company-sort-prefer-same-case-prefix)
+
   (setq-default company-idle-delay .2
-                company-minimum-prefix-length 2
-                company-tooltip-align-annotations t)
-  (add-to-list 'company-backends 'company-dabbrev-code)
-  (add-to-list 'company-backends 'company-yasnippet)
-  (add-to-list 'company-backends 'company-files)
-  (add-to-list 'company-backends 'company-elisp))
+                company-minimum-prefix-length 1
+                company-tooltip-align-annotations t))
 #+END_SRC
 *** COMMENT Statistic
 Show more offten used completeons first
@@ -1148,25 +1214,46 @@ Replace for i-search or swiper
   :ensure smartparens
   :config
   (setq sp-show-pair-from-inside t
-        smartparens-strict-mode t)
+        sp-highlight-pair-overlay nil
+        sp-wrap-respect-direction t)
 
-  (setq sp-highlight-pair-overlay nil)
+  (sp-with-modes 'web-mode
+    (sp-local-pair "%" "%" :wrap "C-%")
+    (sp-local-pair "<" ">" :wrap "C->"))
 
-  (sp-local-pair 'web-mode "%" "%" :wrap "C-%")
-  (sp-local-pair 'web-mode "<" ">" :wrap "C->")
+  (define-key smartparens-mode-map (kbd "C-c (") 'sp-wrap-round)
+  (define-key smartparens-mode-map (kbd "C-c {") 'sp-wrap-curly)
+  (define-key smartparens-mode-map (kbd "C-c [") 'sp-wrap-square)
 
-  ;; (add-hook 'prog-mode-hook 'turn-on-smartparens-strict-mode)
-  ;; (add-hook 'markdown-mode-hook 'turn-on-smartparens-strict-mode)
-  ;; (add-hook 'org-mode-hook 'turn-on-smartparens-strict-mode)
+  (define-key smartparens-mode-map (kbd "C-(") 'sp-backward-slurp-sexp)
+  (define-key smartparens-mode-map (kbd "C-)") 'sp-forward-slurp-sexp)
+  (define-key smartparens-mode-map (kbd "C-}") 'sp-forward-barf-sexp)
+  (define-key smartparens-mode-map (kbd "C-{") 'sp-backward-barf-sexp)
+
   (sp-local-pair 'prog-mode "{" nil :post-handlers '(("||\n[i]" "RET")))
+  (sp-local-pair 'prog-mode "[" nil :post-handlers '(("||\n[i]" "RET")))
+  (sp-local-pair 'prog-mode "(" nil :post-handlers '(("||\n[i]" "RET")))
   (sp-local-pair 'java-mode "/*" "*/" :post-handlers '(("* ||\n[i]" "RET")))
 
   (smartparens-global-strict-mode t)
   (show-smartparens-global-mode t)
 
+  (sp-with-modes 'org-mode
+    (sp-local-pair "=" "=" :wrap "C-="))
+
+  (bind-key [remap c-electric-backspace] 'sp-backward-delete-char smartparens-strict-mode-map)
+  (bind-key [remap c-electric-delete-forward] 'sp-delete-char smartparens-strict-mode-map)
+
   :bind
   ("M-]" . 'sp-unwrap-sexp))
 #+END_SRC
+** COMMENT Paredit
+#+begin_src emacs-lisp
+(use-package paredit
+  :config
+  (put 'paredit-forward-delete 'delete-selection 'supersede)
+  (add-hook 'prog-mode-hook 'enable-paredit-mode))
+#+end_src
 ** Workspaces
 #+BEGIN_SRC emacs-lisp
 (use-package eyebrowse
@@ -1985,6 +2072,7 @@ But there is no backward compatibility.
                "\\documentclass[11pt,a4paper]{article}
   \\usepackage{dejavu}
   \\usepackage[english, russian]{babel}
+  \\usepackage[hidelinks]{hyperref}
   \\usepackage{geometry}
   \\geometry{a4paper}
   \\geometry{left=2cm,right=1cm,top=1cm,bottom=1cm,includeheadfoot,headheight=1.2cm}
@@ -2001,6 +2089,7 @@ But there is no backward compatibility.
                "\\documentclass[11pt,a4paper]{article}
   \\usepackage{dejavu}
   \\usepackage[english]{babel}
+  \\usepackage[hidelinks]{hyperref}
   \\usepackage{geometry}
   \\geometry{a4paper}
   \\geometry{left=2cm,right=1cm,top=1cm,bottom=1cm,includeheadfoot,headheight=1.2cm}
@@ -2021,7 +2110,10 @@ But there is no backward compatibility.
    (sql . t)
    (shell . t)
    (sqlite . t)
-   (haskell . t)))
+   (haskell . t)
+   (ditaa . t)
+   (plantuml . t)))
+
 (setq org-confirm-babel-evaluate t
       org-export-use-babel nil)
 
@@ -2247,6 +2339,23 @@ But there is no backward compatibility.
   :config
   (add-hook 'java-mode-hook 'fci-mode))
 #+end_src
+** XML
+*** Common settings
+#+begin_src emacs-lisp
+(setq nxml-child-indent 4 nxml-attribute-indent 4)
+#+end_src
+*** Format XML
+#+begin_src emacs-lisp
+(use-package xml-format
+  :demand t
+  :after nxml-mode)
+#+end_src
+** NIX
+*** Edit .nix configuration files
+#+begin_src emacs-lisp
+(use-package nix-mode
+  :mode "\\.nix\\'")
+#+end_src
 ** Languages
 *** LSP mode
 **** Common setup
@@ -2263,6 +2372,10 @@ But there is no backward compatibility.
 	lsp-keep-workspace-alive t
 	lsp-file-watch-threshold nil
 	lsp-enable-folding t)
+
+  (define-key lsp-mode-map (kbd "C-c '") #'lsp-execute-code-action)
+  (define-key lsp-mode-map (kbd "C-c /") #'lsp-find-implementation)
+  (define-key lsp-mode-map (kbd "C-c C-r") #'lsp-rename)
 
   ;; Avoid broken italic for Fira Code font
   ;; (set-face-attribute 'lsp-face-highlight-write nil :slant 'normal :weight 'bold)
@@ -2287,7 +2400,11 @@ But there is no backward compatibility.
   (add-hook 'hack-local-variables-hook
 	    (lambda () (when (and pyvenv-virtual-env
 				  (derived-mode-p 'python-mode))
-			 (lsp))))
+			         (lsp))))
+
+  ;; (add-hook 'lsp-mode-hook
+  ;;           (lambda ()
+  ;;             (local-set-key (kbd "C-c /") 'lsp-find-implementation)))
 
   ;; (setq lsp-print-io t)
   (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
@@ -2302,6 +2419,8 @@ But there is no backward compatibility.
 	lsp-ui-flycheck-enable t
 	lsp-ui-flycheck-list-position 'bottom
 	lsp-ui-flycheck-live-reporting t)
+
+  (set-face-attribute 'lsp-ui-sideline-code-action nil :foreground "#DFAF8F")
 
   ;; (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
   (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-find-references)
@@ -2366,10 +2485,10 @@ But there is no backward compatibility.
 (require 'google-java-format)
 (setq google-java-format-executable "/home/rrudakov/.local/bin/google-java-format")
 
-(add-hook 'java-mode-hook
-          (lambda () (setq-local fill-column 160)))
+;; (add-hook 'java-mode-hook
+;;           (lambda () (setq-local fill-column 160)))
 
-(add-hook 'java-mode-hook 'display-fill-column-indicator-mode)
+;; (add-hook 'java-mode-hook 'display-fill-column-indicator-mode)
 
 (add-hook 'java-mode-hook
           (lambda ()
@@ -2406,7 +2525,7 @@ But there is no backward compatibility.
   ;; (require 'lsp-java-boot)
 
   ;; ;; to enable the lenses
-  (add-hook 'lsp-mode-hook #'lsp-lens-mode)
+  ;; (add-hook 'lsp-mode-hook #'lsp-lens-mode)
   ;; (add-hook 'java-mode-hook #'lsp-java-boot-lens-mode)
   )
 #+END_SRC
@@ -2425,7 +2544,7 @@ But there is no backward compatibility.
                                    (point-max)))]))
 #+END_SRC
 *** Haskell
-**** Intero
+**** COMMENT Intero
 #+BEGIN_SRC emacs-lisp
 (use-package intero
   :after flycheck
@@ -2455,11 +2574,13 @@ But there is no backward compatibility.
 
   (add-hook 'haskell-mode-hook 'haskell-auto-insert-module-template))
 #+end_src
-**** COMMENT lsp-haskell
+**** lsp-haskell
 #+begin_src emacs-lisp
 (use-package lsp-haskell
   :after lsp-mode
   :config
+  (setq lsp-haskell-process-path-hie "ghcide")
+  (setq lsp-haskell-process-args-hie '())
   (add-hook 'haskell-mode-hook #'lsp))
 #+end_src
 **** Align rules
@@ -2718,6 +2839,36 @@ But there is no backward compatibility.
 #+begin_src emacs-lisp
 (use-package rust-mode)
 #+end_src
+*** Clojure
+**** Clojure mode
+#+begin_src emacs-lisp
+(use-package clojure-mode)
+#+end_src
+**** CIDER
+#+begin_src emacs-lisp
+(use-package cider
+  :config
+  (add-hook 'clojure-mode-hook #'cider-mode))
+#+end_src
+**** Clojure refactoring
+#+begin_src emacs-lisp
+(use-package clj-refactor
+  :config
+  (defun my-clojure-mode-hook ()
+    (clj-refactor-mode 1)
+    (yas-minor-mode 1) ; for adding require/use/import statements
+    ;; This choice of keybinding leaves cider-macroexpand-1 unbound
+    (cljr-add-keybindings-with-prefix "C-c C-m"))
+
+  (add-hook 'clojure-mode-hook #'my-clojure-mode-hook))
+#+end_src
+**** Clojure refactoring helm integration
+#+begin_src emacs-lisp
+(use-package cljr-helm
+  :config
+  (add-hook 'clojure-mode-hook
+            (lambda () (local-set-key (kbd "C-c C-r") 'cljr-helm))))
+#+end_src
 *** Gherkin
 **** Syntax highlighting
 #+begin_src emacs-lisp
@@ -2725,10 +2876,25 @@ But there is no backward compatibility.
   :config
   (add-to-list 'auto-mode-alist '("\\.story$" . feature-mode)))
 #+end_src
+*** PlantUML
+**** Major mode
+#+begin_src emacs-lisp
+(use-package plantuml-mode
+  :config
+  (setq org-plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar"
+        plantuml-default-exec-mode 'executable)
+
+  (add-to-list 'org-src-lang-modes '("plantuml" . plantuml)))
+#+end_src
 ** Debugger
 #+BEGIN_SRC emacs-lisp
 (use-package realgud)
 #+END_SRC
+** Kubernetes client for emacs
+#+begin_src emacs-lisp
+(use-package kubernetes
+  :commands (kubernetes-overview))
+#+end_src
 ** Create GIF screencasts
 #+begin_src emacs-lisp
 (use-package gif-screencast)
