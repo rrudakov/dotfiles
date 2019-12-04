@@ -615,12 +615,10 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
   (load-theme 'sanityinc-tomorrow-night t)
 
   ;; Fixes for emacs 27
-  ;; (set-face-attribute 'helm-selection nil :extend t)
   (set-face-attribute 'match nil :background "#282a2e" :reverse-video nil)
 
   (set-face-attribute 'secondary-selection nil :extend t)
   (set-face-attribute 'org-block nil :extend t)
-  ;; (set-face-attribute 'org-agenda-clocking nil :extend t)
   )
 
 ;; (use-package zenburn-theme
@@ -1195,7 +1193,7 @@ Replace for i-search or swiper
         '(("\\`\\*helm.*?\\*\\'" :regexp t :align t :size 0.4)
           ("\\`\\*cljr.*?\\*\\'" :regexp t :align t :size 0.4)
           (compilation-mode :select t :align t :size 0.4)
-          ("\\`\\*Org\sSrc.*?\\*.*\\'" :regexp t :align right :size 100)
+          ;; ("\\`\\*Org\sSrc.*?\\*.*\\'" :regexp t :align right :size 100)
           ("\\`\\*Org-Babel\sError\sOutput\\*.*\\'" :regexp t :align t :size 0.4)
           ("*compilation*" :select t :align t :size 0.4)
           ("*Async Shell Command*" :select t :align t :size 0.4)
@@ -1330,11 +1328,11 @@ Replace for i-search or swiper
        #b00000000
        #b00000000
        #b00000000
-       #b00111100
-       #b01111110
-       #b01111110
-       #b01111110
-       #b00111100
+       #b00011100
+       #b00111110
+       #b00111110
+       #b00111110
+       #b00011100
        #b00000000
        #b00000000
        #b00000000
@@ -1659,7 +1657,7 @@ Visual Regexp package:
       org-tags-column 0
       ;; org-tags-column -100
       org-startup-folded 'content
-      org-startup-indented nil          ;Return it when it will be fixed
+      org-startup-indented nil
       org-startup-shrink-all-tables t
       org-edit-src-content-indentation 0
       org-cycle-separator-lines 1
@@ -1677,7 +1675,7 @@ Visual Regexp package:
       org-ctrl-k-protect-subtree t
       org-imenu-depth 4
       org-export-with-sub-superscripts nil
-      org-src-window-setup 'other-window
+      org-src-window-setup 'same-window
       org-catch-invisible-edits 'show-and-error
       org-return-follows-link t
       ;; org-M-RET-may-split-line nil
