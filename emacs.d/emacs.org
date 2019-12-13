@@ -610,111 +610,23 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 ** Theme
 *** Color scheme
 #+BEGIN_SRC emacs-lisp
-(use-package color-theme-sanityinc-tomorrow
+;; (use-package color-theme-sanityinc-tomorrow
+;;   :config
+;;   (load-theme 'sanityinc-tomorrow-night t)
+
+;;   ;; Fixes for emacs 27
+;;   (set-face-attribute 'match nil :background "#282a2e" :reverse-video nil)
+;;   (set-face-attribute 'org-block nil :extend t)
+;;   (set-face-attribute 'org-tag nil :background "#373b41"))
+
+(use-package zenburn-theme
+  :after (smerge-mode ediff org)
   :config
-  (load-theme 'sanityinc-tomorrow-night t)
+  (load-theme 'zenburn t)
 
   ;; Fixes for emacs 27
-  (set-face-attribute 'match nil :background "#282a2e" :reverse-video nil)
-
-  (set-face-attribute 'secondary-selection nil :extend t)
-  (set-face-attribute 'org-block nil :extend t)
+  ;; (set-face-attribute 'helm-selection nil :extend t)
   )
-
-;; (use-package zenburn-theme
-;;   :after (helm smerge-mode ediff org)
-;;   :config
-;;   (load-theme 'zenburn t)
-;;   (let ((line (face-attribute 'mode-line :underline)))
-;;     ;; (set-face-attribute 'mode-line          nil :overline   line)
-;;     ;; (set-face-attribute 'mode-line-inactive nil :overline   line)
-;;     ;; (set-face-attribute 'mode-line-inactive nil :underline  line)
-;;     ;; (set-face-attribute 'mode-line          nil :box        nil)
-;;     ;; (set-face-attribute 'mode-line-inactive nil :box        nil)
-
-;;     ;; Customizations
-;;     (set-face-attribute 'highlight nil :background nil :foreground nil :weight 'bold)
-
-;;     ;; Fixes for emacs 27
-;;     (set-face-attribute 'helm-source-header nil :extend t)
-;;     (set-face-attribute 'helm-selection nil :extend t)
-
-;;     (set-face-attribute 'secondary-selection nil :extend t)
-;;     (set-face-attribute 'org-agenda-clocking nil :extend t)
-;;     (set-face-attribute 'diff-header nil :extend t)
-;;     (set-face-attribute 'diff-file-header nil :extend t)
-;;     (set-face-attribute 'diff-removed nil :extend t)
-;;     (set-face-attribute 'diff-added nil :extend t)
-;;     (set-face-attribute 'ediff-current-diff-A nil :extend t)
-;;     (set-face-attribute 'ediff-current-diff-B nil :extend t)
-;;     (set-face-attribute 'ediff-current-diff-C nil :extend t)
-;;     (set-face-attribute 'ediff-current-diff-Ancestor nil :extend t)
-;;     (set-face-attribute 'ediff-even-diff-A nil :extend t)
-;;     (set-face-attribute 'ediff-even-diff-B nil :extend t)
-;;     (set-face-attribute 'ediff-even-diff-C nil :extend t)
-;;     (set-face-attribute 'ediff-even-diff-Ancestor nil :extend t)
-;;     (set-face-attribute 'ediff-odd-diff-A nil :extend t)
-;;     (set-face-attribute 'ediff-odd-diff-B nil :extend t)
-;;     (set-face-attribute 'ediff-odd-diff-C nil :extend t)
-;;     (set-face-attribute 'ediff-odd-diff-Ancestor nil :extend t)
-
-;;     (set-face-attribute 'smerge-upper nil :extend t)
-;;     (set-face-attribute 'smerge-lower nil :extend t)
-;;     (set-face-attribute 'smerge-base nil :extend t)
-;;     (set-face-attribute 'smerge-markers nil :extend t)))
-
-;; (use-package gruvbox-theme
-;;   :after (helm smerge-mode ediff org)
-;;   :config
-;;   (load-theme 'gruvbox-dark-soft t)
-
-;;   (require 'gruvbox-dark-soft-theme)
-
-;;   (let ((line (face-attribute 'mode-line :underline)))
-;;     (set-face-attribute 'mode-line          nil :overline   line)
-;;     (set-face-attribute 'mode-line-inactive nil :overline   line)
-;;     (set-face-attribute 'mode-line-inactive nil :underline  line)
-;;     (set-face-attribute 'mode-line          nil :box        nil)
-;;     (set-face-attribute 'mode-line-inactive nil :box        nil)
-
-;;     ;; Customizations
-;;     (set-face-attribute 'highlight nil :background nil :foreground nil :weight 'bold)
-;;     (set-face-attribute 'org-block-begin-line nil :background nil :foreground "dim gray")
-;;     (set-face-attribute 'org-block-end-line nil :background nil :foreground "dim gray")
-
-;;     (require 'color)
-;;     (set-face-attribute 'org-block nil
-;;                         :background (color-darken-name (face-attribute 'default :background) 2)
-;;                         :extend t)
-
-;;     ;; Fixes for emacs 27
-;;     (set-face-attribute 'helm-source-header nil :extend t)
-;;     (set-face-attribute 'helm-selection nil :extend t)
-
-;;     (set-face-attribute 'secondary-selection nil :extend t)
-;;     (set-face-attribute 'org-agenda-clocking nil :extend t)
-;;     (set-face-attribute 'diff-header nil :extend t)
-;;     (set-face-attribute 'diff-file-header nil :extend t)
-;;     (set-face-attribute 'diff-removed nil :extend t)
-;;     (set-face-attribute 'diff-added nil :extend t)
-;;     (set-face-attribute 'ediff-current-diff-A nil :extend t)
-;;     (set-face-attribute 'ediff-current-diff-B nil :extend t)
-;;     (set-face-attribute 'ediff-current-diff-C nil :extend t)
-;;     (set-face-attribute 'ediff-current-diff-Ancestor nil :extend t)
-;;     (set-face-attribute 'ediff-even-diff-A nil :extend t)
-;;     (set-face-attribute 'ediff-even-diff-B nil :extend t)
-;;     (set-face-attribute 'ediff-even-diff-C nil :extend t)
-;;     (set-face-attribute 'ediff-even-diff-Ancestor nil :extend t)
-;;     (set-face-attribute 'ediff-odd-diff-A nil :extend t)
-;;     (set-face-attribute 'ediff-odd-diff-B nil :extend t)
-;;     (set-face-attribute 'ediff-odd-diff-C nil :extend t)
-;;     (set-face-attribute 'ediff-odd-diff-Ancestor nil :extend t)
-
-;;     (set-face-attribute 'smerge-upper nil :extend t)
-;;     (set-face-attribute 'smerge-lower nil :extend t)
-;;     (set-face-attribute 'smerge-base nil :extend t)
-;;     (set-face-attribute 'smerge-markers nil :extend t))
-;;   )
 #+END_SRC
 *** COMMENT Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
@@ -1701,7 +1613,6 @@ Visual Regexp package:
 
 (set-face-attribute 'org-done nil :strike-through t)
 (set-face-attribute 'org-headline-done nil :foreground "dim gray" :strike-through t)
-(set-face-attribute 'org-tag nil :foreground "#4F4F4F" :background "#AC7373")
 
 (add-hook 'mail-mode-hook 'turn-on-orgtbl)
 (add-hook 'mail-mode-hook 'turn-on-orgstruct)
@@ -1728,6 +1639,7 @@ Visual Regexp package:
       org-agenda-show-log t
       org-agenda-window-setup 'only-window
       org-agenda-span 'week
+      org-agenda-todo-ignore-scheduled 'future
       org-agenda-show-future-repeats 'next)
 #+END_SRC
 *** Capture settings
@@ -1779,11 +1691,7 @@ Visual Regexp package:
 #+END_SRC
 *** Tag list
 #+BEGIN_SRC emacs-lisp
-(setq org-tag-alist '((:startgroup . nil)
-                      ("@critical")
-                      ("@medium")
-                      ("@low")
-                      (:endgroup . nil)))
+(setq org-tag-alist '(("@bug" . ?b) ("@task" . ?t) ("@story" . ?s)))
 #+END_SRC
 *** Keywords list
 Maybe it's a good idea to use unicode symbols for TODO keywords:
@@ -2543,18 +2451,7 @@ But there is no backward compatibility.
 
 (eval-after-load 'latex '(add-to-list 'LaTeX-verbatim-environments "lstlisting"))
 
-(font-lock-add-keywords
- 'latex-mode
- `((,(concat "^\\s-*\\\\\\("
-             "\\(documentclass\\|\\(sub\\)?section[*]?\\)"
-             "\\(\\[[^]% \t\n]*\\]\\)?{[-[:alnum:]_ ]+"
-             "\\|"
-             "\\(begin\\|end\\){document"
-             "\\)}.*\n?")
-    (0 'your-face append))))
-
-(add-hook 'LaTeX-mode-hook (lambda ()
-                             (TeX-fold-mode 1)))
+(add-hook 'LaTeX-mode-hook (lambda () (TeX-fold-mode 1)))
 #+END_SRC
 *** Python
 **** Virtualenv
