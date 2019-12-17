@@ -287,18 +287,11 @@ Picked mostly from doom-emacs configuration.
  ad-redefinition-action 'accept   ; silence advised function warnings
  apropos-do-all t                 ; make `apropos' more useful
 
- ;; keep the point out of the minibuffer
- ;; minibuffer-prompt-properties '(read-only t point-entered minibuffer-avoid-prompt face minibuffer-prompt)
-
  ;; History & backup settings (save nothing, that's what git is for)
- auto-save-default nil
- create-lockfiles nil
  history-length 1000
- indent-tabs-mode nil
- make-backup-files nil)
+ indent-tabs-mode nil)
 
 (setq-default
- blink-matching-paren t ; don't blink--too distracting
  cursor-in-non-selected-windows nil  ; hide cursors in other windows
  frame-inhibit-implied-resize t
  ;; remove continuation arrow on right fringe
@@ -541,19 +534,34 @@ No more ugly line splitting
 #+BEGIN_SRC emacs-lisp
 (setq-default truncate-lines t)
 #+END_SRC
+*** Auto saving settings
+#+begin_src emacs-lisp
+(defconst rr-savefile-dir (expand-file-name "savefile" user-emacs-directory)
+  "Declare variable for save file directory.")
+
+;; create the savefile dir if it doesn't exist
+(unless (file-exists-p rr-savefile-dir)
+  (make-directory rr-savefile-dir))
+
+;; store all backup and autosave files in the tmp dir
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+
+#+end_src
 *** Save minibuffer history between sessions
 #+BEGIN_SRC emacs-lisp
 (use-package savehist
   :ensure nil
   :config
-  (savehist-mode 1)
   (setq history-delete-duplicates t)
   (setq savehist-save-minibuffer-history 1)
+  (setq savehist-file (expand-file-name "savehist" rr-savefile-dir))
   (setq savehist-additional-variables
         '(kill-ring
           search-ring
           regexp-search-ring
-          shell-command-history)))
+          shell-command-history))
+  (savehist-mode +1))
 #+END_SRC
 *** Kill-ring
 Save stuff you’ve copied in other applications to the emacs kill-ring.
@@ -620,13 +628,8 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 ;;   (set-face-attribute 'org-tag nil :background "#373b41"))
 
 (use-package zenburn-theme
-  :after (smerge-mode ediff org)
   :config
-  (load-theme 'zenburn t)
-
-  ;; Fixes for emacs 27
-  ;; (set-face-attribute 'helm-selection nil :extend t)
-  )
+  (load-theme 'zenburn t))
 #+END_SRC
 *** COMMENT Highlight symbol at point
 #+BEGIN_SRC emacs-lisp
@@ -712,6 +715,14 @@ nil."
   (add-hook 'text-mode-hook 'flyspell-mode)
   (add-hook 'prog-mode-hook #'flyspell-prog-mode))
 #+end_src
+** Remember location in files
+#+begin_src emacs-lisp
+(use-package saveplace
+  :config
+  (setq save-place-file (expand-file-name "saveplace" rr-savefile-dir))
+  ;; activate it for all buffers
+  (setq-default save-place t))
+#+end_src
 ** SQL
 *** Emacs clojure database client
 #+begin_src emacs-lisp
@@ -752,6 +763,13 @@ nil."
   :config
   (which-key-mode))
 #+END_SRC
+** Avy navigation
+#+begin_src emacs-lisp
+(use-package avy
+  :bind (("M-g w" . avy-goto-word-or-subword-1))
+  :config
+  (setq avy-background t))
+#+end_src
 ** Replace built-in help
 #+BEGIN_SRC emacs-lisp
 (use-package helpful
@@ -781,6 +799,14 @@ nil."
                 company-minimum-prefix-length 1
                 company-tooltip-align-annotations t))
 #+END_SRC
+*** COMMENT Show completion in posframe
+#+begin_src emacs-lisp
+(use-package company-posframe
+  :config
+  (setq company-posframe-show-indicator nil
+        company-posframe-show-metadata t)
+  (company-posframe-mode 1))
+#+end_src
 *** COMMENT Statistic
 Show more offten used completeons first
 #+BEGIN_SRC emacs-lisp
@@ -792,6 +818,7 @@ Show more offten used completeons first
 #+BEGIN_SRC emacs-lisp
 (use-package company-quickhelp
   :config
+  (setq company-quickhelp-use-propertized-text t)
   (company-quickhelp-mode 1))
 #+END_SRC
 *** Languages
@@ -886,6 +913,7 @@ Show more offten used completeons first
   (setq helm-display-function #'pop-to-buffer)
   (setq helm-show-completion-display-function #'pop-to-buffer)
 
+  (set-face-attribute 'helm-delete-async-message nil :foreground "#F0DFAF")
   (helm-mode 1)
   (helm-adaptive-mode 1))
 #+END_SRC
@@ -1567,7 +1595,7 @@ Visual Regexp package:
       org-pretty-entities-include-sub-superscripts t
       org-priority-faces '((?a . error) (?b . warning) (?c . success))
       org-tags-column 0
-      ;; org-tags-column -100
+      ;; org-tags-column -120
       org-startup-folded 'content
       org-startup-indented nil
       org-startup-shrink-all-tables t
@@ -1613,6 +1641,7 @@ Visual Regexp package:
 
 (set-face-attribute 'org-done nil :strike-through t)
 (set-face-attribute 'org-headline-done nil :foreground "dim gray" :strike-through t)
+(set-face-attribute 'org-tag nil :background "#7C4343" :foreground "#DCDCCC")
 
 (add-hook 'mail-mode-hook 'turn-on-orgtbl)
 (add-hook 'mail-mode-hook 'turn-on-orgstruct)
@@ -2159,6 +2188,7 @@ But there is no backward compatibility.
 	    lsp-message-project-root-warning t
 	    lsp-keep-workspace-alive t
 	    lsp-file-watch-threshold nil
+        ;; lsp-enable-text-document-color t
 	    lsp-enable-folding t)
 
   (require 'lsp-clients)
@@ -2647,6 +2677,12 @@ But there is no backward compatibility.
   :config
   (add-hook 'clojure-mode-hook
             (lambda () (local-set-key (kbd "C-c C-r") 'cljr-helm))))
+#+end_src
+**** CIDER helm integration
+#+begin_src emacs-lisp
+(use-package helm-cider
+  :config
+  (helm-cider-mode 1))
 #+end_src
 *** Gherkin
 **** Syntax highlighting
