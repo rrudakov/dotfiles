@@ -130,12 +130,6 @@ Unordered lists with separator '::'
              (equal "\n" (string (char-after (point)))))
     (delete-char 1)))
 #+END_SRC
-** COMMENT Remove whitespaces before insert newline
-#+BEGIN_SRC emacs-lisp
-(defadvice newline (before rr/remove-spaces activate)
-  "Remove trailing whitespace before insert newline."
-  (delete-trailing-whitespace))
-#+END_SRC
 ** Replace org-link with description of if empty its address
 #+BEGIN_SRC emacs-lisp
 (defun rr/org-replace-link-by-link-description ()
@@ -471,9 +465,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 *** More convenient scrolling settings
 #+begin_src emacs-lisp
-(setq scroll-conservatively 101
+(setq scroll-conservatively 100000
       scroll-preserve-screen-position t
-      scroll-margin 15)
+      scroll-margin 0)
 #+end_src
 *** Single line horizontal scrolling
 #+BEGIN_SRC emacs-lisp
@@ -691,14 +685,6 @@ nil."
   (setq minions-direct '(pyvenv-mode))
   (minions-mode 1))
 #+end_src
-***** COMMENT Ribbons
-#+begin_src emacs-lisp
-(use-package moody
-  :config
-  (setq x-underline-at-descent-line t)
-  (moody-replace-mode-line-buffer-identification)
-  (moody-replace-vc-mode))
-#+end_src
 ** Shell settings
 #+begin_src emacs-lisp
 (setq comint-scroll-to-bottom-on-input t
@@ -805,6 +791,7 @@ nil."
                 company-tooltip-align-annotations t))
 #+END_SRC
 *** COMMENT Show completion in posframe
+So far it has performance issues.
 #+begin_src emacs-lisp
 (use-package company-posframe
   :config
@@ -1113,13 +1100,6 @@ Replace for i-search or swiper
   :bind
   ("M-]" . 'sp-unwrap-sexp))
 #+END_SRC
-** COMMENT Paredit
-#+begin_src emacs-lisp
-(use-package paredit
-  :config
-  (put 'paredit-forward-delete 'delete-selection 'supersede)
-  (add-hook 'prog-mode-hook 'enable-paredit-mode))
-#+end_src
 ** Workspaces
 #+BEGIN_SRC emacs-lisp
 (use-package eyebrowse
@@ -1167,8 +1147,7 @@ Replace for i-search or swiper
 #+BEGIN_SRC emacs-lisp
 (use-package anzu
   :config
-  (global-anzu-mode +1)
-  (setq anzu-cons-mode-line-p nil))
+  (global-anzu-mode +1))
 #+END_SRC
 ** Windows navigation
 #+BEGIN_SRC emacs-lisp
@@ -1233,7 +1212,7 @@ Replace for i-search or swiper
   (setq projectile-completion-system 'helm)
   ;; (setq projectile-completion-system 'ivy)
   (add-to-list 'projectile-globally-ignored-files "*.log")
-  (setq projectile-mode-line '(:eval (format " [%s]" (projectile-project-name))))
+  ;; (setq projectile-mode-line '(:eval (format " [%s]" (projectile-project-name))))
   (projectile-mode +1))
 #+END_SRC
 *** Helm projectile
@@ -1310,7 +1289,7 @@ Replace for i-search or swiper
                 (append flycheck-disabled-checkers
                         '(json-jsonlist))))
 #+END_SRC
-*** Show errors in posframe
+*** COMMENT Show errors in posframe
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck-posframe
   :after flycheck
@@ -1357,7 +1336,7 @@ Replace for i-search or swiper
 #+begin_src emacs-lisp
 (use-package transient
   :config
-  (setq transient-show-popup 2))
+  (setq transient-show-popup t))
 #+end_src
 *** Work with forges
 #+BEGIN_SRC emacs-lisp
@@ -2190,6 +2169,7 @@ But there is no backward compatibility.
 	    lsp-inhibit-message t
 	    lsp-response-timeout 60
 	    lsp-prefer-flymake nil
+        lsp-prefer-capf t
 	    lsp-message-project-root-warning t
 	    lsp-keep-workspace-alive t
 	    lsp-file-watch-threshold nil
@@ -2242,7 +2222,6 @@ But there is no backward compatibility.
 (use-package company-lsp
   :config
   (push 'company-lsp company-backends)
-  ;; (add-hook 'company-completion-finished-hook (lambda (&rest _) (lsp-signature-activate)))
   (setq company-lsp-enable-snippet t))
 #+END_SRC
 **** COMMENT Folding
@@ -2280,7 +2259,7 @@ But there is no backward compatibility.
                                      :port nil))
   )
 #+end_src
-*** Code documentation
+*** COMMENT Code documentation
 #+begin_src emacs-lisp
 (use-package eldoc-box
   :config
