@@ -261,6 +261,11 @@ At the moment I set default font using ~~/.Xresources~ file.
      (set-fontset-font font-set nil my-font))
    font-sets))
 #+END_SRC
+*** Disable variable pitch at all
+#+begin_src emacs-lisp
+(let ((default-font (face-attribute 'default :family)))
+  (set-face-attribute 'variable-pitch nil :family default-font))
+#+end_src
 *** Open files ends with "rc" in conf-unix-mode
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
@@ -626,9 +631,9 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 ;;   (set-face-attribute 'match nil :background "#282a2e" :reverse-video nil)
 ;;   (set-face-attribute 'org-block nil :extend t)
 ;;   (set-face-attribute 'org-tag nil :background "#373b41"))
-
 (use-package zenburn-theme
   :config
+  (setq zenburn-use-variable-pitch nil)
   (load-theme 'zenburn t))
 #+END_SRC
 *** COMMENT Highlight symbol at point
@@ -2470,6 +2475,10 @@ But there is no backward compatibility.
 ;; Update PDF buffers after successful LaTeX runs
 (add-hook 'TeX-after-compilation-finished-functions
           #'TeX-revert-document-buffer)
+
+(with-eval-after-load 'font-latex
+  (setq font-latex-fontify-sectioning 'color)
+  (set-face-attribute 'font-latex-slide-title-face nil :height 1.0 :inherit font-lock-type-face))
 
 (setq-default TeX-master nil)
 (add-hook 'LaTeX-mode-hook 'visual-line-mode)
