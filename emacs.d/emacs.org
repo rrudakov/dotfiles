@@ -682,7 +682,7 @@ nil."
 #+begin_src emacs-lisp
 (use-package minions
   :config
-  (setq minions-direct '(pyvenv-mode))
+  (setq minions-direct '(pyvenv-mode projectile-mode))
   (minions-mode 1))
 #+end_src
 ** Shell settings
@@ -1212,7 +1212,7 @@ Replace for i-search or swiper
   (setq projectile-completion-system 'helm)
   ;; (setq projectile-completion-system 'ivy)
   (add-to-list 'projectile-globally-ignored-files "*.log")
-  ;; (setq projectile-mode-line '(:eval (format " [%s]" (projectile-project-name))))
+  (setq projectile-mode-line-function '(lambda () (format " Proj[%s]" (projectile-project-name))))
   (projectile-mode +1))
 #+END_SRC
 *** Helm projectile
@@ -1289,14 +1289,14 @@ Replace for i-search or swiper
                 (append flycheck-disabled-checkers
                         '(json-jsonlist))))
 #+END_SRC
-*** COMMENT Show errors in posframe
+*** Show errors in posframe
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck-posframe
   :after flycheck
   :config
-  (setq flycheck-posframe-info-prefix "\u25B6 ")
-  (setq flycheck-posframe-warning-prefix "\u0021 ")
-  (setq flycheck-posframe-error-prefix "\u203C ")
+  ;; (setq flycheck-posframe-info-prefix "\u25B6 ")
+  ;; (setq flycheck-posframe-warning-prefix "\u0021 ")
+  ;; (setq flycheck-posframe-error-prefix "\u203C ")
   (set-face-attribute 'flycheck-posframe-info-face nil :inherit 'info)
   (set-face-attribute 'flycheck-posframe-warning-face nil :inherit 'warning)
   (set-face-attribute 'flycheck-posframe-error-face nil :inherit 'success)
@@ -2377,7 +2377,8 @@ But there is no backward compatibility.
 
   (add-hook 'haskell-mode-hook 'haskell-auto-insert-module-template))
 #+end_src
-**** lsp-haskell
+**** COMMENT lsp-haskell
+Latest update in haskell-mode introduce some incompatibility. Investigation required.
 #+begin_src emacs-lisp
 (use-package lsp-haskell
   :after lsp-mode
