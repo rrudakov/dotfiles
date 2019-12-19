@@ -1210,6 +1210,7 @@ Replace for i-search or swiper
   (setq projectile-keymap-prefix (kbd "C-c p"))
   :config
   (setq projectile-completion-system 'helm)
+  (setq projectile-sort-order 'recently-active)
   ;; (setq projectile-completion-system 'ivy)
   (add-to-list 'projectile-globally-ignored-files "*.log")
   (setq projectile-mode-line-function '(lambda () (format " Proj[%s]" (projectile-project-name))))
