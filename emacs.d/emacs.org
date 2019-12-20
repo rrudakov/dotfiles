@@ -1860,7 +1860,6 @@ But there is no backward compatibility.
 (setq org-latex-inputenc-alist '(("utf8" . "utf8x")))
 (setq org-latex-default-packages-alist
       '(("AUTO" "inputenc"  t ("pdflatex"))
-        ("T2A"   "fontenc"   t ("pdflatex"))
         (""     "graphicx"  t)
         (""     "grffile"   t)
         (""     "longtable" nil)
@@ -1872,20 +1871,20 @@ But there is no backward compatibility.
         (""     "amssymb"   t)
         (""     "capt-of"   nil)
         (""     "hyperref"  nil)))
-  (unless (boundp 'org-latex-classes)
-    (setq org-latex-classes nil))
+(unless (boundp 'org-latex-classes)
+  (setq org-latex-classes nil))
 
 (add-to-list 'org-latex-classes
              '("org-article"
                "\\documentclass[11pt,a4paper]{article}
-  \\usepackage{dejavu}
-  \\usepackage[english, russian]{babel}
-  \\usepackage[hidelinks]{hyperref}
-  \\usepackage{geometry}
-  \\geometry{a4paper}
-  \\geometry{left=2cm,right=1cm,top=1cm,bottom=1cm,includeheadfoot,headheight=1.2cm}
-  \\renewcommand*\\familydefault{\\sfdefault}
-  \\renewcommand*\\ttdefault{cmvtt}"
+\\usepackage[sfdefault]{noto}
+\\usepackage{sourcecodepro}
+\\usepackage[T2A]{fontenc}
+\\usepackage[english, russian]{babel}
+\\usepackage[hidelinks]{hyperref}
+\\usepackage{geometry}
+\\geometry{a4paper}
+\\geometry{left=2cm,right=1cm,top=1cm,bottom=1cm,includeheadfoot,headheight=1.2cm}"
                ("\\section{%s}" . "\\section*{%s}")
                ("\\subsection{%s}" . "\\subsection*{%s}")
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
@@ -1895,14 +1894,14 @@ But there is no backward compatibility.
 (add-to-list 'org-latex-classes
              '("org-article-en"
                "\\documentclass[11pt,a4paper]{article}
-  \\usepackage{dejavu}
-  \\usepackage[english]{babel}
-  \\usepackage[hidelinks]{hyperref}
-  \\usepackage{geometry}
-  \\geometry{a4paper}
-  \\geometry{left=2cm,right=1cm,top=1cm,bottom=1cm,includeheadfoot,headheight=1.2cm}
-  \\renewcommand*\\familydefault{\\sfdefault}
-  \\renewcommand*\\ttdefault{cmvtt}"
+\\usepackage[default]{sourcesanspro}
+\\usepackage{sourcecodepro}
+\\usepackage[T1]{fontenc}
+\\usepackage[english]{babel}
+\\usepackage[hidelinks]{hyperref}
+\\usepackage{geometry}
+\\geometry{a4paper}
+\\geometry{left=2cm,right=1cm,top=1cm,bottom=1cm,includeheadfoot,headheight=1.2cm}"
                ("\\section{%s}" . "\\section*{%s}")
                ("\\subsection{%s}" . "\\subsection*{%s}")
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
