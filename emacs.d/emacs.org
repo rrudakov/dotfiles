@@ -191,6 +191,13 @@ Unordered lists with separator '::'
       (message "Copied buffer file name '%s' to the clipboard." filename))))
 #+end_src
 
+* Create my personal keymap
+#+begin_src emacs-lisp
+(defvar rr-lsp-keymap
+  (make-sparse-keymap)
+  "My personal keymap for LSP mode.")
+#+end_src
+
 * Configuration
 ** Start emacs server
 #+BEGIN_SRC emacs-lisp
@@ -1118,6 +1125,7 @@ Replace for i-search or swiper
         '(("\\`\\*helm.*?\\*\\'" :regexp t :align t :size 0.4)
           ("\\`\\*cljr.*?\\*\\'" :regexp t :align t :size 0.4)
           (compilation-mode :select t :align t :size 0.4)
+          (dap-server-log-mode :select t :align t :size 0.4)
           ;; ("\\`\\*Org\sSrc.*?\\*.*\\'" :regexp t :align right :size 100)
           ("\\`\\*Org-Babel\sError\sOutput\\*.*\\'" :regexp t :align t :size 0.4)
           ("*compilation*" :select t :align t :size 0.4)
@@ -1788,28 +1796,10 @@ But there is no backward compatibility.
 #+END_SRC
 *** Notifications
 #+begin_src emacs-lisp
-(require 'appt)
-(appt-activate t)
-
-;; Use appointment data from org-mode
-(defun rr/org-agenda-to-appt ()
-  (interactive)
-  (setq appt-time-msg-list nil)
-  (org-agenda-to-appt))
-
-(setq appt-display-duration 30)
-;; Update after emacs start
-(rr/org-agenda-to-appt)
-
-;; Every day at 0:05
-(run-at-time "0:05" (* 24 3600) 'rr/org-agenda-to-appt)
-
-(add-hook 'after-save-hook
-          '(lambda ()
-             (if (org-agenda-file-p (buffer-file-name))
-                 (rr/org-agenda-to-appt))))
-
-(setq org-show-notification-handler 'message)
+(use-package org-notify
+  :ensure nil
+  :config
+  (org-notify-start))
 #+end_src
 *** Markdown export
 #+BEGIN_SRC emacs-lisp
@@ -2151,10 +2141,12 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
 (use-package lsp-mode
   :after pyvenv
-  :bind (:map lsp-mode-map
-              ("C-c '" . lsp-execute-code-action)
-              ("C-c /" . lsp-find-implementation)
-              ("C-c C-r" . lsp-rename))
+  :bind-keymap
+  ("C-c j" . rr-lsp-keymap)
+  :bind (:map rr-lsp-keymap
+              ("a" . lsp-execute-code-action)
+              ("i" . lsp-find-implementation)
+              ("r" . lsp-rename))
   :config
   (setq lsp-eldoc-render-all nil
 	    lsp-highlight-symbol-at-point nil
@@ -2232,6 +2224,12 @@ But there is no backward compatibility.
 #+begin_src emacs-lisp
 (use-package dap-mode
   :after lsp-java
+  :bind (:map dap-server-log-mode-map
+              ("q" . kill-buffer-and-window)
+              :map rr-lsp-keymap
+              ("t" . dap-java-run-test-method)
+              ("c" . dap-java-run-test-class)
+              ("b" . dap-breakpoint-toggle))
   :config
   (dap-mode 1)
   (dap-ui-mode 1)
@@ -2248,8 +2246,7 @@ But there is no backward compatibility.
                                      :request "attach"
                                      :hostName "localhost"
                                      :projectName nil
-                                     :port nil))
-  )
+                                     :port nil)))
 #+end_src
 *** COMMENT Code documentation
 #+begin_src emacs-lisp
