@@ -136,6 +136,8 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
   [ ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
     -- launch command prompt
   , ((modm, xK_p), shellPrompt myPromptConfig)
+    -- launch emacs client with new frame
+  , ((modm .|. shiftMask, xK_u), spawn "emacsclient -c")
     -- launch ssh prompt
   , ((modm, xK_s), sshPrompt myPromptConfig)
     -- close focused window
@@ -144,7 +146,7 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
   , ((modm, xK_space), sendMessage NextLayout)
     --  Reset the layouts on the current workspace to default
   , ((modm .|. shiftMask, xK_space), setLayout $ XMonad.layoutHook conf)
-  , ((modm .|. shiftMask, xK_x), spawn "light-locker-command -l")
+  -- , ((modm .|. shiftMask, xK_x), spawn "light-locker-command -l")
     -- Resize viewed windows to the correct size
   , ((modm, xK_n), refresh)
     -- Move focus to the next window
@@ -187,9 +189,9 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
   , ( (modm, xK_q)
     , spawn $
       mconcat
-        [ "if type /usr/local/bin/xmonad-session; then "
-        , "xmonad-session --recompile && xmonad-session --restart; "
-        , "else xmessage xmonad-session not in \\$PATH: \"$PATH\"; fi"
+        [ "if type xmonad; then "
+        , "xmonad --recompile && xmonad --restart; "
+        , "else xmessage xmonad not in \\$PATH: \"$PATH\"; fi"
         ])
   , ((modm, xK_b), sendMessage ToggleStruts)
   , ((modm, xK_BackSpace), focusUrgent)
