@@ -1574,7 +1574,6 @@ Visual Regexp package:
 ** Org
 *** Some tweaks
 #+begin_src emacs-lisp
-(add-hook 'org-mode-hook 'turn-on-font-lock)
 (add-hook 'org-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
 
 ;; Setup ui
@@ -1628,6 +1627,7 @@ Visual Regexp package:
 
 (org-display-inline-images)
 (add-to-list 'org-modules 'org-habit)
+(add-to-list 'org-modules 'org-notify)
 
 (eval-after-load 'org
   '(org-load-modules-maybe t))
@@ -1796,10 +1796,58 @@ But there is no backward compatibility.
 #+END_SRC
 *** Notifications
 #+begin_src emacs-lisp
-(use-package org-notify
+(use-package appt
   :ensure nil
+  :after notifications
   :config
-  (org-notify-start))
+  (appt-activate t)
+  (setq appt-message-warning-time 15) ;Show notification 15 minutes before event
+  (setq appt-display-mode-line nil)   ;Don't show anything in mode line
+
+  ;; Use appointment data from org-mode
+  (defun rr/org-agenda-to-appt ()
+    (interactive)
+    (setq appt-time-msg-list nil)
+    (org-agenda-to-appt))
+
+  (defun rr/format-minutes (min-rest)
+    "Format minutes for notification."
+    (cond ((equal "0" min-rest) "Now.")
+          ((equal "1" min-rest) (format "In %s minute." min-rest))
+          (t (format "In %s minutes." min-rest))))
+
+  (defun rr/show-appt-notification (min-to-app new-time appt-msg)
+    "Show notifications function."
+    (let ((mins-to-app (if (listp min-to-app)
+                           min-to-app
+                         (list min-to-app)))
+          (appt-msgs (if (listp appt-msg)
+                         appt-msg
+                       (list appt-msg))))
+      (let ((msgs (mapcar* #'cons appt-msgs mins-to-app)))
+        (dolist (msg msgs)
+          (let ((title (car msg))
+                (min-rest (cdr msg)))
+            (notifications-notify :title title
+                                  :timeout (if (equal min-rest "0") 0 -1)
+                                  :body (format "%s\n%s"
+                                                (rr/format-minutes min-rest)
+                                                new-time)))))))
+
+  ;; Update after emacs start
+  (add-hook 'after-init-hook 'rr/org-agenda-to-appt)
+
+  ;; Every day at 0:05
+  (run-at-time "0:05" (* 24 3600) 'rr/org-agenda-to-appt)
+
+  (add-hook 'after-save-hook
+            '(lambda ()
+               (if (org-agenda-file-p (buffer-file-name))
+                   (rr/org-agenda-to-appt))))
+
+  (setq appt-disp-window-function 'rr/show-appt-notification)
+  (setq appt-delete-window-function (lambda () t))
+  (setq org-show-notification-handler 'notifications-notify))
 #+end_src
 *** Markdown export
 #+BEGIN_SRC emacs-lisp
