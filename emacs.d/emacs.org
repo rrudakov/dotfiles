@@ -213,6 +213,20 @@ Unordered lists with separator '::'
 :PROPERTIES:
 :VISIBILITY: folded
 :END:
+*** Auto saving settings
+#+begin_src emacs-lisp
+(defconst rr-savefile-dir (expand-file-name "savefile" user-emacs-directory)
+  "Declare variable for save file directory.")
+
+;; create the savefile dir if it doesn't exist
+(unless (file-exists-p rr-savefile-dir)
+  (make-directory rr-savefile-dir))
+
+;; store all backup and autosave files in the tmp dir
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+
+#+end_src
 *** Increase performance
 #+BEGIN_SRC emacs-lisp
 (setq gnutls-min-prime-bits 4096)
@@ -459,10 +473,12 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
 (use-package recentf
   :config
-  (setq recentf-max-saved-items 200
-        recentf-max-menu-items 15)
+  (setq recentf-save-file (expand-file-name "recentf" rr-savefile-dir)
+        recentf-max-saved-items 500
+        recentf-max-menu-items 15
+        recentf-auto-cleanup 'never)
   (add-to-list 'recentf-exclude (expand-file-name "~/.emacs.d/"))
-  (recentf-mode))
+  (recentf-mode +1))
 #+END_SRC
 *** Imenu
 #+BEGIN_SRC emacs-lisp
@@ -540,20 +556,6 @@ No more ugly line splitting
 #+BEGIN_SRC emacs-lisp
 (setq-default truncate-lines t)
 #+END_SRC
-*** Auto saving settings
-#+begin_src emacs-lisp
-(defconst rr-savefile-dir (expand-file-name "savefile" user-emacs-directory)
-  "Declare variable for save file directory.")
-
-;; create the savefile dir if it doesn't exist
-(unless (file-exists-p rr-savefile-dir)
-  (make-directory rr-savefile-dir))
-
-;; store all backup and autosave files in the tmp dir
-(setq backup-directory-alist
-      `((".*" . ,temporary-file-directory)))
-
-#+end_src
 *** Save minibuffer history between sessions
 #+BEGIN_SRC emacs-lisp
 (use-package savehist
@@ -931,6 +933,8 @@ Show more offten used completeons first
   (setq helm-display-function #'pop-to-buffer)
   (setq helm-show-completion-display-function #'pop-to-buffer)
 
+  (setq helm-adaptive-history-file (expand-file-name "helm-adaptive-history" rr-savefile-dir))
+
   (helm-mode 1)
   (helm-adaptive-mode 1))
 #+END_SRC
@@ -1040,7 +1044,7 @@ Show more offten used completeons first
 (use-package smartparens-config
   :ensure smartparens
   :config
-  (setq sp-show-pair-from-inside t
+  (setq sp-show-pair-from-inside nil
         sp-highlight-pair-overlay nil
         sp-wrap-respect-direction t)
 
@@ -1700,6 +1704,7 @@ But there is no backward compatibility.
 #+END_SRC
 *** Clock settings
 #+BEGIN_SRC emacs-lisp
+(setq org-clock-persist-file (expand-file-name "org-clock-save.el" rr-savefile-dir))
 (setq org-clock-persist t)
 (org-clock-persistence-insinuate)
 (setq org-log-into-drawer t)
