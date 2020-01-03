@@ -1,4 +1,5 @@
 #+TITLE: My Emacs configuration
+#+HTML: <p align="center"> <a href="https://www.gnu.org/software/emacs/"> <img src="https://img.shields.io/badge/GNU%20Emacs-28.0.50-b48ead.svg?style=plastic"/></a> <a href="https://orgmode.org/"><img src="https://img.shields.io/badge/org--mode-9.3.1-elpalus.svg?style=plastic"/></a> </p>
 
 * Keybindings
 ** Common
@@ -50,6 +51,7 @@ M-s h f         hi-lock-find-patterns
 ** Helm
 #+begin_src text
 C-c i   insert current file path to current buffer
+C-x c s search using surfraw utility on the web
 #+end_src
 ** Dired
 #+begin_src text
@@ -218,14 +220,28 @@ Unordered lists with separator '::'
 (defconst rr-savefile-dir (expand-file-name "savefile" user-emacs-directory)
   "Declare variable for save file directory.")
 
+(defconst rr-backup-dir (expand-file-name "backup" user-emacs-directory)
+  "Declare variable for all backup files.")
+
 ;; create the savefile dir if it doesn't exist
 (unless (file-exists-p rr-savefile-dir)
   (make-directory rr-savefile-dir))
 
 ;; store all backup and autosave files in the tmp dir
 (setq backup-directory-alist
-      `((".*" . ,temporary-file-directory)))
+      `((".*" . ,rr-backup-dir)))
 
+;; Silently delete execess backup versions
+(setq delete-old-versions t)
+
+;; Only keep the last 1000 backups of a file.
+(setq kept-old-versions 10)
+
+;; Even version controlled files get to be backed up.
+(setq vc-make-backup-files t)
+
+;; Use version numbers for backup files.
+(setq version-control t)
 #+end_src
 *** Increase performance
 #+BEGIN_SRC emacs-lisp
@@ -325,10 +341,7 @@ Picked mostly from doom-emacs configuration.
  mouse-yank-at-point t           ; middle-click paste at point, not at click
  resize-mini-windows 'grow-only  ; Minibuffer resizing
  show-help-function nil          ; hide :help-echo text
- split-width-threshold 160	 ; favor horizontal splits
- uniquify-buffer-name-style 'forward
  use-dialog-box nil              ; always avoid GUI
- x-stretch-cursor nil
 
  ;; defer jit font locking slightly to [try to] improve Emacs performance
  jit-lock-defer-time nil
@@ -351,6 +364,14 @@ Picked mostly from doom-emacs configuration.
       initial-major-mode 'fundamental-mode
       initial-scratch-message nil)
 #+END_SRC
+*** Unique buffer names
+#+begin_src emacs-lisp
+(use-package uniquify
+  :ensure nil
+  :custom
+  (uniquify-separator "/")
+  (uniquify-buffer-file-name 'forward))
+#+end_src
 *** More reliable inter-window border
 The native border "consumes" a pixel of the fringe on righter-most splits,
 =window-divider= does not. Available since Emacs 25.1.
@@ -496,13 +517,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
 (setq auto-hscroll-mode t)
 #+END_SRC
-*** COMMENT Show trailing whitespace
-#+BEGIN_SRC emacs-lisp
-(add-hook 'prog-mode-hook
-          (lambda ()
-            (interactive)
-            (setq show-trailing-whitespace 1)))
-#+END_SRC
 *** Navigation by subwords
 #+begin_src emacs-lisp
 (add-hook 'prog-mode-hook 'subword-mode)
@@ -607,6 +621,11 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 *** Use built-in tooltips
 #+begin_src emacs-lisp
 (setq x-gtk-use-system-tooltips nil)
+#+end_src
+*** Prefer only vertical windows splitting
+#+begin_src emacs-lisp
+(setq split-height-threshold nil)
+(setq split-width-threshold 80)
 #+end_src
 *** Confirm kill emacs
 #+BEGIN_SRC emacs-lisp
@@ -737,10 +756,8 @@ nil."
 ** Remember location in files
 #+begin_src emacs-lisp
 (use-package saveplace
-  :config
-  (setq save-place-file (expand-file-name "saveplace" rr-savefile-dir))
-  ;; activate it for all buffers
-  (setq-default save-place t))
+  :custom (save-place-file (expand-file-name "saveplace" rr-savefile-dir))
+  :config (save-place-mode 1))
 #+end_src
 ** SQL
 *** Emacs clojure database client
@@ -1556,6 +1573,7 @@ Visual Regexp package:
       org-insert-heading-respect-content t
       org-fontify-quote-and-verse-blocks t
       org-fontify-done-headline t
+      ;; org-fontify-todo-headline t
       org-image-actual-width 500
       org-use-sub-superscripts '{})
 
@@ -1564,13 +1582,14 @@ Visual Regexp package:
       org-ctrl-k-protect-subtree t
       org-imenu-depth 4
       org-export-with-sub-superscripts nil
-      org-src-window-setup 'same-window
+      org-src-window-setup 'reorganize-frame
       org-catch-invisible-edits 'show-and-error
       org-return-follows-link t
       ;; org-M-RET-may-split-line nil
       org-list-use-circular-motion t
       org-export-with-drawers t
       org-export-with-properties t
+      org-reverse-note-order t
       org-use-speed-commands t
       org-enforce-todo-dependencies t
       org-enforce-todo-checkbox-dependencies t)
@@ -1710,7 +1729,10 @@ But there is no backward compatibility.
 (setq org-log-into-drawer t)
 (setq org-log-done nil)
 (setq org-log-repeat nil)
+(setq org-log-redeadline 'time)
+(setq org-log-reschedule 'time)
 (setq org-clock-out-when-done t)
+(setq org-clock-in-resume t)
 (setq org-clock-out-remove-zero-time-clocks t)
 (setq org-clock-report-include-clocking-task t)
 (setq org-clock-persist-query-resume nil)
@@ -1915,12 +1937,6 @@ But there is no backward compatibility.
       org-export-use-babel nil)
 
 (use-package ob-async)
-#+END_SRC
-*** Manage passwords using org-mode
-#+BEGIN_SRC emacs-lisp
-(use-package org-password-manager
-  :config
-  (add-hook 'org-mode-hook 'org-password-manager-key-bindings))
 #+END_SRC
 *** Google calendar sync
 #+BEGIN_SRC emacs-lisp
@@ -2153,6 +2169,7 @@ But there is no backward compatibility.
 	    lsp-message-project-root-warning t
 	    lsp-keep-workspace-alive t
 	    lsp-file-watch-threshold nil
+        lsp-signature-auto-activate nil
         ;; lsp-enable-text-document-color t
 	    lsp-enable-folding t)
 
