@@ -180,6 +180,14 @@ Unordered lists with separator '::'
       (when (eq major-mode 'org-mode)
         (normal-mode)))))
 #+end_src
+** Prefer split windows side-by-side
+#+begin_src emacs-lisp
+(defun split-window-prefer-side-by-side (&optional window)
+  (let ((split-height-threshold (and (< (window-width window)
+                                        split-width-threshold)
+                                     split-height-threshold)))
+    (split-window-sensibly window)))
+#+end_src
 ** Copy file name to clipboard from dired
 #+begin_src emacs-lisp
 (defun prelude-copy-file-name-to-clipboard ()
@@ -563,7 +571,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
                 compilation-ask-about-save nil   ; save all buffers on `compile'
                 compilation-scroll-output t
                 confirm-nonexistent-file-or-buffer t)
-  (define-key compilation-mode-map (kbd "q") 'kill-buffer-and-window))
+  (define-key compilation-mode-map (kbd "q") 'delete-window))
 #+END_SRC
 *** Unclassified settings
 No more ugly line splitting
@@ -622,16 +630,23 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 #+begin_src emacs-lisp
 (setq x-gtk-use-system-tooltips nil)
 #+end_src
-*** Prefer only vertical windows splitting
+*** Windows splitting preferences
 #+begin_src emacs-lisp
-(setq split-height-threshold nil)
-(setq split-width-threshold 80)
+;; (setq split-height-threshold nil)
+;; (setq split-width-threshold 80)
+(setq split-window-preferred-function 'split-window-prefer-side-by-side)
 #+end_src
 *** Confirm kill emacs
 #+BEGIN_SRC emacs-lisp
 (setq confirm-kill-processes nil
       confirm-kill-emacs nil)
 #+END_SRC
+** Set the same PATH as in shell
+#+begin_src emacs-lisp
+(use-package exec-path-from-shell
+  :config
+  (exec-path-from-shell-initialize))
+#+end_src
 ** Open compilation errors in same mode window
 #+begin_src emacs-lisp
 (defvar display-buffer-same-window-commands
