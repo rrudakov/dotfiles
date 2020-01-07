@@ -843,6 +843,8 @@ nil."
 (use-package company
   :config
   (setq company-global-modes '(not org-mode markdown-mode shell-mode eshell-mode))
+  (setq company-frontends '(company-pseudo-tooltip-frontend
+                            company-echo-metadata-frontend))
 
   (global-company-mode)
 

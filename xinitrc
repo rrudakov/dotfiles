@@ -11,11 +11,22 @@ sysmodmap=/etc/X11/xinit/.Xmodmap
 [ -f $userresources ] && /usr/bin/xrdb -merge $userresources
 [ -f $usermodmap ] && /usr/bin/xmodmap $usermodmap
 
-export PATH=$HOME/.local/bin:$PATH
 export GDK_USE_XFT=1
 export DE="xfce"
-light-locker &
+
+# start some nice programs
+
+if [ -d /etc/X11/xinit/xinitrc.d ] ; then
+ for f in /etc/X11/xinit/xinitrc.d/?*.sh ; do
+  [ -x "$f" ] && . "$f"
+ done
+ unset f
+fi
+
 $HOME/.local/bin/switch_monitor
 xsetroot -cursor_name left_ptr
+picom -b
 stalonetray &
-compton -b &
+protonmail-bridge --no-window &
+
+exec xmonad

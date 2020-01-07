@@ -126,6 +126,8 @@ myPromptConfig =
     , searchPredicate = isPrefixOf
     , alwaysHighlight = True
     , maxComplRows = Nothing
+    -- , defaultPrompter = id
+    -- , sorter = const id
     }
 
 -- | My keybindings
