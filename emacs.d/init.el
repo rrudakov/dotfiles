@@ -52,7 +52,7 @@ There are two things you can do about this warning:
 (use-package org
   :ensure org-plus-contrib)
 
-(setq vc-follow-symlinks "t")
+(setq vc-follow-symlinks t)
 (org-babel-load-file (expand-file-name "emacs.org" user-emacs-directory))
 
 (when (file-exists-p custom-file)
