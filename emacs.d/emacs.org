@@ -2192,9 +2192,6 @@ But there is no backward compatibility.
   (setq lsp-rust-clippy-preference "on")
   (add-hook 'rust-mode-hook 'lsp)
 
-  ;; XML setup
-  (add-hook 'nxml-mode-hook 'lsp)
-
   ;; Python lsp settings
   (setq lsp-pyls-plugins-pylint-enabled t
 	    lsp-pyls-plugins-rope-completion-enabled nil
