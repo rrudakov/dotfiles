@@ -209,12 +209,6 @@ Unordered lists with separator '::'
 #+end_src
 
 * Configuration
-** COMMENT Start emacs server
-#+BEGIN_SRC emacs-lisp
-(require 'server)
-(unless (server-running-p)
-  (server-start))
-#+END_SRC
 ** Load my secret tokens
 #+BEGIN_SRC emacs-lisp
 (require 'mysecret nil t)
@@ -223,6 +217,10 @@ Unordered lists with separator '::'
 :PROPERTIES:
 :VISIBILITY: folded
 :END:
+*** Use package default settings
+#+BEGIN_SRC emacs-lisp
+(setq-default use-package-always-ensure t)
+#+END_SRC
 *** Auto saving settings
 #+begin_src emacs-lisp
 (defconst rr-savefile-dir (expand-file-name "savefile" user-emacs-directory)
@@ -251,7 +249,7 @@ Unordered lists with separator '::'
 ;; Use version numbers for backup files.
 (setq version-control t)
 #+end_src
-*** Increase performance
+*** TLS default settings
 #+BEGIN_SRC emacs-lisp
 (setq gnutls-min-prime-bits 4096)
 #+END_SRC
@@ -261,7 +259,7 @@ Unordered lists with separator '::'
 #+end_src
 *** Do not indicate empty lines at the end of the window in the left fringe
 #+BEGIN_SRC emacs-lisp
-(set-default 'indicate-empty-lines nil)
+(setq-default indicate-empty-lines nil)
 #+END_SRC
 *** Enable y/n answers instead of yes/no
 #+BEGIN_SRC emacs-lisp
@@ -307,7 +305,8 @@ At the moment I set default font using ~~/.Xresources~ file.
 #+end_src
 *** Open files ends with "rc" in conf-unix-mode
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode))
+(use-package conf-mode
+  :mode ("\\.*rc$" . conf-unix-mode))
 #+END_SRC
 *** Set specific browser to open links
 #+BEGIN_SRC emacs-lisp
@@ -402,22 +401,20 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 *** Settings for tramp-mode
 #+BEGIN_SRC emacs-lisp
-(require 'tramp)
-
-(setq tramp-terminal-type "tramp"
-      tramp-default-method "ssh"
-      explicit-shell-file-name "/bin/bash"
-      tramp-completion-reread-directory-timeout nil)
-
-(setq vc-ignore-dir-regexp
+(use-package tramp
+  :custom
+  (tramp-terminal-type "tramp")
+  (tramp-default-method "ssh")
+  (explicit-shell-file-name "/bin/bash")
+  (tramp-completion-reread-directory-timeout nil)
+  (vc-ignore-dir-regexp
       (format "\\(%s\\)\\|\\(%s\\)"
               vc-ignore-dir-regexp
               tramp-file-name-regexp))
-
-(setq tramp-verbose 1)
-(setq auto-revert-remote-files nil)
-
-(add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+  (tramp-verbose 1)
+  (auto-revert-remote-files nil)
+  :config
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 #+END_SRC
 *** Set default input method
 #+BEGIN_SRC emacs-lisp
@@ -437,7 +434,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 *** Default mode
 #+BEGIN_SRC emacs-lisp
-(setq-default major-mode 'text-mode)
+(setq-default major-mode 'org-mode)
 #+END_SRC
 *** Fill column
 #+BEGIN_SRC emacs-lisp
@@ -483,26 +480,25 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 ;; Don't ask for confirmation to delete marked buffers
 (setq ibuffer-expert t)
 #+END_SRC
-*** Use package default settings
-#+BEGIN_SRC emacs-lisp
-(setq-default use-package-always-ensure t)
-#+END_SRC
 *** Recent files
 #+BEGIN_SRC emacs-lisp
 (use-package recentf
+  :custom
+  (recentf-save-file (expand-file-name "recentf" rr-savefile-dir))
+  (recentf-max-saved-items 500)
+  (recentf-max-menu-items 15)
+  (recentf-auto-cleanup 'never)
   :config
-  (setq recentf-save-file (expand-file-name "recentf" rr-savefile-dir)
-        recentf-max-saved-items 500
-        recentf-max-menu-items 15
-        recentf-auto-cleanup 'never)
   (add-to-list 'recentf-exclude (expand-file-name "~/.emacs.d/"))
   (recentf-mode +1))
 #+END_SRC
 *** Imenu
 #+BEGIN_SRC emacs-lisp
-(setq imenu-auto-rescan t
-      imenu-max-item-length 160
-      imenu-max-items 100)
+(use-package imenu
+  :custom
+  (imenu-auto-rescan t)
+  (imenu-max-item-length 160)
+  (imenu-max-items 100))
 #+END_SRC
 *** More convenient scrolling settings
 #+begin_src emacs-lisp
@@ -525,31 +521,26 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 *** Ediff settings
 #+BEGIN_SRC emacs-lisp
 (use-package ediff
-  :config
-  (setq ediff-window-setup-function 'ediff-setup-windows-plain
-        ediff-split-window-function 'split-window-horizontally))
+  :custom
+  (ediff-window-setup-function 'ediff-setup-windows-plain)
+  (ediff-split-window-function 'split-window-horizontally))
 #+END_SRC
 *** Smerge
 #+begin_src emacs-lisp
 (use-package smerge-mode)
 #+end_src
 *** ANSI colors
-**** Compilation buffer
 #+BEGIN_SRC emacs-lisp
-(require 'ansi-color)
+(use-package ansi-color
+  :config
+  (defun colorize-compilation-buffer ()
+    "Use ansi colors to colorize compipaiton buffer."
+    (toggle-read-only)
+    (ansi-color-apply-on-region compilation-filter-start (point))
+    (toggle-read-only))
 
-(defun colorize-compilation-buffer ()
-  "Use ansi colors to colorize compipaiton buffer."
-  (toggle-read-only)
-  (ansi-color-apply-on-region compilation-filter-start (point))
-  (toggle-read-only))
-
-(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
-(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
-#+END_SRC
-**** Shell
-#+BEGIN_SRC emacs-lisp
-(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+  (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+  (add-hook 'compilation-filter-hook 'colorize-compilation-buffer))
 #+END_SRC
 *** Compilation mode settings
 #+BEGIN_SRC emacs-lisp
@@ -571,15 +562,15 @@ No more ugly line splitting
 #+BEGIN_SRC emacs-lisp
 (use-package savehist
   :ensure nil
+  :custom
+  (history-delete-duplicates t)
+  (savehist-save-minibuffer-history 1)
+  (savehist-file (expand-file-name "savehist" rr-savefile-dir))
+  (savehist-additional-variables '(kill-ring
+                                   search-ring
+                                   regexp-search-ring
+                                   shell-command-history))
   :config
-  (setq history-delete-duplicates t)
-  (setq savehist-save-minibuffer-history 1)
-  (setq savehist-file (expand-file-name "savehist" rr-savefile-dir))
-  (setq savehist-additional-variables
-        '(kill-ring
-          search-ring
-          regexp-search-ring
-          shell-command-history))
   (savehist-mode +1))
 #+END_SRC
 *** Kill-ring
@@ -621,8 +612,6 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 #+end_src
 *** Windows splitting preferences
 #+begin_src emacs-lisp
-;; (setq split-height-threshold nil)
-;; (setq split-width-threshold 80)
 (setq split-window-preferred-function 'split-window-prefer-side-by-side)
 #+end_src
 *** Confirm kill emacs
@@ -676,30 +665,10 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 
   (if (daemonp)
       (add-hook 'after-make-frame-functions 'rr/apply-theme)
-    (rr/apply-theme nil))
+    (rr/apply-theme (selected-frame)))
 
   (with-eval-after-load 'zenburn
     (rr/refresh-org-buffers)))
-#+END_SRC
-*** COMMENT Highlight symbol at point
-#+BEGIN_SRC emacs-lisp
-(use-package highlight-symbol
-  :config
-  (highlight-symbol-nav-mode)
-
-  (add-hook 'prog-mode-hook (lambda () (highlight-symbol-mode)))
-
-  (setq highlight-symbol-idle-delay 0.2
-        highlight-symbol-on-navigation-p t)
-
-  (global-set-key [(control shift mouse-1)]
-                  (lambda (event)
-                    (interactive "e")
-                    (goto-char (posn-point (event-start event)))
-                    (highlight-symbol-at-point)))
-
-  (global-set-key (kbd "M-n") 'highlight-symbol-next)
-  (global-set-key (kbd "M-p") 'highlight-symbol-prev))
 #+END_SRC
 *** Modeline
 **** Custom functions
@@ -712,9 +681,9 @@ STATUS defaults to `flycheck-last-status-change' if omitted or
 nil."
   (let ((text (pcase (or status flycheck-last-status-change)
                 (`not-checked "")
-                (`no-checker "-")
-                (`running "*")
-                (`errored "!")
+                (`no-checker "- ")
+                (`running "* ")
+                (`errored "! ")
                 (`finished
                  (let-alist (flycheck-count-errors flycheck-current-errors)
                    (concat
@@ -722,8 +691,8 @@ nil."
                     (propertize (format "• %s " (or .warning "✓")) 'face `(:inherit warning))
                     (propertize (format "• %s " (or .info "✓")) 'face `(:inherit success))
                     )))
-                (`interrupted ".")
-                (`suspicious "?"))))
+                (`interrupted ". ")
+                (`suspicious "? "))))
     (propertize text)))
 
 (add-to-list 'global-mode-string '(:eval (rr/flycheck-mode-line-status-text)))
@@ -732,8 +701,9 @@ nil."
 ***** Minions
 #+begin_src emacs-lisp
 (use-package minions
+  :custom
+  (minions-direct '(pyvenv-mode projectile-mode))
   :config
-  (setq minions-direct '(pyvenv-mode projectile-mode))
   (minions-mode 1))
 #+end_src
 ** Shell settings
@@ -752,8 +722,9 @@ nil."
 ** Spell checking
 #+begin_src emacs-lisp
 (use-package ispell
+  :custom
+  (ispell-program-name "aspell")
   :config
-  (setq ispell-program-name "aspell")
   (add-hook 'text-mode-hook 'flyspell-mode)
   (add-hook 'prog-mode-hook #'flyspell-prog-mode))
 #+end_src
@@ -807,23 +778,23 @@ nil."
 #+begin_src emacs-lisp
 (use-package avy
   :bind (("M-g w" . avy-goto-word-or-subword-1))
-  :config
-  (setq avy-background t))
+  :custom (avy-background t))
 #+end_src
 ** Replace built-in help
 #+BEGIN_SRC emacs-lisp
 (use-package helpful
-  :config
-  (global-set-key (kbd "C-h f") #'helpful-callable)
-  (global-set-key (kbd "C-h v") #'helpful-variable)
-  (global-set-key (kbd "C-h k") #'helpful-key))
+  :bind
+  (("C-h f" . helpful-callable)
+   ("C-h v" . helpful-variable)
+   ("C-h k" . helpful-key)))
 #+END_SRC
 ** YASnippet
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
+  :custom
+  (yas-indent-line 'fixed)
   :config
   (yas-reload-all)
-  (setq yas-indent-line 'fixed)
   (add-hook 'prog-mode-hook #'yas-minor-mode))
 #+END_SRC
 ** Auto complete
@@ -845,9 +816,10 @@ nil."
 So far it has performance issues.
 #+begin_src emacs-lisp
 (use-package company-posframe
+  :custom
+  (company-posframe-show-indicator nil)
+  (company-posframe-show-metadata t)
   :config
-  (setq company-posframe-show-indicator nil
-        company-posframe-show-metadata t)
   (company-posframe-mode 1))
 #+end_src
 *** COMMENT Statistic
@@ -964,24 +936,22 @@ Show more offten used completeons first
 *** Tramp
 #+BEGIN_SRC emacs-lisp
 (use-package helm-tramp
-  :config
-  (define-key global-map (kbd "C-c s") 'helm-tramp))
+  :bind (("C-c s" . helm-tramp)))
 #+END_SRC
 *** Helm flx
 #+BEGIN_SRC emacs-lisp
 (use-package helm-flx
   :after helm
+  :custom
+  (helm-flx-for-helm-find-files t)
+  (helm-flx-for-helm-locate t)
   :config
-  (helm-flx-mode +1)
-  (setq helm-flx-for-helm-find-files t
-        helm-flx-for-helm-locate t))
+  (helm-flx-mode +1))
 #+END_SRC
 *** Google search using helm
 #+BEGIN_SRC emacs-lisp
 (use-package helm-google
-  :config
-  (setq helm-google-default-engine 'searx)
-  (global-set-key (kbd "C-h C--") 'helm-google))
+  :bind (("C-h C--" . helm-google)))
 #+END_SRC
 *** Helm flycheck
 #+BEGIN_SRC emacs-lisp
@@ -989,7 +959,7 @@ Show more offten used completeons first
   :after flycheck
   :config
   (eval-after-load 'flycheck
-    '(define-key flycheck-mode-map (kbd "C-c ! h") 'helm-flycheck)))
+    '(define-key flycheck-mode-map (kbd "C-'") 'helm-flycheck)))
 #+END_SRC
 *** Helm org rifle
 #+begin_src emacs-lisp
@@ -1001,13 +971,12 @@ Show more offten used completeons first
 #+begin_src emacs-lisp
 (use-package helm-xref
   :after helm
-  :config
-  (setq xref-show-xrefs-function 'helm-xref-show-xrefs-27))
+  :custom
+  (xref-show-xrefs-function 'helm-xref-show-xrefs-27))
 #+end_src
 *** Helm lsp integration
 #+begin_src emacs-lisp
 (use-package helm-lsp
-  :config
   :bind (("C-x c j" . helm-lsp-workspace-symbol)))
 #+end_src
 ** COMMENT Ivy
@@ -1092,9 +1061,6 @@ Show more offten used completeons first
   (smartparens-global-strict-mode t)
   (show-smartparens-global-mode t)
 
-  (sp-with-modes 'org-mode
-    (sp-local-pair "=" "=" :wrap "C-="))
-
   (bind-key [remap c-electric-backspace] 'sp-backward-delete-char smartparens-strict-mode-map)
   (bind-key [remap c-electric-delete-forward] 'sp-delete-char smartparens-strict-mode-map)
 
@@ -1104,10 +1070,12 @@ Show more offten used completeons first
 ** Workspaces
 #+BEGIN_SRC emacs-lisp
 (use-package eyebrowse
+  :custom
+  (eyebrowse-wrap-around t)
+  (eyebrowse-new-workspace t)
+  (eyebrowse-switch-back-and-forth t)
+  (eyebrowse-mode-line-style 'always)
   :config
-  (setq eyebrowse-wrap-around t
-        eyebrowse-new-workspace t
-        eyebrowse-switch-back-and-forth t)
   (eyebrowse-mode t))
 #+END_SRC
 ** Popup windows settings
@@ -1169,18 +1137,24 @@ Show more offten used completeons first
           (define-key map (kbd "M-7") 'winum-select-window-7)
           (define-key map (kbd "M-8") 'winum-select-window-8)
           map))
-
+  :custom
+  (winum-auto-setup-mode-line t)
+  (winum-ignored-buffers '(" *which-key*"))
   :config
-  (setq winum-auto-setup-mode-line t
-        winum-ignored-buffers '(" *which-key*"))
   (winum-mode))
 #+END_SRC
 ** Smartscan
 #+begin_src emacs-lisp
 (use-package smartscan
+  :custom
+  (smartscan-symbol-selector "symbol")
   :config
-  (setq smartscan-symbol-selector "symbol")
   (add-hook 'prog-mode-hook 'smartscan-mode))
+#+end_src
+** PKGBUILD major mode
+#+begin_src emacs-lisp
+(use-package pkgbuild-mode
+  :mode "/PKGBUILD$")
 #+end_src
 ** Dried
 *** Common settings
@@ -1207,20 +1181,22 @@ Show more offten used completeons first
 (use-package projectile
   :init
   (setq projectile-keymap-prefix (kbd "C-c p"))
+  :custom
+  (projectile-completion-system 'helm)
+  ;; (projectile-completion-system 'ivy)
+  (projectile-sort-order 'recently-active)
+  (projectile-mode-line-function (lambda () (format " Proj[%s]" (projectile-project-name))))
   :config
-  (setq projectile-completion-system 'helm)
-  (setq projectile-sort-order 'recently-active)
-  ;; (setq projectile-completion-system 'ivy)
   (add-to-list 'projectile-globally-ignored-files "*.log")
-  (setq projectile-mode-line-function '(lambda () (format " Proj[%s]" (projectile-project-name))))
   (projectile-mode +1))
 #+END_SRC
 *** Helm projectile
 #+BEGIN_SRC emacs-lisp
 (use-package helm-projectile
+  :custom
+  (projectile-switch-project-action 'helm-projectile)
   :config
-  (helm-projectile-on)
-  (setq projectile-switch-project-action 'helm-projectile))
+  (helm-projectile-on))
 #+END_SRC
 *** COMMENT Counsel projectile
 #+begin_src emacs-lisp
@@ -1231,21 +1207,18 @@ Show more offten used completeons first
 ** Htmlize
 #+BEGIN_SRC emacs-lisp
 (use-package htmlize
-  :config
-  (setq org-html-htmlize-output-type 'inline-css))
+  :custom
+  (org-html-htmlize-output-type 'inline-css))
 #+END_SRC
 ** Syntax check
 *** Flycheck
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
+  :custom
+  (flycheck-idle-change-delay 2)
   :config
-  (setq flycheck-idle-change-delay 2)
   (add-hook 'after-init-hook #'global-flycheck-mode)
-  (global-set-key (kbd "C-'") 'helm-flycheck)
 
-  (defun doom-modeline-update-flycheck-text (&optional status)
-    (setq doom-modeline--flycheck-text
-          (rr/flycheck-mode-line-status-text)))
   (when (fboundp 'define-fringe-bitmap)
     (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
       [#b00000000
@@ -1279,8 +1252,6 @@ Show more offten used completeons first
       :fringe-bitmap bitmap
       :fringe-face 'flycheck-fringe-info))
 
-  ;; (setq flycheck-mode-line '(:eval (rr/flycheck-mode-line-status-text)))
-
   (setq-default flycheck-disabled-checkers
                 (append flycheck-disabled-checkers
                         '(javascript-jshint)))
@@ -1308,18 +1279,15 @@ Show more offten used completeons first
 *** GIT
 #+BEGIN_SRC emacs-lisp
 (use-package magit
+  :bind (("C-x g" . magit-status))
+  :custom
+  (magit-revision-insert-related-refs 'all)
+  (magit-revision-use-hash-sections 'quick)
+  (magit-diff-highlight-hunk-region-functions '(magit-diff-highlight-hunk-region-dim-outside
+                                                magit-diff-highlight-hunk-region-using-underlines))
+  (magit-pull-or-fetch t)
   :config
-  (global-set-key (kbd "C-x g") 'magit-status)
   (global-magit-file-mode)
-
-  (setq magit-revision-insert-related-refs 'all
-        magit-revision-use-hash-sections 'quick)
-
-  (setq magit-diff-highlight-hunk-region-functions
-        '(magit-diff-highlight-hunk-region-dim-outside
-          magit-diff-highlight-hunk-region-using-underlines))
-
-  (setq magit-pull-or-fetch t)
 
   (add-hook 'focus-in-hook #'git-gutter:update-all-windows)
   (add-hook 'magit-post-refresh-hook #'git-gutter:update-all-windows)
@@ -1329,8 +1297,8 @@ Show more offten used completeons first
 *** Transient
 #+begin_src emacs-lisp
 (use-package transient
-  :config
-  (setq transient-show-popup t))
+  :custom
+  (transient-show-popup t))
 #+end_src
 *** Work with forges
 #+BEGIN_SRC emacs-lisp
@@ -1346,6 +1314,8 @@ Show more offten used completeons first
 *** GIT gutter
 #+BEGIN_SRC emacs-lisp
 (use-package git-gutter-fringe
+  :custom
+  (git-gutter-fr:side 'right-fringe)
   :config
   (defun rr/git-gutter-local ()
     "Enable `git-gutter-mode' in non-remote buffers."
@@ -1358,8 +1328,6 @@ Show more offten used completeons first
   (add-hook 'conf-mode-hook #'rr/git-gutter-local)
 
   (setq-default fringes-outside-margins t)
-
-  (setq git-gutter-fr:side 'right-fringe)
 
   (fringe-helper-define 'git-gutter-fr:added '(center repeated)
     "XXXXXXXX")
@@ -1386,24 +1354,24 @@ Show more offten used completeons first
 ** Multiple cursors
 #+BEGIN_SRC emacs-lisp
 (use-package multiple-cursors
-  :config
-  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
-  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-  (global-set-key (kbd "C-c d") 'mc/skip-to-next-like-this))
+  :bind
+  (("C-S-c C-S-c" . mc/edit-lines)
+   ("C->" . mc/mark-next-like-this)
+   ("C-<" . mc/mark-previous-like-this)
+   ("C-c C-<" . mc/mark-all-like-this)
+   ("C-c d" . mc/skip-to-next-like-this)))
 #+END_SRC
 ** Expand region
 #+BEGIN_SRC emacs-lisp
 (use-package expand-region
-  :config
-  (global-set-key (kbd "C-=") 'er/expand-region))
+  :bind
+  (("C-=" . er/expand-region)))
 #+END_SRC
 ** Search and grep utilities
 #+BEGIN_SRC emacs-lisp
 (use-package wgrep
-  :config
-  (setq wgrep-auto-save-buffer t))
+  :custom
+  (wgrep-auto-save-buffer t))
 
 (use-package wgrep-ag)
 
@@ -1419,10 +1387,10 @@ Show more offten used completeons first
 ** Terminal emulator
 #+BEGIN_SRC emacs-lisp
 (use-package sane-term
+  :bind
+  (("C-x t" . sane-term)
+   ("C-x T" . sane-term-create))
   :config
-  (global-set-key (kbd "C-x t") 'sane-term)
-  (global-set-key (kbd "C-x T") 'sane-term-create)
-
   ;; Optional convenience binding. This allows C-y to paste even when in term-char-mode (see below).
   (add-hook
    'term-mode-hook
@@ -1949,164 +1917,85 @@ But there is no backward compatibility.
 #+begin_src emacs-lisp
 (use-package poporg)
 #+end_src
-** COMMENT Email
-*** COMMENT BSC configuration
+** Email
+*** ProtonMail configuration
 #+BEGIN_SRC emacs-lisp
-(require 'smtpmail)
-
-(setq send-mail-function 'smtpmail-send-it
-      message-send-mail-function 'smtpmail-send-it
-      starttls-use-gnutls t
-      mu4e-sent-messages-behavior 'sent
-      mu4e-drafts-folder "/Drafts"
-      mu4e-sent-folder "/Sent Items"
-      user-mail-address "Roman.Rudakov@bsc-ideas.com"
-      user-full-name "Roman Rudakov"
-      smtpmail-default-smtp-server "smtp.office365.com"
-      smtpmail-local-domain "bscpraha.cz"
-      smtpmail-smtp-server "smtp.office365.com"
-      smtpmail-stream-type 'starttls
-      smtpmail-smtp-service 587)
-
-(require 'mu4e)
-
-;; use mu4e for e-mail in emacs
-(setq mail-user-agent 'mu4e-user-agent)
-
-(setq mu4e-view-use-gnus t)
-
-(setq mu4e-maildir (expand-file-name "~/.mail/BSC"))
-(setq mu4e-trash-folder  "/Deleted Items")
-
-(setq mu4e-headers-auto-update t
-      mu4e-compose-signature-auto-include nil
-      mu4e-completing-read-function 'completing-read)
-
-(setq mu4e-maildir-shortcuts
-      '(("/INBOX" . ?i)
-        ("/Sent Items" . ?s)
-        ("/Deleted Items" . ?t)
-        ("/Drafts" . ?d)))
-
-(setq mu4e-use-fancy-chars nil)
-(setq mu4e-view-show-images t)
-
-(when (fboundp 'imagemagick-register-types)
-  (imagemagick-register-types))
-
-(setq mu4e-view-prefer-html t)
-(add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t)
-
-(setq message-kill-buffer-on-exit t)
-
-(setq mu4e-reply-to-address "Roman.Rudakov@bsc-ideas.com")
-
-(require 'org-mu4e)
-(setq org-mu4e-convert-to-html nil)
-(add-hook 'message-send-hook 'rr/htmlize-mail)
-
-(setq mu4e-headers-fields
-      '((:human-date . 25)
-        (:flags . 6)
-        (:from . 22)
-        (:subject . nil)))
-
-;; Useful, but I prefer classic way
-;; (use-package mu4e-conversation
-;;   :after mu4e
-;;   :config
-;;   (global-mu4e-conversation-mode))
-
-;; Run mu4e in background after starting emacs
-(mu4e t)
-
-(use-package helm-mu
-  :after (helm mu4e)
-  :config
-  (define-key mu4e-main-mode-map "s" 'helm-mu)
-  (define-key mu4e-headers-mode-map "s" 'helm-mu)
-  (define-key mu4e-view-mode-map "s" 'helm-mu))
-#+END_SRC
-*** GMail configuration
-#+BEGIN_SRC emacs-lisp
-(require 'smtpmail)
-
-(setq message-send-mail-function 'smtpmail-send-it
-   starttls-use-gnutls t
-   smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil))
-   smtpmail-auth-credentials '(("smtp.gmail.com" 587 "phentagram@gmail.com" nil))
-   smtpmail-default-smtp-server "smtp.gmail.com"
-   smtpmail-smtp-server "smtp.gmail.com"
-   smtpmail-smtp-service 587)
-
-(setq user-mail-address "phentagram@gmail.com"
+(setq user-mail-address "rrudakov@pm.me"
       user-full-name "Roman Rudakov")
 
-(require 'mu4e)
+(use-package smtpmail
+  :ensure nil
+  :after message
+  :custom
+  (message-send-mail-function 'smtpmail-send-it)
+  (smtpmail-default-smtp-server "127.0.0.1")
+  (smtpmail-smtp-server "127.0.0.1")
+  (smtpmail-smtp-service 1025))
 
-(setq mu4e-drafts-folder "/[Gmail].Drafts")
-(setq mu4e-sent-folder   "/[Gmail].Sent Mail")
-(setq mu4e-trash-folder  "/[Gmail].Bin")
+(use-package mu4e
+  :ensure nil
+  :after message
+  :bind
+  (:map mu4e-main-mode-map
+        ([remap mu4e-quit] . kill-current-buffer))
+  :custom
+  (mu4e-maildir (expand-file-name "~/.mail/ProtonMail"))
+  (mu4e-reply-to-address user-mail-address)
+  (mu4e-sent-folder "/Sent")
+  (mu4e-trash-folder "/Trash")
+  (mu4e-sent-messages-behavior 'delete)
+  (mu4e-view-use-gnus nil)
+  (mu4e-hide-index-messages t)
+  (mu4e-headers-auto-update t)
+  (mu4e-compose-signature-auto-include nil)
+  (mu4e-completing-read-function 'completing-read)
+  (mu4e-maildir-shortcuts '(("/INBOX" . ?i)
+                            ("/Sent" . ?s)
+                            ("/Trash" . ?t)
+                            ("/All Mail" . ?a)))
+  (mu4e-use-fancy-chars nil)
+  (mu4e-view-show-images t)
+  (mu4e-view-prefer-html nil)
+  ;; (mu4e-html2text-command "w3m -dump -T text/html -O utf8 -graph")
+  (mu4e-headers-fields '((:human-date . 25)
+                         (:flags . 6)
+                         (:from . 22)
+                         (:subject . nil)))
+  (message-kill-buffer-on-exit t)
+  (mail-user-agent 'mu4e-user-agent)
+  :config
+  (when (fboundp 'imagemagick-register-types)
+    (imagemagick-register-types))
 
-(setq mu4e-sent-messages-behavior 'delete)
+  (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t)
 
-;; use mu4e for e-mail in emacs
-(setq mail-user-agent 'mu4e-user-agent)
 
-(setq mu4e-view-use-gnus nil
-      mu4e-hide-index-messages t)
-
-(setq mu4e-maildir (expand-file-name "~/.mail/GMail"))
-
-(setq mu4e-headers-auto-update t
-      mu4e-compose-signature-auto-include nil
-      mu4e-completing-read-function 'completing-read)
-
-(setq mu4e-maildir-shortcuts
-      '( ("/INBOX"               . ?i)
-         ("/[Gmail].Sent Mail"   . ?s)
-         ("/[Gmail].Trash"       . ?t)
-         ("/[Gmail].All Mail"    . ?a)))
-
-(setq mu4e-use-fancy-chars nil)
-(setq mu4e-view-show-images t)
-
-(when (fboundp 'imagemagick-register-types)
-  (imagemagick-register-types))
-
-(setq mu4e-view-prefer-html nil)
-;; (setq mu4e-html2text-command "html2text --images-to-alt -b 72 --ignore-tables --ignore-emphasis")
-(setq mu4e-html2text-command "w3m -dump -T text/html -O utf8 -graph")
-
-(add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t)
-
-(setq message-kill-buffer-on-exit t)
-
-(setq mu4e-reply-to-address "phentagram@gmail.com")
-
-(require 'org-mu4e)
-(setq org-mu4e-convert-to-html nil)
-(add-hook 'message-send-hook 'rr/htmlize-mail)
-
-(setq mu4e-headers-fields
-      '((:human-date . 25)
-        (:flags . 6)
-        (:from . 22)
-        (:subject . nil)))
-
-;; Run mu4e in background after starting emacs
-(mu4e t)
-
+  ;; Run mu4e in background after starting emacs
+  (mu4e t))
+#+END_SRC
+*** Use helm for mail filtration
+#+begin_src emacs-lisp
 (use-package helm-mu
   :after (helm mu4e)
-  :config
-  (define-key mu4e-main-mode-map "s" 'helm-mu)
-  (define-key mu4e-headers-mode-map "s" 'helm-mu)
-  (define-key mu4e-view-mode-map "s" 'helm-mu))
-#+END_SRC
+  :bind
+  (:map
+   mu4e-main-mode-map
+   ("s" . helm-mu)
+   :map
+   mu4e-headers-mode-map
+   ("s" . helm-mu)
+   :map
+   mu4e-view-mode-map
+   ("s" . helm-mu)))
+#+end_src
 *** Alerts
 #+BEGIN_SRC emacs-lisp
 (use-package mu4e-alert
+  :custom
+  (mu4e-alert-modeline-formatter (lambda (count)
+                                   (if (> count 0)
+                                       (format "[Unread emails: %d]" count)
+                                     "")))
   :config
   (mu4e-alert-set-default-style 'libnotify)
   (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
@@ -2115,8 +2004,9 @@ But there is no backward compatibility.
 ** Auto set indentation settings
 #+begin_src emacs-lisp
 (use-package dtrt-indent
+  :custom
+  (dtrt-indent-verbosity 0)
   :config
-  (setq dtrt-indent-verbosity 0)
   (add-hook 'prog-mode-hook 'dtrt-indent-mode))
 #+end_src
 ** XML
@@ -2183,12 +2073,6 @@ But there is no backward compatibility.
 	    lsp-pyls-plugins-jedi-completion-include-params nil
 	    lsp-pyls-plugins-jedi-signature-help-enabled t)
 
-  ;; Enable lsp for python after load dired local variables
-  (add-hook 'hack-local-variables-hook
-	        (lambda () (when (and pyvenv-virtual-env
-				                  (derived-mode-p 'python-mode))
-			             (lsp))))
-
   (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
 
 (use-package lsp-ui
@@ -2250,17 +2134,18 @@ But there is no backward compatibility.
 *** Treemacs integration
 #+begin_src emacs-lisp
 (use-package treemacs
-  :bind (:map lsp-mode-map
-              ("C-c *" . treemacs))
-  :config
-  (setq treemacs-no-png-images t
-        treemacs-width 50))
+  :bind
+  (:map lsp-mode-map
+        ("C-c *" . treemacs))
+  :custom
+  (treemacs-no-png-images t)
+  (treemacs-width 50))
 
 (use-package lsp-treemacs)
 
 ;; (use-package treemacs-projectile)
 #+end_src
-*** Google c-style
+*** COMMENT Google c-style
 #+begin_src emacs-lisp
 (use-package google-c-style
   :config
@@ -2282,11 +2167,6 @@ But there is no backward compatibility.
 (add-hook 'java-mode-hook
           (lambda ()
             (setq c-basic-offset 4)))
-#+end_src
-**** Workaround for smartparens
-#+begin_src emacs-lisp
-(define-key java-mode-map "(" nil)
-(define-key java-mode-map "{" nil)
 #+end_src
 **** lsp-mode setup
 #+BEGIN_SRC emacs-lisp
@@ -2427,31 +2307,31 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 *** LaTeX
 **** AucTEX tweaks
 #+BEGIN_SRC emacs-lisp
-(setq TeX-auto-save t)
-(setq TeX-parse-self t)
+(use-package tex
+  :ensure nil
+  :custom
+  (TeX-auto-save t)
+  (TeX-parse-self t)
+  (TeX-view-program-selection '((output-pdf "PDF Tools")) "Use pdf-tools to open PDF files")
+  (TeX-source-correlate-start-server t)
+  :config
+  (setq-default TeX-master nil))
 
-;; Use pdf-tools to open PDF files
-(setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-      TeX-source-correlate-start-server t)
+(use-package font-latex
+  :ensure nil
+  :custom
+  (font-latex-fontify-sectioning 'color))
 
-;; Update PDF buffers after successful LaTeX runs
-(add-hook 'TeX-after-compilation-finished-functions
-          #'TeX-revert-document-buffer)
-
-(with-eval-after-load 'font-latex
-  (setq font-latex-fontify-sectioning 'color))
-
-(setq-default TeX-master nil)
-(add-hook 'LaTeX-mode-hook 'visual-line-mode)
-(add-hook 'LaTeX-mode-hook 'flyspell-mode)
-(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-(add-hook 'LaTeX-mode-hook (lambda () (auto-fill-mode -1)))
-(setq reftex-plug-into-AUCTeX t)
-
-(eval-after-load 'latex '(add-to-list 'LaTeX-verbatim-environments "lstlisting"))
-
-(add-hook 'LaTeX-mode-hook (lambda () (TeX-fold-mode 1)))
+(use-package latex
+  :ensure nil
+  :config
+  (eval-after-load 'latex '(add-to-list 'LaTeX-verbatim-environments "lstlisting"))
+  (add-hook 'LaTeX-mode-hook 'visual-line-mode)
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+  (add-hook 'LaTeX-mode-hook (lambda () (auto-fill-mode -1)))
+  (add-hook 'LaTeX-mode-hook (lambda () (TeX-fold-mode 1))))
 #+END_SRC
 *** Python
 **** Virtualenv
@@ -2469,18 +2349,20 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 ***** Automatically sort imports
 #+BEGIN_SRC emacs-lisp
 (use-package isortify
+  :custom
+  (isortify-line-width 79)
+  (isortify-multi-line-output 3)
+  (isortify-trailing-comma t)
   :config
-  (setq isortify-line-width 79
-        isortify-multi-line-output 3
-        isortify-trailing-comma t)
   (add-hook 'python-mode-hook 'isortify-mode))
 #+END_SRC
 **** Format code
 #+BEGIN_SRC emacs-lisp
 (use-package blacken
+  :custom
+  (blacken-line-length 79)
+  (blacken-allow-py36 t)
   :config
-  (setq blacken-line-length 79
-        blacken-allow-py36 t)
   ;; (add-hook 'python-mode-hook 'blacken-mode)
   )
 (use-package py-yapf
@@ -2491,17 +2373,16 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 **** Tox
 #+BEGIN_SRC emacs-lisp
 (use-package tox
-  :config
-  (setq tox-runner 'py.test)
-  (global-set-key "\C-ct" 'tox-current-class))
+  :custom
+  (tox-runner 'py.test)
+  :bind
+  (("C-c t" . tox-current-class)))
 #+END_SRC
 **** Sphinx doc
 #+begin_src emacs-lisp
 (use-package sphinx-doc
   :config
-  (add-hook 'python-mode-hook (lambda ()
-                                (require 'sphinx-doc)
-                                (sphinx-doc-mode t))))
+  (add-hook 'python-mode-hook 'sphinx-doc-mode))
 #+end_src
 **** Editing requirements files
 #+BEGIN_SRC emacs-lisp
@@ -2509,26 +2390,32 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+END_SRC
 **** Custom bindings
 #+BEGIN_SRC emacs-lisp
-(add-hook 'python-mode-hook (lambda ()
-                              (local-set-key (kbd "C-c j") 'rr/python-split-string)))
+(define-key python-mode-map (kbd "C-c j") 'sp-split-sexp)
 #+END_SRC
 *** JSON
 #+BEGIN_SRC emacs-lisp
 (use-package json-mode
+  :custom
+  (json-reformat:indent-width 4)
+  (json-reformat:pretty-string? t)
   :config
-  (add-hook 'json-mode-hook #'flycheck-mode)
-  (setq json-reformat:indent-width 4)
-  (setq json-reformat:pretty-string? t))
+  (add-hook 'json-mode-hook #'flycheck-mode))
 #+END_SRC
 *** YAML
 #+BEGIN_SRC emacs-lisp
 (use-package yaml-mode
-  :config
-  (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
+  :mode "\\.yml\\'")
 #+END_SRC
 *** WEB
 #+BEGIN_SRC emacs-lisp
 (use-package web-mode
+  :custom
+  (web-mode-markup-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  (web-mode-code-indent-offset 2)
+  (web-mode-enable-auto-closing t)
+  (web-mode-enable-auto-pairing nil)
+  (web-mode-enable-css-colorization t)
   :config
   (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
@@ -2539,13 +2426,6 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
   (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.jinja2\\'" . web-mode))
-
-  (setq web-mode-markup-indent-offset 2
-        web-mode-css-indent-offset 2
-        web-mode-code-indent-offset 2
-        web-mode-enable-auto-closing t
-        web-mode-enable-auto-pairing nil
-        web-mode-enable-css-colorization t)
 
   ;; Set django engine for django projects
   (defun rr/django-project-hook ()
@@ -2644,9 +2524,8 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 **** Clojure refactoring helm integration
 #+begin_src emacs-lisp
 (use-package cljr-helm
-  :config
-  (add-hook 'clojure-mode-hook
-            (lambda () (local-set-key (kbd "C-c C-r") 'cljr-helm))))
+  :bind (:map clojure-mode-map
+              ("C-c C-r" . cljr-helm)))
 #+end_src
 **** CIDER helm integration
 #+begin_src emacs-lisp
@@ -2658,17 +2537,16 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 **** Syntax highlighting
 #+begin_src emacs-lisp
 (use-package feature-mode
-  :config
-  (add-to-list 'auto-mode-alist '("\\.story$" . feature-mode)))
+  :mode "\\.story$")
 #+end_src
 *** PlantUML
 **** Major mode
 #+begin_src emacs-lisp
 (use-package plantuml-mode
+  :custom
+  (org-plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar")
+  (plantuml-default-exec-mode 'executable)
   :config
-  (setq org-plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar"
-        plantuml-default-exec-mode 'executable)
-
   (add-to-list 'org-src-lang-modes '("plantuml" . plantuml)))
 #+end_src
 ** Debugger
