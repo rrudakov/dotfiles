@@ -209,7 +209,7 @@ Unordered lists with separator '::'
 #+end_src
 
 * Configuration
-** Start emacs server
+** COMMENT Start emacs server
 #+BEGIN_SRC emacs-lisp
 (require 'server)
 (unless (server-running-p)
@@ -393,28 +393,12 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
 (tooltip-mode -1)
 #+END_SRC
-*** Disable menu bar
-#+BEGIN_SRC emacs-lisp
-(menu-bar-mode -1)
-#+END_SRC
-*** Disable toolbar
-#+BEGIN_SRC emacs-lisp
-(when (fboundp 'tool-bar-mode)
-  (tool-bar-mode -1))
-#+END_SRC
 *** Graphic mode settings
 #+BEGIN_SRC emacs-lisp
-(defvar my-ui-fringe-size '4 "Default fringe width.")
-
 (when (display-graphic-p)
-  (scroll-bar-mode -1)
   (setq-default line-spacing 0)
   ;; buffer name  in frame title
-  (setq frame-title-format '("" "%b @ Emacs " emacs-version))
-  ;; standardize fringe width
-  ;; (push (cons 'left-fringe  my-ui-fringe-size) default-frame-alist)
-  ;; (push (cons 'right-fringe my-ui-fringe-size) default-frame-alist)
-  )
+  (setq frame-title-format '("" "%b @ Emacs " emacs-version)))
 #+END_SRC
 *** Settings for tramp-mode
 #+BEGIN_SRC emacs-lisp
@@ -2158,7 +2142,7 @@ But there is no backward compatibility.
   :bind (:map origami-mode-map
               ([C-tab] . origami-recursively-toggle-node))
   :config
-  (add-hook 'prog-mode-hook 'origami-mode))
+  (add-hook 'prog-mode-hook (lambda () (origami-mode))))
 #+end_src
 ** Languages
 *** LSP mode
