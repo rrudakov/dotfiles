@@ -644,23 +644,28 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 
   (defun rr/apply-theme (frame)
     "Apply some customizaitons to current theme."
-    (with-selected-frame frame
-      (load-theme 'zenburn t)
-      (custom-theme-set-faces
-       'user
-       `(helm-delete-async-message ((t (:foreground "#F0DFAF"))))
-       `(flycheck-posframe-info-face ((t (:inherit 'info))))
-       `(flycheck-posframe-warning-face ((t (:inherit 'warning))))
-       `(flycheck-posframe-error-face ((t (:inherit 'success))))
-       `(git-gutter-fr:added ((t (:background "#3F3F3F"))))
-       `(git-gutter-fr:deleted ((t (:background "#3F3F3F"))))
-       `(git-gutter-fr:modified ((t (:background "#3F3F3F"))))
-       `(lsp-ui-sideline-code-action ((t (:foreground "dim gray"))))
-       `(font-latex-slide-title-face ((t (:height 1.0 :inherit font-lock-type-face))))
-       `(org-done ((t (:strike-through t))))
-       `(org-headline-done ((t (:foreground "dim gray" :strike-through t))))
-       `(org-tag ((t (:background "#7C4343" :foreground "#DCDCCC")))))
-      (message "Custom theme loaded"))
+    (let ((bg "#3F3F3F")
+          (block-bg "#494949")
+          (yellow "#F0DFAF"))
+      (with-selected-frame frame
+        (load-theme 'zenburn t)
+        (custom-theme-set-faces
+         'user
+         `(helm-delete-async-message ((t (:foreground ,yellow))))
+         `(flycheck-posframe-info-face ((t (:inherit 'info))))
+         `(flycheck-posframe-warning-face ((t (:inherit 'warning))))
+         `(flycheck-posframe-error-face ((t (:inherit 'success))))
+         `(git-gutter-fr:added ((t (:background ,bg))))
+         `(git-gutter-fr:deleted ((t (:background ,bg))))
+         `(git-gutter-fr:modified ((t (:background ,bg))))
+         `(fringe ((t (:background ,bg))))
+         `(markdown-code-face ((t (:background ,block-bg :extend t))))
+         `(lsp-ui-sideline-code-action ((t (:foreground "dim gray"))))
+         `(font-latex-slide-title-face ((t (:height 1.0 :inherit font-lock-type-face))))
+         `(org-done ((t (:strike-through t))))
+         `(org-headline-done ((t (:foreground "dim gray" :strike-through t))))
+         `(org-tag ((t (:background "#7C4343" :foreground "#DCDCCC")))))
+        (message "Custom theme loaded")))
     (remove-hook 'after-make-frame-functions 'rr/apply-theme))
 
   (if (daemonp)
@@ -1515,6 +1520,18 @@ Visual Regexp package:
 (use-package helm-pass)
 ;; (use-package ivy-pass)
 #+end_src
+** Markdown mode
+#+begin_src emacs-lisp
+(use-package markdown-mode
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (setq markdown-command "multimarkdown"))
+#+end_src
+** Edit region in indirect buffer
+#+begin_src emacs-lisp
+(use-package edit-indirect)
+#+end_src
 ** Org
 *** Some tweaks
 #+begin_src emacs-lisp
@@ -1928,8 +1945,7 @@ But there is no backward compatibility.
   :after message
   :custom
   (message-send-mail-function 'smtpmail-send-it)
-  (smtpmail-default-smtp-server "127.0.0.1")
-  (smtpmail-smtp-server "127.0.0.1")
+  (smtpmail-smtp-server "localhost")
   (smtpmail-smtp-service 1025))
 
 (use-package mu4e
