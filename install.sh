@@ -84,11 +84,12 @@ echo "Creating stack project"
 stack init
 echo "...done"
 echo "Replace flags for xmobar in stack.yaml"
-/usr/bin/sed -i "s/flags: {}/flags:/g" stack.yaml || exit 1
+/usr/bin/sed -i "/flags: {}/c\flags:" stack.yaml || exit 1
 /usr/bin/sed -i "/flags:/a\  xmobar:" stack.yaml || exit 1
 /usr/bin/sed -i "/xmobar:/a\    with_threaded: true" stack.yaml || exit 1
 /usr/bin/sed -i "/with_threaded: true/a\    with_utf8: true" stack.yaml || exit 1
 /usr/bin/sed -i "/with_utf8: true/a\    with_xpm: true" stack.yaml || exit 1
+/usr/bin/sed -i "/with_xpm: true/a\    with_xft: true" stack.yaml || exit 1
 echo "...done"
 echo "Build and install xmonad and dependencies"
 stack install || exit 1
