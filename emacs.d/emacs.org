@@ -664,8 +664,8 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
          `(font-latex-slide-title-face ((t (:height 1.0 :inherit font-lock-type-face))))
          `(org-done ((t (:strike-through t))))
          `(org-headline-done ((t (:foreground "dim gray" :strike-through t))))
-         `(org-tag ((t (:background "#7C4343" :foreground "#DCDCCC")))))
-        (message "Custom theme loaded")))
+         `(org-table ((t (:background "#383838"))))
+         `(org-tag ((t (:background "#7C4343" :foreground "#DCDCCC")))))))
     (remove-hook 'after-make-frame-functions 'rr/apply-theme))
 
   (if (daemonp)
@@ -2099,6 +2099,7 @@ But there is no backward compatibility.
         lsp-ui-doc-include-signature t
         lsp-ui-doc-position 'at-point
 	    lsp-ui-sideline-show-hover nil
+        lsp-ui-sideline-show-code-actions nil
 	    lsp-ui-sideline-ignore-duplicate t
 	    lsp-ui-flycheck-enable t
 	    lsp-ui-flycheck-list-position 'bottom
