@@ -365,10 +365,8 @@ Picked mostly from doom-emacs configuration.
 #+END_SRC
 *** Be quiet at startup
 #+BEGIN_SRC emacs-lisp
-;; (advice-add #'display-startup-echo-area-message :override #'ignore)
 (setq inhibit-startup-message t
       inhibit-startup-echo-area-message user-login-name
-      initial-major-mode 'fundamental-mode
       initial-scratch-message nil)
 #+END_SRC
 *** Unique buffer names
@@ -377,7 +375,7 @@ Picked mostly from doom-emacs configuration.
   :ensure nil
   :custom
   (uniquify-separator "/")
-  (uniquify-buffer-file-name 'forward))
+  (uniquify-buffer-name-style 'forward))
 #+end_src
 *** More reliable inter-window border
 The native border "consumes" a pixel of the fringe on righter-most splits,
@@ -430,7 +428,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 *** EPA
 #+BEGIN_SRC emacs-lisp
-(setq epa-pinentry-mode 'loopback)
+(setq epg-pinentry-mode 'loopback)
 #+END_SRC
 *** Default mode
 #+BEGIN_SRC emacs-lisp
@@ -439,7 +437,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 *** Fill column
 #+BEGIN_SRC emacs-lisp
 (setq-default fill-column 79)
-(add-hook 'text-mode-hook 'auto-fill-mode)
+(add-hook 'text-mode-hook #'auto-fill-mode)
 #+END_SRC
 *** Auto revert changes
 #+BEGIN_SRC emacs-lisp
@@ -512,7 +510,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 *** Navigation by subwords
 #+begin_src emacs-lisp
-(add-hook 'prog-mode-hook 'subword-mode)
+(add-hook 'prog-mode-hook #'subword-mode)
 #+end_src
 *** Set minimal height of window
 #+BEGIN_SRC emacs-lisp
@@ -522,8 +520,8 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
 (use-package ediff
   :custom
-  (ediff-window-setup-function 'ediff-setup-windows-plain)
-  (ediff-split-window-function 'split-window-horizontally))
+  (ediff-window-setup-function #'ediff-setup-windows-plain)
+  (ediff-split-window-function #'split-window-right))
 #+END_SRC
 *** Smerge
 #+begin_src emacs-lisp
@@ -539,8 +537,8 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
     (ansi-color-apply-on-region compilation-filter-start (point))
     (toggle-read-only))
 
-  (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
-  (add-hook 'compilation-filter-hook 'colorize-compilation-buffer))
+  (add-hook 'shell-mode-hook #'ansi-color-for-comint-mode-on)
+  (add-hook 'compilation-filter-hook #'colorize-compilation-buffer))
 #+END_SRC
 *** Compilation mode settings
 #+BEGIN_SRC emacs-lisp
@@ -551,7 +549,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
                 compilation-ask-about-save nil   ; save all buffers on `compile'
                 compilation-scroll-output t
                 confirm-nonexistent-file-or-buffer t)
-  (define-key compilation-mode-map (kbd "q") 'delete-window))
+  (define-key compilation-mode-map (kbd "q") #'delete-window))
 #+END_SRC
 *** Unclassified settings
 No more ugly line splitting
@@ -596,7 +594,7 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 #+end_src
 *** Cleanup trailing spaces before save
 #+begin_src emacs-lisp
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+(add-hook 'before-save-hook #'delete-trailing-whitespace)
 #+end_src
 *** Set tab width
 #+begin_src emacs-lisp
@@ -612,7 +610,7 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 #+end_src
 *** Windows splitting preferences
 #+begin_src emacs-lisp
-(setq split-window-preferred-function 'split-window-prefer-side-by-side)
+(setq split-window-preferred-function #'split-window-prefer-side-by-side)
 #+end_src
 *** Confirm kill emacs
 #+BEGIN_SRC emacs-lisp
@@ -673,7 +671,7 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
     (remove-hook 'after-make-frame-functions 'rr/apply-theme))
 
   (if (daemonp)
-      (add-hook 'after-make-frame-functions 'rr/apply-theme)
+      (add-hook 'after-make-frame-functions #'rr/apply-theme)
     (rr/apply-theme (selected-frame)))
 
   (with-eval-after-load 'zenburn
@@ -752,7 +750,7 @@ nil."
     (ejc-set-rows-limit 500)
     (ejc-set-column-width-limit nil))
 
-  (add-hook 'ejc-sql-connected-hook 'rr/ejc-sql-connected-hook)
+  (add-hook 'ejc-sql-connected-hook #'rr/ejc-sql-connected-hook)
 
   (setq ejc-org-mode-show-results nil)
 
@@ -856,22 +854,22 @@ Show more offten used completeons first
 #+BEGIN_SRC emacs-lisp
 (use-package company-web
   :config
-  (add-to-list 'company-backends 'company-web-html)
-  (add-to-list 'company-backends 'company-web-jade)
-  (add-to-list 'company-backends 'company-web-slim))
+  (add-to-list 'company-backends #'company-web-html)
+  (add-to-list 'company-backends #'company-web-jade)
+  (add-to-list 'company-backends #'company-web-slim))
 #+END_SRC
 **** Shell
 #+BEGIN_SRC emacs-lisp
 (use-package company-shell
   :config
-  (add-to-list 'company-backends 'company-shell))
+  (add-to-list 'company-backends #'company-shell))
 #+END_SRC
 **** JavaScript
 #+BEGIN_SRC emacs-lisp
 (use-package company-tern
   :after tern
   :config
-  (add-to-list 'company-backends 'company-tern))
+  (add-to-list 'company-backends #'company-tern))
 #+END_SRC
 ** Paradox
 #+BEGIN_SRC emacs-lisp
@@ -914,30 +912,30 @@ Show more offten used completeons first
 	    helm-echo-input-in-header-line nil
 	    helm-display-header-line nil
 	    helm-buffer-max-length 40
-	    helm-ff-delete-files-function 'helm-delete-marked-files-async
+	    helm-ff-delete-files-function #'helm-delete-marked-files-async
 	    helm-inherit-input-method nil)
 
   (require 'helm-files)
 
   (with-eval-after-load 'helm
-    (define-key global-map [remap find-file] 'helm-find-files)
-    (define-key global-map [remap occur] 'helm-occur)
-    (define-key global-map [remap switch-to-buffer] 'helm-mini)
-    (define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
-    (define-key global-map [remap execute-extended-command] 'helm-M-x)
-    (define-key global-map [remap yank-pop] 'helm-show-kill-ring)
+    (define-key global-map [remap find-file] #'helm-find-files)
+    (define-key global-map [remap occur] #'helm-occur)
+    (define-key global-map [remap switch-to-buffer] #'helm-mini)
+    (define-key global-map [remap dabbrev-expand] #'helm-dabbrev)
+    (define-key global-map [remap execute-extended-command] #'helm-M-x)
+    (define-key global-map [remap yank-pop] #'helm-show-kill-ring)
 
-    (define-key lisp-interaction-mode-map [remap completion-at-point] 'helm-lisp-completion-at-point)
-    (define-key emacs-lisp-mode-map       [remap completion-at-point] 'helm-lisp-completion-at-point)
+    (define-key lisp-interaction-mode-map [remap completion-at-point] #'helm-lisp-completion-at-point)
+    (define-key emacs-lisp-mode-map       [remap completion-at-point] #'helm-lisp-completion-at-point)
 
-    (define-key helm-find-files-map (kbd "C-i") 'helm-ff-TAB))
+    (define-key helm-find-files-map (kbd "C-i") #'helm-ff-TAB))
 
 
   (add-hook 'eshell-mode-hook
 	        (lambda ()
 	          (eshell-cmpl-initialize)
-	          (define-key eshell-mode-map [remap eshell-pcomplete] 'helm-esh-pcomplete)
-	          (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))
+	          (define-key eshell-mode-map [remap eshell-pcomplete] #'helm-esh-pcomplete)
+	          (define-key eshell-mode-map (kbd "M-p") #'helm-eshell-history)))
 
   (setq helm-display-function #'pop-to-buffer)
   (setq helm-show-completion-display-function #'pop-to-buffer)
@@ -963,7 +961,7 @@ Show more offten used completeons first
   :after flycheck
   :config
   (eval-after-load 'flycheck
-    '(define-key flycheck-mode-map (kbd "C-'") 'helm-flycheck)))
+    '(define-key flycheck-mode-map (kbd "C-'") #'helm-flycheck)))
 #+END_SRC
 *** Helm org rifle
 #+begin_src emacs-lisp
@@ -974,9 +972,7 @@ Show more offten used completeons first
 *** Helm xref
 #+begin_src emacs-lisp
 (use-package helm-xref
-  :after helm
-  :custom
-  (xref-show-xrefs-function 'helm-xref-show-xrefs-27))
+  :after helm)
 #+end_src
 *** Helm lsp integration
 #+begin_src emacs-lisp
@@ -995,18 +991,18 @@ Show more offten used completeons first
 
   ;; enable this if you want `swiper' to use it
   (setq search-default-mode #'char-fold-to-regexp)
-  (global-set-key "\C-s" 'swiper)
-  (global-set-key (kbd "C-c C-r") 'ivy-resume)
-  (global-set-key (kbd "M-x") 'counsel-M-x)
-  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-  (global-set-key (kbd "C-c g") 'counsel-git)
-  (global-set-key (kbd "C-x j") 'counsel-semantic-or-imenu)
-  (global-set-key (kbd "C-c j") 'counsel-git-grep)
-  (global-set-key (kbd "C-c k") 'counsel-ag)
-  (global-set-key (kbd "C-x l") 'counsel-locate)
-  (global-set-key (kbd "C-x b") 'ivy-switch-buffer)
-  (global-set-key (kbd "M-y") 'counsel-yank-pop)
-  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+  (global-set-key "\C-s" #'swiper)
+  (global-set-key (kbd "C-c C-r") #'ivy-resume)
+  (global-set-key (kbd "M-x") #'counsel-M-x)
+  (global-set-key (kbd "C-x C-f") #'counsel-find-file)
+  (global-set-key (kbd "C-c g") #'counsel-git)
+  (global-set-key (kbd "C-x j") #'counsel-semantic-or-imenu)
+  (global-set-key (kbd "C-c j") #'counsel-git-grep)
+  (global-set-key (kbd "C-c k") #'counsel-ag)
+  (global-set-key (kbd "C-x l") #'counsel-locate)
+  (global-set-key (kbd "C-x b") #'ivy-switch-buffer)
+  (global-set-key (kbd "M-y") #'counsel-yank-pop)
+  (define-key minibuffer-local-map (kbd "C-r") #'counsel-minibuffer-history)
 
   (setq ivy-height-alist
         '((counsel-evil-registers . 5)
@@ -1039,23 +1035,27 @@ Show more offten used completeons first
 #+BEGIN_SRC emacs-lisp
 (use-package smartparens-config
   :ensure smartparens
+  :custom
+  (sp-show-pair-from-inside nil)
+  (sp-highlight-pair-overlay nil)
+  (sp-wrap-respect-direction t)
   :config
-  (setq sp-show-pair-from-inside nil
-        sp-highlight-pair-overlay nil
-        sp-wrap-respect-direction t)
-
   (sp-with-modes 'web-mode
     (sp-local-pair "%" "%" :wrap "C-%")
     (sp-local-pair "<" ">" :wrap "C->"))
 
-  (define-key smartparens-mode-map (kbd "C-c (") 'sp-wrap-round)
-  (define-key smartparens-mode-map (kbd "C-c {") 'sp-wrap-curly)
-  (define-key smartparens-mode-map (kbd "C-c [") 'sp-wrap-square)
+  (define-key smartparens-mode-map (kbd "C-c (") #'sp-wrap-round)
+  (define-key smartparens-mode-map (kbd "C-c {") #'sp-wrap-curly)
+  (define-key smartparens-mode-map (kbd "C-c [") #'sp-wrap-square)
+  (define-key smartparens-mode-map (kbd "M-]") #'sp-unwrap-sexp)
 
-  (define-key smartparens-mode-map (kbd "C-(") 'sp-backward-slurp-sexp)
-  (define-key smartparens-mode-map (kbd "C-)") 'sp-forward-slurp-sexp)
-  (define-key smartparens-mode-map (kbd "C-}") 'sp-forward-barf-sexp)
-  (define-key smartparens-mode-map (kbd "C-{") 'sp-backward-barf-sexp)
+  (define-key smartparens-mode-map (kbd "C-(") #'sp-backward-slurp-sexp)
+  (define-key smartparens-mode-map (kbd "C-)") #'sp-forward-slurp-sexp)
+  (define-key smartparens-mode-map (kbd "C-}") #'sp-forward-barf-sexp)
+  (define-key smartparens-mode-map (kbd "C-{") #'sp-backward-barf-sexp)
+
+  (define-key smartparens-strict-mode-map [remap c-electric-backspace] #'sp-backward-delete-char)
+  (define-key smartparens-strict-mode-map [remap c-electric-delete-forward] #'sp-delete-char)
 
   (sp-local-pair 'prog-mode "{" nil :post-handlers '(("||\n[i]" "RET")))
   (sp-local-pair 'prog-mode "[" nil :post-handlers '(("||\n[i]" "RET")))
@@ -1063,13 +1063,7 @@ Show more offten used completeons first
   (sp-local-pair 'java-mode "/*" "*/" :post-handlers '(("* ||\n[i]" "RET")))
 
   (smartparens-global-strict-mode t)
-  (show-smartparens-global-mode t)
-
-  (bind-key [remap c-electric-backspace] 'sp-backward-delete-char smartparens-strict-mode-map)
-  (bind-key [remap c-electric-delete-forward] 'sp-delete-char smartparens-strict-mode-map)
-
-  :bind
-  ("M-]" . 'sp-unwrap-sexp))
+  (show-smartparens-global-mode t))
 #+END_SRC
 ** Workspaces
 #+BEGIN_SRC emacs-lisp
@@ -1136,17 +1130,17 @@ Show more offten used completeons first
   :init
   (setq winum-keymap
         (let ((map (make-sparse-keymap)))
-          (define-key map (kbd "C-`") 'winum-select-window-by-number)
-          (define-key map (kbd "C-²") 'winum-select-window-by-number)
-          (define-key map (kbd "M-0") 'winum-select-window-0-or-10)
-          (define-key map (kbd "M-1") 'winum-select-window-1)
-          (define-key map (kbd "M-2") 'winum-select-window-2)
-          (define-key map (kbd "M-3") 'winum-select-window-3)
-          (define-key map (kbd "M-4") 'winum-select-window-4)
-          (define-key map (kbd "M-5") 'winum-select-window-5)
-          (define-key map (kbd "M-6") 'winum-select-window-6)
-          (define-key map (kbd "M-7") 'winum-select-window-7)
-          (define-key map (kbd "M-8") 'winum-select-window-8)
+          (define-key map (kbd "C-`") #'winum-select-window-by-number)
+          (define-key map (kbd "C-²") #'winum-select-window-by-number)
+          (define-key map (kbd "M-0") #'winum-select-window-0-or-10)
+          (define-key map (kbd "M-1") #'winum-select-window-1)
+          (define-key map (kbd "M-2") #'winum-select-window-2)
+          (define-key map (kbd "M-3") #'winum-select-window-3)
+          (define-key map (kbd "M-4") #'winum-select-window-4)
+          (define-key map (kbd "M-5") #'winum-select-window-5)
+          (define-key map (kbd "M-6") #'winum-select-window-6)
+          (define-key map (kbd "M-7") #'winum-select-window-7)
+          (define-key map (kbd "M-8") #'winum-select-window-8)
           map))
   :custom
   (winum-auto-setup-mode-line t)
@@ -1160,7 +1154,7 @@ Show more offten used completeons first
   :custom
   (smartscan-symbol-selector "symbol")
   :config
-  (add-hook 'prog-mode-hook 'smartscan-mode))
+  (add-hook 'prog-mode-hook #'smartscan-mode))
 #+end_src
 ** PKGBUILD major mode
 #+begin_src emacs-lisp
@@ -1184,7 +1178,7 @@ Show more offten used completeons first
 (use-package dired-git-info
   :config
   (with-eval-after-load 'dired
-    (define-key dired-mode-map ")" 'dired-git-info-mode)))
+    (define-key dired-mode-map ")" #'dired-git-info-mode)))
 #+end_src
 ** Projectile
 *** Basic setup
@@ -1205,7 +1199,7 @@ Show more offten used completeons first
 #+BEGIN_SRC emacs-lisp
 (use-package helm-projectile
   :custom
-  (projectile-switch-project-action 'helm-projectile)
+  (projectile-switch-project-action #'helm-projectile)
   :config
   (helm-projectile-on))
 #+END_SRC
@@ -1276,9 +1270,9 @@ Show more offten used completeons first
 (use-package flycheck-posframe
   :after flycheck
   :config
-  (add-hook 'flycheck-mode-hook #'(lambda ()
-                                    (unless (bound-and-true-p lsp-mode)
-                                      (flycheck-posframe-mode)))))
+  (add-hook 'flycheck-mode-hook (lambda ()
+                                  (unless (bound-and-true-p lsp-mode)
+                                    (flycheck-posframe-mode)))))
 #+END_SRC
 ** Highlight TODO item
 #+begin_src emacs-lisp
@@ -1302,8 +1296,8 @@ Show more offten used completeons first
 
   (add-hook 'focus-in-hook #'git-gutter:update-all-windows)
   (add-hook 'magit-post-refresh-hook #'git-gutter:update-all-windows)
-  (add-hook 'focus-in-hook 'rr/refresh-vc-state)
-  (add-hook 'magit-post-refresh-hook 'rr/refresh-vc-state))
+  (add-hook 'focus-in-hook #'rr/refresh-vc-state)
+  (add-hook 'magit-post-refresh-hook #'rr/refresh-vc-state))
 #+END_SRC
 *** Transient
 #+begin_src emacs-lisp
@@ -1360,7 +1354,7 @@ Show more offten used completeons first
 #+begin_src emacs-lisp
 (use-package magit-todos
   :config
-  (add-hook 'prog-mode-hook 'magit-todos-mode))
+  (add-hook 'prog-mode-hook #'magit-todos-mode))
 #+end_src
 ** Multiple cursors
 #+BEGIN_SRC emacs-lisp
@@ -1421,8 +1415,9 @@ Colorize color names in buffers
 #+BEGIN_SRC emacs-lisp
 (use-package rainbow-mode
   :config
-  (add-to-list 'rainbow-x-colors-major-mode-list 'web-mode)
-  (add-to-list 'rainbow-x-colors-major-mode-list 'python-mode))
+  (add-to-list 'rainbow-x-colors-major-mode-list #'web-mode)
+  (add-to-list 'rainbow-x-colors-major-mode-list #'python-mode)
+  (add-to-list 'rainbow-x-colors-major-mode-list #'emacs-lisp-mode))
 #+END_SRC
 ** CSV
 Major mode for work with CSV files
@@ -1468,7 +1463,7 @@ And autocompletion for it:
 #+BEGIN_SRC emacs-lisp
 (use-package company-restclient
   :config
-  (add-to-list 'company-backends 'company-restclient))
+  (add-to-list 'company-backends #'company-restclient))
 #+END_SRC
 And even org-babel integration:
 #+BEGIN_SRC emacs-lisp
@@ -1541,7 +1536,7 @@ Visual Regexp package:
 ** Org
 *** Some tweaks
 #+begin_src emacs-lisp
-(add-hook 'org-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
+(add-hook 'org-mode-hook (lambda () (global-hl-line-mode -1)))
 
 ;; Setup ui
 (setq org-adapt-indentation nil
@@ -1696,7 +1691,7 @@ But there is no backward compatibility.
   (let (org-log-done org-log-states)   ; turn off logging
     (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 
-(add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
+(add-hook 'org-after-todo-statistics-hook #'org-summary-todo)
 #+END_SRC
 *** Custom keywords faces
 #+BEGIN_SRC emacs-lisp
@@ -1749,7 +1744,7 @@ But there is no backward compatibility.
                  (string-equal last "CANCELED")))
     (rr/read-non-clocking-state)))
 
-(setq org-clock-out-switch-to-state 'rr/after-clock-stop)
+(setq org-clock-out-switch-to-state #'rr/after-clock-stop)
 #+END_SRC
 *** Appearance
 **** COMMENT Org bullets
@@ -1805,19 +1800,19 @@ But there is no backward compatibility.
                                                 new-time)))))))
 
   ;; Update after emacs start
-  (add-hook 'after-init-hook 'rr/org-agenda-to-appt)
+  (add-hook 'after-init-hook #'rr/org-agenda-to-appt)
 
   ;; Every day at 0:05
-  (run-at-time "0:05" (* 24 3600) 'rr/org-agenda-to-appt)
+  (run-at-time "0:05" (* 24 3600) #'rr/org-agenda-to-appt)
 
   (add-hook 'after-save-hook
-            '(lambda ()
-               (if (org-agenda-file-p (buffer-file-name))
-                   (rr/org-agenda-to-appt))))
+            (lambda ()
+              (if (org-agenda-file-p (buffer-file-name))
+                  (rr/org-agenda-to-appt))))
 
-  (setq appt-disp-window-function 'rr/show-appt-notification)
+  (setq appt-disp-window-function #'rr/show-appt-notification)
   (setq appt-delete-window-function (lambda () t))
-  (setq org-show-notification-handler 'notifications-notify))
+  (setq org-show-notification-handler #'notifications-notify))
 #+end_src
 *** Markdown export
 #+BEGIN_SRC emacs-lisp
@@ -1837,13 +1832,8 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
 (use-package org-mime
   :config
-  (add-hook 'message-mode-hook
-            (lambda ()
-              (local-set-key (kbd "C-c M-o") 'org-mime-htmlize)))
-
-  (add-hook 'org-mode-hook
-            (lambda ()
-              (local-set-key (kbd "C-c M-o") 'org-mime-org-buffer-htmlize)))
+  (define-key message-mode-map (kbd "C-c M-o") #'org-mime-htmlize)
+  (define-key org-mode-map (kbd "C-c M-o") #'org-mime-org-buffer-htmlize)
 
   (add-hook 'org-mime-html-hook
             (lambda ()
@@ -1950,7 +1940,7 @@ But there is no backward compatibility.
   :ensure nil
   :after message
   :custom
-  (message-send-mail-function 'smtpmail-send-it)
+  (message-send-mail-function #'smtpmail-send-it)
   (smtpmail-smtp-server "localhost")
   (smtpmail-smtp-service 1025))
 
@@ -1991,7 +1981,6 @@ But there is no backward compatibility.
 
   (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t)
 
-
   ;; Run mu4e in background after starting emacs
   (mu4e t))
 #+END_SRC
@@ -2029,7 +2018,7 @@ But there is no backward compatibility.
   :custom
   (dtrt-indent-verbosity 0)
   :config
-  (add-hook 'prog-mode-hook 'dtrt-indent-mode))
+  (add-hook 'prog-mode-hook #'dtrt-indent-mode))
 #+end_src
 ** XML
 *** Common settings
@@ -2094,13 +2083,16 @@ But there is no backward compatibility.
 	    lsp-pyls-plugins-jedi-completion-enabled t
 	    lsp-pyls-plugins-jedi-completion-include-params nil
 	    lsp-pyls-plugins-jedi-signature-help-enabled t)
-  (add-hook 'python-mode-hook 'lsp)
+  (add-hook 'python-mode-hook #'lsp)
 
-  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
+  (add-hook 'lsp-after-open-hook #'lsp-enable-imenu))
 
 (use-package lsp-ui
+  :bind
+  (:map lsp-ui-mode-map
+        ([remap xref-find-references] . lsp-find-references))
   :config
-  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+  (add-hook 'lsp-mode-hook #'lsp-ui-mode)
   (setq lsp-ui-sideline-update-mode 'line
 	    lsp-ui-doc-enable nil
         lsp-ui-doc-include-signature t
@@ -2110,9 +2102,7 @@ But there is no backward compatibility.
 	    lsp-ui-sideline-ignore-duplicate t
 	    lsp-ui-flycheck-enable t
 	    lsp-ui-flycheck-list-position 'bottom
-	    lsp-ui-flycheck-live-reporting t)
-
-  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-find-references))
+	    lsp-ui-flycheck-live-reporting t))
 #+END_SRC
 **** Completion
 #+begin_src emacs-lisp
@@ -2158,6 +2148,7 @@ But there is no backward compatibility.
 *** Treemacs integration
 #+begin_src emacs-lisp
 (use-package treemacs
+  :after lsp-mode
   :bind
   (:map lsp-mode-map
         ("C-c *" . treemacs))
@@ -2173,8 +2164,8 @@ But there is no backward compatibility.
 #+begin_src emacs-lisp
 (use-package google-c-style
   :config
-  (add-hook 'c-mode-common-hook 'google-set-c-style)
-  (add-hook 'c-mode-common-hook 'google-make-newline-indent))
+  (add-hook 'c-mode-common-hook #'google-set-c-style)
+  (add-hook 'c-mode-common-hook #'google-make-newline-indent))
 #+end_src
 *** Java
 **** Common setup
@@ -2184,9 +2175,7 @@ But there is no backward compatibility.
 
 (setq google-java-format-executable "/home/rrudakov/.local/bin/google-java-format")
 
-(add-hook 'java-mode-hook
-          (lambda ()
-            (local-set-key (kbd "C-c C-f") 'google-java-format-buffer)))
+(define-key java-mode-map (kbd "C-c C-f") #'google-java-format-buffer)
 
 (add-hook 'java-mode-hook
           (lambda ()
@@ -2197,7 +2186,7 @@ But there is no backward compatibility.
 (use-package lsp-java
   :after lsp-mode
   :config
-  (add-hook 'java-mode-hook 'lsp)
+  (add-hook 'java-mode-hook #'lsp)
   (setq lsp-java-save-actions-organize-imports nil
         lsp-java-format-on-type-enabled nil)
 
@@ -2222,7 +2211,7 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
 (setq auto-insert-query nil)
 (setq auto-insert-directory (expand-file-name "templates/" user-emacs-directory))
-(add-hook 'find-file-hook 'auto-insert)
+(add-hook 'find-file-hook #'auto-insert)
 (auto-insert-mode 1)
 
 (add-to-list 'auto-insert-alist
@@ -2239,16 +2228,7 @@ But there is no backward compatibility.
   :after flycheck
   :config
   (intero-global-mode)
-  ;; (add-hook 'haskell-mode-hook 'company-mode)
   (flycheck-add-next-checker 'intero '(warning . haskell-hlint))
-  ;; (custom-set-variables
-  ;;  '(haskell-stylish-on-save t))
-  ;; (add-hook 'haskell-mode-hook
-  ;;           (lambda ()
-  ;;             (set (make-local-variable 'company-backends)
-  ;;                  (append '((company-capf company-dabbrev-code))
-  ;;                          company-backends))))
-
   ;; (setq haskell-tags-on-save t)
   ;; (setq tags-revert-without-query t)
   ;; (setq haskell-indentation-electric-flag t)
@@ -2259,9 +2239,9 @@ But there is no backward compatibility.
 (use-package haskell-mode
   :config
   (setq haskell-mode-stylish-haskell-path "brittany")
-  (setq haskell-stylish-on-save t)
+  (setq haskell-stylish-on-save nil)
 
-  (add-hook 'haskell-mode-hook 'haskell-auto-insert-module-template))
+  (add-hook 'haskell-mode-hook #'haskell-auto-insert-module-template))
 #+end_src
 **** COMMENT lsp-haskell
 Latest update in haskell-mode introduce some incompatibility. Investigation required.
@@ -2307,7 +2287,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+END_SRC
 **** Haskell doc mode
 #+BEGIN_SRC emacs-lisp
-(add-hook 'haskell-mode-hook 'turn-on-haskell-doc-mode)
+(add-hook 'haskell-mode-hook #'turn-on-haskell-doc-mode)
 #+END_SRC
 **** Indentation
 #+BEGIN_SRC emacs-lisp
@@ -2349,11 +2329,12 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 (use-package latex
   :ensure nil
   :config
-  (eval-after-load 'latex '(add-to-list 'LaTeX-verbatim-environments "lstlisting"))
-  (add-hook 'LaTeX-mode-hook 'visual-line-mode)
-  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
-  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+  (eval-after-load 'latex
+    '(add-to-list 'LaTeX-verbatim-environments "lstlisting"))
+  (add-hook 'LaTeX-mode-hook #'visual-line-mode)
+  (add-hook 'LaTeX-mode-hook #'flyspell-mode)
+  (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
+  (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
   (add-hook 'LaTeX-mode-hook (lambda () (auto-fill-mode -1)))
   (add-hook 'LaTeX-mode-hook (lambda () (TeX-fold-mode 1))))
 #+END_SRC
@@ -2363,7 +2344,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 (use-package pyvenv
   :config
   (pyvenv-tracking-mode)
-  (add-hook 'pyvenv-post-activate-hooks 'lsp))
+  (add-hook 'pyvenv-post-activate-hooks #'lsp))
 #+END_SRC
 **** Default interpreter
 #+BEGIN_SRC emacs-lisp
@@ -2378,7 +2359,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
   (isortify-multi-line-output 3)
   (isortify-trailing-comma t)
   :config
-  (add-hook 'python-mode-hook 'isortify-mode))
+  (add-hook 'python-mode-hook #'isortify-mode))
 #+END_SRC
 **** Format code
 #+BEGIN_SRC emacs-lisp
@@ -2404,7 +2385,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+begin_src emacs-lisp
 (use-package sphinx-doc
   :config
-  (add-hook 'python-mode-hook 'sphinx-doc-mode))
+  (add-hook 'python-mode-hook #'sphinx-doc-mode))
 #+end_src
 **** Editing requirements files
 #+BEGIN_SRC emacs-lisp
@@ -2412,7 +2393,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+END_SRC
 **** Custom bindings
 #+BEGIN_SRC emacs-lisp
-(define-key python-mode-map (kbd "C-c j") 'sp-split-sexp)
+(define-key python-mode-map (kbd "C-c j") #'sp-split-sexp)
 #+END_SRC
 *** JSON
 #+BEGIN_SRC emacs-lisp
@@ -2455,7 +2436,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
         (if (file-exists-p (concat (projectile-project-root) "manage.py"))
             (web-mode-set-engine "django"))))
 
-  (add-hook 'web-mode-hook 'rr/django-project-hook))
+  (add-hook 'web-mode-hook #'rr/django-project-hook))
 #+END_SRC
 *** JavaScript
 **** TypeScript
@@ -2478,7 +2459,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
         tide-completion-detailed t)
 
   ;; formats the buffer before saving
-  (add-hook 'before-save-hook 'tide-format-before-save)
+  (add-hook 'before-save-hook #'tide-format-before-save)
 
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
   ;; configure javascript-tide checker to run after your default javascript checker
@@ -2592,15 +2573,18 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 ** Set keybindings
 *** Common
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "M-[") 'align)
+(global-set-key (kbd "M-[") #'align)
 #+END_SRC
 *** Org
 #+BEGIN_SRC emacs-lisp
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cc" 'org-capture)
-(global-set-key "\C-cb" 'org-switchb)
-(global-set-key (kbd "<f5>") 'org-clock-goto)
-(define-key org-agenda-mode-map (kbd "C-c m") 'org-agenda-month-view)
-(define-key org-mode-map (kbd "C-c u") 'rr/org-replace-link-by-link-description)
+(global-set-key (kbd "C-c l") #'org-store-link)
+(global-set-key (kbd "C-c a") #'org-agenda)
+(global-set-key (kbd "C-c c") #'org-capture)
+(global-set-key (kbd "C-c b") #'org-switchb)
+(global-set-key (kbd "<f5>") #'org-clock-goto)
+(define-key org-agenda-mode-map (kbd "C-c m") #'org-agenda-month-view)
+(define-key org-mode-map (kbd "C-c u") #'rr/org-replace-link-by-link-description)
+(global-set-key (kbd "<f6>") #'profiler-start)
+(global-set-key (kbd "<f7>") #'profiler-report)
+(global-set-key (kbd "<f8>") #'profiler-stop)
 #+END_SRC
