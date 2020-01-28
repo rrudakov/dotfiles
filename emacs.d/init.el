@@ -55,7 +55,7 @@ There are two things you can do about this warning:
 (setq vc-follow-symlinks t)
 (org-babel-load-file (expand-file-name "emacs.org" user-emacs-directory))
 
-(when (file-exists-p custom-file)
-  (load custom-file))
+;; (when (file-exists-p custom-file)
+;;   (load custom-file :noerror))
 (provide 'init)
 ;;; init.el ends here

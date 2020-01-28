@@ -188,6 +188,13 @@ Unordered lists with separator '::'
                                      split-height-threshold)))
     (split-window-sensibly window)))
 #+end_src
+** Set margins
+#+begin_src emacs-lisp
+(defun rr/set-margins ()
+  "Set margins in current buffer."
+  (setq left-margin-width 3)
+  (setq right-margin-width 3))
+#+end_src
 ** Copy file name to clipboard from dired
 #+begin_src emacs-lisp
 (defun prelude-copy-file-name-to-clipboard ()
@@ -617,6 +624,13 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 (setq confirm-kill-processes nil
       confirm-kill-emacs nil)
 #+END_SRC
+** Files local variables behaviour
+#+begin_src emacs-lisp
+(use-package files
+  :ensure nil
+  :custom
+  (enable-local-variables t))
+#+end_src
 ** Set the same PATH as in shell
 #+begin_src emacs-lisp
 (use-package exec-path-from-shell
@@ -732,8 +746,9 @@ nil."
   :custom
   (ispell-program-name "aspell")
   :config
-  (add-hook 'text-mode-hook 'flyspell-mode)
-  (add-hook 'prog-mode-hook #'flyspell-prog-mode))
+  (add-hook 'text-mode-hook #'flyspell-mode)
+  ;; (add-hook 'prog-mode-hook #'flyspell-prog-mode)
+  )
 #+end_src
 ** Remember location in files
 #+begin_src emacs-lisp
@@ -815,8 +830,7 @@ nil."
 
   (global-company-mode)
 
-  (setq-default company-idle-delay .2
-                company-minimum-prefix-length 1
+  (setq-default company-minimum-prefix-length 2
                 company-tooltip-align-annotations t))
 #+END_SRC
 *** COMMENT Show completion in posframe
@@ -874,6 +888,8 @@ Show more offten used completeons first
 ** Paradox
 #+BEGIN_SRC emacs-lisp
 (use-package paradox
+  :custom
+  (paradox-github-token t)
   :config
   (setq-default paradox-column-width-package 27
                 paradox-column-width-version 13
@@ -891,7 +907,14 @@ Show more offten used completeons first
 (use-package minibuffer
   :ensure nil
   :custom
-  (completion-styles '(basic partial-completion flex)))
+  (completion-styles '(basic partial-completion emacs22 flex)))
+#+end_src
+** Xref
+#+begin_src emacs-lisp
+(use-package xref
+  :ensure nil
+  :custom
+  (xref-prompt-for-identifier nil))
 #+end_src
 ** Helm
 *** Configuration
@@ -1527,7 +1550,9 @@ Visual Regexp package:
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
-  :init (setq markdown-command "multimarkdown"))
+  :init (setq markdown-command "multimarkdown")
+  :config
+  (add-hook 'markdown-mode-hook #'rr/set-margins))
 #+end_src
 ** Edit region in indirect buffer
 #+begin_src emacs-lisp
@@ -1536,7 +1561,8 @@ Visual Regexp package:
 ** Org
 *** Some tweaks
 #+begin_src emacs-lisp
-(add-hook 'org-mode-hook (lambda () (global-hl-line-mode -1)))
+(add-hook 'org-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
+(add-hook 'org-mode-hook #'rr/set-margins)
 
 ;; Setup ui
 (setq org-adapt-indentation nil
@@ -2040,10 +2066,10 @@ But there is no backward compatibility.
 ** Code folding
 #+begin_src emacs-lisp
 (use-package origami
-  :bind (:map origami-mode-map
-              ([C-tab] . origami-recursively-toggle-node))
+  :init
+  (global-origami-mode)
   :config
-  (add-hook 'prog-mode-hook (lambda () (origami-mode))))
+  (define-key origami-mode-map [C-tab] #'origami-recursively-toggle-node))
 #+end_src
 ** Languages
 *** LSP mode
@@ -2058,18 +2084,17 @@ But there is no backward compatibility.
               ("i" . lsp-find-implementation)
               ("r" . lsp-rename))
   :config
-  (setq lsp-eldoc-render-all nil
-	    lsp-highlight-symbol-at-point nil
-	    lsp-inhibit-message t
-	    lsp-response-timeout 60
-	    lsp-prefer-flymake nil
-        ;; lsp-prefer-capf t
-	    lsp-message-project-root-warning t
-	    lsp-keep-workspace-alive t
-	    lsp-file-watch-threshold nil
+  (setq lsp-prefer-flymake nil
+        lsp-prefer-capf t
         lsp-signature-auto-activate nil
-        ;; lsp-enable-text-document-color t
-	    lsp-enable-folding t)
+        lsp-enable-links nil
+        lsp-auto-configure t
+        lsp-before-save-edits nil
+        lsp-imenu-sort-methods '(kind position)
+        lsp-lens-check-interval 0.5
+        lsp-log-io nil)
+
+  (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
 
   (require 'lsp-clients)
 
@@ -2093,10 +2118,10 @@ But there is no backward compatibility.
         ([remap xref-find-references] . lsp-find-references))
   :config
   (add-hook 'lsp-mode-hook #'lsp-ui-mode)
-  (setq lsp-ui-sideline-update-mode 'line
-	    lsp-ui-doc-enable nil
+  (setq lsp-ui-doc-enable nil
         lsp-ui-doc-include-signature t
         lsp-ui-doc-position 'at-point
+        lsp-ui-sideline-update-mode 'line
 	    lsp-ui-sideline-show-hover nil
         lsp-ui-sideline-show-code-actions nil
 	    lsp-ui-sideline-ignore-duplicate t
@@ -2104,7 +2129,7 @@ But there is no backward compatibility.
 	    lsp-ui-flycheck-list-position 'bottom
 	    lsp-ui-flycheck-live-reporting t))
 #+END_SRC
-**** Completion
+**** COMMENT Completion
 #+begin_src emacs-lisp
 (use-package company-lsp
   :config
@@ -2160,7 +2185,7 @@ But there is no backward compatibility.
 
 ;; (use-package treemacs-projectile)
 #+end_src
-*** COMMENT Google c-style
+*** Google c-style
 #+begin_src emacs-lisp
 (use-package google-c-style
   :config
@@ -2191,13 +2216,9 @@ But there is no backward compatibility.
         lsp-java-format-on-type-enabled nil)
 
   (setq lsp-java-format-settings-url "file:///home/rrudakov/Work/EPAM/eclipse-java-code-style.xml"
-        lsp-java-format-settings-profile "GoogleStyle"
-        lsp-java-format-enabled t)
+        lsp-java-format-settings-profile "GoogleStyle")
 
-  (add-to-list 'lsp-java-vmargs "-javaagent:/home/rrudakov/Soft/lombok/lombok.jar")
-  (add-to-list 'lsp-java-vmargs "-noverify")
-  (add-to-list 'lsp-java-vmargs "-XX:+UseG1GC")
-  (add-to-list 'lsp-java-vmargs "-XX:+UseStringDeduplication")
+  (setq lsp-java-vmargs '("-javaagent:/home/rrudakov/Soft/lombok/lombok.jar" "-Xmx1G" "-XX:+UseG1GC" "-XX:+UseStringDeduplication"))
 
   ;; ;; Spring boot support
   ;; (require 'lsp-java-boot)
