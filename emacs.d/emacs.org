@@ -215,27 +215,26 @@ Unordered lists with separator '::'
   "My personal keymap for LSP mode.")
 #+end_src
 
-* Configuration
-** Load my secret tokens
-#+BEGIN_SRC emacs-lisp
-(require 'mysecret nil t)
-#+END_SRC
-** Common
-:PROPERTIES:
-:VISIBILITY: folded
-:END:
-*** Use package default settings
-#+BEGIN_SRC emacs-lisp
-(setq-default use-package-always-ensure t)
-#+END_SRC
-*** Auto saving settings
+* Define some variables
 #+begin_src emacs-lisp
 (defconst rr-savefile-dir (expand-file-name "savefile" user-emacs-directory)
   "Declare variable for save file directory.")
 
 (defconst rr-backup-dir (expand-file-name "backup" user-emacs-directory)
   "Declare variable for all backup files.")
+#+end_src
 
+* Configuration
+** Use package default settings
+#+BEGIN_SRC emacs-lisp
+(setq-default use-package-always-ensure t)
+#+END_SRC
+** Load my secret tokens
+#+BEGIN_SRC emacs-lisp
+(require 'mysecret nil t)
+#+END_SRC
+** Auto saving settings
+#+begin_src emacs-lisp
 ;; create the savefile dir if it doesn't exist
 (unless (file-exists-p rr-savefile-dir)
   (make-directory rr-savefile-dir))
@@ -247,15 +246,31 @@ Unordered lists with separator '::'
 ;; Silently delete execess backup versions
 (setq delete-old-versions t)
 
-;; Only keep the last 1000 backups of a file.
+;; Only keep the last 10 backups of a file.
 (setq kept-old-versions 10)
 
 ;; Even version controlled files get to be backed up.
-(setq vc-make-backup-files t)
+;; (setq vc-make-backup-files t)
 
 ;; Use version numbers for backup files.
-(setq version-control t)
+;; (setq version-control t)
 #+end_src
+** Avoid creating lock files
+#+begin_src emacs-lisp
+(setq create-lockfiles nil)
+#+end_src
+** Set tab width
+#+begin_src emacs-lisp
+(setq-default tab-width 4)
+#+end_src
+** Replace selected text on input
+#+BEGIN_SRC emacs-lisp
+(delete-selection-mode)
+#+END_SRC
+** Common
+:PROPERTIES:
+:VISIBILITY: folded
+:END:
 *** TLS default settings
 #+BEGIN_SRC emacs-lisp
 (setq gnutls-min-prime-bits 4096)
@@ -317,7 +332,7 @@ At the moment I set default font using ~~/.Xresources~ file.
 #+END_SRC
 *** Set specific browser to open links
 #+BEGIN_SRC emacs-lisp
-(setq browse-url-browser-function 'browse-url-chrome)
+(setq browse-url-browser-function 'browse-url-firefox)
 #+END_SRC
 *** Use UTF-8 as default coding system
 #+BEGIN_SRC emacs-lisp
@@ -380,9 +395,9 @@ Picked mostly from doom-emacs configuration.
 #+begin_src emacs-lisp
 (use-package uniquify
   :ensure nil
-  :custom
-  (uniquify-separator "/")
-  (uniquify-buffer-name-style 'forward))
+  :config
+  (setq uniquify-separator "/"
+        uniquify-buffer-name-style 'forward))
 #+end_src
 *** More reliable inter-window border
 The native border "consumes" a pixel of the fringe on righter-most splits,
@@ -407,31 +422,21 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 *** Settings for tramp-mode
 #+BEGIN_SRC emacs-lisp
 (use-package tramp
-  :custom
-  (tramp-terminal-type "tramp")
-  (tramp-default-method "ssh")
-  (explicit-shell-file-name "/bin/bash")
-  (tramp-completion-reread-directory-timeout nil)
-  (vc-ignore-dir-regexp
-      (format "\\(%s\\)\\|\\(%s\\)"
-              vc-ignore-dir-regexp
-              tramp-file-name-regexp))
-  (tramp-verbose 1)
-  (auto-revert-remote-files nil)
   :config
+  (setq tramp-terminal-type "tramp"
+        tramp-default-method "ssh"
+        explicit-shell-file-name "/bin/bash"
+        tramp-completion-reread-directory-timeout nil
+        vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)"
+                                     vc-ignore-dir-regexp
+                                     tramp-file-name-regexp)
+        tramp-verbose 1
+        auto-revert-remote-files nil)
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 #+END_SRC
 *** Set default input method
 #+BEGIN_SRC emacs-lisp
 (setq default-input-method "russian-computer")
-#+END_SRC
-*** Replace selected text on input
-#+BEGIN_SRC emacs-lisp
-(delete-selection-mode)
-#+END_SRC
-*** Disabled commands
-#+BEGIN_SRC emacs-lisp
-(setq disabled-command-function nil)
 #+END_SRC
 *** EPA
 #+BEGIN_SRC emacs-lisp
@@ -450,10 +455,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+BEGIN_SRC emacs-lisp
 (use-package autorevert
   :ensure nil
-  :custom
-  (auto-revert-verbose nil)
-  (global-auto-revert-non-file-buffers t)
   :config
+  (setq auto-revert-verbose nil
+        global-auto-revert-non-file-buffers t)
   (global-auto-revert-mode 1))
 #+END_SRC
 *** Ibuffer
@@ -488,22 +492,21 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 *** Recent files
 #+BEGIN_SRC emacs-lisp
 (use-package recentf
-  :custom
-  (recentf-save-file (expand-file-name "recentf" rr-savefile-dir))
-  (recentf-max-saved-items 500)
-  (recentf-max-menu-items 15)
-  (recentf-auto-cleanup 'never)
   :config
+  (setq recentf-save-file (expand-file-name "recentf" rr-savefile-dir)
+        recentf-max-saved-items 500
+        recentf-max-menu-items 15
+        recentf-auto-cleanup 'never)
   (add-to-list 'recentf-exclude (expand-file-name "~/.emacs.d/"))
   (recentf-mode +1))
 #+END_SRC
 *** Imenu
 #+BEGIN_SRC emacs-lisp
 (use-package imenu
-  :custom
-  (imenu-auto-rescan t)
-  (imenu-max-item-length 160)
-  (imenu-max-items 100))
+  :config
+  (setq imenu-auto-rescan t
+        imenu-max-item-length 160
+        imenu-max-items 100))
 #+END_SRC
 *** More convenient scrolling settings
 #+begin_src emacs-lisp
@@ -526,9 +529,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 *** Ediff settings
 #+BEGIN_SRC emacs-lisp
 (use-package ediff
-  :custom
-  (ediff-window-setup-function #'ediff-setup-windows-plain)
-  (ediff-split-window-function #'split-window-right))
+  :config
+  (setq ediff-window-setup-function #'ediff-setup-windows-plain
+        ediff-split-window-function #'split-window-right))
 #+END_SRC
 *** Smerge
 #+begin_src emacs-lisp
@@ -567,15 +570,14 @@ No more ugly line splitting
 #+BEGIN_SRC emacs-lisp
 (use-package savehist
   :ensure nil
-  :custom
-  (history-delete-duplicates t)
-  (savehist-save-minibuffer-history 1)
-  (savehist-file (expand-file-name "savehist" rr-savefile-dir))
-  (savehist-additional-variables '(kill-ring
-                                   search-ring
-                                   regexp-search-ring
-                                   shell-command-history))
   :config
+  (setq history-delete-duplicates t
+        savehist-save-minibuffer-history 1
+        savehist-file (expand-file-name "savehist" rr-savefile-dir)
+        savehist-additional-variables '(kill-ring
+                                        search-ring
+                                        regexp-search-ring
+                                        shell-command-history))
   (savehist-mode +1))
 #+END_SRC
 *** Kill-ring
@@ -603,10 +605,6 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 #+begin_src emacs-lisp
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 #+end_src
-*** Set tab width
-#+begin_src emacs-lisp
-(setq-default tab-width 4)
-#+end_src
 *** Show column number
 #+begin_src emacs-lisp
 (column-number-mode)
@@ -628,8 +626,8 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 #+begin_src emacs-lisp
 (use-package files
   :ensure nil
-  :custom
-  (enable-local-variables t))
+  :config
+  (setq enable-local-variables t))
 #+end_src
 ** Set the same PATH as in shell
 #+begin_src emacs-lisp
@@ -665,13 +663,14 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
         (custom-theme-set-faces
          'user
          `(helm-delete-async-message ((t (:foreground ,yellow))))
-         `(flycheck-posframe-info-face ((t (:inherit 'info))))
+         `(flycheck-posframe-info-face ((t (:inherit 'success))))
          `(flycheck-posframe-warning-face ((t (:inherit 'warning))))
-         `(flycheck-posframe-error-face ((t (:inherit 'success))))
+         `(flycheck-posframe-error-face ((t (:inherit 'error))))
          `(git-gutter-fr:added ((t (:background ,bg))))
          `(git-gutter-fr:deleted ((t (:background ,bg))))
          `(git-gutter-fr:modified ((t (:background ,bg))))
          `(fringe ((t (:background ,bg))))
+         `(window-divider ((t (:foreground "dim gray"))))
          `(markdown-code-face ((t (:background ,block-bg :extend t))))
          `(lsp-ui-sideline-code-action ((t (:foreground "dim gray"))))
          `(font-latex-slide-title-face ((t (:height 1.0 :inherit font-lock-type-face))))
@@ -722,9 +721,8 @@ nil."
 ***** Minions
 #+begin_src emacs-lisp
 (use-package minions
-  :custom
-  (minions-direct '(pyvenv-mode projectile-mode))
   :config
+  (setq minions-direct '(pyvenv-mode projectile-mode))
   (minions-mode 1))
 #+end_src
 ** Shell settings
@@ -743,18 +741,17 @@ nil."
 ** Spell checking
 #+begin_src emacs-lisp
 (use-package ispell
-  :custom
-  (ispell-program-name "aspell")
   :config
+  (setq ispell-program-name "aspell")
   (add-hook 'text-mode-hook #'flyspell-mode)
-  ;; (add-hook 'prog-mode-hook #'flyspell-prog-mode)
-  )
+  (add-hook 'prog-mode-hook #'flyspell-prog-mode))
 #+end_src
 ** Remember location in files
 #+begin_src emacs-lisp
 (use-package saveplace
-  :custom (save-place-file (expand-file-name "saveplace" rr-savefile-dir))
-  :config (save-place-mode 1))
+  :config
+  (setq save-place-file (expand-file-name "saveplace" rr-savefile-dir))
+  (save-place-mode 1))
 #+end_src
 ** SQL
 *** Emacs clojure database client
@@ -796,12 +793,6 @@ nil."
   :config
   (which-key-mode))
 #+END_SRC
-** Avy navigation
-#+begin_src emacs-lisp
-(use-package avy
-  :bind (("M-g w" . avy-goto-word-or-subword-1))
-  :custom (avy-background t))
-#+end_src
 ** Replace built-in help
 #+BEGIN_SRC emacs-lisp
 (use-package helpful
@@ -813,11 +804,10 @@ nil."
 ** YASnippet
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
-  :custom
-  (yas-indent-line 'fixed)
+  :init
+  (yas-global-mode)
   :config
-  (yas-reload-all)
-  (add-hook 'prog-mode-hook #'yas-minor-mode))
+  (setq yas-indent-line 'fixed))
 #+END_SRC
 ** Auto complete
 *** Common
@@ -826,29 +816,11 @@ nil."
   :config
   (setq company-global-modes '(not org-mode markdown-mode shell-mode eshell-mode))
   (setq company-frontends '(company-pseudo-tooltip-frontend
-                            company-echo-metadata-frontend))
+			                company-echo-metadata-frontend))
+  (setq company-tooltip-align-annotations t
+        company-idle-delay 0.1)
 
-  (global-company-mode)
-
-  (setq-default company-minimum-prefix-length 2
-                company-tooltip-align-annotations t))
-#+END_SRC
-*** COMMENT Show completion in posframe
-So far it has performance issues.
-#+begin_src emacs-lisp
-(use-package company-posframe
-  :custom
-  (company-posframe-show-indicator nil)
-  (company-posframe-show-metadata t)
-  :config
-  (company-posframe-mode 1))
-#+end_src
-*** COMMENT Statistic
-Show more offten used completeons first
-#+BEGIN_SRC emacs-lisp
-(use-package company-statistics
-  :config
-  (company-statistics-mode))
+  (global-company-mode +1))
 #+END_SRC
 *** Quick help
 #+BEGIN_SRC emacs-lisp
@@ -888,9 +860,8 @@ Show more offten used completeons first
 ** Paradox
 #+BEGIN_SRC emacs-lisp
 (use-package paradox
-  :custom
-  (paradox-github-token t)
   :config
+  (setq paradox-github-token t)
   (setq-default paradox-column-width-package 27
                 paradox-column-width-version 13
                 paradox-execute-asynchronously t
@@ -898,23 +869,19 @@ Show more offten used completeons first
                 paradox-hide-wiki-packages t)
   (paradox-enable))
 #+END_SRC
-** Flx
-#+begin_src emacs-lisp
-(use-package flx)
-#+end_src
-** Completion styles setup
+** COMMENT Completion styles setup
 #+begin_src emacs-lisp
 (use-package minibuffer
   :ensure nil
-  :custom
-  (completion-styles '(basic partial-completion emacs22 flex)))
+  :config
+  (setq completion-styles '(basic partial-completion emacs22 flex)))
 #+end_src
 ** Xref
 #+begin_src emacs-lisp
 (use-package xref
   :ensure nil
-  :custom
-  (xref-prompt-for-identifier nil))
+  :config
+  (setq xref-prompt-for-identifier nil))
 #+end_src
 ** Helm
 *** Configuration
@@ -1058,11 +1025,11 @@ Show more offten used completeons first
 #+BEGIN_SRC emacs-lisp
 (use-package smartparens-config
   :ensure smartparens
-  :custom
-  (sp-show-pair-from-inside nil)
-  (sp-highlight-pair-overlay nil)
-  (sp-wrap-respect-direction t)
   :config
+  (setq sp-show-pair-from-inside nil
+        sp-highlight-pair-overlay nil
+        sp-wrap-respect-direction t)
+
   (sp-with-modes 'web-mode
     (sp-local-pair "%" "%" :wrap "C-%")
     (sp-local-pair "<" ">" :wrap "C->"))
@@ -1091,20 +1058,19 @@ Show more offten used completeons first
 ** Workspaces
 #+BEGIN_SRC emacs-lisp
 (use-package eyebrowse
-  :custom
-  (eyebrowse-wrap-around t)
-  (eyebrowse-new-workspace t)
-  (eyebrowse-switch-back-and-forth t)
-  (eyebrowse-mode-line-style 'always)
   :config
+  (setq eyebrowse-wrap-around t
+        eyebrowse-new-workspace t
+        eyebrowse-switch-back-and-forth t
+        eyebrowse-mode-line-style 'always)
   (eyebrowse-mode t))
 #+END_SRC
 ** Emacs build-in tab-bar mode
 #+begin_src emacs-lisp
 (use-package tab-bar
-  :custom
-  (tab-bar-show nil)
-  (tab-bar-new-tab-choice "*scratch*"))
+  :config
+  (setq tab-bar-show nil
+        tab-bar-new-tab-choice "*scratch*"))
 #+end_src
 ** Popup windows settings
 *** Shackle
@@ -1116,7 +1082,7 @@ Show more offten used completeons first
           ("\\`\\*cljr.*?\\*\\'" :regexp t :align t :size 0.4)
           (compilation-mode :select t :align t :size 0.4)
           (dap-server-log-mode :select t :align t :size 0.4)
-          ;; ("\\`\\*Org\sSrc.*?\\*.*\\'" :regexp t :align right :size 100)
+          ;; ("\\`\\*Org\sSrc.*?\\*.*\\'" :regexp t :align right :size 0.5)
           ("\\`\\*Org-Babel\sError\sOutput\\*.*\\'" :regexp t :align t :size 0.4)
           ("*compilation*" :select t :align t :size 0.4)
           ("*Async Shell Command*" :select t :align t :size 0.4)
@@ -1165,18 +1131,16 @@ Show more offten used completeons first
           (define-key map (kbd "M-7") #'winum-select-window-7)
           (define-key map (kbd "M-8") #'winum-select-window-8)
           map))
-  :custom
-  (winum-auto-setup-mode-line t)
-  (winum-ignored-buffers '(" *which-key*"))
   :config
+  (setq winum-auto-setup-mode-line t
+        winum-ignored-buffers '(" *which-key*"))
   (winum-mode))
 #+END_SRC
 ** Smartscan
 #+begin_src emacs-lisp
 (use-package smartscan
-  :custom
-  (smartscan-symbol-selector "symbol")
   :config
+  (setq smartscan-symbol-selector "symbol")
   (add-hook 'prog-mode-hook #'smartscan-mode))
 #+end_src
 ** PKGBUILD major mode
@@ -1190,10 +1154,9 @@ Show more offten used completeons first
 (use-package dired+
   :config
   (setq dired-listing-switches "--group-directories-first -alh"
-        dired-dwim-target t            ; if another Dired buffer is visible in another window, use that directory as target for Rename/Copy
-        dired-recursive-copies 'always         ; "always" means no asking
-        dired-recursive-deletes 'top           ; "top" means ask once for top level directory
-        )
+        dired-dwim-target t
+        dired-recursive-copies 'always
+        dired-recursive-deletes 'top)
   (toggle-diredp-find-file-reuse-dir 1))
 #+END_SRC
 *** Show git information in dired
@@ -1209,21 +1172,20 @@ Show more offten used completeons first
 (use-package projectile
   :init
   (setq projectile-keymap-prefix (kbd "C-c p"))
-  :custom
-  (projectile-completion-system 'helm)
-  ;; (projectile-completion-system 'ivy)
-  (projectile-sort-order 'recently-active)
-  (projectile-mode-line-function (lambda () (format " Proj[%s]" (projectile-project-name))))
   :config
+  (setq projectile-completion-system 'helm
+        ;; projectile-completion-system 'ivy
+        projectile-sort-order 'recently-active
+        projectile-mode-line-function (lambda ()
+                                        (format " Proj[%s]" (projectile-project-name))))
   (add-to-list 'projectile-globally-ignored-files "*.log")
   (projectile-mode +1))
 #+END_SRC
 *** Helm projectile
 #+BEGIN_SRC emacs-lisp
 (use-package helm-projectile
-  :custom
-  (projectile-switch-project-action #'helm-projectile)
   :config
+  (setq projectile-switch-project-action #'helm-projectile)
   (helm-projectile-on))
 #+END_SRC
 *** COMMENT Counsel projectile
@@ -1235,16 +1197,16 @@ Show more offten used completeons first
 ** Htmlize
 #+BEGIN_SRC emacs-lisp
 (use-package htmlize
-  :custom
-  (org-html-htmlize-output-type 'inline-css))
+  :config
+  (setq org-html-htmlize-output-type 'inline-css))
 #+END_SRC
 ** Syntax check
 *** Flycheck
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
-  :custom
-  (flycheck-idle-change-delay 2)
   :config
+  (setq flycheck-idle-change-delay 2)
+
   (add-hook 'after-init-hook #'global-flycheck-mode)
 
   (when (fboundp 'define-fringe-bitmap)
@@ -1278,24 +1240,20 @@ Show more offten used completeons first
       :severity 0
       :overlay-category 'flycheck-info-overlay
       :fringe-bitmap bitmap
-      :fringe-face 'flycheck-fringe-info))
-
-  (setq-default flycheck-disabled-checkers
-                (append flycheck-disabled-checkers
-                        '(javascript-jshint)))
-
-  (setq-default flycheck-disabled-checkers
-                (append flycheck-disabled-checkers
-                        '(json-jsonlist))))
+      :fringe-face 'flycheck-fringe-info)))
 #+END_SRC
 *** Show errors in posframe
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck-posframe
   :after flycheck
   :config
-  (add-hook 'flycheck-mode-hook (lambda ()
-                                  (unless (bound-and-true-p lsp-mode)
-                                    (flycheck-posframe-mode)))))
+  ;; (flycheck-posframe-configure-pretty-defaults)
+  (with-eval-after-load 'flycheck
+    (require 'flycheck-posframe)
+    (add-hook 'flycheck-mode-hook
+              (lambda ()
+                (unless (bound-and-true-p lsp-mode)
+                  (flycheck-posframe-mode))))))
 #+END_SRC
 ** Highlight TODO item
 #+begin_src emacs-lisp
@@ -1308,25 +1266,24 @@ Show more offten used completeons first
 #+BEGIN_SRC emacs-lisp
 (use-package magit
   :bind (("C-x g" . magit-status))
-  :custom
-  (magit-revision-insert-related-refs 'all)
-  (magit-revision-use-hash-sections 'quick)
-  (magit-diff-highlight-hunk-region-functions '(magit-diff-highlight-hunk-region-dim-outside
-                                                magit-diff-highlight-hunk-region-using-underlines))
-  (magit-pull-or-fetch t)
   :config
+  (setq magit-revision-insert-related-refs 'all
+        magit-revision-use-hash-sections 'quick
+        magit-pull-or-fetch t)
+
   (global-magit-file-mode)
 
-  (add-hook 'focus-in-hook #'git-gutter:update-all-windows)
+  ;; (add-hook 'focus-in-hook #'git-gutter:update-all-windows)
   (add-hook 'magit-post-refresh-hook #'git-gutter:update-all-windows)
-  (add-hook 'focus-in-hook #'rr/refresh-vc-state)
-  (add-hook 'magit-post-refresh-hook #'rr/refresh-vc-state))
+  ;; (add-hook 'focus-in-hook #'rr/refresh-vc-state)
+  ;; (add-hook 'magit-post-refresh-hook #'rr/refresh-vc-state)
+  )
 #+END_SRC
 *** Transient
 #+begin_src emacs-lisp
 (use-package transient
-  :custom
-  (transient-show-popup t))
+  :config
+  (setq transient-show-popup t))
 #+end_src
 *** Work with forges
 #+BEGIN_SRC emacs-lisp
@@ -1342,9 +1299,9 @@ Show more offten used completeons first
 *** GIT gutter
 #+BEGIN_SRC emacs-lisp
 (use-package git-gutter-fringe
-  :custom
-  (git-gutter-fr:side 'right-fringe)
   :config
+  (setq git-gutter-fr:side 'right-fringe)
+
   (defun rr/git-gutter-local ()
     "Enable `git-gutter-mode' in non-remote buffers."
     (when (and (buffer-file-name)
@@ -1398,8 +1355,8 @@ Show more offten used completeons first
 ** Search and grep utilities
 #+BEGIN_SRC emacs-lisp
 (use-package wgrep
-  :custom
-  (wgrep-auto-save-buffer t))
+  :config
+  (setq wgrep-auto-save-buffer t))
 
 (use-package wgrep-ag)
 
@@ -1506,7 +1463,7 @@ And even org-babel integration:
 #+BEGIN_SRC emacs-lisp
 (use-package gitignore-templates)
 #+END_SRC
-** Volatile highlight
+** COMMENT Volatile highlight
 #+BEGIN_SRC emacs-lisp
 (use-package volatile-highlights
   :config
@@ -1597,7 +1554,7 @@ Visual Regexp package:
       org-ctrl-k-protect-subtree t
       org-imenu-depth 4
       org-export-with-sub-superscripts nil
-      org-src-window-setup 'reorganize-frame
+      org-src-window-setup 'other-frame
       org-catch-invisible-edits 'show-and-error
       org-return-follows-link t
       ;; org-M-RET-may-split-line nil
@@ -1754,7 +1711,8 @@ But there is no backward compatibility.
 
 (setq org-clock-in-switch-to-state "PROGRESS")
 
-(setq non-clocking-states '("WAITING" "REVIEW" "DONE" "TODO" "CANCELLED"))
+(defvar non-clocking-states '("WAITING" "REVIEW" "DONE" "TODO" "CANCELLED")
+  "New state for current clocking task.")
 
 (defun rr/read-non-clocking-state ()
   "Prompt to select non-clocking state."
@@ -1773,14 +1731,6 @@ But there is no backward compatibility.
 (setq org-clock-out-switch-to-state #'rr/after-clock-stop)
 #+END_SRC
 *** Appearance
-**** COMMENT Org bullets
-#+BEGIN_SRC emacs-lisp
-(use-package org-bullets
-  :init
-  (setq org-bullets-bullet-list '("•"))
-  :config
-  (add-hook 'org-mode-hook #'org-bullets-mode))
-#+END_SRC
 **** Org source code
 #+BEGIN_SRC emacs-lisp
 (setq org-src-fontify-natively t)
@@ -1952,6 +1902,13 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
 (use-package org-gcal)
 #+END_SRC
+*** Google translate interface
+#+begin_src emacs-lisp
+(use-package google-translate-default-ui
+  :ensure google-translate
+  :config
+  (setq google-translate-default-target-language "ru"))
+#+end_src
 *** Edit program comments and strings using Org-mode
 #+begin_src emacs-lisp
 (use-package poporg)
@@ -1965,10 +1922,10 @@ But there is no backward compatibility.
 (use-package smtpmail
   :ensure nil
   :after message
-  :custom
-  (message-send-mail-function #'smtpmail-send-it)
-  (smtpmail-smtp-server "localhost")
-  (smtpmail-smtp-service 1025))
+  :config
+  (setq message-send-mail-function #'smtpmail-send-it
+        smtpmail-smtp-server "localhost"
+        smtpmail-smtp-service 1025))
 
 (use-package mu4e
   :ensure nil
@@ -1976,32 +1933,32 @@ But there is no backward compatibility.
   :bind
   (:map mu4e-main-mode-map
         ([remap mu4e-quit] . kill-current-buffer))
-  :custom
-  (mu4e-maildir (expand-file-name "~/.mail/ProtonMail"))
-  (mu4e-reply-to-address user-mail-address)
-  (mu4e-sent-folder "/Sent")
-  (mu4e-trash-folder "/Trash")
-  (mu4e-sent-messages-behavior 'delete)
-  (mu4e-view-use-gnus nil)
-  (mu4e-hide-index-messages t)
-  (mu4e-headers-auto-update t)
-  (mu4e-compose-signature-auto-include nil)
-  (mu4e-completing-read-function 'completing-read)
-  (mu4e-maildir-shortcuts '(("/INBOX" . ?i)
-                            ("/Sent" . ?s)
-                            ("/Trash" . ?t)
-                            ("/All Mail" . ?a)))
-  (mu4e-use-fancy-chars nil)
-  (mu4e-view-show-images t)
-  (mu4e-view-prefer-html nil)
-  ;; (mu4e-html2text-command "w3m -dump -T text/html -O utf8 -graph")
-  (mu4e-headers-fields '((:human-date . 25)
-                         (:flags . 6)
-                         (:from . 22)
-                         (:subject . nil)))
-  (message-kill-buffer-on-exit t)
-  (mail-user-agent 'mu4e-user-agent)
   :config
+  (setq mu4e-maildir (expand-file-name "~/.mail/ProtonMail")
+        mu4e-reply-to-address user-mail-address
+        mu4e-sent-folder "/Sent"
+        mu4e-trash-folder "/Trash"
+        mu4e-sent-messages-behavior 'delete
+        mu4e-view-use-gnus nil
+        mu4e-hide-index-messages t
+        mu4e-headers-auto-update t
+        mu4e-compose-signature-auto-include nil
+        mu4e-completing-read-function 'completing-read
+        mu4e-maildir-shortcuts '(("/INBOX" . ?i)
+                                 ("/Sent" . ?s)
+                                 ("/Trash" . ?t)
+                                 ("/All Mail" . ?a))
+        mu4e-use-fancy-chars nil
+        mu4e-view-show-images t
+        mu4e-view-prefer-html nil
+        ;; mu4e-html2text-command "w3m -dump -T text/html -O utf8 -graph"
+        mu4e-headers-fields '((:human-date . 25)
+                              (:flags . 6)
+                              (:from . 22)
+                              (:subject . nil))
+        message-kill-buffer-on-exit t
+        mail-user-agent 'mu4e-user-agent)
+
   (when (fboundp 'imagemagick-register-types)
     (imagemagick-register-types))
 
@@ -2028,12 +1985,11 @@ But there is no backward compatibility.
 *** Alerts
 #+BEGIN_SRC emacs-lisp
 (use-package mu4e-alert
-  :custom
-  (mu4e-alert-modeline-formatter (lambda (count)
-                                   (if (> count 0)
-                                       (format "[Unread emails: %d]" count)
-                                     "")))
   :config
+  (setq mu4e-alert-modeline-formatter (lambda (count)
+                                        (if (> count 0)
+                                            (format "[Unread emails: %d]" count)
+                                          "")))
   (mu4e-alert-set-default-style 'libnotify)
   (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
   (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
@@ -2041,9 +1997,8 @@ But there is no backward compatibility.
 ** Auto set indentation settings
 #+begin_src emacs-lisp
 (use-package dtrt-indent
-  :custom
-  (dtrt-indent-verbosity 0)
   :config
+  (setq dtrt-indent-verbosity 0)
   (add-hook 'prog-mode-hook #'dtrt-indent-mode))
 #+end_src
 ** XML
@@ -2071,6 +2026,11 @@ But there is no backward compatibility.
   :config
   (define-key origami-mode-map [C-tab] #'origami-recursively-toggle-node))
 #+end_src
+** Clang format
+Common tool for code formatting.
+#+begin_src emacs-lisp
+(use-package clang-format)
+#+end_src
 ** Languages
 *** LSP mode
 **** Common setup
@@ -2084,17 +2044,17 @@ But there is no backward compatibility.
               ("i" . lsp-find-implementation)
               ("r" . lsp-rename))
   :config
-  (setq lsp-prefer-flymake nil
-        lsp-prefer-capf t
+  (setq lsp-prefer-capf t
         lsp-signature-auto-activate nil
         lsp-enable-links nil
-        lsp-auto-configure t
-        lsp-before-save-edits nil
         lsp-imenu-sort-methods '(kind position)
         lsp-lens-check-interval 0.5
-        lsp-log-io nil)
+        lsp-idle-delay 0.5)
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
+
+  (with-eval-after-load 'flycheck-posframe
+    (add-hook 'lsp-after-open-hook (lambda () (flycheck-posframe-mode -1))))
 
   (require 'lsp-clients)
 
@@ -2108,33 +2068,21 @@ But there is no backward compatibility.
 	    lsp-pyls-plugins-jedi-completion-enabled t
 	    lsp-pyls-plugins-jedi-completion-include-params nil
 	    lsp-pyls-plugins-jedi-signature-help-enabled t)
-  (add-hook 'python-mode-hook #'lsp)
-
-  (add-hook 'lsp-after-open-hook #'lsp-enable-imenu))
+  (add-hook 'python-mode-hook #'lsp))
 
 (use-package lsp-ui
-  :bind
-  (:map lsp-ui-mode-map
-        ([remap xref-find-references] . lsp-find-references))
   :config
-  (add-hook 'lsp-mode-hook #'lsp-ui-mode)
   (setq lsp-ui-doc-enable nil
         lsp-ui-doc-include-signature t
         lsp-ui-doc-position 'at-point
         lsp-ui-sideline-update-mode 'line
-	    lsp-ui-sideline-show-hover nil
+        lsp-ui-sideline-show-hover nil
         lsp-ui-sideline-show-code-actions nil
-	    lsp-ui-sideline-ignore-duplicate t
-	    lsp-ui-flycheck-enable t
-	    lsp-ui-flycheck-list-position 'bottom
-	    lsp-ui-flycheck-live-reporting t))
+        lsp-ui-sideline-ignore-duplicate t)
+  :bind
+  (:map lsp-ui-mode-map
+        ([remap xref-find-references] . lsp-find-references)))
 #+END_SRC
-**** COMMENT Completion
-#+begin_src emacs-lisp
-(use-package company-lsp
-  :config
-  (push 'company-lsp company-backends))
-#+end_src
 *** DAP mode
 **** Common setup
 #+begin_src emacs-lisp
@@ -2164,12 +2112,6 @@ But there is no backward compatibility.
                                      :projectName nil
                                      :port nil)))
 #+end_src
-*** COMMENT Code documentation
-#+begin_src emacs-lisp
-(use-package eldoc-box
-  :config
-  (eldoc-box-hover-mode))
-#+end_src
 *** Treemacs integration
 #+begin_src emacs-lisp
 (use-package treemacs
@@ -2177,9 +2119,9 @@ But there is no backward compatibility.
   :bind
   (:map lsp-mode-map
         ("C-c *" . treemacs))
-  :custom
-  (treemacs-no-png-images t)
-  (treemacs-width 50))
+  :config
+  (setq treemacs-no-png-images t
+        treemacs-width 50))
 
 (use-package lsp-treemacs)
 
@@ -2218,15 +2160,10 @@ But there is no backward compatibility.
   (setq lsp-java-format-settings-url "file:///home/rrudakov/Work/EPAM/eclipse-java-code-style.xml"
         lsp-java-format-settings-profile "GoogleStyle")
 
-  (setq lsp-java-vmargs '("-javaagent:/home/rrudakov/Soft/lombok/lombok.jar" "-Xmx1G" "-XX:+UseG1GC" "-XX:+UseStringDeduplication"))
-
-  ;; ;; Spring boot support
-  ;; (require 'lsp-java-boot)
-
-  ;; ;; to enable the lenses
-  ;; (add-hook 'lsp-mode-hook #'lsp-lens-mode)
-  ;; (add-hook 'java-mode-hook #'lsp-java-boot-lens-mode)
-  )
+  (setq lsp-java-vmargs '("-javaagent:/home/rrudakov/Soft/lombok/lombok.jar"
+                          "-Xmx1G"
+                          "-XX:+UseG1GC"
+                          "-XX:+UseStringDeduplication")))
 #+END_SRC
 **** Expand snippet for new class
 #+BEGIN_SRC emacs-lisp
@@ -2264,18 +2201,10 @@ But there is no backward compatibility.
 
   (add-hook 'haskell-mode-hook #'haskell-auto-insert-module-template))
 #+end_src
-**** COMMENT lsp-haskell
+**** lsp-haskell
 Latest update in haskell-mode introduce some incompatibility. Investigation required.
 #+begin_src emacs-lisp
-(use-package lsp-haskell
-  :after lsp-mode
-  :load-path "/home/rrudakov/Projects/lsp-haskell"
-  :config
-  ;; (setq lsp-haskell-process-path-hie "ghcide")
-  ;; (setq lsp-haskell-process-args-hie '())
-  (lsp-haskell-set-hlint-on)
-  (lsp-haskell-set-completion-snippets-on)
-  (add-hook 'haskell-mode-hook #'lsp))
+(use-package lsp-haskell)
 #+end_src
 **** Align rules
 #+BEGIN_SRC emacs-lisp
@@ -2334,18 +2263,17 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+BEGIN_SRC emacs-lisp
 (use-package tex
   :ensure nil
-  :custom
-  (TeX-auto-save t)
-  (TeX-parse-self t)
-  (TeX-view-program-selection '((output-pdf "PDF Tools")) "Use pdf-tools to open PDF files")
-  (TeX-source-correlate-start-server t)
   :config
+  (setq TeX-auto-save t
+        TeX-parse-self t
+        TeX-view-program-selection '((output-pdf "PDF Tools"))
+        TeX-source-correlate-start-server t)
   (setq-default TeX-master nil))
 
 (use-package font-latex
   :ensure nil
-  :custom
-  (font-latex-fontify-sectioning 'color))
+  :config
+  (setq font-latex-fontify-sectioning 'color))
 
 (use-package latex
   :ensure nil
@@ -2364,7 +2292,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+BEGIN_SRC emacs-lisp
 (use-package pyvenv
   :config
-  (pyvenv-tracking-mode)
+  (add-hook 'python-mode-hook 'pyvenv-tracking-mode)
   (add-hook 'pyvenv-post-activate-hooks #'lsp))
 #+END_SRC
 **** Default interpreter
@@ -2375,32 +2303,26 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 ***** Automatically sort imports
 #+BEGIN_SRC emacs-lisp
 (use-package isortify
-  :custom
-  (isortify-line-width 79)
-  (isortify-multi-line-output 3)
-  (isortify-trailing-comma t)
   :config
+  (setq isortify-line-width 79
+        isortify-multi-line-output 3
+        isortify-trailing-comma t)
   (add-hook 'python-mode-hook #'isortify-mode))
 #+END_SRC
 **** Format code
 #+BEGIN_SRC emacs-lisp
 (use-package blacken
-  :custom
-  (blacken-line-length 79)
-  (blacken-allow-py36 t)
   :config
-  ;; (add-hook 'python-mode-hook 'blacken-mode)
-  )
-(use-package py-yapf
-  :config
-  ;; (add-hook 'python-mode-hook 'py-yapf-enable-on-save)
-  )
+  (setq blacken-line-length 79
+        blacken-allow-py36 t))
+
+(use-package py-yapf)
 #+END_SRC
 **** Tox
 #+BEGIN_SRC emacs-lisp
 (use-package tox
-  :custom
-  (tox-runner 'py.test))
+  :config
+  (setq tox-runner 'py.test))
 #+END_SRC
 **** Sphinx doc
 #+begin_src emacs-lisp
@@ -2412,17 +2334,17 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+BEGIN_SRC emacs-lisp
 (use-package pip-requirements)
 #+END_SRC
-**** Custom bindings
-#+BEGIN_SRC emacs-lisp
-(define-key python-mode-map (kbd "C-c j") #'sp-split-sexp)
-#+END_SRC
+*** Emacs lisp
+**** Project management
+#+begin_src emacs-lisp
+(use-package cask)
+#+end_src
 *** JSON
 #+BEGIN_SRC emacs-lisp
 (use-package json-mode
-  :custom
-  (json-reformat:indent-width 4)
-  (json-reformat:pretty-string? t)
   :config
+  (setq json-reformat:indent-width 4
+        json-reformat:pretty-string? t)
   (add-hook 'json-mode-hook #'flycheck-mode))
 #+END_SRC
 *** YAML
@@ -2433,14 +2355,14 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 *** WEB
 #+BEGIN_SRC emacs-lisp
 (use-package web-mode
-  :custom
-  (web-mode-markup-indent-offset 2)
-  (web-mode-css-indent-offset 2)
-  (web-mode-code-indent-offset 2)
-  (web-mode-enable-auto-closing t)
-  (web-mode-enable-auto-pairing nil)
-  (web-mode-enable-css-colorization t)
   :config
+  (setq web-mode-markup-indent-offset 2
+        web-mode-css-indent-offset 2
+        web-mode-code-indent-offset 2
+        web-mode-enable-auto-closing t
+        web-mode-enable-auto-pairing nil
+        web-mode-enable-css-colorization t)
+
   (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
@@ -2533,6 +2455,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+begin_src emacs-lisp
 (use-package cider
   :config
+  (setq cider-prompt-for-symbol nil)
   (add-hook 'clojure-mode-hook #'cider-mode))
 #+end_src
 **** Clojure refactoring
@@ -2540,9 +2463,10 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 (use-package clj-refactor
   :config
   (defun my-clojure-mode-hook ()
-    (clj-refactor-mode 1)
-    (yas-minor-mode 1))
+    (clj-refactor-mode 1))
 
+  (setq cljr-hotload-dependencies t
+        cljr-warn-on-eval nil)
   (add-hook 'clojure-mode-hook #'my-clojure-mode-hook))
 #+end_src
 **** Clojure refactoring helm integration
@@ -2567,10 +2491,9 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 **** Major mode
 #+begin_src emacs-lisp
 (use-package plantuml-mode
-  :custom
-  (org-plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar")
-  (plantuml-default-exec-mode 'executable)
   :config
+  (setq org-plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar"
+        plantuml-default-exec-mode 'executable)
   (add-to-list 'org-src-lang-modes '("plantuml" . plantuml)))
 #+end_src
 ** Debugger

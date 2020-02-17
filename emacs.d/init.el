@@ -42,12 +42,12 @@ There are two things you can do about this warning:
 (add-to-list 'load-path "~/.emacs.d/custom/")
 
 (unless (package-installed-p 'use-package)
-  (warn "use-package is not installed, trying to install")
   (package-install 'use-package))
 
 (eval-when-compile
   (require 'use-package))
-(require 'bind-key)
+
+;; (require 'bind-key)
 
 (use-package org
   :ensure org-plus-contrib)
@@ -55,7 +55,7 @@ There are two things you can do about this warning:
 (setq vc-follow-symlinks t)
 (org-babel-load-file (expand-file-name "emacs.org" user-emacs-directory))
 
-;; (when (file-exists-p custom-file)
-;;   (load custom-file :noerror))
+(when (file-exists-p custom-file)
+  (load custom-file))
 (provide 'init)
 ;;; init.el ends here

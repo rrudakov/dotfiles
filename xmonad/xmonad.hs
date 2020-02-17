@@ -312,8 +312,8 @@ scratchpads =
 myManageHook :: Query (Endo WindowSet)
 myManageHook =
   composeAll
-    [ className =? "firefox" --> doShift "5"
-    , className =? "Google-chrome" --> doShift "2"
+    [ className =? "firefox" --> doShift "2"
+    , className =? "Google-chrome" --> doShift "5"
     , className =? "MPlayer" --> doFloat
     , resource =? "desktop_window" --> doIgnore
     , resource =? "kdesktop" --> doIgnore
