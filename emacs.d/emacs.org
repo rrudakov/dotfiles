@@ -807,7 +807,8 @@ nil."
   :init
   (yas-global-mode)
   :config
-  (setq yas-indent-line 'fixed))
+  (setq yas-indent-line 'fixed
+        yas-inhibit-overlay-modification-protection t))
 #+END_SRC
 ** Auto complete
 *** Common
@@ -2047,6 +2048,7 @@ Common tool for code formatting.
   (setq lsp-prefer-capf t
         lsp-signature-auto-activate nil
         lsp-enable-links nil
+        lsp-file-watch-threshold 2000
         lsp-imenu-sort-methods '(kind position)
         lsp-lens-check-interval 0.5
         lsp-idle-delay 0.5)
