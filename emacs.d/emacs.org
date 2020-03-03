@@ -629,6 +629,7 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 #+end_src
 ** Theme
 *** Color scheme
+**** Zenburn theme
 #+BEGIN_SRC emacs-lisp
 (use-package zenburn-theme
   :config
@@ -883,7 +884,9 @@ nil."
 	    helm-display-header-line nil
 	    helm-buffer-max-length 40
 	    helm-ff-delete-files-function #'helm-delete-marked-files-async
-	    helm-inherit-input-method nil)
+	    helm-inherit-input-method nil
+        helm-truncate-lines t
+        helm-buffers-truncate-lines t)
 
   ;; Remove all distracting information from helm modeline
   (setq helm-mode-line-string "\\<helm-map>"
@@ -1227,10 +1230,11 @@ Better sorting for counsel/ivy
 #+BEGIN_SRC emacs-lisp
 (use-package dired+
   :config
-  (setq dired-listing-switches "--group-directories-first -alh"
+  (setq dired-listing-switches "-AFhlv --group-directories-first"
         dired-dwim-target t
         dired-recursive-copies 'always
-        dired-recursive-deletes 'top)
+        dired-recursive-deletes 'always
+        dired-isearch-filenames 'dwim)
   (toggle-diredp-find-file-reuse-dir 1))
 #+END_SRC
 *** Show git information in dired
@@ -1260,6 +1264,7 @@ Better sorting for counsel/ivy
 (use-package helm-projectile
   :config
   (setq projectile-switch-project-action #'helm-projectile)
+  (setq helm-projectile-truncate-lines t)
   (helm-projectile-on))
 #+END_SRC
 *** COMMENT Counsel projectile
