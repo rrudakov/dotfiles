@@ -241,6 +241,9 @@ Unordered lists with separator '::'
 ;; Only keep the last 10 backups of a file.
 (setq kept-old-versions 10)
 
+;; Do not print messages in the minibuffer
+(setq auto-save-no-message t)
+
 ;; Even version controlled files get to be backed up.
 ;; (setq vc-make-backup-files t)
 
@@ -635,41 +638,83 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
   :config
   (setq zenburn-use-variable-pitch nil)
 
-  (defun rr/apply-theme (frame)
+  (defun rr/apply-theme ()
     "Apply some customizaitons to current theme."
     (let ((bg "#3F3F3F")
           (block-bg "#494949")
           (yellow "#F0DFAF")
           (default-font (face-attribute 'default :family)))
+      (load-theme 'zenburn t)
+      (custom-theme-set-faces
+       'user
+       `(helm-delete-async-message ((t (:foreground ,yellow))))
+       `(helm-selection ((t (:extend t))))
+       `(flycheck-posframe-info-face ((t (:inherit 'success))))
+       `(flycheck-posframe-warning-face ((t (:inherit 'warning))))
+       `(flycheck-posframe-error-face ((t (:inherit 'error))))
+       `(fringe ((t (:background ,bg))))
+       `(window-divider ((t (:foreground "dim gray"))))
+       `(markdown-code-face ((t (:background ,block-bg :extend t))))
+       `(lsp-ui-sideline-code-action ((t (:foreground "dim gray"))))
+       `(font-latex-slide-title-face ((t (:height 1.0 :inherit font-lock-type-face))))
+       `(tab-bar ((t (:family ,default-font :background "#383838"))))
+       `(tab-bar-tab ((t (:family ,default-font :background ,bg))))
+       `(tab-bar-tab-inactive ((t (:family ,default-font))))
+       `(org-done ((t (:strike-through t))))
+       `(org-headline-done ((t (:foreground "dim gray" :strike-through t))))
+       `(org-mode-line-clock ((t (:background nil))))
+       `(org-table ((t (:background "#383838"))))
+       `(org-tag ((t (:background "#7C4343" :foreground "#DCDCCC"))))))
+    (remove-hook 'server-after-make-frame-hook 'rr/apply-theme))
+
+  (if (daemonp)
+      (add-hook 'server-after-make-frame-hook #'rr/apply-theme)
+    (rr/apply-theme))
+
+  (with-eval-after-load 'zenburn
+    (rr/refresh-org-buffers)))
+#+END_SRC
+**** COMMENT Gruvbox dark theme
+#+begin_src emacs-lisp
+(use-package gruvbox-theme
+  :config
+
+  (defun rr/apply-theme (frame)
+    "Apply some customizaitons to current theme."
+    (let ((bg "#32302f")
+          ;; (block-bg "#494949")
+          ;; (yellow "#F0DFAF")
+          (default-font (face-attribute 'default :family)))
       (with-selected-frame frame
-        (load-theme 'zenburn t)
+        (load-theme 'gruvbox-dark-soft t)
         (custom-theme-set-faces
          'user
-         `(helm-delete-async-message ((t (:foreground ,yellow))))
+         ;; `(helm-delete-async-message ((t (:foreground ,yellow))))
          `(flycheck-posframe-info-face ((t (:inherit 'success))))
          `(flycheck-posframe-warning-face ((t (:inherit 'warning))))
          `(flycheck-posframe-error-face ((t (:inherit 'error))))
          `(fringe ((t (:background ,bg))))
          `(window-divider ((t (:foreground "dim gray"))))
-         `(markdown-code-face ((t (:background ,block-bg :extend t))))
+         ;; `(markdown-code-face ((t (:background ,block-bg :extend t))))
          `(lsp-ui-sideline-code-action ((t (:foreground "dim gray"))))
          `(font-latex-slide-title-face ((t (:height 1.0 :inherit font-lock-type-face))))
-         `(tab-bar ((t (:family ,default-font :background "#383838"))))
+         ;; `(tab-bar ((t (:family ,default-font :background "#383838"))))
          `(tab-bar-tab ((t (:family ,default-font :background ,bg))))
          `(tab-bar-tab-inactive ((t (:family ,default-font))))
          `(org-done ((t (:strike-through t))))
          `(org-headline-done ((t (:foreground "dim gray" :strike-through t))))
-         `(org-table ((t (:background "#383838"))))
-         `(org-tag ((t (:background "#7C4343" :foreground "#DCDCCC")))))))
+         ;; `(org-table ((t (:background "#383838"))))
+         ;; `(org-tag ((t (:background "#7C4343" :foreground "#DCDCCC"))))
+         )))
     (remove-hook 'after-make-frame-functions 'rr/apply-theme))
 
   (if (daemonp)
       (add-hook 'after-make-frame-functions #'rr/apply-theme)
     (rr/apply-theme (selected-frame)))
 
-  (with-eval-after-load 'zenburn
+  (with-eval-after-load 'gruvbox-theme
     (rr/refresh-org-buffers)))
-#+END_SRC
+#+end_src
 *** Modeline
 **** Custom functions
 ***** Flycheck status
@@ -922,11 +967,6 @@ nil."
   (helm-mode 1)
   (helm-adaptive-mode 1))
 #+END_SRC
-*** COMMENT Tramp
-#+BEGIN_SRC emacs-lisp
-(use-package helm-tramp
-  :bind (("C-c s" . helm-tramp)))
-#+END_SRC
 *** Helm flycheck
 #+BEGIN_SRC emacs-lisp
 (use-package helm-flycheck
@@ -1121,6 +1161,11 @@ Better sorting for counsel/ivy
 
 (define-key global-map (kbd "C-c s") #'window-toggle-side-windows)
 
+(setq switch-to-buffer-obey-display-actions nil)
+
+(defvar display-buffer-same-window-commands
+  '(compile-goto-error push-button))
+
 (setq display-buffer-alist
       `(
         ;; Magit
@@ -1144,6 +1189,13 @@ Better sorting for counsel/ivy
           display-buffer-in-direction)
          (direction . rightmost)
          (window-width . 0.5))
+        ;; Open clickable text
+        ((lambda (&rest _)
+           (memq this-command display-buffer-same-window-commands))
+         (display-buffer-reuse-mode-window
+          display-buffer-in-direction)
+         (direction . rightmost)
+         (window-width . 0.5))
         ;; Flycheck error list
         ("\\*Flycheck\serrors.*\\*"
          (display-buffer-reuse-mode-window
@@ -1153,29 +1205,30 @@ Better sorting for counsel/ivy
          (slot . 0)
          (preserve-size . (nil . t))
          ,parameters)
+        ;; Org mode
+        ("\\*Org\sSrc.*\\*"
+         (display-buffer-reuse-mode-window)
+         (direction . rightmost)
+         (window-width . 0.5))
         ;; Shell output
         ("\\*\\(?:Async\sShell\sCommand\\|Shell\sCommand\sOutput\\)\\*"
          (display-buffer-reuse-mode-window
-          display-buffer-in-side-window)
+          display-buffer-in-direction)
          (window-height . 0.4)
-         (side . bottom)
-         (slot . 1)
+         (direction . bottom)
          ,parameters)
         ;; Helm
         ("\\*\\(?:helm.*?\\|cljr.*?\\)\\*"
-         (display-buffer-in-side-window)
+         (display-buffer-in-direction)
          (window-height . 0.4)
-         (window-width . 0.6)
-         (side . bottom)
-         (slot . -1)
+         (direction . bottom)
          ,parameters)
         ;; Side buffers
         ("\\*\\(?:[H|h]elp.*?\\|Python.*?\\|grep\\|compilation\\|Completions\\)\\*"
          (display-buffer-reuse-mode-window
-          display-buffer-in-side-window)
+          display-buffer-in-direction)
          (window-height . 0.4)
-         (side . bottom)
-         (slot . 0)
+         (direction . bottom)
          ,parameters)))
 #+end_src
 ** Rainbow delimiters
@@ -1570,7 +1623,6 @@ Visual Regexp package:
       org-pretty-entities-include-sub-superscripts t
       org-priority-faces '((?a . error) (?b . warning) (?c . success))
       org-tags-column 0
-      ;; org-tags-column -120
       org-startup-folded 'content
       org-startup-indented nil
       org-startup-shrink-all-tables t
@@ -1582,6 +1634,7 @@ Visual Regexp package:
       org-insert-heading-respect-content t
       org-fontify-quote-and-verse-blocks t
       org-fontify-done-headline t
+      org-fontify-whole-heading-line t
       ;; org-fontify-todo-headline t
       org-image-actual-width 500
       org-use-sub-superscripts '{})
@@ -1591,7 +1644,7 @@ Visual Regexp package:
       org-ctrl-k-protect-subtree t
       org-imenu-depth 4
       org-export-with-sub-superscripts nil
-      org-src-window-setup 'other-frame
+      org-src-window-setup 'current-window
       org-catch-invisible-edits 'show-and-error
       org-return-follows-link t
       ;; org-M-RET-may-split-line nil
@@ -2031,6 +2084,67 @@ But there is no backward compatibility.
   (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
   (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
 #+END_SRC
+*** GNUS
+**** Basic setup
+#+begin_src emacs-lisp
+(use-package gnus
+  :config
+  (setq gnus-select-method '(nntp "news.gwene.org"))
+  (setq gnus-secondary-select-methods
+        '((nnimap "127.0.0.1"
+                  (nnimap-server-port 1143)
+                  (nnimap-stream plain))))
+  (setq gnus-agent t
+        gnus-novice-user t
+        gnus-use-cache t))
+
+(use-package gnus-start
+  :ensure gnus
+  :config
+  (setq gnus-save-newsrc-file nil))
+
+(use-package gnus-group
+  :ensure gnus
+  :config
+  (setq gnus-group-mode-line-format "%%b"
+        gnus-list-groups-with-ticked-articles nil
+        gnus-group-sort-function
+        '((gnus-group-sort-by-unread)
+          (gnus-group-sort-by-alphabet)
+          (gnus-group-sort-by-rank))))
+
+(use-package gnus-topic
+  :ensure gnus
+  :config
+  (setq gnus-topic-display-empty-topics t)
+  (add-hook 'gnus-group-mode-hook 'gnus-topic-mode))
+
+(use-package gnus-sum
+  :ensure gnus
+  :demand t
+  :config
+  (setq gnus-auto-select-first nil
+        gnus-summary-mode-line-format "%p"
+        gnus-fetch-old-headers 'some)
+  (setq gnus-user-date-format-alist
+        '(((gnus-seconds-today) . "Today at %R")
+          ((+ 86400 (gnus-seconds-today)) . "Yesterday, %R")
+          (t . "%Y-%m-%d %R")))
+  (setq gnus-summary-line-format "%U%R%z %-16,16&user-date;  %4L:%-30,30f  %B%S\n")
+  (setq gnus-sum-thread-tree-false-root ""
+        gnus-sum-thread-tree-indent " "
+        gnus-sum-thread-tree-leaf-with-other "├─➤ "
+        gnus-sum-thread-tree-root ""
+        gnus-sum-thread-tree-single-leaf "└─➤ "
+        gnus-sum-thread-tree-vertical "│"))
+
+(use-package mm-decode
+  :ensure nil
+  :config
+  (with-eval-after-load "mm-decode"
+    (add-to-list 'mm-discouraged-alternatives "text/html")
+    (add-to-list 'mm-discouraged-alternatives "text/richtext")))
+#+end_src
 ** Auto set indentation settings
 #+begin_src emacs-lisp
 (use-package dtrt-indent
@@ -2202,18 +2316,6 @@ Common tool for code formatting.
                                    (point-max)))]))
 #+END_SRC
 *** Haskell
-**** COMMENT Intero
-#+BEGIN_SRC emacs-lisp
-(use-package intero
-  :after flycheck
-  :config
-  (intero-global-mode)
-  (flycheck-add-next-checker 'intero '(warning . haskell-hlint))
-  ;; (setq haskell-tags-on-save t)
-  ;; (setq tags-revert-without-query t)
-  ;; (setq haskell-indentation-electric-flag t)
-  )
-#+END_SRC
 **** Haskell mode
 #+begin_src emacs-lisp
 (use-package haskell-mode
