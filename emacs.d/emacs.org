@@ -641,20 +641,43 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
   (defun rr/apply-theme ()
     "Apply some customizaitons to current theme."
     (let ((bg "#3F3F3F")
+          (fg "#DCDCCC")
+          (fg-05 "#989890")
           (block-bg "#494949")
           (yellow "#F0DFAF")
+          (blue "#8CD0D3")
+          (red "#CC9393")
+          (orange "#DFAF8F")
+          (green+4 "#BFEBBF")
           (default-font (face-attribute 'default :family)))
       (load-theme 'zenburn t)
       (custom-theme-set-faces
        'user
+       ;; Helm
        `(helm-delete-async-message ((t (:foreground ,yellow))))
        `(helm-selection ((t (:extend t))))
+       ;; Flycheck posframe
        `(flycheck-posframe-info-face ((t (:inherit 'success))))
        `(flycheck-posframe-warning-face ((t (:inherit 'warning))))
        `(flycheck-posframe-error-face ((t (:inherit 'error))))
+       ;; Eyebrowse
+       `(eyebrowse-mode-line-active ((t (:inherit 'mode-line-emphasis :foreground ,yellow))))
+       `(eyebrowse-mode-line-inactive ((t (:foreground "dim gray"))))
+       ;; VC state
+       `(vc-edited-state ((t :inherit 'vc-state-base :foreground ,blue)))
+       `(vc-up-to-date-state ((t :inherit 'vc-state-base :foreground ,green+4)))
+       `(vc-removed-state ((t :inherit 'vc-state-base :foreground ,red)))
+       `(vc-conflict-state ((t :inherit 'vc-state-base :foreground ,orange)))
+       `(vc-locally-added-state ((t :inherit 'vc-state-base :foreground ,fg)))
+       `(vc-needs-update-state ((t :inherit 'vc-state-base :foreground ,yellow)))
+       `(vc-missing-state ((t :inherit 'vc-state-base :foreground ,fg-05)))
+       ;; Set fringe color the same as background
        `(fringe ((t (:background ,bg))))
+       ;; Less contrast window divider
        `(window-divider ((t (:foreground "dim gray"))))
+       ;; Emphasize code block in markdown mode
        `(markdown-code-face ((t (:background ,block-bg :extend t))))
+       ;; Less contrast lsp-ui code actions
        `(lsp-ui-sideline-code-action ((t (:foreground "dim gray"))))
        `(font-latex-slide-title-face ((t (:height 1.0 :inherit font-lock-type-face))))
        `(tab-bar ((t (:family ,default-font :background "#383838"))))
@@ -674,47 +697,6 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
   (with-eval-after-load 'zenburn
     (rr/refresh-org-buffers)))
 #+END_SRC
-**** COMMENT Gruvbox dark theme
-#+begin_src emacs-lisp
-(use-package gruvbox-theme
-  :config
-
-  (defun rr/apply-theme (frame)
-    "Apply some customizaitons to current theme."
-    (let ((bg "#32302f")
-          ;; (block-bg "#494949")
-          ;; (yellow "#F0DFAF")
-          (default-font (face-attribute 'default :family)))
-      (with-selected-frame frame
-        (load-theme 'gruvbox-dark-soft t)
-        (custom-theme-set-faces
-         'user
-         ;; `(helm-delete-async-message ((t (:foreground ,yellow))))
-         `(flycheck-posframe-info-face ((t (:inherit 'success))))
-         `(flycheck-posframe-warning-face ((t (:inherit 'warning))))
-         `(flycheck-posframe-error-face ((t (:inherit 'error))))
-         `(fringe ((t (:background ,bg))))
-         `(window-divider ((t (:foreground "dim gray"))))
-         ;; `(markdown-code-face ((t (:background ,block-bg :extend t))))
-         `(lsp-ui-sideline-code-action ((t (:foreground "dim gray"))))
-         `(font-latex-slide-title-face ((t (:height 1.0 :inherit font-lock-type-face))))
-         ;; `(tab-bar ((t (:family ,default-font :background "#383838"))))
-         `(tab-bar-tab ((t (:family ,default-font :background ,bg))))
-         `(tab-bar-tab-inactive ((t (:family ,default-font))))
-         `(org-done ((t (:strike-through t))))
-         `(org-headline-done ((t (:foreground "dim gray" :strike-through t))))
-         ;; `(org-table ((t (:background "#383838"))))
-         ;; `(org-tag ((t (:background "#7C4343" :foreground "#DCDCCC"))))
-         )))
-    (remove-hook 'after-make-frame-functions 'rr/apply-theme))
-
-  (if (daemonp)
-      (add-hook 'after-make-frame-functions #'rr/apply-theme)
-    (rr/apply-theme (selected-frame)))
-
-  (with-eval-after-load 'gruvbox-theme
-    (rr/refresh-org-buffers)))
-#+end_src
 *** Modeline
 **** Custom functions
 ***** Flycheck status
@@ -963,6 +945,10 @@ nil."
   (setq helm-display-function #'display-buffer)
   (setq helm-show-completion-display-function #'display-buffer)
   (setq helm-adaptive-history-file (expand-file-name "helm-adaptive-history" rr-savefile-dir))
+
+  (require 'helm-grep)
+  (setq helm-grep-default-command "grep --color=never -a -d skip %e -n%cH -e %p %f"
+        helm-grep-git-grep-command "git --no-pager grep -n%cH --color=never --full-name -e %p -- %f")
 
   (helm-mode 1)
   (helm-adaptive-mode 1))
@@ -1224,7 +1210,13 @@ Better sorting for counsel/ivy
          (direction . bottom)
          ,parameters)
         ;; Side buffers
-        ("\\*\\(?:[H|h]elp.*?\\|Python.*?\\|grep\\|compilation\\|Completions\\)\\*"
+        ("\\*Help\\*"
+         (display-buffer-reuse-mode-window
+          display-buffer-in-direction)
+         (window-height . 0.4)
+         (direction . bottom)
+         ,parameters)
+        ("\\*\\(?:help.*?\\|Python.*?\\|grep\\|compilation\\|Completions\\)\\*"
          (display-buffer-reuse-mode-window
           display-buffer-in-direction)
          (window-height . 0.4)
