@@ -1392,7 +1392,8 @@ Better sorting for counsel/ivy
         magit-diff-refine-hunk t
         magit-pull-or-fetch t)
 
-  (global-magit-file-mode))
+  (global-magit-file-mode)
+  (add-hook 'magit-post-refresh-hook #'rr/refresh-vc-state))
 #+END_SRC
 *** Transient
 #+begin_src emacs-lisp
