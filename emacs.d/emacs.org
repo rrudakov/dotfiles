@@ -1389,7 +1389,7 @@ Better sorting for counsel/ivy
   (global-set-key (kbd "C-x g") #'magit-status)
   (setq magit-revision-insert-related-refs 'all
         magit-revision-use-hash-sections 'quick
-        magit-diff-refine-hunk t
+        magit-diff-refine-hunk nil
         magit-pull-or-fetch t)
 
   (global-magit-file-mode)
