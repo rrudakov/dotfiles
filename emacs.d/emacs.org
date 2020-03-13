@@ -1393,7 +1393,7 @@ Better sorting for counsel/ivy
         magit-pull-or-fetch t)
 
   (global-magit-file-mode)
-  (add-hook 'magit-post-refresh-hook #'rr/refresh-vc-state))
+  (add-hook 'magit-post-refresh-hook #'rr/refresh-vc-state 5))
 #+END_SRC
 *** Transient
 #+begin_src emacs-lisp
@@ -1420,7 +1420,7 @@ Better sorting for counsel/ivy
   :config
   (setq diff-hl-draw-borders nil
         diff-hl-side 'right)
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh 3))
 #+end_src
 *** Show TODO items in magit buffer
 #+begin_src emacs-lisp
