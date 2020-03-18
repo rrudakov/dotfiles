@@ -1,9 +1,9 @@
 #!/bin/bash
 
-DPI=141
+DPI=166
 INTERNAL=true
-TRAY_GEOMETRY="4x1-260+0"
-TRAY_ICON_SIZE=22
+TRAY_GEOMETRY="4x1-280+0"
+TRAY_ICON_SIZE=24
 TRAY_SLOT_SIZE=24
 
 function adjust_xresources () {
