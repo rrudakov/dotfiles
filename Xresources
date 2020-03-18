@@ -14,7 +14,7 @@ Emacs.menuBar: 0
 Emacs.toolBar: 0
 Emacs.verticalScrollBars: off
 ! Font settings
-! Emacs.FontBackend: Xft
+Emacs.FontBackend: ftcrhb
 Emacs.font: Source Code Variable-8
 Emacs.lineSpacing: 0
 
