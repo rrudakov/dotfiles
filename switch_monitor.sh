@@ -68,10 +68,8 @@ adjust_stalonetray $TRAY_GEOMETRY $TRAY_ICON_SIZE $TRAY_SLOT_SIZE
 # Run xrandr command
 if [ "$INTERNAL" == true ]; then
     /usr/bin/xrandr --output eDP-1-1 --auto --output HDMI-1-1 --off
-    /usr/bin/nitrogen --set-auto $HOME/Wallpapers/internal.jpg
 else
     /usr/bin/xrandr --output eDP-1-1 --off --output HDMI-1-1 --auto
-    /usr/bin/nitrogen --set-scaled $HOME/Wallpapers/external2.jpg
 fi
 
 # Recompile and restart xmonad

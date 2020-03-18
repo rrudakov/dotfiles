@@ -1141,11 +1141,11 @@ Better sorting for counsel/ivy
 #+END_SRC
 *** Configure window behavior using display-buffer-alist
 #+begin_src emacs-lisp
-(defvar parameters
+(defconst parameters
   '(window-parameters . ((no-other-window . t)
                          (no-delete-other-windows . t))))
 
-(defvar parameters-no-mode-line
+(defconst parameters-no-mode-line
   '(window-parameters . ((no-other-window . t)
                          (no-delete-other-windows . t)
                          (mode-line-format . none))))
@@ -1154,8 +1154,37 @@ Better sorting for counsel/ivy
 
 (setq switch-to-buffer-obey-display-actions nil)
 
-(defvar display-buffer-same-window-commands
+(defconst display-buffer-same-window-commands
   '(compile-goto-error push-button))
+
+(defconst display-buffer-bottom-regexps
+  (mapcar (lambda (s) (concat "\\*" s "\\*"))
+          '("[H|h]elp.*?"
+            "Disabled\sCommand"
+            "Backtrace"
+            "Apropos"
+            "Python.*?"
+            "grep"
+            "compilation"
+            "Completions"
+            "Async\sShell\sCommand"
+            "Shell\sCommand\sOutput"))
+  "List of buffer name regexps.
+All matched buffers should be displayed at
+bottom of the frame.")
+
+(defconst helm-buffers-regexps
+  '("\\*helm.*?\\*"
+    "\\*cljr.*?\\*")
+  "List of helm buffer regexps.")
+
+(defun bottom-special-buffer-p (buf &rest _)
+  "Predicate to display BUF in bottom of the frame."
+  (seq-contains-p display-buffer-bottom-regexps buf #'string-match-p))
+
+(defun helm-buffer-p (buf &rest _)
+  "Predicate for helm BUF."
+  (seq-contains-p helm-buffers-regexps buf #'string-match-p))
 
 (setq display-buffer-alist
       `(
@@ -1201,27 +1230,14 @@ Better sorting for counsel/ivy
          (display-buffer-reuse-mode-window)
          (direction . rightmost)
          (window-width . 0.5))
-        ;; Shell output
-        ("\\*\\(?:Async\sShell\sCommand\\|Shell\sCommand\sOutput\\)\\*"
-         (display-buffer-reuse-mode-window
-          display-buffer-in-direction)
-         (window-height . 0.4)
-         (direction . bottom)
-         ,parameters)
         ;; Helm
-        ("\\*\\(?:helm.*?\\|cljr.*?\\)\\*"
+        (,#'helm-buffer-p
          (display-buffer-in-direction)
          (window-height . 0.4)
          (direction . bottom)
          ,parameters)
-        ;; Side buffers
-        ("\\*Help\\*"
-         (display-buffer-reuse-mode-window
-          display-buffer-in-direction)
-         (window-height . 0.4)
-         (direction . bottom)
-         ,parameters)
-        ("\\*\\(?:help.*?\\|Python.*?\\|grep\\|compilation\\|Completions\\)\\*"
+        ;; Bottom special buffers
+        (,#'bottom-special-buffer-p
          (display-buffer-reuse-mode-window
           display-buffer-in-direction)
          (window-height . 0.4)
