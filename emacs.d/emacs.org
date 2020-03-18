@@ -266,6 +266,13 @@ Unordered lists with separator '::'
 #+BEGIN_SRC emacs-lisp
 (delete-selection-mode)
 #+END_SRC
+** Built-in help mode
+#+begin_src emacs-lisp
+(use-package help
+  :ensure nil
+  :config
+  (setq help-window-select t))
+#+end_src
 ** Common
 :PROPERTIES:
 :VISIBILITY: folded
@@ -684,10 +691,15 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
        `(markdown-code-face ((t (:background ,block-bg :extend t))))
        ;; Less contrast lsp-ui code actions
        `(lsp-ui-sideline-code-action ((t (:foreground ,dim))))
+       ;; LaTeX
        `(font-latex-slide-title-face ((t (:height 1.0 :inherit font-lock-type-face))))
+       ;; Tab bar mode
        `(tab-bar ((t (:family ,default-font :background "#383838"))))
        `(tab-bar-tab ((t (:family ,default-font :background ,bg))))
        `(tab-bar-tab-inactive ((t (:family ,default-font))))
+       ;; Clickable text
+       `(button ((t (:foreground ,yellow :weight bold))))
+       ;; Some org-mode faces
        `(org-done ((t (:strike-through t))))
        `(org-headline-done ((t (:foreground ,dim :strike-through t))))
        `(org-mode-line-clock ((t (:background nil))))
@@ -805,7 +817,7 @@ nil."
   :config
   (which-key-mode))
 #+END_SRC
-** Replace built-in help
+** COMMENT Replace built-in help
 #+BEGIN_SRC emacs-lisp
 (use-package helpful
   :config
@@ -1205,6 +1217,12 @@ bottom of the frame.")
          (direction . rightmost)
          (window-width . 0.5))
         ("magit-revision:.*"
+         (display-buffer-reuse-mode-window
+          display-buffer-in-direction)
+         (direction . rightmost)
+         (window-width . 0.5))
+        ;; Google translate buffer
+        ("\\*Google\sTranslate\\*"
          (display-buffer-reuse-mode-window
           display-buffer-in-direction)
          (direction . rightmost)
@@ -2013,7 +2031,8 @@ But there is no backward compatibility.
 (use-package google-translate-default-ui
   :ensure google-translate
   :config
-  (setq google-translate-default-target-language "ru"))
+  (setq google-translate-default-target-language "ru"
+        google-translate-pop-up-buffer-set-focus t))
 #+end_src
 *** Edit program comments and strings using Org-mode
 #+begin_src emacs-lisp
