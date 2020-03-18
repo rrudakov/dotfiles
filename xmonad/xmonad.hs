@@ -379,13 +379,13 @@ myPP :: PP
 myPP =
   namedScratchpadFilterOutWorkspacePP $
   xmobarPP
-    { ppCurrent = xmobarColor "#fabd2f" "#3c3836" . wrap " " " "
-    , ppTitle = xmobarColor "#928374" "" . shorten 60
-    , ppHidden = xmobarColor "#ebdbb2" ""
-    , ppHiddenNoWindows = xmobarColor "#504945" ""
-    , ppUrgent = xmobarColor "#fabd2f" "#cc241d" . wrap " " " "
+    { ppCurrent = xmobarColor "#DFAF8F" "#3F3F3F" . wrap " " " "
+    , ppTitle = xmobarColor "#7F9F7F" "" . shorten 60
+    , ppHidden = xmobarColor "#DCDCCC" ""
+    , ppHiddenNoWindows = xmobarColor "#656555" ""
+    , ppUrgent = xmobarColor "#2B2B2B" "#CC9393" . wrap " " " "
     , ppSep = "  "
-    , ppLayout = xmobarColor "#98971a" ""
+    , ppLayout = xmobarColor "#DCDCCC" ""
     }
 
 toggleStrutsKey :: XConfig l -> (KeyMask, KeySym)
