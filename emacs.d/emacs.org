@@ -874,7 +874,7 @@ nil."
   :config
   (add-to-list 'company-backends #'company-tern))
 #+END_SRC
-** Paradox
+** COMMENT Paradox
 #+BEGIN_SRC emacs-lisp
 (use-package paradox
   :config
@@ -1137,6 +1137,7 @@ Better sorting for counsel/ivy
   (mapcar (lambda (s) (concat "\\*" s "\\*"))
           '("[H|h]elp.*?"
             "Disabled\sCommand"
+            "cider-doc"
             "Backtrace"
             "Apropos"
             "Python.*?"
