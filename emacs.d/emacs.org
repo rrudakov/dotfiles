@@ -1115,34 +1115,6 @@ Better sorting for counsel/ivy
         tab-bar-new-tab-choice "*scratch*"))
 #+end_src
 ** Popup windows settings
-*** COMMENT Shackle
-#+BEGIN_SRC emacs-lisp
-(use-package shackle
-  :config
-  (setq shackle-rules
-        '(("\\`\\*helm.*?\\*\\'" :regexp t :align t :size 0.4)
-          ("\\`\\*cljr.*?\\*\\'" :regexp t :align t :size 0.4)
-          (compilation-mode :select t :align t :size 0.4)
-          (dap-server-log-mode :select t :align t :size 0.4)
-          ;; ("\\`\\*Org\sSrc.*?\\*.*\\'" :regexp t :align right :size 0.5)
-          ("\\`\\*Org-Babel\sError\sOutput\\*.*\\'" :regexp t :align t :size 0.4)
-          ("*compilation*" :select t :align t :size 0.4)
-          ("*Async Shell Command*" :select t :align t :size 0.4)
-          ("*Shell Command Output*" :select t :align t :size 0.4)
-          ("\\`\\*e?shell.*\\'" :regexp t :select t :popup t :align t :size 0.4)
-          (ejc-result-mode :select t :popup t :align t :size 0.5)
-          (comint-mode :select t :align t :size 0.4)
-          (help-mode :select t :align t :size 0.4)
-          (helpful-mode :select t :align t :size 0.4)
-          (magit-status-mode :select t :align t :size 0.4 :inhibit-window-quit t)
-          (magit-log-mode :same t :inhibit-window-quit t)
-          (magit-refs-mode :select t :same t :align t :size 0.4)
-          (magit-diff-mode :select nil :align right :size 0.5)
-          (magit-revision-mode :select t :align right :size 0.5)
-          (flycheck-error-list-mode :select t :align right :size 0.3)
-          (inferior-python-mode :select t :popup t :align t :size 0.4)))
-  (shackle-mode))
-#+END_SRC
 *** Configure window behavior using display-buffer-alist
 #+begin_src emacs-lisp
 (defconst parameters
