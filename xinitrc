@@ -25,7 +25,7 @@ fi
 
 $HOME/.local/bin/switch_monitor
 xsetroot -cursor_name left_ptr
-xsetroot -solid "#2B2B2B"
+hsetroot -solid "#2B2B2B"
 picom -b
 stalonetray &
 protonmail-bridge --no-window &

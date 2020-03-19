@@ -817,14 +817,6 @@ nil."
   :config
   (which-key-mode))
 #+END_SRC
-** COMMENT Replace built-in help
-#+BEGIN_SRC emacs-lisp
-(use-package helpful
-  :config
-  (define-key global-map [remap describe-variable] #'helpful-variable)
-  (define-key global-map [remap describe-function] #'helpful-function)
-  (define-key global-map [remap describe-key] #'helpful-key))
-#+END_SRC
 ** YASnippet
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
@@ -1227,13 +1219,6 @@ bottom of the frame.")
           display-buffer-in-direction)
          (direction . rightmost)
          (window-width . 0.5))
-        ;; Open clickable text
-        ((lambda (&rest _)
-           (memq this-command display-buffer-same-window-commands))
-         (display-buffer-reuse-mode-window
-          display-buffer-in-direction)
-         (direction . rightmost)
-         (window-width . 0.5))
         ;; Flycheck error list
         ("\\*Flycheck\serrors.*\\*"
          (display-buffer-reuse-mode-window
@@ -1260,7 +1245,14 @@ bottom of the frame.")
           display-buffer-in-direction)
          (window-height . 0.4)
          (direction . bottom)
-         ,parameters)))
+         ,parameters)
+        ;; Open clickable text
+        ((lambda (&rest _)
+           (memq this-command display-buffer-same-window-commands))
+         (display-buffer-reuse-mode-window
+          display-buffer-in-direction)
+         (direction . rightmost)
+         (window-width . 0.5))))
 #+end_src
 ** Rainbow delimiters
 #+BEGIN_SRC emacs-lisp
