@@ -44,10 +44,13 @@ There are two things you can do about this warning:
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 
+;; Configure `use-package' prior to loading it.
+(eval-and-compile
+  (setq use-package-always-ensure t)
+  (setq use-package-enable-imenu-support t))
+
 (eval-when-compile
   (require 'use-package))
-
-;; (require 'bind-key)
 
 (use-package org
   :ensure org-plus-contrib)
@@ -57,5 +60,6 @@ There are two things you can do about this warning:
 
 (when (file-exists-p custom-file)
   (load custom-file))
+
 (provide 'init)
 ;;; init.el ends here

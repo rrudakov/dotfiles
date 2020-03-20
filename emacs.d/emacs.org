@@ -213,10 +213,6 @@ Unordered lists with separator '::'
 #+end_src
 
 * Configuration
-** Use package default settings
-#+BEGIN_SRC emacs-lisp
-(setq-default use-package-always-ensure t)
-#+END_SRC
 ** Load my secret tokens
 #+BEGIN_SRC emacs-lisp
 (require 'mysecret nil t)
