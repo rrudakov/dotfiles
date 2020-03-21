@@ -217,6 +217,11 @@ Unordered lists with separator '::'
 #+BEGIN_SRC emacs-lisp
 (require 'mysecret nil t)
 #+END_SRC
+** Unset some unused keybindings
+#+begin_src emacs-lisp
+(global-unset-key (kbd "C-z"))
+(global-unset-key (kbd "C-x C-z"))
+#+end_src
 ** Increase amount of data which emacs reads from the process
 #+begin_src emacs-lisp
 (setq read-process-output-max (* 4 1024 1024))
@@ -293,7 +298,8 @@ Unordered lists with separator '::'
 #+BEGIN_SRC emacs-lisp
 (use-package hl-line
   :config
-  (global-hl-line-mode 1))
+  (setq hl-line-sticky-flag nil)
+  (add-hook 'prog-mode-hook 'hl-line-mode))
 #+END_SRC
 *** COMMENT Set default font
 Good choices:
@@ -936,7 +942,7 @@ And third party package for proper syntax highlighting for pre tags in HTML:
 #+end_src
 ** Isearch built-in settings
 #+begin_src emacs-lisp
-(use-package iserarch
+(use-package isearch
   :ensure nil
   :config
   (setq search-whitespace-regexp ".*?"
@@ -1442,6 +1448,11 @@ bottom of the frame.")
       :fringe-bitmap bitmap
       :fringe-face 'flycheck-fringe-info)))
 #+END_SRC
+And disable flymake autoload:
+#+begin_src emacs-lisp
+(use-package flymake
+  :commands flymake-mode)
+#+end_src
 *** Show errors in posframe
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck-posframe
@@ -1669,7 +1680,6 @@ Build in regex package:
 ** Org
 *** Some tweaks
 #+begin_src emacs-lisp
-(add-hook 'org-mode-hook (lambda () (setq-local global-hl-line-mode nil)))
 (add-hook 'org-mode-hook #'rr/set-margins)
 
 ;; Setup ui
@@ -2066,19 +2076,13 @@ But there is no backward compatibility.
 (use-package poporg)
 #+end_src
 ** Email
-*** ProtonMail configuration
-#+BEGIN_SRC emacs-lisp
+*** Setup username and email address
+#+begin_src emacs-lisp
 (setq user-mail-address "rrudakov@pm.me"
       user-full-name "Roman Rudakov")
-
-(use-package smtpmail
-  :ensure nil
-  :after message
-  :config
-  (setq message-send-mail-function #'smtpmail-send-it
-        smtpmail-smtp-server "localhost"
-        smtpmail-smtp-service 1025))
-
+#+end_src
+*** ProtonMail configuration
+#+BEGIN_SRC emacs-lisp
 (use-package mu4e
   :ensure nil
   :after message
@@ -2146,6 +2150,16 @@ But there is no backward compatibility.
   (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
   (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
 #+END_SRC
+*** Sending emails
+#+begin_src emacs-lisp
+(use-package smtpmail
+  :ensure nil
+  :after message
+  :config
+  (setq message-send-mail-function #'smtpmail-send-it
+        smtpmail-smtp-server "127.0.0.1"
+        smtpmail-smtp-service 1025))
+#+end_src
 *** GNUS
 **** Basic setup
 #+begin_src emacs-lisp
@@ -2211,6 +2225,20 @@ But there is no backward compatibility.
   (with-eval-after-load "mm-decode"
     (add-to-list 'mm-discouraged-alternatives "text/html")
     (add-to-list 'mm-discouraged-alternatives "text/richtext")))
+
+(use-package gnus-demon
+  :ensure gnus
+  :config
+  (add-hook 'gnus-startup-hook
+            (lambda ()
+              (gnus-demon-add-handler #'gnus-demon-scan-news 1 nil)
+              (gnus-demon-init)))
+
+(use-package gnus-notifications
+  :ensure gnus
+  :config
+  (setq gnus-notifications-use-google-contacts nil)
+  (add-hook 'gnus-after-getting-new-news-hook 'gnus-notifications))
 #+end_src
 ** Auto set indentation settings
 #+begin_src emacs-lisp
