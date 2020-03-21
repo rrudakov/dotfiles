@@ -789,6 +789,19 @@ nil."
         shr-table-corner ?\s
         shr-width (current-fill-column)))
 #+end_src
+And third party package for proper syntax highlighting for pre tags in HTML:
+#+begin_src emacs-lisp
+(use-package shr-tag-pre-highlight
+  :ensure t
+  :after shr
+  :config
+  (add-to-list 'shr-external-rendering-functions
+               '(pre . shr-tag-pre-highlight))
+  (when (version< emacs-version "26")
+    (with-eval-after-load 'eww
+      (advice-add 'eww-display-html :around
+                  'eww-display-html--override-shr-external-rendering-functions))))
+#+end_src
 ** Spell checking
 #+begin_src emacs-lisp
 (use-package ispell
