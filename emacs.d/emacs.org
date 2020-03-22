@@ -2671,7 +2671,8 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 (use-package cider
   :config
   (setq cider-prompt-for-symbol nil)
-  (add-hook 'clojure-mode-hook #'cider-mode))
+  (add-hook 'clojure-mode-hook #'cider-mode)
+  (add-hook 'clojurescript-mode-hook #'cider-mode))
 #+end_src
 **** Clojure refactoring
 #+begin_src emacs-lisp
@@ -2682,13 +2683,16 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 
   (setq cljr-hotload-dependencies t
         cljr-warn-on-eval nil)
-  (add-hook 'clojure-mode-hook #'my-clojure-mode-hook))
+  (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
+  (add-hook 'clojurescript-mode-hook #'my-clojure-mode-hook))
 #+end_src
 **** Clojure refactoring helm integration
 #+begin_src emacs-lisp
 (use-package cljr-helm
-  :bind (:map clojure-mode-map
-              ("C-c C-r" . cljr-helm)))
+  :after clj-refactor
+  :config
+  (define-key clojure-mode-map (kbd "C-c C-r") #'cljr-helm)
+  (define-key clojurescript-mode-map (kbd "C-c C-r") #'cljr-helm))
 #+end_src
 **** CIDER helm integration
 #+begin_src emacs-lisp
