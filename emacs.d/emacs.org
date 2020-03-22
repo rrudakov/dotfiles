@@ -1207,6 +1207,7 @@ Better sorting for counsel/ivy
             "grep"
             "compilation"
             "Completions"
+            "Compile-Log"
             "Async\sShell\sCommand"
             "Shell\sCommand\sOutput"))
   "List of buffer name regexps.
