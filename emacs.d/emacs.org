@@ -364,7 +364,7 @@ Picked mostly from doom-emacs configuration.
  history-length 50
  indent-tabs-mode nil)
 
-(setq x-wait-for-event-timeout 0)'
+(setq x-wait-for-event-timeout 0)
 
 (setq-default
  cursor-in-non-selected-windows nil  ; hide cursors in other windows
@@ -2163,6 +2163,9 @@ But there is no backward compatibility.
 #+end_src
 *** GNUS
 **** Basic setup
+GNUS split into many packages. I use ~use-package~ to setup each of them.
+
+First setup groups and IMAP.
 #+begin_src emacs-lisp
 (use-package gnus
   :config
@@ -2174,12 +2177,18 @@ But there is no backward compatibility.
   (setq gnus-agent t
         gnus-novice-user t
         gnus-use-cache t))
+#+end_src
 
+Do not save ~.newsrc~ file. I don't use another newsreaders.
+#+begin_src emacs-lisp
 (use-package gnus-start
   :ensure gnus
   :config
   (setq gnus-save-newsrc-file nil))
+#+end_src
 
+Setup groups view.
+#+begin_src emacs-lisp
 (use-package gnus-group
   :ensure gnus
   :config
@@ -2189,13 +2198,19 @@ But there is no backward compatibility.
         '((gnus-group-sort-by-unread)
           (gnus-group-sort-by-alphabet)
           (gnus-group-sort-by-rank))))
+#+end_src
 
+Enable topics by default in groups view.
+#+begin_src emacs-lisp
 (use-package gnus-topic
   :ensure gnus
   :config
   (setq gnus-topic-display-empty-topics t)
   (add-hook 'gnus-group-mode-hook 'gnus-topic-mode))
+#+end_src
 
+Prettify summary view. Setup mode line and continuations arrow for threads.
+#+begin_src emacs-lisp
 (use-package gnus-sum
   :ensure gnus
   :demand t
@@ -2214,27 +2229,39 @@ But there is no backward compatibility.
         gnus-sum-thread-tree-root ""
         gnus-sum-thread-tree-single-leaf "└─➤ "
         gnus-sum-thread-tree-vertical "│"))
+#+end_src
 
+Enable asynchronous operations in GNUS.
+#+begin_src emacs-lisp
 (use-package gnus-async
   :ensure nil
   :config
   (setq gnus-asynchronous t))
+#+end_src
 
+Prefer plain text over HTML (not sure if it is actually works):
+#+begin_src emacs-lisp
 (use-package mm-decode
   :ensure nil
   :config
   (with-eval-after-load "mm-decode"
     (add-to-list 'mm-discouraged-alternatives "text/html")
     (add-to-list 'mm-discouraged-alternatives "text/richtext")))
+#+end_src
 
+Enable demon on GNUS startup to check new mail periodically.
+#+begin_src emacs-lisp
 (use-package gnus-demon
   :ensure gnus
   :config
   (add-hook 'gnus-startup-hook
             (lambda ()
-              (gnus-demon-add-handler #'gnus-demon-scan-news 1 nil)
-              (gnus-demon-init)))
+              (gnus-demon-add-handler #'gnus-demon-scan-news 5 nil)
+              (gnus-demon-init))))
+#+end_src
 
+Enable notifications when new email/news is received:
+#+begin_src emacs-lisp
 (use-package gnus-notifications
   :ensure gnus
   :config
