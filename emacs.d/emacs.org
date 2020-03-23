@@ -1194,7 +1194,10 @@ Better sorting for counsel/ivy
 (setq switch-to-buffer-obey-display-actions nil)
 
 (defconst display-buffer-same-window-commands
-  '(compile-goto-error push-button magit-diff-visit-file))
+  '(compile-goto-error
+    push-button
+    magit-diff-visit-file
+    magit-todos-jump-to-item))
 
 (defconst display-buffer-bottom-regexps
   (mapcar (lambda (s) (concat "\\*" s "\\*"))
