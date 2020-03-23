@@ -2747,6 +2747,20 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 (use-package kubernetes
   :commands (kubernetes-overview))
 #+end_src
+** Emacs everywhere
+#+begin_src emacs-lisp
+(defun pull-request-conversation-p (window-title)
+  "Predicate to make sure WINDOW-TITLE match PR conversation."
+  (or (string-match-p "Pull request" window-title)))
+
+(defun popup-handler (app-name window-title x y w h)
+  "Set major mode based on APP-NAME and WINDOW-TITLE."
+  (cond
+    ((pull-request-conversation-p window-title) (gfm-mode))
+    (t (markdown-mode))))
+
+(add-hook 'ea-popup-hook 'popup-handler)
+#+end_src
 ** Create GIF screencasts
 #+begin_src emacs-lisp
 (use-package gif-screencast)

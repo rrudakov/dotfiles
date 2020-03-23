@@ -140,6 +140,8 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
   , ((modm, xK_p), shellPrompt myPromptConfig)
     -- launch emacs client with new frame
   , ((modm .|. shiftMask, xK_u), spawn "emacsclient -c")
+    -- launch emacs anywhere command
+  , ((modm, xK_f), spawn "~/.emacs_anywhere/bin/run")
     -- launch ssh prompt
   , ((modm, xK_s), sshPrompt myPromptConfig)
     -- close focused window
@@ -342,6 +344,10 @@ myEventHook =
   dynamicPropertyChange
     "WM_NAME"
     (className =? "Spotify" -->
+     customFloating (W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))) <+>
+  dynamicPropertyChange
+    "WM_NAME"
+    (title =? "*Emacs Anywhere*" -->
      customFloating (W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4)))
 
 -- | Make java GUI working
