@@ -779,8 +779,11 @@ nil."
 #+end_src
 ** EShell settings
 #+begin_src emacs-lisp
-(setq eshell-scroll-to-bottom-on-input t
-      eshell-scroll-to-bottom-on-output t)
+(use-package esh-mode
+  :ensure nil
+  :config
+  (setq eshell-scroll-to-bottom-on-input t
+        eshell-scroll-to-bottom-on-output t))
 #+end_src
 ** Built-in web browser and HTML parser
 #+begin_src emacs-lisp
@@ -1156,6 +1159,8 @@ Better sorting for counsel/ivy
   (sp-local-pair 'prog-mode "[" nil :post-handlers '(("||\n[i]" "RET")))
   (sp-local-pair 'prog-mode "(" nil :post-handlers '(("||\n[i]" "RET")))
   (sp-local-pair 'java-mode "/*" "*/" :post-handlers '(("* ||\n[i]" "RET")))
+
+  (add-hook 'eshell-mode-hook 'smartparens-strict-mode)
 
   (smartparens-global-strict-mode t)
   (show-smartparens-global-mode t))
@@ -2760,7 +2765,9 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
   "Set major mode based on APP-NAME and WINDOW-TITLE."
   (cond
     ((pull-request-conversation-p window-title) (gfm-mode))
-    (t (markdown-mode))))
+    (t (markdown-mode)))
+  (when (gui-get-selection 'PRIMARY)
+    (insert (gui-get-selection 'PRIMARY))))
 
 (add-hook 'ea-popup-hook 'popup-handler)
 #+end_src
