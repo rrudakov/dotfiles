@@ -2050,6 +2050,12 @@ But there is no backward compatibility.
                ("\\paragraph{%s}" . "\\paragraph*{%s}")
                ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 #+END_SRC
+*** Jira export
+#+begin_src emacs-lisp
+(use-package ox-jira
+  :config
+  (setq org-export-copy-to-kill-ring 'if-interactive))
+#+end_src
 *** Evaluate source code
 #+BEGIN_SRC emacs-lisp
 (org-babel-do-load-languages
@@ -2072,14 +2078,6 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
 (use-package org-gcal)
 #+END_SRC
-*** Google translate interface
-#+begin_src emacs-lisp
-(use-package google-translate-default-ui
-  :ensure google-translate
-  :config
-  (setq google-translate-default-target-language "ru"
-        google-translate-pop-up-buffer-set-focus t))
-#+end_src
 *** Edit program comments and strings using Org-mode
 #+begin_src emacs-lisp
 (use-package poporg)
@@ -2275,6 +2273,13 @@ Enable notifications when new email/news is received:
   :config
   (setq gnus-notifications-use-google-contacts nil)
   (add-hook 'gnus-after-getting-new-news-hook 'gnus-notifications))
+#+end_src
+** Google translate interface
+#+begin_src emacs-lisp
+(use-package google-translate-default-ui
+  :ensure google-translate
+  :config
+  (setq google-translate-pop-up-buffer-set-focus t))
 #+end_src
 ** Auto set indentation settings
 #+begin_src emacs-lisp
