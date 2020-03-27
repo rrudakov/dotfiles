@@ -1555,6 +1555,7 @@ And disable flymake autoload:
 (use-package helm-ag)
 (use-package helm-rg)
 (use-package deadgrep)
+(use-package rg)
 #+END_SRC
 ** Terminal emulator
 #+BEGIN_SRC emacs-lisp
