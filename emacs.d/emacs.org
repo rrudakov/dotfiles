@@ -2724,7 +2724,9 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+begin_src emacs-lisp
 (use-package cider
   :config
-  (setq cider-prompt-for-symbol nil)
+  (setq cider-prompt-for-symbol nil
+        cider-repl-wrap-history t
+        nrepl-hide-special-buffers t)
   (add-hook 'clojure-mode-hook #'cider-mode)
   (add-hook 'clojurescript-mode-hook #'cider-mode))
 #+end_src
