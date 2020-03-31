@@ -274,6 +274,23 @@ Unordered lists with separator '::'
   :config
   (setq help-window-select t))
 #+end_src
+** Mouse settings
+*** Disable tooltips completely
+#+BEGIN_SRC emacs-lisp
+(use-package tooltip
+  :ensure nil
+  :config
+  (tooltip-mode -1)
+  (setq tooltip-use-echo-area nil
+        show-help-function nil))
+#+END_SRC
+*** Move mouse away from text
+#+begin_src emacs-lisp
+(use-package avoid
+  :config
+  (if (display-mouse-p)
+      (mouse-avoidance-mode 'banish)))
+#+end_src
 ** Common
 :PROPERTIES:
 :VISIBILITY: folded
@@ -408,21 +425,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
               window-divider-default-bottom-width 0
               window-divider-default-right-width 1)
 (window-divider-mode +1)
-#+END_SRC
-*** Move mouse away from text
-#+begin_src emacs-lisp
-(use-package avoid
-  :config
-  (if (display-mouse-p)
-      (mouse-avoidance-mode 'banish)))
-#+end_src
-*** Disable tooltips completely
-#+BEGIN_SRC emacs-lisp
-(use-package tooltip
-  :ensure nil
-  :config
-  (tooltip-mode -1)
-  (setq tooltip-use-echo-area nil))
 #+END_SRC
 *** Graphic mode settings
 #+BEGIN_SRC emacs-lisp
