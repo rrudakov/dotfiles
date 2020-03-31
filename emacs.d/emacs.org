@@ -409,9 +409,20 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
               window-divider-default-right-width 1)
 (window-divider-mode +1)
 #+END_SRC
-*** Relegate tooltips to echo area only
+*** Move mouse away from text
+#+begin_src emacs-lisp
+(use-package avoid
+  :config
+  (if (display-mouse-p)
+      (mouse-avoidance-mode 'banish)))
+#+end_src
+*** Disable tooltips completely
 #+BEGIN_SRC emacs-lisp
-(tooltip-mode -1)
+(use-package tooltip
+  :ensure nil
+  :config
+  (tooltip-mode -1)
+  (setq tooltip-use-echo-area nil))
 #+END_SRC
 *** Graphic mode settings
 #+BEGIN_SRC emacs-lisp
