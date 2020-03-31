@@ -257,7 +257,7 @@ Unordered lists with separator '::'
 #+end_src
 ** Set tab width
 #+begin_src emacs-lisp
-(setq-default tab-width 4)
+(setq-default tab-width 2)
 #+end_src
 ** Display fringe outside margins
 #+begin_src emacs-lisp
@@ -796,7 +796,8 @@ nil."
   :ensure nil
   :config
   (setq eshell-scroll-to-bottom-on-input t
-        eshell-scroll-to-bottom-on-output t))
+        eshell-scroll-to-bottom-on-output t
+        eshell-destroy-buffer-when-process-dies t))
 #+end_src
 ** Built-in web browser and HTML parser
 #+begin_src emacs-lisp
@@ -2431,7 +2432,7 @@ Common tool for code formatting.
 
 (add-hook 'java-mode-hook
           (lambda ()
-            (setq c-basic-offset 4)))
+            (setq c-basic-offset 2)))
 #+end_src
 **** lsp-mode setup
 #+BEGIN_SRC emacs-lisp
