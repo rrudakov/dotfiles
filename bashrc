@@ -43,13 +43,6 @@ alias java='java "$_SILENT_JAVA_OPTIONS"'
 # Set QT5 theme
 export QT_STYLE_OVERRIDE=adwaita-dark
 
-# Set path for Android studio
-export ANDROID_HOME="$HOME/Android/Sdk"
-export PATH="$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools/bin:$PATH"
-
-# Set path for Texlive
-export PATH="$HOME/.local/texlive/2017/bin/x86_64-linux:$PATH"
-
 # Add local bin directory to PATH
 export PATH="$HOME/.local/bin:$PATH"
 
@@ -62,7 +55,7 @@ export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
 source /usr/bin/virtualenvwrapper.sh
 
 # Set default editor
-export EDITOR=emacsclient
+export EDITOR="emacsclient -c"
 
 # Add completion for stack tool
 eval "$(stack --bash-completion-script stack)"
