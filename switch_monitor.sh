@@ -44,13 +44,13 @@ function adjust_stalonetray () {
 }
 
 if [ $# -eq 0 ]; then
-    if /usr/bin/xrandr --query | grep --silent '\bHDMI-1-1 connected\b'; then
+    if /usr/bin/xrandr --query | grep --silent '\bDP1 connected\b'; then
         echo "Connected"
-        DPI=93
+        DPI=163
         INTERNAL=false
-        TRAY_GEOMETRY="4x1-180+2"
-        TRAY_ICON_SIZE=12
-        TRAY_SLOT_SIZE=16
+        TRAY_GEOMETRY="4x1-280+0"
+        TRAY_ICON_SIZE=24
+        TRAY_SLOT_SIZE=24
     fi
 else
     if [ $1 == "--internal" ]; then
@@ -67,9 +67,9 @@ adjust_stalonetray $TRAY_GEOMETRY $TRAY_ICON_SIZE $TRAY_SLOT_SIZE
 
 # Run xrandr command
 if [ "$INTERNAL" == true ]; then
-    /usr/bin/xrandr --output eDP-1-1 --auto --output HDMI-1-1 --off
+    /usr/bin/xrandr --output eDP1 --auto --output DP1 --off
 else
-    /usr/bin/xrandr --output eDP-1-1 --off --output HDMI-1-1 --auto
+    /usr/bin/xrandr --output eDP1 --off --output DP1 --auto
 fi
 
 # Recompile and restart xmonad
