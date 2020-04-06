@@ -474,35 +474,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
         global-auto-revert-non-file-buffers t)
   (global-auto-revert-mode 1))
 #+END_SRC
-*** COMMENT Ibuffer
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-x C-b") 'ibuffer)
-
-(setq ibuffer-saved-filter-groups
-      (quote (("default"
-               ("dired" (mode . dired-mode))
-               ("org" (name . "^.*org$"))
-               ("shell" (or (mode . eshell-mode) (mode . shell-mode)))
-               ("mu4e" (name . "\*mu4e\*"))
-               ("Python" (mode . python-mode))
-               ("Haskell" (mode . haskell-mode))
-               ("Web" (mode . web-mode))
-               ("emacs" (or
-                         (name . "^\\*scratch\\*$")
-                         (name . "^\\*Messages\\*$")))
-               ))))
-
-(add-hook 'ibuffer-mode-hook
-          (lambda ()
-            (ibuffer-auto-mode 1)
-            (ibuffer-switch-to-saved-filter-groups "default")))
-
-;; Don't show filter groups if there are no buffers in that group
-(setq ibuffer-show-empty-filter-groups nil)
-
-;; Don't ask for confirmation to delete marked buffers
-(setq ibuffer-expert t)
-#+END_SRC
 *** Recent files
 #+BEGIN_SRC emacs-lisp
 (use-package recentf
@@ -936,18 +907,6 @@ And third party package for proper syntax highlighting for pre tags in HTML:
   :after tern
   :config
   (add-to-list 'company-backends #'company-tern))
-#+END_SRC
-** COMMENT Paradox
-#+BEGIN_SRC emacs-lisp
-(use-package paradox
-  :config
-  (setq paradox-github-token t)
-  (setq-default paradox-column-width-package 27
-                paradox-column-width-version 13
-                paradox-execute-asynchronously t
-                paradox-spinner-type 'progress-bar
-                paradox-hide-wiki-packages t)
-  (paradox-enable))
 #+END_SRC
 ** Completion styles setup
 #+begin_src emacs-lisp
