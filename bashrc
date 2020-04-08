@@ -52,7 +52,7 @@ export PATH="$HOME/.cargo/bin:$PATH"
 # Set up virtualenvwrapper
 export WORKON_HOME="$HOME/.virtualenvs"
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
-source /usr/bin/virtualenvwrapper.sh
+source $HOME/.local/bin/virtualenvwrapper.sh
 
 # Set default editor
 export EDITOR="emacsclient -c"

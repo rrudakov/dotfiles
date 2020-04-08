@@ -66,6 +66,13 @@ git clone https://github.com/VundleVim/Vundle.vim.git ${HOME}/.vim/bundle/Vundle
 echo "...done"
 
 # Install xmonad
+# System dependencies:
+# libxss-dev
+# libasound2-dev
+# libxrandr-dev
+# libxft-dev
+# libxpm-dev
+
 echo "Installing xmonad"
 cd ${HOME}/.xmonad
 echo "Clone xmonad repo"
@@ -81,7 +88,7 @@ echo "Clone xmobar repo"
 git clone https://github.com/jaor/xmobar || exit 1
 echo "...done"
 echo "Creating stack project"
-stack init
+stack init --resolver lts-14.27
 echo "...done"
 echo "Replace flags for xmobar in stack.yaml"
 /usr/bin/sed -i "/flags: {}/c\flags:" stack.yaml || exit 1

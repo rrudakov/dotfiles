@@ -73,7 +73,7 @@ else
 fi
 
 # Recompile and restart xmonad
-/usr/local/bin/xmonad-session --restart
+xmonad --restart
 
 # Start stalonetray
 if ! /usr/bin/pgrep -x "stalonetray" > /dev/null

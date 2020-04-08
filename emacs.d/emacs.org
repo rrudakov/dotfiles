@@ -217,6 +217,10 @@ Unordered lists with separator '::'
 #+BEGIN_SRC emacs-lisp
 (require 'mysecret nil t)
 #+END_SRC
+** Auth sources settings
+#+begin_src emacs-lisp
+(setq auth-source-save-behavior nil)
+#+end_src
 ** Unset some unused keybindings
 #+begin_src emacs-lisp
 (global-unset-key (kbd "C-z"))
@@ -494,9 +498,12 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 *** More convenient scrolling settings
 #+begin_src emacs-lisp
-(setq scroll-conservatively 100000
+(setq scroll-margin 3
+      scroll-conservatively 101
+      scroll-up-aggressively 0.01
+      scroll-down-aggressively 0.01
       scroll-preserve-screen-position t
-      scroll-margin 0)
+      auto-window-vscroll nil)
 #+end_src
 *** Single line horizontal scrolling
 #+BEGIN_SRC emacs-lisp
@@ -1221,7 +1228,7 @@ bottom of the frame.")
         ("magit-refs:.*"
          (display-buffer-reuse-mode-window
           display-buffer-same-window))
-        ("magit-diff:.*"
+        ("magit-diff.*"
          (display-buffer-reuse-mode-window
           display-buffer-in-direction)
          (direction . rightmost)
@@ -2062,7 +2069,7 @@ But there is no backward compatibility.
 (setq user-mail-address "rrudakov@pm.me"
       user-full-name "Roman Rudakov")
 #+end_src
-*** ProtonMail configuration
+*** COMMENT ProtonMail configuration
 #+BEGIN_SRC emacs-lisp
 (use-package mu4e
   :ensure nil
@@ -2104,7 +2111,7 @@ But there is no backward compatibility.
   ;; Run mu4e in background after starting emacs
   (mu4e t))
 #+END_SRC
-*** Use helm for mail filtration
+*** COMMENT Use helm for mail filtration
 #+begin_src emacs-lisp
 (use-package helm-mu
   :after (helm mu4e)
@@ -2119,7 +2126,7 @@ But there is no backward compatibility.
    mu4e-view-mode-map
    ("s" . helm-mu)))
 #+end_src
-*** Alerts
+*** COMMENT Alerts
 #+BEGIN_SRC emacs-lisp
 (use-package mu4e-alert
   :config
