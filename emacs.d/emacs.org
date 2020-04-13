@@ -652,62 +652,56 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 
   (defun rr/apply-theme ()
     "Apply some customizaitons to current theme."
-    (let ((bg "#3F3F3F")
-          (fg "#DCDCCC")
-          (fg-05 "#989890")
-          (dim "dim gray")
-          (block-bg "#494949")
-          (yellow "#F0DFAF")
-          (blue "#8CD0D3")
-          (red "#CC9393")
-          (orange "#DFAF8F")
-          (green+4 "#BFEBBF")
+    (load-theme 'zenburn t)
+    (let ((dim "dim gray")
           (default-font (face-attribute 'default :family)))
-      (load-theme 'zenburn t)
-      (custom-theme-set-faces
-       'user
-       ;; Helm
-       `(helm-delete-async-message ((t (:foreground ,yellow))))
-       `(helm-selection ((t (:extend t))))
-       ;; Flycheck posframe
-       `(flycheck-posframe-info-face ((t (:inherit 'success))))
-       `(flycheck-posframe-warning-face ((t (:inherit 'warning))))
-       `(flycheck-posframe-error-face ((t (:inherit 'error))))
-       `(flycheck-posframe-background-face ((t (:background ,block-bg))))
-       `(flycheck-posframe-border-face ((t (:foreground ,dim))))
-       ;; Eyebrowse
-       `(eyebrowse-mode-line-active ((t (:inherit 'mode-line-emphasis :foreground ,yellow))))
-       `(eyebrowse-mode-line-inactive ((t (:foreground ,dim))))
-       ;; VC state
-       `(vc-edited-state ((t :inherit 'vc-state-base :foreground ,blue)))
-       `(vc-up-to-date-state ((t :inherit 'vc-state-base :foreground ,green+4)))
-       `(vc-removed-state ((t :inherit 'vc-state-base :foreground ,red)))
-       `(vc-conflict-state ((t :inherit 'vc-state-base :foreground ,orange)))
-       `(vc-locally-added-state ((t :inherit 'vc-state-base :foreground ,fg)))
-       `(vc-needs-update-state ((t :inherit 'vc-state-base :foreground ,yellow)))
-       `(vc-missing-state ((t :inherit 'vc-state-base :foreground ,fg-05)))
-       ;; Set fringe color the same as background
-       `(fringe ((t (:background ,bg))))
-       ;; Less contrast window divider
-       `(window-divider ((t (:foreground ,dim))))
-       ;; Emphasize code block in markdown mode
-       `(markdown-code-face ((t (:background ,block-bg :extend t))))
-       ;; Less contrast lsp-ui code actions
-       `(lsp-ui-sideline-code-action ((t (:foreground ,dim))))
-       ;; LaTeX
-       `(font-latex-slide-title-face ((t (:height 1.0 :inherit font-lock-type-face))))
-       ;; Tab bar mode
-       `(tab-bar ((t (:family ,default-font :background "#383838"))))
-       `(tab-bar-tab ((t (:family ,default-font :background ,bg))))
-       `(tab-bar-tab-inactive ((t (:family ,default-font))))
-       ;; Clickable text
-       `(button ((t (:foreground ,yellow :weight bold))))
-       ;; Some org-mode faces
-       `(org-done ((t (:strike-through t))))
-       `(org-headline-done ((t (:foreground ,dim :strike-through t))))
-       `(org-mode-line-clock ((t (:background nil))))
-       `(org-table ((t (:background "#383838"))))
-       `(org-tag ((t (:background "#7C4343" :foreground "#DCDCCC"))))))
+      (zenburn-with-color-variables
+       (custom-theme-set-faces
+        'user
+        `(helm-delete-async-message ((t (:foreground ,zenburn-yellow))))
+        `(helm-selection ((t (:extend t))))
+        ;; Highlight line
+        ;; `(hl-line ((t (:extend t :background "#5F5F5F"))))
+        ;; `(hl-line-face ((((class color) (min-colors 89)) (:background "#5F5F5F")) (t :weight bold)))
+        ;; Flycheck posframe
+        `(flycheck-posframe-info-face ((t (:inherit 'success))))
+        `(flycheck-posframe-warning-face ((t (:inherit 'warning))))
+        `(flycheck-posframe-error-face ((t (:inherit 'error))))
+        `(flycheck-posframe-background-face ((t (:background ,zenburn-bg+05))))
+        `(flycheck-posframe-border-face ((t (:foreground ,dim))))
+        ;; Eyebrowse
+        `(eyebrowse-mode-line-active ((t (:inherit 'mode-line-emphasis :foreground ,zenburn-yellow))))
+        `(eyebrowse-mode-line-inactive ((t (:foreground ,dim))))
+        ;; VC state
+        `(vc-edited-state ((t :inherit 'vc-state-base :foreground ,zenburn-blue)))
+        `(vc-up-to-date-state ((t :inherit 'vc-state-base :foreground ,zenburn-green+4)))
+        `(vc-removed-state ((t :inherit 'vc-state-base :foreground ,zenburn-red)))
+        `(vc-conflict-state ((t :inherit 'vc-state-base :foreground ,zenburn-orange)))
+        `(vc-locally-added-state ((t :inherit 'vc-state-base :foreground ,zenburn-fg)))
+        `(vc-needs-update-state ((t :inherit 'vc-state-base :foreground ,zenburn-yellow)))
+        `(vc-missing-state ((t :inherit 'vc-state-base :foreground ,zenburn-fg-05)))
+        ;; Set fringe color the same as background
+        `(fringe ((t (:background ,zenburn-bg))))
+        ;; Less contrast window divider
+        `(window-divider ((t (:foreground ,dim))))
+        ;; Emphasize code block in markdown mode
+        `(markdown-code-face ((t (:background ,zenburn-bg+05 :extend t))))
+        ;; Less contrast lsp-ui code actions
+        `(lsp-ui-sideline-code-action ((t (:foreground ,dim))))
+        ;; LaTeX
+        `(font-latex-slide-title-face ((t (:height 1.0 :inherit font-lock-type-face))))
+        ;; Tab bar mode
+        `(tab-bar ((t (:family ,default-font :background ,zenburn-bg-05))))
+        `(tab-bar-tab ((t (:family ,default-font :background ,zenburn-bg))))
+        `(tab-bar-tab-inactive ((t (:family ,default-font))))
+        ;; Clickable text
+        `(button ((t (:foreground ,zenburn-yellow :weight bold))))
+        ;; Some org-mode faces
+        `(org-done ((t (:strike-through t))))
+        `(org-headline-done ((t (:foreground ,dim :strike-through t))))
+        `(org-mode-line-clock ((t (:background nil))))
+        `(org-table ((t (:background ,zenburn-bg-05))))
+        `(org-tag ((t (:background ,zenburn-red-5 :foreground ,zenburn-fg)))))))
     (remove-hook 'server-after-make-frame-hook 'rr/apply-theme))
 
   (if (daemonp)
@@ -1553,8 +1547,7 @@ And disable flymake autoload:
          (interactive)
          (term-line-mode)
          (yank)
-         (term-char-mode)))))
-  (add-hook 'term-mode-hook (lambda () (setq-local global-hl-line-mode nil))))
+         (term-char-mode))))))
 #+END_SRC
 ** Rainbow mode
 #+BEGIN_QUOTE
