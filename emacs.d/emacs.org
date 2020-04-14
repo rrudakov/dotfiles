@@ -1238,6 +1238,9 @@ bottom of the frame.")
           display-buffer-in-direction)
          (direction . rightmost)
          (window-width . 0.5))
+        ("COMMIT_EDITMSG"
+         (display-buffer-reuse-mode-window
+          display-buffer-same-window))
         ;; Google translate buffer
         ("\\*Google\sTranslate\\*"
          (display-buffer-reuse-mode-window

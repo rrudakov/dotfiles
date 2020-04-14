@@ -17,7 +17,7 @@
 	ui = auto
 	branch = auto
 [gpg]
-	program = gpg2
+	program = gpg
 [commit]
 	gpgsign = true
 [gitlab]
