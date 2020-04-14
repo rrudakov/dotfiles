@@ -1882,6 +1882,10 @@ But there is no backward compatibility.
 #+BEGIN_SRC emacs-lisp
 (setq org-src-fontify-natively t)
 #+END_SRC
+*** Unset some keybindings
+#+begin_src emacs-lisp
+(define-key orgtbl-mode-map (kbd "C-c C-w") nil)
+#+end_src
 *** Notifications
 #+begin_src emacs-lisp
 (use-package appt
