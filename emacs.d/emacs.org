@@ -432,10 +432,15 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 #+END_SRC
 *** Graphic mode settings
 #+BEGIN_SRC emacs-lisp
-(when (display-graphic-p)
+(defun rr/graphic-mode-settings ()
+  "Setup for current FRAME."
   (setq-default line-spacing 0)
   ;; buffer name  in frame title
   (setq frame-title-format '("" "%b @ Emacs " emacs-version)))
+
+(if (daemonp)
+    (add-hook 'server-after-make-frame-hook #'rr/graphic-mode-settings)
+  (rr/graphic-mode-settings))
 #+END_SRC
 *** Settings for tramp-mode
 #+BEGIN_SRC emacs-lisp
