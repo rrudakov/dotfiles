@@ -2737,7 +2737,15 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
         plantuml-default-exec-mode 'executable)
   (add-to-list 'org-src-lang-modes '("plantuml" . plantuml)))
 #+end_src
-** Kubernetes client for emacs
+** Kubernetes
+*** Major mode for kubernetes configs
+#+begin_src emacs-lisp
+(use-package k8s-mode
+ :config
+ (setq k8s-search-documentation-browser-function 'browse-url-firefox)
+ (add-hook 'k8s-mode-hook #'yas-minor-mode))
+#+end_src
+*** Kubernetes client for emacs
 #+begin_src emacs-lisp
 (use-package kubernetes
   :commands (kubernetes-overview))

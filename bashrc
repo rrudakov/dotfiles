@@ -14,6 +14,7 @@ source /usr/share/bash-completion/bash_completion
 source /usr/share/bash-completion/completions/pass
 source $HOME/.local/share/bash-completion/completions/rustup
 source $HOME/.local/share/bash-completion/completions/cargo
+source <(kubectl completion bash)
 
 # Set propmt
 export PS1='\[\e[32m\u\]\[\e[0m\]@\[\e[34m\h\] \[\e[33m\w\]\n\[\e[33m\]\[\e[1m\]$ \[\e[0m\]'

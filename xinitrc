@@ -26,8 +26,8 @@ fi
 $HOME/.local/bin/switch_monitor
 xsetroot -cursor_name left_ptr
 hsetroot -solid "#2B2B2B"
-picom -b
+systemctl --user import-environment DISPLAY
 stalonetray &
 protonmail-bridge --no-window &
 
-exec xmonad
+exec dbus-launch --sh-syntax --exit-with-session xmonad
