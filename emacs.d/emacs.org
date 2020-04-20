@@ -230,6 +230,10 @@ Unordered lists with separator '::'
 #+begin_src emacs-lisp
 (setq read-process-output-max (* 4 1024 1024))
 #+end_src
+** Increase max number of Lisp variable bindings
+#+begin_src emacs-lisp
+(setq max-specpdl-size 3200)
+#+end_src
 ** Auto saving settings
 #+begin_src emacs-lisp
 ;; create the savefile dir if it doesn't exist
@@ -2151,7 +2155,8 @@ But there is no backward compatibility.
   :config
   (setq message-send-mail-function #'smtpmail-send-it
         smtpmail-smtp-server "127.0.0.1"
-        smtpmail-smtp-service 1025))
+        smtpmail-smtp-service 1025
+        smtpmail-stream-type 'starttls))
 #+end_src
 *** GNUS
 **** Basic setup
@@ -2163,9 +2168,10 @@ First setup groups and IMAP.
   :config
   (setq gnus-select-method '(nntp "news.gwene.org"))
   (setq gnus-secondary-select-methods
-        '((nnimap "127.0.0.1"
+        '((nnimap "protonmail"
+                  (nnimap-address "127.0.0.1")
                   (nnimap-server-port 1143)
-                  (nnimap-stream plain))))
+                  (nnimap-stream starttls))))
   (setq gnus-agent t
         gnus-novice-user t
         gnus-use-cache t))
