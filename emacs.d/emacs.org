@@ -1197,6 +1197,7 @@ Better sorting for counsel/ivy
             "Python.*?"
             "grep"
             "compilation"
+            ".*?\sserver\slog"
             "Completions"
             "Compile-Log"
             "Async\sShell\sCommand"
@@ -2351,29 +2352,44 @@ Common tool for code formatting.
 #+begin_src emacs-lisp
 (use-package dap-mode
   :after lsp-java
-  :bind (:map dap-server-log-mode-map
-              ("q" . kill-buffer-and-window)
-              :map rr-lsp-keymap
-              ("t" . dap-java-run-test-method)
-              ("c" . dap-java-run-test-class)
-              ("b" . dap-breakpoint-toggle))
   :config
   (dap-mode 1)
   (dap-ui-mode 1)
 
+  (setq dap-java-test-runner (expand-file-name (locate-user-emacs-file ".cache/lsp/eclipse.jdt.ls/test-runner/junit-platform-console-standalone.jar")))
+  (setq dap-connect-retry-interval 0.5
+        dap-connect-retry-count 1200)
+
   (require 'dap-lldb)
   (require 'dap-java)
+
+  (define-key rr-lsp-keymap (kbd "t") #'dap-java-run-test-method)
+  (define-key rr-lsp-keymap (kbd "c") #'dap-java-run-test-class)
+  (define-key rr-lsp-keymap (kbd "b") #'dap-breakpoint-toggle)
+
   (add-hook 'dap-stopped-hook
             (lambda (arg) (call-interactively #'dap-hydra)))
 
   ;; Run build with args:
   ;; -Dmaven.failsafe.debug="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1044 -Xnoagent"
-  (dap-register-debug-template "Debug external maven"
-                               (list :type "java"
-                                     :request "attach"
-                                     :hostName "localhost"
-                                     :projectName nil
-                                     :port nil)))
+  ;; TODO: select test module name
+  (defun rr/debug-test ()
+    (interactive)
+    (let* ((port "1044")
+           (method-name (dap-java-test-method-at-point))
+           (current-workdir (projectile-project-root))
+           (project-name (file-name-nondirectory (directory-file-name current-workdir)))
+           (command (format "mvn clean install -U -DskipTests && mvn -Dit.test=%s verify -pl integration-tests -P tests-for-development -Dmaven.failsafe.debug=\"-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%s -Xnoagent\"" method-name port)))
+      (dap-debug
+       (list :type "java"
+             :request "attach"
+             :hostName "localhost"
+             :port port
+             :projectName project-name
+             :wait-for-port t
+             :program-to-start command
+             :name method-name
+             :cwd current-workdir)))))
 #+end_src
 *** Treemacs integration
 #+begin_src emacs-lisp
@@ -2507,7 +2523,8 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 **** Ligatures support
 #+begin_src emacs-lisp
 (use-package hasklig-mode
-  :hook (haskell-mode))
+  :config
+  (add-hook 'haskell-mode-hook 'hasklig-mode))
 #+end_src
 *** LaTeX
 **** AucTEX tweaks
