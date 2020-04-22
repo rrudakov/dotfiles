@@ -707,6 +707,7 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
         `(button ((t (:foreground ,zenburn-yellow :weight bold))))
         ;; Some org-mode faces
         `(org-done ((t (:strike-through t))))
+        `(org-checkbox ((t (:box nil :background nil))))
         `(org-headline-done ((t (:foreground ,dim :strike-through t))))
         `(org-mode-line-clock ((t (:background nil))))
         `(org-table ((t (:background ,zenburn-bg-05))))
@@ -1278,6 +1279,11 @@ bottom of the frame.")
          (window-height . 0.4)
          (direction . bottom)
          ,parameters)
+        ("\\*cider-error\\*"
+         (display-buffer-reuse-mode-window
+          display-buffer-in-direction)
+         (direction . rightmost)
+         (window-width . 0.5))
         ;; Open clickable text
         ((lambda (&rest _)
            (memq this-command display-buffer-same-window-commands))
