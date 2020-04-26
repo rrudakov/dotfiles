@@ -697,6 +697,7 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
         `(markdown-code-face ((t (:background ,zenburn-bg+05 :extend t))))
         ;; Less contrast lsp-ui code actions
         `(lsp-ui-sideline-code-action ((t (:foreground ,dim))))
+        `(lsp-face-highlight-textual ((t (:inherit 'highlight :weight bold))))
         ;; LaTeX
         `(font-latex-slide-title-face ((t (:height 1.0 :inherit font-lock-type-face))))
         ;; Tab bar mode
@@ -2328,6 +2329,7 @@ Common tool for code formatting.
         lsp-file-watch-threshold 2000
         lsp-imenu-sort-methods '(kind position)
         lsp-lens-check-interval 0.5
+        lsp-diagnostics-modeline-scope :file
         lsp-idle-delay 0.500)
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
