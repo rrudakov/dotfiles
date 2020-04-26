@@ -912,13 +912,6 @@ And third party package for proper syntax highlighting for pre tags in HTML:
   :config
   (add-to-list 'company-backends #'company-shell))
 #+END_SRC
-**** JavaScript
-#+BEGIN_SRC emacs-lisp
-(use-package company-tern
-  :after tern
-  :config
-  (add-to-list 'company-backends #'company-tern))
-#+END_SRC
 ** Completion styles setup
 #+begin_src emacs-lisp
 (use-package minibuffer
