@@ -697,6 +697,7 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
         `(markdown-code-face ((t (:background ,zenburn-bg+05 :extend t))))
         ;; Less contrast lsp-ui code actions
         `(lsp-ui-sideline-code-action ((t (:foreground ,dim))))
+        `(lsp-face-highlight-textual ((t (:inherit 'highlight :weight bold))))
         ;; LaTeX
         `(font-latex-slide-title-face ((t (:height 1.0 :inherit font-lock-type-face))))
         ;; Tab bar mode
@@ -911,13 +912,6 @@ And third party package for proper syntax highlighting for pre tags in HTML:
 (use-package company-shell
   :config
   (add-to-list 'company-backends #'company-shell))
-#+END_SRC
-**** JavaScript
-#+BEGIN_SRC emacs-lisp
-(use-package company-tern
-  :after tern
-  :config
-  (add-to-list 'company-backends #'company-tern))
 #+END_SRC
 ** Completion styles setup
 #+begin_src emacs-lisp
@@ -2335,6 +2329,7 @@ Common tool for code formatting.
         lsp-file-watch-threshold 2000
         lsp-imenu-sort-methods '(kind position)
         lsp-lens-check-interval 0.5
+        lsp-diagnostics-modeline-scope :file
         lsp-idle-delay 0.500)
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
