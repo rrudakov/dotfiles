@@ -320,6 +320,7 @@ myManageHook =
     , resource =? "desktop_window" --> doIgnore
     , resource =? "kdesktop" --> doIgnore
     , className =? "xfce4-notifyd" --> doIgnore
+    , title =? "Microsoft Teams Notification" --> doIgnore
     , className =? "rdesktop" --> doFullFloat
     , title =? "Media viewer" --> doFullFloat
     , title =? "Unlock Keyring" --> doCenterFloat

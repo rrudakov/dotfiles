@@ -2363,8 +2363,7 @@ Common tool for code formatting.
   (dap-ui-mode 1)
 
   (setq dap-java-test-runner (expand-file-name (locate-user-emacs-file ".cache/lsp/eclipse.jdt.ls/test-runner/junit-platform-console-standalone.jar")))
-  (setq dap-connect-retry-interval 0.5
-        dap-connect-retry-count 1200)
+  (setq dap-auto-show-output nil)
 
   (require 'dap-lldb)
   (require 'dap-java)
@@ -2381,7 +2380,9 @@ Common tool for code formatting.
   ;; TODO: select test module name
   (defun rr/debug-test ()
     (interactive)
-    (let* ((port "1044")
+    (let* ((dap-connect-retry-interval 0.5)
+           (dap-connect-retry-count 1200)
+           (port "1044")
            (method-name (dap-java-test-method-at-point))
            (current-workdir (projectile-project-root))
            (project-name (file-name-nondirectory (directory-file-name current-workdir)))
@@ -2401,14 +2402,14 @@ Common tool for code formatting.
 #+begin_src emacs-lisp
 (use-package treemacs
   :after lsp-mode
-  :bind
-  (:map lsp-mode-map
-        ("C-c *" . treemacs))
   :config
+  (define-key lsp-mode-map (kbd "C-c *") #'treemacs)
   (setq treemacs-no-png-images t
         treemacs-width 50))
 
-(use-package lsp-treemacs)
+(use-package lsp-treemacs
+  :config
+  (lsp-treemacs-sync-mode 1))
 
 ;; (use-package treemacs-projectile)
 #+end_src

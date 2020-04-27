@@ -30,4 +30,4 @@ systemctl --user import-environment DISPLAY
 stalonetray &
 protonmail-bridge --no-window &
 
-exec dbus-launch --sh-syntax --exit-with-session xmonad
+exec xmonad
