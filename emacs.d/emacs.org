@@ -1194,6 +1194,7 @@ Better sorting for counsel/ivy
             "Apropos"
             "Python.*?"
             "grep"
+            "lsp-help"
             "compilation"
             ".*?\sserver\slog"
             "Completions"
@@ -1411,6 +1412,7 @@ bottom of the frame.")
 (use-package flycheck
   :config
   (setq flycheck-idle-change-delay 2)
+  (setq flycheck-indication-mode 'left-fringe)
 
   (add-hook 'after-init-hook #'global-flycheck-mode)
 
@@ -2319,13 +2321,13 @@ Common tool for code formatting.
 #+BEGIN_SRC emacs-lisp
 (use-package lsp-mode
   :after pyvenv
-  :bind-keymap
-  ("C-c j" . rr-lsp-keymap)
-  :bind (:map rr-lsp-keymap
-              ("a" . lsp-execute-code-action)
-              ("i" . lsp-find-implementation)
-              ("r" . lsp-rename))
   :config
+  (define-key lsp-mode-map (kbd "C-c j") rr-lsp-keymap)
+  (define-key rr-lsp-keymap (kbd "a") #'lsp-execute-code-action)
+  (define-key rr-lsp-keymap (kbd "i") #'lsp-find-implementation)
+  (define-key rr-lsp-keymap (kbd "r") #'lsp-rename)
+  (define-key rr-lsp-keymap (kbd "d") #'lsp-describe-thing-at-point)
+
   (setq lsp-prefer-capf t
         lsp-signature-auto-activate nil
         lsp-diagnostic-package :flycheck
@@ -2403,13 +2405,15 @@ Common tool for code formatting.
   :config
   (define-key lsp-mode-map (kbd "C-c *") #'treemacs)
   (setq treemacs-no-png-images t
-        treemacs-width 50))
+        treemacs-width 70
+        treemacs-follow-after-init t
+        treemacs-project-follow-cleanup t))
 
 (use-package lsp-treemacs
+  :after (treemacs lsp-mode)
   :config
-  (lsp-treemacs-sync-mode 1))
-
-;; (use-package treemacs-projectile)
+  (lsp-treemacs-sync-mode 1)
+  (define-key rr-lsp-keymap (kbd "h") #'lsp-treemacs-call-hierarchy))
 #+end_src
 *** Google c-style
 #+begin_src emacs-lisp
