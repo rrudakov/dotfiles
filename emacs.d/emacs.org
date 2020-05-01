@@ -440,7 +440,7 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   "Setup for current FRAME."
   (setq-default line-spacing 0)
   ;; buffer name  in frame title
-  (setq frame-title-format '("" "%b @ Emacs " emacs-version)))
+  (setq frame-title-format '("" "%b @ Emacs")))
 
 (if (daemonp)
     (add-hook 'server-after-make-frame-hook #'rr/graphic-mode-settings)
@@ -1114,7 +1114,10 @@ Better sorting for counsel/ivy
   :config
   (setq sp-show-pair-from-inside nil
         sp-highlight-pair-overlay nil
-        sp-wrap-respect-direction t)
+        sp-highlight-wrap-overlay nil
+        sp-highlight-wrap-tag-overlay nil
+        sp-wrap-respect-direction nil
+        sp-navigate-interactive-always-progress-point t)
 
   (sp-with-modes 'web-mode
     (sp-local-pair "%" "%" :wrap "C-%")
@@ -1138,7 +1141,7 @@ Better sorting for counsel/ivy
   (sp-local-pair 'prog-mode "(" nil :post-handlers '(("||\n[i]" "RET")))
   (sp-local-pair 'java-mode "/*" "*/" :post-handlers '(("* ||\n[i]" "RET")))
 
-  (add-hook 'eshell-mode-hook 'smartparens-strict-mode)
+  (add-hook 'eshell-mode-hook #'smartparens-strict-mode)
 
   (smartparens-global-strict-mode t)
   (show-smartparens-global-mode t))

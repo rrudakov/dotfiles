@@ -27,6 +27,7 @@ $HOME/.local/bin/switch_monitor
 xsetroot -cursor_name left_ptr
 hsetroot -solid "#2B2B2B"
 systemctl --user import-environment DISPLAY
+compton -b
 stalonetray &
 protonmail-bridge --no-window &
 

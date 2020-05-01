@@ -137,7 +137,8 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
     -- launch a terminal
   [ ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
     -- launch command prompt
-  , ((modm, xK_p), shellPrompt myPromptConfig)
+  -- , ((modm, xK_p), shellPrompt myPromptConfig)
+  , ((modm, xK_p), spawn "rofi -show run")
     -- launch emacs client with new frame
   , ((modm .|. shiftMask, xK_u), spawn "emacsclient -c")
     -- launch emacs anywhere command
@@ -274,7 +275,7 @@ myLayout =
   avoidStruts $
   lessBorders Screen tiled ||| noBorders full ||| lessBorders Screen grid
   where
-    tiled = renamed [Replace "[T]"] $ Tall 1 (3 / 100) (1 / 2)
+    tiled = renamed [Replace "[T]"] $ Tall 1 (1 / 100) (2 / 3)
     full  = renamed [Replace "[F]"] Full
     grid  = renamed [Replace "[G]"] Grid
 
@@ -325,6 +326,7 @@ myManageHook =
     , title =? "Media viewer" --> doFullFloat
     , title =? "Unlock Keyring" --> doCenterFloat
     , className =? "Nm-openconnect-auth-dialog" --> doCenterFloat
+    , isFullscreen --> doFullFloat
     , title =? "Helm" -->
       customFloating (W.RationalRect (1 / 5) (1 / 5) (3 / 5) (3 / 5))
     , title =? "capture" -->
@@ -335,21 +337,13 @@ myManageHook =
     , namedScratchpadManageHook scratchpads
     ]
 
--- | Fullscreen flash
-flashHook :: ManageHook
-flashHook = composeOne [isFullscreen -?> doFullFloat]
-
-myEventHook :: Event -> X Data.Monoid.All
-myEventHook =
-  docksEventHook <+>
-  dynamicPropertyChange
-    "WM_NAME"
-    (className =? "Spotify" -->
-     customFloating (W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))) <+>
-  dynamicPropertyChange
-    "WM_NAME"
-    (title =? "*Emacs Anywhere*" -->
-     customFloating (W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4)))
+-- | Set hooks for windows with dynamic properties
+myDynHook :: ManageHook
+myDynHook =
+  composeAll
+  [ className =? "Spotify" --> customFloating (W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
+  , title =? "*Emacs Anywhere* @ Emacs" --> customFloating (W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
+  ]
 
 -- | Make java GUI working
 myStartupHook :: X ()
@@ -415,6 +409,7 @@ myConfig ::
                       (ConfigurableBorder Ambiguity) (ModifiedLayout Rename Grid)))))))
 myConfig =
   ewmh $
+  docks $
   withUrgencyHook
     NoUrgencyHook
     def
@@ -432,10 +427,13 @@ myConfig =
       , keys = myKeys
       , mouseBindings = myMouseBindings
         -- hooks, layouts
-      , manageHook = myManageHook <+> flashHook <+> manageDocks
+      , manageHook = myManageHook <+> manageDocks
       , layoutHook = myLayout
       , handleEventHook =
-          myEventHook <+>
-          ewmhDesktopsEventHook <+> fullscreenEventHook <+> perWindowKbdLayout
+          ewmhDesktopsEventHook <+>
+          fullscreenEventHook <+>
+          perWindowKbdLayout <+>
+          docksEventHook <+>
+          dynamicPropertyChange "WM_NAME" myDynHook
       , startupHook = myStartupHook
       }
