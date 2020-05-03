@@ -321,10 +321,8 @@ myManageHook =
     , resource =? "desktop_window" --> doIgnore
     , resource =? "kdesktop" --> doIgnore
     , className =? "xfce4-notifyd" --> doIgnore
-    , title =? "Microsoft Teams Notification" --> doIgnore
     , className =? "rdesktop" --> doFullFloat
     , title =? "Media viewer" --> doFullFloat
-    , title =? "Unlock Keyring" --> doCenterFloat
     , className =? "Nm-openconnect-auth-dialog" --> doCenterFloat
     , isFullscreen --> doFullFloat
     , title =? "Helm" -->
@@ -343,6 +341,8 @@ myDynHook =
   composeAll
   [ className =? "Spotify" --> customFloating (W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
   , title =? "*Emacs Anywhere* @ Emacs" --> customFloating (W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
+  , title =? "Microsoft Teams Notification" --> doFullFloat
+  , title =? "Unlock Keyring" --> doCenterFloat
   ]
 
 -- | Make java GUI working
@@ -408,6 +408,7 @@ myConfig ::
                    (ModifiedLayout
                       (ConfigurableBorder Ambiguity) (ModifiedLayout Rename Grid)))))))
 myConfig =
+  ewmhFullscreen $
   ewmh $
   docks $
   withUrgencyHook
