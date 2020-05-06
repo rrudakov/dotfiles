@@ -29,6 +29,7 @@ hsetroot -solid "#2B2B2B"
 systemctl --user import-environment DISPLAY
 picom -b
 stalonetray &
+flameshot &
 protonmail-bridge --no-window &
 
 exec xmonad
