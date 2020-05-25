@@ -267,6 +267,11 @@ Unordered lists with separator '::'
 #+begin_src emacs-lisp
 (setq-default tab-width 2)
 #+end_src
+** COMMENT Set default margins
+#+begin_src emacs-lisp
+(setq-default left-margin-width 1)
+(setq-default right-margin-width 1)
+#+end_src
 ** Display fringe outside margins
 #+begin_src emacs-lisp
 (setq-default fringes-outside-margins t)
@@ -712,7 +717,7 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
         `(org-headline-done ((t (:foreground ,dim :strike-through t))))
         `(org-mode-line-clock ((t (:background nil))))
         `(org-table ((t (:background ,zenburn-bg-05))))
-        `(org-tag ((t (:background ,zenburn-red-5 :foreground ,zenburn-fg)))))))
+        `(org-tag ((t (:background ,zenburn-bg+1 :foreground ,zenburn-red)))))))
     (remove-hook 'server-after-make-frame-hook 'rr/apply-theme))
 
   (if (daemonp)
@@ -722,6 +727,51 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
   (with-eval-after-load 'zenburn
     (rr/refresh-org-buffers)))
 #+END_SRC
+**** COMMENT Modus vivendi
+#+begin_src emacs-lisp
+(use-package modus-vivendi-theme
+  :init
+  (setq modus-vivendi-theme-slanted-constructs nil
+        modus-vivendi-theme-bold-constructs t
+        modus-vivendi-theme-visible-fringes nil
+        modus-vivendi-theme-3d-modeline nil
+        modus-vivendi-theme-subtle-diffs t
+        modus-vivendi-theme-distinct-org-blocks t
+        modus-vivendi-theme-proportional-fonts nil
+        modus-vivendi-theme-rainbow-headings nil
+        modus-vivendi-theme-section-headings nil
+        modus-vivendi-theme-scale-headings nil)
+  :config
+  (defun rr/apply-modus-theme ()
+    "Apply custom theme."
+    (load-theme 'modus-vivendi t)
+    (remove-hook 'server-after-make-frame-hook #'rr/apply-modus-theme))
+
+  (if (daemonp)
+      (add-hook 'server-after-make-frame-hook #'rr/apply-modus-theme)
+    (rr/apply-modus-theme)))
+#+end_src
+**** COMMENT Tomorrow night
+#+begin_src emacs-lisp
+(use-package color-theme-sanityinc-tomorrow
+  :config
+  (defun rr/apply-tomorrow-theme ()
+    "Apply custom theme."
+    (load-theme 'sanityinc-tomorrow-night t)
+    (let ((background "#1d1f21")
+          (selection "#373b41")
+          (red "#cc6666"))
+      (custom-theme-set-faces
+       'user
+       `(fringe ((t (:background ,background))))
+       `(org-tag ((t (:background ,selection :foreground ,red))))
+       `(org-block ((t (:extend t))))))
+    (remove-hook 'server-after-make-frame-hook #'rr/apply-tomorrow-theme))
+
+  (if (daemonp)
+      (add-hook 'server-after-make-frame-hook #'rr/apply-tomorrow-theme)
+    (rr/apply-tomorrow-theme)))
+#+end_src
 *** Modeline
 **** Custom functions
 ***** Flycheck status
@@ -934,9 +984,9 @@ And third party package for proper syntax highlighting for pre tags in HTML:
 ** Xref
 #+begin_src emacs-lisp
 (use-package xref
-  :ensure nil
   :config
-  (setq xref-prompt-for-identifier nil))
+  (setq xref-file-name-display 'nondirectory
+        xref-prompt-for-identifier nil))
 #+end_src
 ** Helm
 *** Configuration
@@ -1282,6 +1332,15 @@ bottom of the frame.")
           display-buffer-in-direction)
          (direction . rightmost)
          (window-width . 0.5))
+        ("\\*cider-test-report"
+         (display-buffer-reuse-mode-window
+          display-buffer-in-direction)
+         (direction . rightmost)
+         (window-width . 0.5))
+        ("\\*cider-repl.*$"
+         (display-buffer-reuse-mode-window
+          display-buffer-at-bottom)
+         (window-height . 0.3))
         ;; Open clickable text
         ((lambda (&rest _)
            (memq this-command display-buffer-same-window-commands))
@@ -1416,38 +1475,39 @@ bottom of the frame.")
 
   (add-hook 'after-init-hook #'global-flycheck-mode)
 
-  (when (fboundp 'define-fringe-bitmap)
-    (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
-      [#b00000000
-       #b00000000
-       #b00000000
-       #b00000000
-       #b00011100
-       #b00111110
-       #b00111110
-       #b00111110
-       #b00011100
-       #b00000000
-       #b00000000
-       #b00000000
-       #b00000000]))
+  ;; (when (fboundp 'define-fringe-bitmap)
+  ;;   (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
+  ;;     [#b00000000
+  ;;      #b00000000
+  ;;      #b00000000
+  ;;      #b00000000
+  ;;      #b00011100
+  ;;      #b00111110
+  ;;      #b00111110
+  ;;      #b00111110
+  ;;      #b00011100
+  ;;      #b00000000
+  ;;      #b00000000
+  ;;      #b00000000
+  ;;      #b00000000]))
 
-  (let ((bitmap 'flycheck-fringe-bitmap-double-arrow))
-    (flycheck-define-error-level 'error
-      :severity 2
-      :overlay-category 'flycheck-error-overlay
-      :fringe-bitmap bitmap
-      :fringe-face 'flycheck-fringe-error)
-    (flycheck-define-error-level 'warning
-      :severity 1
-      :overlay-category 'flycheck-warning-overlay
-      :fringe-bitmap bitmap
-      :fringe-face 'flycheck-fringe-warning)
-    (flycheck-define-error-level 'info
-      :severity 0
-      :overlay-category 'flycheck-info-overlay
-      :fringe-bitmap bitmap
-      :fringe-face 'flycheck-fringe-info)))
+  ;; (let ((bitmap 'flycheck-fringe-bitmap-double-arrow))
+  ;;   (flycheck-define-error-level 'error
+  ;;     :severity 2
+  ;;     :overlay-category 'flycheck-error-overlay
+  ;;     :fringe-bitmap bitmap
+  ;;     :fringe-face 'flycheck-fringe-error)
+  ;;   (flycheck-define-error-level 'warning
+  ;;     :severity 1
+  ;;     :overlay-category 'flycheck-warning-overlay
+  ;;     :fringe-bitmap bitmap
+  ;;     :fringe-face 'flycheck-fringe-warning)
+  ;;   (flycheck-define-error-level 'info
+  ;;     :severity 0
+  ;;     :overlay-category 'flycheck-info-overlay
+  ;;     :fringe-bitmap bitmap
+  ;;     :fringe-face 'flycheck-fringe-info))
+  )
 #+END_SRC
 And disable flymake autoload:
 #+begin_src emacs-lisp
@@ -1457,11 +1517,10 @@ And disable flymake autoload:
 *** Show errors in posframe
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck-posframe
-  :after flycheck
   :config
-  (setq flycheck-posframe-border-width 1)
   (with-eval-after-load 'flycheck
     (require 'flycheck-posframe)
+    (setq flycheck-posframe-border-width 1)
     (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)))
 #+END_SRC
 ** Highlight TODO item
@@ -1482,7 +1541,8 @@ And disable flymake autoload:
         magit-pull-or-fetch t)
 
   (global-magit-file-mode)
-  (add-hook 'magit-post-refresh-hook #'rr/refresh-vc-state 5))
+  ;; (add-hook 'magit-post-refresh-hook #'rr/refresh-vc-state 5)
+  )
 #+END_SRC
 *** Transient
 #+begin_src emacs-lisp
@@ -1509,7 +1569,10 @@ And disable flymake autoload:
   :config
   (setq diff-hl-draw-borders nil
         diff-hl-side 'right)
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh 3))
+  (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
+  ;; (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh 3)
+  )
 #+end_src
 *** Show TODO items in magit buffer
 #+begin_src emacs-lisp
@@ -1841,10 +1904,16 @@ But there is no backward compatibility.
 *** Custom keywords faces
 #+BEGIN_SRC emacs-lisp
 (setq org-todo-keyword-faces
-      '(("PROGRESS" . (:foreground "#8CD0D3" :weight bold))
+      '(("PROGRESS" . (:foreground "#93E0E3" :weight bold))
         ("WAITING" . (:foreground "#DFAF8F" :weight bold))
         ("REVIEW" . (:foreground "#DFAF8F" :weight bold))
         ("CANCELLED" . (:foreground "#DCDCCC" :weight bold))))
+
+;; (setq org-todo-keyword-faces
+;;       '(("PROGRESS" . (:foreground "#8abeb7" :weight bold))
+;;         ("WAITING" . (:foreground "#de935f"))
+;;         ("REVIEW" . (:foreground "#de935f"))
+;;         ("CANCELLED" . (:foreground "#969896"))))
 #+END_SRC
 *** Handle local file links by extension
 #+BEGIN_SRC emacs-lisp
@@ -2310,6 +2379,13 @@ Enable notifications when new email/news is received:
   (add-hook 'prog-mode-hook 'origami-mode)
   (define-key origami-mode-map [C-tab] #'origami-recursively-toggle-node))
 #+end_src
+** ElDoc
+Show signature of function or describe symbol at point in minibuffer.
+#+begin_src emacs-lisp
+(use-package eldoc
+  :config
+  (global-eldoc-mode))
+#+end_src
 ** Clang format
 Common tool for code formatting.
 #+begin_src emacs-lisp
@@ -2357,7 +2433,7 @@ Common tool for code formatting.
 **** Common setup
 #+begin_src emacs-lisp
 (use-package dap-mode
-  :after lsp-java
+  :after (lsp-java s)
   :config
   (dap-mode 1)
   (dap-ui-mode 1)
@@ -2377,16 +2453,28 @@ Common tool for code formatting.
 
   ;; Run build with args:
   ;; -Dmaven.failsafe.debug="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1044 -Xnoagent"
-  ;; TODO: select test module name
-  (defun rr/debug-test ()
-    (interactive)
+  (require 'seq)
+  (require 's)
+
+  (defun rr/find-test-module ()
+    (let* ((project-root (projectile-project-root))
+           (modules (seq-filter
+                     (lambda (dir) (or (s-suffix? "-tests" dir)
+                                       (s-suffix? "-test" dir)))
+                     (directory-files project-root))))
+      (if (seq-empty-p modules)
+          (error "Test module not found")
+        (first modules))))
+
+  (defun rr/debug-test (test-name)
+    "Debug java test class or method depends on TEST-NAME."
     (let* ((dap-connect-retry-interval 0.5)
            (dap-connect-retry-count 1200)
            (port "1044")
-           (method-name (dap-java-test-method-at-point))
            (current-workdir (projectile-project-root))
+           (test-module (rr/find-test-module))
            (project-name (file-name-nondirectory (directory-file-name current-workdir)))
-           (command (format "mvn clean install -U -DskipTests && mvn -Dit.test=%s verify -pl integration-tests -P tests-for-development -Dmaven.failsafe.debug=\"-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%s -Xnoagent\"" method-name port)))
+           (command (format "mvn clean install -U -DskipTests && mvn -Dit.test=%s verify -pl %s -P tests-for-development -Dmaven.failsafe.debug=\"-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%s -Xnoagent\"" test-name test-module port)))
       (dap-debug
        (list :type "java"
              :request "attach"
@@ -2395,8 +2483,16 @@ Common tool for code formatting.
              :projectName project-name
              :wait-for-port t
              :program-to-start command
-             :name method-name
-             :cwd current-workdir)))))
+             :name test-name
+             :cwd current-workdir))))
+
+  (defun rr/debug-test-mehtod ()
+    (interactive)
+    (rr/debug-test (dap-java-test-method-at-point)))
+
+  (defun rr/debug-test-class ()
+    (interactive)
+    (rr/debug-test (dap-java-test-class))))
 #+end_src
 *** Treemacs integration
 #+begin_src emacs-lisp
@@ -2729,7 +2825,8 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
   :config
   (setq cider-prompt-for-symbol nil
         cider-repl-wrap-history t
-        nrepl-hide-special-buffers t)
+        nrepl-hide-special-buffers t
+        cider-repl-display-help-banner nil)
   (add-hook 'clojure-mode-hook #'cider-mode)
   (add-hook 'clojurescript-mode-hook #'cider-mode))
 #+end_src
