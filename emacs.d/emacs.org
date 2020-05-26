@@ -2486,6 +2486,20 @@ Common tool for code formatting.
              :name test-name
              :cwd current-workdir))))
 
+  (defun rr/run-test (test-name)
+    "Run java test class or method depends on TEST-NAME."
+    (let ((default-directory (projectile-project-root))
+          (test-module (rr/find-test-module)))
+      (projectile-run-compilation (format "mvn clean install -U -DskipTests && mvn -Dit.test=%s verify -pl %s -P tests-for-development" test-name test-module))))
+
+  (defun rr/run-test-method ()
+    (interactive)
+    (rr/run-test (dap-java-test-method-at-point)))
+
+  (defun rr/run-test-class ()
+    (interactive)
+    (rr/run-test (dap-java-test-class)))
+
   (defun rr/debug-test-mehtod ()
     (interactive)
     (rr/debug-test (dap-java-test-method-at-point)))
