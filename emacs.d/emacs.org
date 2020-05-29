@@ -457,7 +457,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   :config
   (setq tramp-terminal-type "tramp"
         tramp-default-method "ssh"
+        tramp-ssh-controlmaster-options "-o ControlMaster=auto -o ControlPath='tramp.%%C'"
         explicit-shell-file-name "/bin/bash"
+        remote-file-name-inhibit-cache 3600
         tramp-completion-reread-directory-timeout nil
         vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)"
                                      vc-ignore-dir-regexp
@@ -1730,11 +1732,11 @@ Build in regex package:
 ** Markdown mode
 #+begin_src emacs-lisp
 (use-package markdown-mode
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
-  :init (setq markdown-command "multimarkdown")
   :config
+  (setq markdown-fontify-code-blocks-natively t)
+  (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+  (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
   (add-hook 'markdown-mode-hook #'rr/set-margins))
 #+end_src
 ** Edit region in indirect buffer
@@ -2923,6 +2925,10 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+BEGIN_SRC emacs-lisp
 (use-package speed-type)
 #+END_SRC
+*** Literate calc mode
+#+begin_src emacs-lisp
+(use-package literate-calc-mode)
+#+end_src
 ** Set keybindings
 *** Common
 #+BEGIN_SRC emacs-lisp
