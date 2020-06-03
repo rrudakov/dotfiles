@@ -1184,6 +1184,12 @@ Better sorting for counsel/ivy
   (define-key smartparens-mode-map (kbd "C-)") #'sp-forward-slurp-sexp)
   (define-key smartparens-mode-map (kbd "C-}") #'sp-forward-barf-sexp)
   (define-key smartparens-mode-map (kbd "C-{") #'sp-backward-barf-sexp)
+  (define-key smartparens-mode-map (kbd "C-M-t") #'sp-transpose-sexp)
+  (define-key smartparens-mode-map (kbd "C-M-k") #'sp-kill-sexp)
+  (define-key smartparens-mode-map (kbd "C-M-f") #'sp-forward-sexp)
+  (define-key smartparens-mode-map (kbd "C-M-b") #'sp-backward-sexp)
+  (define-key smartparens-mode-map (kbd "C-M-a") #'sp-beginning-of-sexp)
+  (define-key smartparens-mode-map (kbd "C-M-e") #'sp-end-of-sexp)
 
   (define-key smartparens-strict-mode-map [remap c-electric-backspace] #'sp-backward-delete-char)
   (define-key smartparens-strict-mode-map [remap c-electric-delete-forward] #'sp-delete-char)
@@ -1543,8 +1549,7 @@ And disable flymake autoload:
         magit-pull-or-fetch t)
 
   (global-magit-file-mode)
-  ;; (add-hook 'magit-post-refresh-hook #'rr/refresh-vc-state 5)
-  )
+  (add-hook 'magit-post-refresh-hook #'rr/refresh-vc-state 5))
 #+END_SRC
 *** Transient
 #+begin_src emacs-lisp
@@ -1572,9 +1577,7 @@ And disable flymake autoload:
   (setq diff-hl-draw-borders nil
         diff-hl-side 'right)
   (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)
-  ;; (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh 3)
-  )
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh 3))
 #+end_src
 *** Show TODO items in magit buffer
 #+begin_src emacs-lisp
