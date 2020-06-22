@@ -28,3 +28,5 @@
 	user = rrudakov
 [gitlab "git.eoadm.com/api/v4"]
 	user = rrudakov
+[pull]
+	rebase = false
