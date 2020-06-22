@@ -674,11 +674,20 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
       (zenburn-with-color-variables
        (custom-theme-set-faces
         'user
+        ;; Helm
         `(helm-delete-async-message ((t (:foreground ,zenburn-yellow))))
         `(helm-selection ((t (:extend t))))
+        `(helm-ff-file ((t (:foreground ,zenburn-fg :background ,zenburn-bg :weight semi-bold))))
+        `(helm-ff-executable ((t (:foreground ,zenburn-green+2 :background ,zenburn-bg :weight semi-bold))))
+        `(helm-ff-prefix ((t (:foreground ,zenburn-bg :background ,zenburn-yellow :weight semi-bold))))
         ;; Highlight line
         ;; `(hl-line ((t (:extend t :background "#5F5F5F"))))
         ;; `(hl-line-face ((((class color) (min-colors 89)) (:background "#5F5F5F")) (t :weight bold)))
+        ;; Different
+        `(link-visited ((t (:foreground ,zenburn-yellow-2 :underline t))))
+        ;; CIDER
+        `(cider-stacktrace-filter-inactive-face ((t (:inherit button :underline nil :weight semi-bold))))
+        `(cider-stacktrace-filter-active-face ((t (:inherit button :underline t :weight semi-bold))))
         ;; Flycheck posframe
         `(flycheck-posframe-info-face ((t (:inherit 'success))))
         `(flycheck-posframe-warning-face ((t (:inherit 'warning))))
@@ -688,6 +697,9 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
         ;; Eyebrowse
         `(eyebrowse-mode-line-active ((t (:inherit 'mode-line-emphasis :foreground ,zenburn-yellow))))
         `(eyebrowse-mode-line-inactive ((t (:foreground ,dim))))
+        ;; Magit
+        `(magit-popup-disabled-argument ((t (:foreground ,zenburn-fg-1 :weight semi-bold))))
+        `(magit-filename ((t (:weight semi-bold))))
         ;; VC state
         `(vc-edited-state ((t :inherit 'vc-state-base :foreground ,zenburn-blue)))
         `(vc-up-to-date-state ((t :inherit 'vc-state-base :foreground ,zenburn-green+4)))
@@ -931,7 +943,7 @@ And third party package for proper syntax highlighting for pre tags in HTML:
   :config
   (setq company-global-modes '(not org-mode markdown-mode shell-mode eshell-mode))
   (setq company-frontends '(company-pseudo-tooltip-frontend
-			                company-echo-metadata-frontend))
+			                      company-echo-metadata-frontend))
   (setq company-tooltip-align-annotations t
         company-idle-delay 0.1)
 
@@ -944,6 +956,14 @@ And third party package for proper syntax highlighting for pre tags in HTML:
   (setq company-quickhelp-use-propertized-text t)
   (company-quickhelp-mode 1))
 #+END_SRC
+*** COMMENT Show completion in posframe
+#+begin_src emacs-lisp
+(use-package company-posframe
+  :config
+  (setq company-posframe-show-indicator nil
+        company-posframe-quickhelp-show-header nil)
+  (company-posframe-mode 1))
+#+end_src
 *** Languages
 **** LaTeX
 #+BEGIN_SRC emacs-lisp
@@ -1784,7 +1804,7 @@ Build in regex package:
       org-ctrl-k-protect-subtree t
       org-imenu-depth 4
       org-export-with-sub-superscripts nil
-      org-src-window-setup 'current-window
+      org-src-window-setup 'split-window-below
       org-catch-invisible-edits 'show-and-error
       org-return-follows-link t
       ;; org-M-RET-may-split-line nil
@@ -2834,9 +2854,16 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 (use-package rust-mode)
 #+end_src
 *** Clojure
+**** Clojure condo linter
+#+begin_src emacs-lisp
+(use-package flycheck-clj-kondo)
+#+end_src
 **** Clojure mode
 #+begin_src emacs-lisp
-(use-package clojure-mode)
+(use-package clojure-mode
+  :after flycheck-clj-kondo
+  :config
+  (require 'flycheck-clj-kondo))
 #+end_src
 **** CIDER
 #+begin_src emacs-lisp
@@ -2889,6 +2916,10 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
   (setq org-plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar"
         plantuml-default-exec-mode 'executable)
   (add-to-list 'org-src-lang-modes '("plantuml" . plantuml)))
+#+end_src
+*** Protobuf
+#+begin_src emacs-lisp
+(use-package protobuf-mode)
 #+end_src
 ** Kubernetes
 *** Major mode for kubernetes configs
