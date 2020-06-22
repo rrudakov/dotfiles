@@ -275,7 +275,7 @@ myLayout =
   avoidStruts $
   lessBorders Screen tiled ||| noBorders full ||| lessBorders Screen grid
   where
-    tiled = renamed [Replace "[T]"] $ Tall 1 (1 / 100) (2 / 3)
+    tiled = renamed [Replace "[T]"] $ Tall 1 (2 / 100) (1 / 2)
     full  = renamed [Replace "[F]"] Full
     grid  = renamed [Replace "[G]"] Grid
 
@@ -341,7 +341,8 @@ myDynHook =
   composeAll
   [ className =? "Spotify" --> customFloating (W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
   , title =? "*Emacs Anywhere* @ Emacs" --> customFloating (W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
-  , title =? "Microsoft Teams Notification" --> doFullFloat
+  -- , title =? "Microsoft Teams Notification" --> customFloating (W.RationalRect (8 / 10) (1 / 8) (2 /10) (2 /8))
+  , title =? "Microsoft Teams Notification" --> doIgnore
   , title =? "Unlock Keyring" --> doCenterFloat
   ]
 
