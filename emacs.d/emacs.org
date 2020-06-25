@@ -2434,9 +2434,8 @@ Common tool for code formatting.
         lsp-diagnostic-package :flycheck
         lsp-file-watch-threshold 2000
         lsp-imenu-sort-methods '(kind position)
-        lsp-lens-check-interval 0.5
         lsp-diagnostics-modeline-scope :file
-        lsp-idle-delay 0.500)
+        lsp-modeline-code-actions-enable nil)
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
 
@@ -2448,10 +2447,10 @@ Common tool for code formatting.
 
   ;; Python lsp settings
   (setq lsp-pyls-plugins-pylint-enabled t
-	    lsp-pyls-plugins-rope-completion-enabled nil
-	    lsp-pyls-plugins-jedi-completion-enabled t
-	    lsp-pyls-plugins-jedi-completion-include-params nil
-	    lsp-pyls-plugins-jedi-signature-help-enabled t)
+	      lsp-pyls-plugins-rope-completion-enabled nil
+	      lsp-pyls-plugins-jedi-completion-enabled t
+	      lsp-pyls-plugins-jedi-completion-include-params nil
+	      lsp-pyls-plugins-jedi-signature-help-enabled t)
   (add-hook 'python-mode-hook #'lsp))
 #+END_SRC
 *** DAP mode
@@ -2933,6 +2932,10 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+begin_src emacs-lisp
 (use-package kubernetes
   :commands (kubernetes-overview))
+#+end_src
+** Dockerfile mode
+#+begin_src emacs-lisp
+(use-package dockerfile-mode)
 #+end_src
 ** Emacs everywhere
 #+begin_src emacs-lisp
