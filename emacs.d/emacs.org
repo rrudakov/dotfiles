@@ -680,6 +680,7 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
         `(helm-ff-file ((t (:foreground ,zenburn-fg :background ,zenburn-bg :weight semi-bold))))
         `(helm-ff-executable ((t (:foreground ,zenburn-green+2 :background ,zenburn-bg :weight semi-bold))))
         `(helm-ff-prefix ((t (:foreground ,zenburn-bg :background ,zenburn-yellow :weight semi-bold))))
+        `(helm-ff-file-extension ((t (:foreground ,zenburn-magenta :extend t))))
         ;; Highlight line
         ;; `(hl-line ((t (:extend t :background "#5F5F5F"))))
         ;; `(hl-line-face ((((class color) (min-colors 89)) (:background "#5F5F5F")) (t :weight bold)))
@@ -2332,7 +2333,7 @@ Enable notifications when new email/news is received:
   (setq gnus-notifications-use-google-contacts nil)
   (add-hook 'gnus-after-getting-new-news-hook 'gnus-notifications))
 #+end_src
-** Google translate interface
+** COMMENT Google translate interface
 #+begin_src emacs-lisp
 (use-package google-translate-default-ui
   :ensure google-translate
@@ -2838,7 +2839,10 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 (use-package clojure-mode
   :after flycheck-clj-kondo
   :config
-  (require 'flycheck-clj-kondo))
+  (require 'flycheck-clj-kondo)
+  ;; (add-to-list 'lsp-language-id-configuration `(clojurescript-mode . "clojure"))
+  ;; (add-hook 'clojurescript-mode-hook #'lsp)
+  )
 #+end_src
 **** CIDER
 #+begin_src emacs-lisp
