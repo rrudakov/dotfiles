@@ -2333,7 +2333,7 @@ Enable notifications when new email/news is received:
   (setq gnus-notifications-use-google-contacts nil)
   (add-hook 'gnus-after-getting-new-news-hook 'gnus-notifications))
 #+end_src
-** COMMENT Google translate interface
+** Google translate interface
 #+begin_src emacs-lisp
 (use-package google-translate-default-ui
   :ensure google-translate
@@ -2675,7 +2675,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+END_SRC
 **** Default interpreter
 #+BEGIN_SRC emacs-lisp
-(setq python-shell-interpreter "python")
+(setq python-shell-interpreter "python3")
 #+END_SRC
 **** Import management
 ***** Automatically sort imports
@@ -2741,32 +2741,35 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+end_src
 **** TypeScript
 #+BEGIN_SRC emacs-lisp
-(use-package typescript-mode)
-
-(use-package tide
+(use-package typescript-mode
   :config
-  (defun setup-tide-mode ()
-    (interactive)
-    (tide-setup)
-    (setq flycheck-check-syntax-automatically '(save mode-enabled))
-    (tide-hl-identifier-mode +1))
+  (add-hook 'typescript-mode-hook #'lsp))
 
-  ;; aligns annotation to the right hand side
-  (setq tide-sort-completions-by-kind t
-        tide-completion-detailed t)
+;; (use-package tide
+;;   :disabled t
+;;   :config
+;;   (defun setup-tide-mode ()
+;;     (interactive)
+;;     (tide-setup)
+;;     (setq flycheck-check-syntax-automatically '(save mode-enabled))
+;;     (tide-hl-identifier-mode +1))
 
-  ;; formats the buffer before saving
-  (add-hook 'before-save-hook #'tide-format-before-save)
+;;   ;; aligns annotation to the right hand side
+;;   (setq tide-sort-completions-by-kind t
+;;         tide-completion-detailed t)
 
-  (add-hook 'typescript-mode-hook #'setup-tide-mode)
-  (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil))
+;;   ;; formats the buffer before saving
+;;   (add-hook 'before-save-hook #'tide-format-before-save)
 
-  (flycheck-add-next-checker 'tsx-tide 'javascript-eslint 'append)
-  (flycheck-add-next-checker 'typescript-tide 'javascript-eslint 'append)
-  (flycheck-add-next-checker 'jsx-tide 'javascript-eslint 'append)
-  (flycheck-add-next-checker 'javascript-tide 'javascript-eslint 'append))
+;;   (add-hook 'typescript-mode-hook #'setup-tide-mode)
+;;   (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil))
+
+;;   (flycheck-add-next-checker 'tsx-tide 'javascript-eslint 'append)
+;;   (flycheck-add-next-checker 'typescript-tide 'javascript-eslint 'append)
+;;   (flycheck-add-next-checker 'jsx-tide 'javascript-eslint 'append)
+;;   (flycheck-add-next-checker 'javascript-tide 'javascript-eslint 'append))
 #+END_SRC
-**** Angular support
+**** COMMENT Angular support
 #+begin_src emacs-lisp
 (use-package ng2-mode
   :after tide
@@ -2808,16 +2811,24 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
             (web-mode-set-engine "django"))))
 
   (add-hook 'web-mode-hook #'rr/django-project-hook)
+  ;; (add-hook 'web-mode-hook
+  ;;           (lambda ()
+  ;;             (when (string-equal "tsx" (file-name-extension buffer-file-name))
+  ;;               (setup-tide-mode))))
   (add-hook 'web-mode-hook
             (lambda ()
               (when (string-equal "tsx" (file-name-extension buffer-file-name))
-                (setup-tide-mode))))
+                (lsp))))
   (flycheck-add-mode 'javascript-eslint 'web-mode)
 
-  (add-hook 'web-mode-hook
+  ;; (add-hook 'web-mode-hook
+  ;;           (lambda ()
+  ;;             (when (string-equal "jsx" (file-name-extension buffer-file-name))
+  ;;               (setup-tide-mode))))
+    (add-hook 'web-mode-hook
             (lambda ()
               (when (string-equal "jsx" (file-name-extension buffer-file-name))
-                (setup-tide-mode))))
+                (lsp))))
   (flycheck-add-mode 'javascript-eslint 'web-mode))
 #+END_SRC
 *** Groovy
