@@ -2388,7 +2388,6 @@ Common tool for code formatting.
 **** Common setup
 #+BEGIN_SRC emacs-lisp
 (use-package lsp-mode
-  :after pyvenv
   :config
   (define-key lsp-mode-map (kbd "C-c j") rr-lsp-keymap)
   (define-key rr-lsp-keymap (kbd "a") #'lsp-execute-code-action)
@@ -2402,7 +2401,8 @@ Common tool for code formatting.
         lsp-file-watch-threshold 2000
         lsp-imenu-sort-methods '(kind position)
         lsp-diagnostics-modeline-scope :file
-        lsp-modeline-code-actions-enable nil)
+        lsp-modeline-code-actions-enable nil
+        lsp-enable-on-type-formatting nil)
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
 
@@ -2741,35 +2741,35 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+end_src
 **** TypeScript
 #+BEGIN_SRC emacs-lisp
-(use-package typescript-mode
+(use-package typescript-mode)
+
+(use-package tide
   :config
-  (add-hook 'typescript-mode-hook #'lsp))
+  (defun setup-tide-mode ()
+    (interactive)
+    (tide-setup)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (tide-hl-identifier-mode +1))
 
-;; (use-package tide
-;;   :disabled t
-;;   :config
-;;   (defun setup-tide-mode ()
-;;     (interactive)
-;;     (tide-setup)
-;;     (setq flycheck-check-syntax-automatically '(save mode-enabled))
-;;     (tide-hl-identifier-mode +1))
+  ;; aligns annotation to the right hand side
+  (setq tide-sort-completions-by-kind t
+        tide-completion-detailed t)
 
-;;   ;; aligns annotation to the right hand side
-;;   (setq tide-sort-completions-by-kind t
-;;         tide-completion-detailed t)
+  ;; formats the buffer before saving
+  (add-hook 'before-save-hook #'tide-format-before-save)
 
-;;   ;; formats the buffer before saving
-;;   (add-hook 'before-save-hook #'tide-format-before-save)
+  (add-hook 'typescript-mode-hook #'setup-tide-mode)
+  (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil))
 
-;;   (add-hook 'typescript-mode-hook #'setup-tide-mode)
-;;   (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil))
+  (define-key tide-mode-map (kbd "C-c j a") #'tide-fix)
+  (define-key tide-mode-map (kbd "C-c C-f") #'tide-organize-imports)
 
-;;   (flycheck-add-next-checker 'tsx-tide 'javascript-eslint 'append)
-;;   (flycheck-add-next-checker 'typescript-tide 'javascript-eslint 'append)
-;;   (flycheck-add-next-checker 'jsx-tide 'javascript-eslint 'append)
-;;   (flycheck-add-next-checker 'javascript-tide 'javascript-eslint 'append))
+  (flycheck-add-next-checker 'tsx-tide 'javascript-eslint 'append)
+  (flycheck-add-next-checker 'typescript-tide 'javascript-eslint 'append)
+  (flycheck-add-next-checker 'jsx-tide 'javascript-eslint 'append)
+  (flycheck-add-next-checker 'javascript-tide 'javascript-eslint 'append))
 #+END_SRC
-**** COMMENT Angular support
+**** Angular support
 #+begin_src emacs-lisp
 (use-package ng2-mode
   :after tide
@@ -2811,24 +2811,24 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
             (web-mode-set-engine "django"))))
 
   (add-hook 'web-mode-hook #'rr/django-project-hook)
-  ;; (add-hook 'web-mode-hook
-  ;;           (lambda ()
-  ;;             (when (string-equal "tsx" (file-name-extension buffer-file-name))
-  ;;               (setup-tide-mode))))
   (add-hook 'web-mode-hook
             (lambda ()
               (when (string-equal "tsx" (file-name-extension buffer-file-name))
-                (lsp))))
-  (flycheck-add-mode 'javascript-eslint 'web-mode)
-
+                (setup-tide-mode))))
   ;; (add-hook 'web-mode-hook
   ;;           (lambda ()
-  ;;             (when (string-equal "jsx" (file-name-extension buffer-file-name))
-  ;;               (setup-tide-mode))))
-    (add-hook 'web-mode-hook
+  ;;             (when (string-equal "tsx" (file-name-extension buffer-file-name))
+  ;;               (lsp))))
+  (flycheck-add-mode 'javascript-eslint 'web-mode)
+
+  (add-hook 'web-mode-hook
             (lambda ()
               (when (string-equal "jsx" (file-name-extension buffer-file-name))
-                (lsp))))
+                (setup-tide-mode))))
+  ;; (add-hook 'web-mode-hook
+  ;;         (lambda ()
+  ;;           (when (string-equal "jsx" (file-name-extension buffer-file-name))
+  ;;             (lsp))))
   (flycheck-add-mode 'javascript-eslint 'web-mode))
 #+END_SRC
 *** Groovy
