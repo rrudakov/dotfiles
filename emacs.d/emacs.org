@@ -945,6 +945,7 @@ And third party package for proper syntax highlighting for pre tags in HTML:
   (setq company-global-modes '(not org-mode markdown-mode shell-mode eshell-mode))
   (setq company-frontends '(company-pseudo-tooltip-frontend
 			                      company-echo-metadata-frontend))
+
   (setq company-tooltip-align-annotations t
         company-idle-delay 0.1)
 
@@ -2753,7 +2754,8 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 
   ;; aligns annotation to the right hand side
   (setq tide-sort-completions-by-kind t
-        tide-completion-detailed t)
+        tide-completion-detailed t
+        tide-completion-show-source t)
 
   ;; formats the buffer before saving
   (add-hook 'before-save-hook #'tide-format-before-save)
