@@ -944,7 +944,7 @@ And third party package for proper syntax highlighting for pre tags in HTML:
   :config
   (setq company-global-modes '(not org-mode markdown-mode shell-mode eshell-mode))
   (setq company-frontends '(company-pseudo-tooltip-frontend
-			                      company-echo-metadata-frontend))
+                            company-echo-metadata-frontend))
 
   (setq company-tooltip-align-annotations t
         company-idle-delay 0.1)
@@ -2403,7 +2403,8 @@ Common tool for code formatting.
         lsp-imenu-sort-methods '(kind position)
         lsp-diagnostics-modeline-scope :file
         lsp-modeline-code-actions-enable nil
-        lsp-enable-on-type-formatting nil)
+        lsp-enable-on-type-formatting nil
+        lsp-diagnostic-clean-after-change nil)
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
 
@@ -2765,6 +2766,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 
   (define-key tide-mode-map (kbd "C-c j a") #'tide-fix)
   (define-key tide-mode-map (kbd "C-c C-f") #'tide-organize-imports)
+  (define-key tide-mode-map (kbd "C-c j r") #'tide-rename-symbol)
 
   (flycheck-add-next-checker 'tsx-tide 'javascript-eslint 'append)
   (flycheck-add-next-checker 'typescript-tide 'javascript-eslint 'append)
@@ -2905,7 +2907,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+begin_src emacs-lisp
 (use-package plantuml-mode
   :config
-  (setq org-plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar"
+  (setq org-plantuml-jar-path "/usr/share/plantuml/plantuml.jar"
         plantuml-default-exec-mode 'executable)
   (add-to-list 'org-src-lang-modes '("plantuml" . plantuml)))
 #+end_src
