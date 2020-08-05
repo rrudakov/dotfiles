@@ -2396,16 +2396,16 @@ Common tool for code formatting.
   (define-key rr-lsp-keymap (kbd "r") #'lsp-rename)
   (define-key rr-lsp-keymap (kbd "d") #'lsp-describe-thing-at-point)
 
-  (setq lsp-prefer-capf t
+  (setq lsp-completion-provider :capf
         lsp-signature-auto-activate nil
         lsp-diagnostic-package :flycheck
         lsp-file-watch-threshold 2000
         lsp-imenu-sort-methods '(kind position)
         lsp-modeline-diagnostics-enable nil
-        lsp-diagnostics-modeline-scope :file
         lsp-modeline-code-actions-enable nil
         lsp-enable-on-type-formatting nil
-        lsp-diagnostic-clean-after-change nil)
+        lsp-enable-indentation nil
+        lsp-diagnostic-clean-after-change t)
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
 
