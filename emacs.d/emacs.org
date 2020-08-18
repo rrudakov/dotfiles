@@ -585,8 +585,9 @@ No more ugly line splitting
         savehist-additional-variables '(kill-ring
                                         search-ring
                                         regexp-search-ring
+                                        extended-command-history
                                         shell-command-history))
-  (savehist-mode +1))
+  (savehist-mode 1))
 #+END_SRC
 *** Kill-ring
 Save stuff you’ve copied in other applications to the emacs kill-ring.
@@ -660,7 +661,7 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 #+end_src
 ** Theme
 *** Color scheme
-**** Zenburn theme
+**** COMMENT Zenburn theme
 #+BEGIN_SRC emacs-lisp
 (use-package zenburn-theme
   :config
@@ -742,29 +743,31 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
   (with-eval-after-load 'zenburn
     (rr/refresh-org-buffers)))
 #+END_SRC
-**** COMMENT Modus vivendi
+**** Modus vivendi
 #+begin_src emacs-lisp
 (use-package modus-vivendi-theme
-  :init
+  :config
   (setq modus-vivendi-theme-slanted-constructs nil
         modus-vivendi-theme-bold-constructs t
-        modus-vivendi-theme-visible-fringes nil
-        modus-vivendi-theme-3d-modeline nil
-        modus-vivendi-theme-subtle-diffs t
-        modus-vivendi-theme-distinct-org-blocks t
-        modus-vivendi-theme-proportional-fonts nil
-        modus-vivendi-theme-rainbow-headings nil
-        modus-vivendi-theme-section-headings nil
-        modus-vivendi-theme-scale-headings nil)
-  :config
+        modus-vivendi-theme-org-blocks 'greyscale
+        modus-vivendi-theme-proportional-fonts nil)
+
   (defun rr/apply-modus-theme ()
     "Apply custom theme."
     (load-theme 'modus-vivendi t)
+    (custom-theme-set-faces
+     'user
+     `(org-agenda-clocking ((((class color) (min-colors 89)) (:inherit modus-theme-special-cold :extend t))))
+     `(org-headline-done ((t (:foreground "#a8a8a8" :strike-through t))))
+     `(org-done ((t (:foreground "#a8a8a8" :strike-through t)))))
     (remove-hook 'server-after-make-frame-hook #'rr/apply-modus-theme))
 
   (if (daemonp)
       (add-hook 'server-after-make-frame-hook #'rr/apply-modus-theme)
-    (rr/apply-modus-theme)))
+    (rr/apply-modus-theme))
+
+  (with-eval-after-load 'modus-vivendi
+    (rr/refresh-org-buffers)))
 #+end_src
 **** COMMENT Tomorrow night
 #+begin_src emacs-lisp
@@ -846,6 +849,14 @@ nil."
   (setq eshell-scroll-to-bottom-on-input t
         eshell-scroll-to-bottom-on-output t
         eshell-destroy-buffer-when-process-dies t))
+#+end_src
+** Attempt to fix performance problem with long lines
+So long mode:
+#+begin_src emacs-lisp
+(use-package so-long
+  :config
+  ;; Avoid performance issues in files with very long lines.
+  (global-so-long-mode 1))
 #+end_src
 ** Built-in web browser and HTML parser
 #+begin_src emacs-lisp
@@ -1024,16 +1035,17 @@ And third party package for proper syntax highlighting for pre tags in HTML:
     (setq helm-google-suggest-use-curl-p t))
 
   (setq helm-split-window-inside-p            nil ; open helm buffer inside current window, not occupy whole other window
-	    helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
-	    helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
-	    helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
-	    helm-ff-file-name-history-use-recentf t
-	    helm-echo-input-in-header-line nil
-	    helm-display-header-line nil
-	    helm-buffer-max-length 40
-	    helm-ff-delete-files-function #'helm-delete-marked-files-async
-	    helm-inherit-input-method nil
+	      helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+	      helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+	      helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+	      helm-ff-file-name-history-use-recentf t
+	      helm-echo-input-in-header-line nil
+	      helm-display-header-line nil
+        helm-buffer-max-length 40
+	      helm-ff-delete-files-function #'helm-delete-marked-files-async
+	      helm-inherit-input-method nil
         helm-truncate-lines t
+        helm-M-x-always-save-history t
         helm-buffers-truncate-lines t)
 
   ;; Remove all distracting information from helm modeline
@@ -1058,10 +1070,10 @@ And third party package for proper syntax highlighting for pre tags in HTML:
     (define-key helm-find-files-map (kbd "C-i") #'helm-ff-TAB))
 
   (add-hook 'eshell-mode-hook
-	        (lambda ()
-	          (eshell-cmpl-initialize)
-	          (define-key eshell-mode-map [remap eshell-pcomplete] #'helm-esh-pcomplete)
-	          (define-key eshell-mode-map (kbd "M-p") #'helm-eshell-history)))
+	          (lambda ()
+	            (eshell-cmpl-initialize)
+	            (define-key eshell-mode-map [remap eshell-pcomplete] #'helm-esh-pcomplete)
+	            (define-key eshell-mode-map (kbd "M-p") #'helm-eshell-history)))
 
   (setq helm-display-function #'display-buffer)
   (setq helm-show-completion-display-function #'display-buffer)
@@ -1500,7 +1512,8 @@ bottom of the frame.")
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
   :config
-  (setq flycheck-idle-change-delay 2)
+  (setq flycheck-idle-change-delay 2
+        flycheck-check-syntax-automatically '(save new-line mode-enabled))
   (setq flycheck-indication-mode 'left-fringe)
 
   (add-hook 'after-init-hook #'global-flycheck-mode))
@@ -1896,17 +1909,25 @@ But there is no backward compatibility.
 #+END_SRC
 *** Custom keywords faces
 #+BEGIN_SRC emacs-lisp
-(setq org-todo-keyword-faces
-      '(("PROGRESS" . (:foreground "#93E0E3" :weight bold))
-        ("WAITING" . (:foreground "#DFAF8F" :weight bold))
-        ("REVIEW" . (:foreground "#DFAF8F" :weight bold))
-        ("CANCELLED" . (:foreground "#DCDCCC" :weight bold))))
+;; Zenburn
+;; (setq org-todo-keyword-faces
+;;       '(("PROGRESS" . (:foreground "#93E0E3" :weight bold))
+;;         ("WAITING" . (:foreground "#DFAF8F" :weight bold))
+;;         ("REVIEW" . (:foreground "#DFAF8F" :weight bold))
+;;         ("CANCELLED" . (:foreground "#DCDCCC" :weight bold))))
 
 ;; (setq org-todo-keyword-faces
 ;;       '(("PROGRESS" . (:foreground "#8abeb7" :weight bold))
 ;;         ("WAITING" . (:foreground "#de935f"))
 ;;         ("REVIEW" . (:foreground "#de935f"))
 ;;         ("CANCELLED" . (:foreground "#969896"))))
+
+;; Modus vivendi
+(setq org-todo-keyword-faces
+      '(("PROGRESS" . (:foreground "#29aeff"))
+        ("WAITING" . (:foreground "#eecc00"))
+        ("REVIEW" . (:foreground "#eecc00"))
+        ("CANCELLED" . (:foreground "#a8a8a8"))))
 #+END_SRC
 *** Handle local file links by extension
 #+BEGIN_SRC emacs-lisp
@@ -2396,9 +2417,7 @@ Common tool for code formatting.
   (define-key rr-lsp-keymap (kbd "r") #'lsp-rename)
   (define-key rr-lsp-keymap (kbd "d") #'lsp-describe-thing-at-point)
 
-  (setq lsp-completion-provider :capf
-        lsp-signature-auto-activate nil
-        lsp-diagnostic-package :flycheck
+  (setq lsp-signature-auto-activate nil
         lsp-file-watch-threshold 2000
         lsp-imenu-sort-methods '(kind position)
         lsp-modeline-diagnostics-enable nil
@@ -2409,13 +2428,13 @@ Common tool for code formatting.
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
 
-  (require 'lsp-clients)
-
   ;; Rust lsp settings
+  (require 'lsp-rust)
   (setq lsp-rust-clippy-preference "on")
   (add-hook 'rust-mode-hook 'lsp)
 
   ;; Python lsp settings
+  (require 'lsp-pyls)
   (setq lsp-pyls-plugins-pylint-enabled t
 	      lsp-pyls-plugins-rope-completion-enabled nil
 	      lsp-pyls-plugins-jedi-completion-enabled t
@@ -2468,7 +2487,7 @@ Common tool for code formatting.
            (current-workdir (projectile-project-root))
            (test-module (rr/find-test-module))
            (project-name (file-name-nondirectory (directory-file-name current-workdir)))
-           (command (format "mvn clean install -U -DskipTests && mvn -Dit.test=%s verify -pl %s -P tests-for-development -Dmaven.failsafe.debug=\"-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%s -Xnoagent\"" test-name test-module port)))
+           (command (format "mvn -Dit.test=%s verify -pl %s -P tests-for-development -Dmaven.failsafe.debug=\"-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%s -Xnoagent\"" test-name test-module port)))
       (dap-debug
        (list :type "java"
              :request "attach"
@@ -2484,7 +2503,7 @@ Common tool for code formatting.
     "Run java test class or method depends on TEST-NAME."
     (let ((default-directory (projectile-project-root))
           (test-module (rr/find-test-module)))
-      (projectile-run-compilation (format "mvn clean install -U -DskipTests && mvn -Dit.test=%s verify -pl %s -P tests-for-development" test-name test-module))))
+      (projectile-run-compilation (format "mvn -Dit.test=%s verify -pl %s -P tests-for-development" test-name test-module))))
 
   (defun rr/run-test-method ()
     (interactive)
@@ -2553,7 +2572,7 @@ Common tool for code formatting.
         lsp-java-format-settings-profile "GoogleStyle")
 
   (setq lsp-java-vmargs '("-javaagent:/home/rrudakov/Soft/lombok/lombok.jar"
-                          "-Xmx1G"
+                          "-Xmx4G"
                           "-XX:+UseG1GC"
                           "-XX:+UseStringDeduplication")))
 #+END_SRC
