@@ -900,7 +900,7 @@ And third party package for proper syntax highlighting for pre tags in HTML:
   (save-place-mode 1))
 #+end_src
 ** SQL
-*** Emacs clojure database client
+*** COMMENT Emacs clojure database client
 #+begin_src emacs-lisp
 (use-package ejc-sql
   :config
@@ -920,6 +920,13 @@ And third party package for proper syntax highlighting for pre tags in HTML:
   ;; Define connections
   (when (require 'databases nil t)
     (rr/setup-connections)))
+#+end_src
+*** Tweaks for sql-mode and sql-indent package
+#+begin_src emacs-lisp
+(use-package sql-indent
+  :config
+  (setq sql-use-indent-support t)
+  (add-hook 'sql-mode-hook #'sqlind-minor-mode))
 #+end_src
 *** Make PostgreSQL default
 #+BEGIN_SRC emacs-lisp
