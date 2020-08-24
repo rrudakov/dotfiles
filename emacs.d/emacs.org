@@ -342,7 +342,8 @@ Saves to a temp file and puts the filename in the kill ring."
 (use-package hl-line
   :config
   (setq hl-line-sticky-flag nil)
-  (add-hook 'prog-mode-hook 'hl-line-mode))
+  (add-hook 'prog-mode-hook #'hl-line-mode)
+  (add-hook 'nxml-mode-hook #'hl-line-mode))
 #+END_SRC
 *** COMMENT Set default font
 Good choices:
