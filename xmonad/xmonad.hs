@@ -52,11 +52,11 @@ myWorkspaces = map show [1 .. 9 :: Int]
 
 -- | Set unfocused windows border color
 myNormalBorderColor :: String
-myNormalBorderColor  = "#282828"
+myNormalBorderColor  = "#bebebe"
 
 -- | Set focused window border color
 myFocusedBorderColor :: String
-myFocusedBorderColor = "#928374"
+myFocusedBorderColor = "#f5f5f5"
 
 -- | Spotify play toggle command
 spotifyPlayToggle :: String
@@ -107,11 +107,11 @@ myPromptConfig :: XPConfig
 myPromptConfig =
   XPC
     { font = "xft:Source Code Variable:size=8:semibold:antialias=true"
-    , bgColor = "#282828"
-    , fgColor = "#ebdbb2"
+    , bgColor = "#000000"
+    , fgColor = "#ffffff"
     , fgHLight = "black"
     , bgHLight = "gray"
-    , borderColor = "#C5C8C6"
+    , borderColor = "#ffffff"
     , promptBorderWidth = 0
     , promptKeymap = defaultXPKeymap
     , completionKey = (0, xK_Tab)
@@ -183,7 +183,7 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
   , ((modm .|. shiftMask, xK_m), namedScratchpadAction scratchpads "spotify")
   , ((modm .|. shiftMask, xK_s), namedScratchpadAction scratchpads "slack")
   , ((modm, xK_u), namedScratchpadAction scratchpads "wire")
-  , ((modm .|. shiftMask, xK_b), namedScratchpadAction scratchpads "skype")
+  -- , ((modm .|. shiftMask, xK_b), namedScratchpadAction scratchpads "skype")
     -- Toggle copy to all workspaces
   , ((modm, xK_a), toggleCopyToAll)
     -- Org capture
@@ -304,11 +304,11 @@ scratchpads =
       "slack"
       (appName =? "slack")
       (customFloating $ W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
-  , NS
-      "skype"
-      "skypeforlinux"
-      (className =? "Skype")
-      (customFloating $ W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
+  -- , NS
+  --     "skype"
+  --     "skypeforlinux"
+  --     (className =? "Skype")
+  --     (customFloating $ W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
   ]
 
 -- | Set hooks for applications
@@ -381,13 +381,13 @@ myPP :: PP
 myPP =
   namedScratchpadFilterOutWorkspacePP $
   xmobarPP
-    { ppCurrent = xmobarColor "#DFAF8F" "#3F3F3F" . wrap " " " "
-    , ppTitle = xmobarColor "#7F9F7F" "" . shorten 60
-    , ppHidden = xmobarColor "#DCDCCC" ""
-    , ppHiddenNoWindows = xmobarColor "#656555" ""
-    , ppUrgent = xmobarColor "#2B2B2B" "#CC9393" . wrap " " " "
+    { ppCurrent = xmobarColor "#f8dec0" "#382f27" . wrap " " " "
+    , ppTitle = xmobarColor "#a8a8a8" "" . shorten 60
+    , ppHidden = xmobarColor "#f8dec0" ""
+    , ppHiddenNoWindows = xmobarColor "#392a48" ""
+    , ppUrgent = xmobarColor "#000000" "#ff8059" . wrap " " " "
     , ppSep = "  "
-    , ppLayout = xmobarColor "#DCDCCC" ""
+    , ppLayout = xmobarColor "#ffffff" ""
     }
 
 toggleStrutsKey :: XConfig l -> (KeyMask, KeySym)

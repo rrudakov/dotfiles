@@ -2,7 +2,7 @@ decorations none
 transparent false
 dockapp_mode none
 geometry 4x1-280+0
-background "#2B2B2B"
+background "#000000"
 kludges force_icons_size
 grow_gravity NE
 icon_gravity NE

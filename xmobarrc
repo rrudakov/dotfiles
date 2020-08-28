@@ -1,10 +1,11 @@
 Config { font = "xft:Source Code Variable:semibold:size=8:antialias=true"
        , additionalFonts = ["xft:Droid Sans Mono:size=8"]
-       , bgColor = "#2B2B2B"
-       , fgColor = "#DCDCCC"
+       , bgColor = "#000000"
+       , fgColor = "#ffffff"
        , position = Top
        , border = NoBorder
-       , borderColor = "#2B2B2B"
+       , borderWidth = 1
+       , borderColor = "#ffffff"
        , textOffset = -1
        , iconOffset = -1
        , lowerOnStart = True
@@ -14,48 +15,48 @@ Config { font = "xft:Source Code Variable:semibold:size=8:antialias=true"
        , overrideRedirect = True
        , persistent = False
        , alpha = 255
-       , commands = [ Run DynNetwork [ "--template" , "<fc=#7F9F7F><icon=.xpm/net_down_03.xbm/></fc><rx>kB/s|<tx>kB/s<fc=#93E0E3><icon=.xpm/net_up_03.xbm/></fc>"
+       , commands = [ Run DynNetwork [ "--template" , "<fc=#44bc44><icon=.xpm/net_down_03.xbm/></fc><rx>kB/s|<tx>kB/s<fc=#29aeff><icon=.xpm/net_up_03.xbm/></fc>"
                                      , "--Low"      , "100000"       -- units: B/s
                                      , "--High"     , "1000000"       -- units: B/s
-		                             , "--normal", "#7F9F7F"
-		                             , "--high", "#CC9393"
+		                                 , "--normal", "#44bc44"
+		                                 , "--high", "#ff8059"
                                      , "-m", "4"
                                      , "-M", "4"
-		                             ] 10
+		                                 ] 10
                     , Run Cpu [ "-L", "3"
-		      	              , "-H", "50"
-			                  , "--normal", "#7F9F7F"
-			                  , "--high", "#CC9393"
+		      	                  , "-H", "50"
+			                        , "--normal", "#44bc44"
+			                        , "--high", "#ff8059"
                               , "-p", "3"
-			                  , "-t <fc=#DCDCCC><icon=.xpm/cpu.xbm/></fc> <total>%"
-			                  ] 10
+			                        , "-t <fc=#ffffff><icon=.xpm/cpu.xbm/></fc> <total>%"
+			                        ] 10
                     , Run Memory [ "-L", "10"
-		                         , "-H", "80"
-                                 , "--normal", "#7F9F7F"
-                                 , "--high", "#CC9393"
+		                             , "-H", "80"
+                                 , "--normal", "#44bc44"
+                                 , "--high", "#ff8059"
                                  , "-p", "3"
-		                         , "-t","<fc=#DCDCCC><icon=.xpm/mem.xbm/></fc> <usedratio>%"
+		                             , "-t","<fc=#ffffff><icon=.xpm/mem.xbm/></fc> <usedratio>%"
                                  ] 10
                     , Run BatteryP ["BAT0"]
-                                   [ "--template" , "<fc=#a89984><icon=.xpm/bat_full_01.xbm/></fc> <acstatus>"
-				                   , "--Low"      , "10"
+                                   [ "--template" , "<fc=#eecc00><icon=.xpm/bat_full_01.xbm/></fc> <acstatus>"
+				                           , "--Low"      , "10"
                                    , "--High"     , "80"
-                                   , "--low"      , "#CC9393"
-                                   , "--normal"   , "#DFAF8F"
-                                   , "--high"     , "#7F9F7F"
+                                   , "--low"      , "#ff8059"
+                                   , "--normal"   , "#eecc00"
+                                   , "--high"     , "#44bc44"
                                    , "-m", "0"
                                    , "-M", "0"
-                                   , "--", "-O", "<fc=#7F9F7F>→<left>%</fc>", "-o", "<left>%", "-i", "<fc=#8CD0D3>Full</fc>"
+                                   , "--", "-O", "<fc=#44bc44>→<left>%</fc>", "-o", "<left>%", "-i", "<fc=#29aeff>Full</fc>"
                                    , "-f", "AC/online"
-				                   ] 10
+				                           ] 10
                     , Run Swap [] 10
                     , Run Com "uname" ["-s","-r"] "" 36000
-    		        , Run Date "%F %T" "date" 10
-		            , Run Kbd [("us", "US"), ("ru", "RU")]
+    		            , Run Date "%F %T" "date" 10
+		                , Run Kbd [("us", "US"), ("ru", "RU")]
                     , Run StdinReader
                     ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = "%cpu% %memory% %dynnetwork% %battery% %StdinReader% }{ <fc=#DCDCCC>%kbd% %date%</fc>"
+       , template = "%cpu% %memory% %dynnetwork% %battery% %StdinReader% }{ <fc=#ffffff>%kbd% %date%</fc>"
        , hideOnStart = False
        }

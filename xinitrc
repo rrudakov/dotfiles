@@ -25,7 +25,7 @@ fi
 
 $HOME/.local/bin/switch_monitor
 xsetroot -cursor_name left_ptr
-hsetroot -solid "#2B2B2B"
+hsetroot -solid "#202020"
 systemctl --user import-environment DISPLAY
 picom -b
 stalonetray &
