@@ -987,26 +987,25 @@ And third party package for proper syntax highlighting for pre tags in HTML:
   (setq yas-indent-line 'fixed
         yas-inhibit-overlay-modification-protection t))
 #+END_SRC
-** Auto complete
+** Auto completion
 *** Common
 #+BEGIN_SRC emacs-lisp
 (use-package company
   :config
   (setq company-global-modes '(not org-mode markdown-mode shell-mode eshell-mode))
-  (setq company-frontends '(company-pseudo-tooltip-frontend
-                            company-echo-metadata-frontend))
-
   (setq company-tooltip-align-annotations t
-        company-idle-delay 0.1)
+        company-idle-delay 0.1
+        company-require-match nil
+        company-abort-manual-when-too-short t)
 
-  (global-company-mode +1))
+  (global-company-mode))
 #+END_SRC
 *** Quick help
 #+BEGIN_SRC emacs-lisp
 (use-package company-quickhelp
   :config
   (setq company-quickhelp-use-propertized-text t)
-  (company-quickhelp-mode 1))
+  (company-quickhelp-mode))
 #+END_SRC
 *** COMMENT Show completion in posframe
 #+begin_src emacs-lisp
