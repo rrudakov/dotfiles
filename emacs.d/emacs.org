@@ -347,32 +347,37 @@ Saves to a temp file and puts the filename in the kill ring."
 #+END_SRC
 *** Set default font
 Good choices:
-+ [[https://slackbuilds.org/repository/14.2/system/Iosevka/][Iosevka]]
-+ [[https://github.com/mozilla/Fira][Fira Mono]]
-+ [[https://github.com/adobe-fonts/source-code-pro][SourceCodePro]] :: Currently used
-+ [[https://slackbuilds.org/repository/14.2/system/hack-font-ttf/][Hack]]
-At the moment I set default font using ~~/.Xresources~ file.
++ [[https://slackbuilds.org/repository/14.2/system/Iosevka/][Iosevka]] :: Too narrow.
++ [[https://github.com/mozilla/Fira][Fira Mono]] :: Can't figure out how to make italic work.
++ [[https://github.com/adobe-fonts/source-code-pro][SourceCodeVariable]] :: Best option for me. Currently used.
 #+BEGIN_SRC emacs-lisp
-;; (let ((my-font "Source Code Variable-8")
-;;       (font-sets '("fontset-default"
-;;                    "fontset-startup")))
-;;   (mapcar
-;;    (lambda (font-set)
-;;      ;; all the characters in that range (which is the full possible range)
-;;      (set-fontset-font font-set '(#x000000 . #x3FFFFF) my-font)
-;;      (set-face-font 'default my-font)
-;;      (set-face-attribute 'default nil :weight 'semi-bold)
+(defconst fixed-pitch-font-family "Source Code Variable"
+  "Font family for default and fixed-pitch faces.")
 
-;;      ;; for all characters without font specification
-;;      ;; in another words it is a setting for lack of fallback font
-;;      ;; if e.g. ℕ called DOUBLE-STRUCK CAPITAL N is not covered by our font
-;;      ;; it will be displayed as placeholder-box,
-;;      ;; because fallback for our font is now... our font :)
-;;      (set-fontset-font font-set nil my-font))
-;;    font-sets))
-(set-face-attribute 'default nil :family "Source Code Variable" :weight 'semi-bold :height 80)
-(set-face-attribute 'fixed-pitch nil :family "Source Code Variable" :weight 'semi-bold :height 80)
-(set-face-attribute 'variable-pitch nil :family "Source Sans Pro" :weight 'semi-bold :height 80)
+(defconst variable-pitch-font-family "Source Sans Pro"
+  "Font family for variable-pitch face.")
+
+(defconst font-size-alist
+  '((normal . 80)
+    (large . 120)
+    (huge . 140))
+  "List of available font sizes.")
+
+(defun rr/set-font (height)
+  "Set fonts HEIGHT for all base faces."
+  (set-face-attribute 'default nil :family fixed-pitch-font-family :weight 'semi-bold :height height)
+  (set-face-attribute 'fixed-pitch nil :family fixed-pitch-font-family :weight 'semi-bold :height height)
+  (set-face-attribute 'variable-pitch nil :family variable-pitch-font-family :weight 'semi-bold :height height))
+
+(defun rr/select-font-size ()
+  "Select font size from predefined list."
+  (interactive)
+  (let ((height (alist-get (intern (completing-read "Select font size:" font-size-alist)) font-size-alist)))
+    (rr/set-font height)))
+
+(define-key global-map (kbd "C-c r f") #'rr/select-font-size)
+
+(rr/set-font 80)
 #+END_SRC
 *** COMMENT Disable variable pitch at all
 #+begin_src emacs-lisp
@@ -832,19 +837,19 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 STATUS defaults to `flycheck-last-status-change' if omitted or
 nil."
   (let ((text (pcase (or status flycheck-last-status-change)
-                (`not-checked "")
-                (`no-checker "- ")
-                (`running "* ")
-                (`errored "! ")
+                (`not-checked " ")
+                (`no-checker " - ")
+                (`running " * ")
+                (`errored " ! ")
                 (`finished
                  (let-alist (flycheck-count-errors flycheck-current-errors)
                    (concat
                     (propertize (format " • %s " (or .error "✓")) 'face `(:inherit error))
                     (propertize (format "• %s " (or .warning "✓")) 'face `(:inherit warning))
-                    (propertize (format "• %s " (or .info .lsp-flycheck-warning-unnecessary "✓")) 'face `(:inherit success))
+                    (propertize (format "• %s " (or .info "✓")) 'face `(:inherit success))
                     )))
-                (`interrupted ". ")
-                (`suspicious "? "))))
+                (`interrupted " . ")
+                (`suspicious " ? "))))
     (propertize text)))
 
 (add-to-list 'global-mode-string '(:eval (rr/flycheck-mode-line-status-text)))
@@ -2463,6 +2468,7 @@ Common tool for code formatting.
         lsp-modeline-code-actions-enable nil
         lsp-enable-on-type-formatting nil
         lsp-enable-indentation nil
+        lsp-modeline-diagnostics-scope :file
         lsp-diagnostic-clean-after-change t)
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
@@ -2990,6 +2996,21 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 ** Dockerfile mode
 #+begin_src emacs-lisp
 (use-package dockerfile-mode)
+#+end_src
+** IRC Client for emacs (ERC)
+#+begin_src emacs-lisp
+(use-package erc
+  :ensure nil
+  :config
+  (setq erc-server "irc.gitter.im"
+        erc-port 6667
+        erc-prompt-for-password nil))
+
+(use-package erc-join
+  :ensure nil
+  :config
+  (setq erc-autojoin-channels-alist
+        '(("irc.gitter.im" "#emacs-lsp/lsp-mode"))))
 #+end_src
 ** Emacs everywhere
 #+begin_src emacs-lisp
