@@ -120,7 +120,13 @@ Very powerful file manager inside of Emacs.
 | ~dired-jump~ | ~C-x C-j~  | Jump to directory of the current buffer |
 
 * External configuration example
+
 ** Define databases connections
+
+Actually this section is obsolete. I don't use ~ejc-sql~ in favor of ~org-mode~
+with ~org-babel~. So far it's enough for my needs. This example here is for
+~ejc-sql~ package and just shows how I used to use it.
+
 #+begin_src emacs-lisp :tangle no
 (require 'cl-lib)
 (require 'ejc-sql)
@@ -155,15 +161,19 @@ Required information is HOSTNAME, DBNAME, USERNAME and PASSWORD"
 #+end_src
 
 * Syntax help
+
 ** Org-mode
+
 *** Unordered lists
 #+BEGIN_SRC text
 Start with '-', '+' or '*' (star not recommended)
 #+END_SRC
+
 *** Ordered lists
 #+BEGIN_SRC text
 Starts with '1.' or '1)'
 #+END_SRC
+
 *** Description list
 #+BEGIN_SRC text
 Unordered lists with separator '::'
@@ -219,6 +229,7 @@ Unordered lists with separator '::'
         (vc-refresh-state)))))
 #+END_SRC
 ** Reset font-lock for all org-mode buffers
+
 #+begin_src emacs-lisp
 (defun rr/refresh-org-buffers ()
   "Reset font-lock on all org-mode buffers."
