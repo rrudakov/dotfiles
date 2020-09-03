@@ -1,64 +1,123 @@
 #+TITLE: My Emacs configuration
-#+HTML: <p align="center"> <a href="https://www.gnu.org/software/emacs/"> <img src="https://img.shields.io/badge/GNU%20Emacs-27.0.90-b1.svg?style=plastic"/></a> <a href="https://orgmode.org/"><img src="https://img.shields.io/badge/org--mode-9.3.6-elpalus.svg?style=plastic"/></a> </p>
+#+AUTHOR: Roman Rudakov
+#+EMAIL: rrudakov@pm.me
+
+[[https://www.gnu.org/software/emacs/][https://img.shields.io/badge/GNU%20Emacs-27.1-b1.svg?style=plastic]]
+[[https://orgmode.org/][https://img.shields.io/badge/org--mode-9.3.7-elpalus.svg?style=plastic]]
+
+This file is my literate config for [[https://www.gnu.org/software/emacs/][GNU/Emacs]] written using [[https://orgmode.org/][org-mode]] syntax and
+tangle automatically to emacs lisp file which loaded from ~.emacs.d/init.el~.
 
 * Keybindings
-** Common
-#+BEGIN_SRC text
-M-:	Eval command
-C-x t   Switch to ansi-terminal or create new
-C-x T   Create new ansi-terminal
-M-\     delete-horizontal-space
-#+END_SRC
-** Haskell
-#+BEGIN_SRC text
-M-q	reformats the current declaration. When inside a comment, it fills the current paragraph instead, like the standard M-q
-C-M-\	reformats the current region
-#+END_SRC
-** Org-mode
-#+BEGIN_SRC text
-C-c ^		Sort headlines
-C-c / 		Prompt to make sparce-tree
-C-c - 		Cycle list level ('-', '+', '1.', '1)' etc.)
-C-c C-x f	Footnote action command
-C-c C-c		When at footnote, go to definition, When at definition, go back to reference
-C-c |		Create new table
-M-S-<right>	Insert new table column
-C-c +		Sum all numbers in current column
-C-c C-x p	Insert property
-C-c C-x C-d	Display time summaries for each subtree in the current buffer
-#+END_SRC
-*** Agenda view
-#+BEGIN_SRC text
-p	Previous period
-n	Next period
-.	Today
-F	Follow mode
-#+END_SRC
-** Terminal
-#+BEGIN_SRC text
-C-c C-j Switch to term-line-mode, which you can then treat like a normal emacs buffer (move, yank, etc)
-C-c C-k Return to term-char-mode, which will act like a traditional ansi-term
-#+END_SRC
-** Highlight text in buffer (hi-lock-mode)
-#+begin_src text
-M-s h w         hi-lock-write-interactive-patterns
-M-s h u         unhighlight-regexp
-M-s h r         highlight-regexp
-M-s h p         highlight-phrase
-M-s h l         highlight-lines-matching-regexp
-M-s h f         hi-lock-find-patterns
-#+end_src
-** Helm
-#+begin_src text
-C-c i   insert current file path to current buffer
-C-x c s search using surfraw utility on the web
-#+end_src
-** Dired
-#+begin_src text
-C-x C-j dired-jump (Jump to directory of the current buffer)
-#+end_src
 
-* Useful commands
+This section is just some kind of reference card where I keep all the
+keybindings which I find useful and probably will use.
+
+** Common
+
+I already use this commands on the daily basis and don't need to memorize them
+but I'll keep it here for history.
+
+| Command                   | Keybinding | Description                                                               |
+|---------------------------+------------+---------------------------------------------------------------------------|
+| ~eval-expression~         | ~M-:~      | Evaluate any emacs lisp expression and print the result in the minibuffer |
+| ~delete-horizontal-space~ | ~M-\~      | Delete all white spaces between two symbols                               |
+
+** Haskell
+
+I used to write some code in Haskell. Hereby some keybindings for haskell-mode.
+
+| Keybinding | Description                                                                                                              |
+|------------+--------------------------------------------------------------------------------------------------------------------------|
+| ~C-M-\~    | Reformat the current region                                                                                              |
+| ~M-q~      | Reformat the current declaration. When inside a comment, it fills the current paragraph instead, like the standard ~M-q~ |
+
+** Org-mode
+
+Org-mode has a lot of functionality and sometimes it's almost impossible to
+remember all the keybindings and commands. I'll keep here all useful commands
+which I can use in the org-mode buffers.
+
+| Keybinding    | Description                                                                  |
+|---------------+------------------------------------------------------------------------------|
+| ~C-c ^~       | Sort headlines                                                               |
+| ~C-c /~       | Prompt to make sparse-tree                                                   |
+| ~C-c C-x f~   | Footnote action command                                                      |
+| ~C-c C-c~     | When at footnote, go to definition. When at definition, go back to reference |
+| ~M-S-<right>~ | Insert new table column                                                      |
+| ~C-c +~       | Sum all numbers in the current column                                        |
+| ~C-c C-x p~   | Insert property                                                              |
+| ~C-c C-x C-d~ | Display time summaries for each sub-tree in the current buffer               |
+
+Besides standard keybindings I use [[https://orgmode.org/manual/Speed-Keys.html][speed-keys]]. Speed keys can be enabled by
+setting ~org-use-speed-keys~ to ~t~. When the point at the first symbol of the
+headline I can execute some commands with only one key press.
+
+| Key       | Description                         |
+|-----------+-------------------------------------|
+| ~I~       | Start clock                         |
+| ~O~       | Stop clock                          |
+| ~w~       | Refile current headline             |
+| ~a~       | Archive current sub-tree            |
+| ~0/1/2/3~ | Set priority to corresponding value |
+
+There are more speed commands. All available commands can be found in the help
+buffer when you press ~?~ on any headline.
+
+*** Agenda view
+
+In the agenda view all standard commands have different keybindings, because
+it's read-only buffer and you can navigate and execute commands with a single
+key press.
+
+| Key       | Description                                                                          |
+|-----------+--------------------------------------------------------------------------------------|
+| ~p~       | Previous period (in month-view it's previous month, in week-view it's previous week) |
+| ~n~       | Next period                                                                          |
+| ~.~       | Quickly jump to today                                                                |
+| ~F~       | Follow mode (corresponding headlines will be shown in the separate buffer)           |
+| ~<space>~ | Open org-mode file with corresponding headline in the separate buffer                |
+
+** Terminal
+
+I don't use ~ansi-term~ anymore or any packages which provide some terminal
+emulator inside emacs. Currently I have setup [[*Terminal emulator][sane-term]] package. Maybe I'll
+consider [[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] when it's stable.
+
+| Keybinding | Description                                                                                       |
+|------------+---------------------------------------------------------------------------------------------------|
+| ~C-c C-j~  | Switch to ~term-line-mode~, which you can then treat like a normal emacs buffer (move, yank etc.) |
+| ~C-c C-k~  | Return to ~term-char-mode~, which will act like a traditional ~ansi-term~                         |
+
+** Highlight text in buffer (hi-lock-mode)
+
+This is useful when you want to highlight some parts of long text with
+different colors to distinguish them from the rest of buffer content.
+
+| Command                              | Keybinding | Description                                                                            |
+|--------------------------------------+------------+----------------------------------------------------------------------------------------|
+| ~highlight-regexp~                   | ~M-s h r~  | Highlight by regex with given face (regex and face are prompted using completing read) |
+| ~unhighlight-regexp~                 | ~M-s h u~  | Remove highlighting for regex (Regex will be prompted using completing read)           |
+| ~highlight-phrase~                   | ~M-s h p~  | Highlight phrase (case insensitive) with given text                                    |
+| ~highlight-lines-matching-regexp~    | ~M-s h l~  | Highlight the entire line which contains given phrase                                  |
+
+** Helm
+
+I use [[https://github.com/emacs-helm/helm][helm]] for incremental completion. It has a lot of modules and
+extensions. Here I'll keep useful keybindings for them.
+
+| Keybinding | Description                                                                                                    |
+|------------+----------------------------------------------------------------------------------------------------------------|
+| ~C-c i~    | Insert file path at point to current buffer (works also in minibuffer if ~enable-recursive-minibuffer~ is ~t~) |
+| ~C-x c s~  | Search using surfraw utility on the web (surfraw must be installed system-wide)                                |
+
+** Dired
+
+Very powerful file manager inside of Emacs.
+
+| Command      | Keybinding | Description                             |
+|--------------+------------+-----------------------------------------|
+| ~dired-jump~ | ~C-x C-j~  | Jump to directory of the current buffer |
 
 * External configuration example
 ** Define databases connections
@@ -986,11 +1045,10 @@ And third party package for proper syntax highlighting for pre tags in HTML:
 ** YASnippet
 #+BEGIN_SRC emacs-lisp
 (use-package yasnippet
-  :init
-  (yas-global-mode)
   :config
   (setq yas-indent-line 'fixed
-        yas-inhibit-overlay-modification-protection t))
+        yas-inhibit-overlay-modification-protection t)
+  (add-hook 'prog-mode-hook #'yas-minor-mode))
 #+END_SRC
 ** Auto completion
 *** Common
