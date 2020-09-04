@@ -22,6 +22,7 @@ but I'll keep it here for history.
 |---------------------------+------------+---------------------------------------------------------------------------|
 | ~eval-expression~         | ~M-:~      | Evaluate any emacs lisp expression and print the result in the minibuffer |
 | ~delete-horizontal-space~ | ~M-\~      | Delete all white spaces between two symbols                               |
+| ~delete-blank-lines~      | ~C-x C-o~  | Delete all empty lines below the pointer                                  |
 
 ** Haskell
 
@@ -164,23 +165,25 @@ Required information is HOSTNAME, DBNAME, USERNAME and PASSWORD"
 
 ** Org-mode
 
-*** Unordered lists
-#+BEGIN_SRC text
-Start with '-', '+' or '*' (star not recommended)
-#+END_SRC
+*** Lists
 
-*** Ordered lists
-#+BEGIN_SRC text
-Starts with '1.' or '1)'
-#+END_SRC
+To create unordered list in the org-mode documents just start line from one of
+the following symbols: ~-~, ~+~ or ~*~ (start not recommended, because it will
+be ambiguous)
 
-*** Description list
-#+BEGIN_SRC text
-Unordered lists with separator '::'
-#+END_SRC
+Ordered list starts from either ~1.~ or ~1)~. This can be customized.
+
+Unordered lists with separator ~::~ will produce description lists.
+
+All lists can be nested in any order.
 
 * Useful functions
+
 ** Capitalize first char
+
+Don't remember why I have it. Probably it can be deprecated in favor to
+~capitalize-word~ function which built-in into emacs.
+
 #+BEGIN_SRC emacs-lisp
 (defun rr/capitalize-first-char (&optional string)
   "Capitalize only the first character of the input STRING."
@@ -189,7 +192,12 @@ Unordered lists with separator '::'
           (rest-str   (substring string 1)))
       (concat (capitalize first-char) rest-str))))
 #+END_SRC
+
 ** Replace org-link with description of if empty its address
+
+This is useful function has some kind of /unlink/ behavior. It replaces org
+link with it's description or if there is no description with its address.
+
 #+BEGIN_SRC emacs-lisp
 (defun rr/org-replace-link-by-link-description ()
   "Replace an org link by its description or if empty its address."
@@ -203,7 +211,13 @@ Unordered lists with separator '::'
           (apply 'delete-region remove)
           (insert description)))))
 #+END_SRC
+
 ** Smart toggle flycheck error list window
+
+Was written a long time ago. Used to use it to pop-up
+~flycheck-error-list-buffer~ if it was opened before or create new one. Now I'm
+using [[https://github.com/yasuyk/helm-flycheck][helm-flycheck]]. Maybe someone will find it useful.
+
 #+BEGIN_SRC emacs-lisp
 (defun rr/flycheck-list-smart-toggle ()
   "Toggle flycheck error list buffer."
@@ -219,7 +233,13 @@ Unordered lists with separator '::'
             (quit-window t window)))
       (flycheck-list-errors))))
 #+END_SRC
+
 ** Update vc-state in all buffers
+
+Used as ~magit-post-refresh-hook~ to update ~vc-state~ for each opened
+buffer. It will affect all modes which relies on ~vc-mode~ state (for example
+~vc-status~ in the modeline and [[https://github.com/dgutov/diff-hl][diff-hl]]).
+
 #+BEGIN_SRC emacs-lisp
 (defun rr/refresh-vc-state ()
   "Refresh `vc-state' on all buffers."
@@ -228,7 +248,17 @@ Unordered lists with separator '::'
       (when (vc-mode)
         (vc-refresh-state)))))
 #+END_SRC
+
 ** Reset font-lock for all org-mode buffers
+
+I use emacs-server which starts in the background using systemd. Also I use
+org-mode option ~org-clock-persist~ set to ~t~ which force emacs to open last
+org file with clocking headline. The theme applies after first frame is created
+and I can see leading stars in the org file which was opened before applying
+theme. This function is used to use for fix this behavior.
+
+After I switch to [[https://gitlab.com/protesilaos/modus-themes][modus-themes]] looks like the issue is gone. I'll keep this
+function in case this behavior will appear again.
 
 #+begin_src emacs-lisp
 (defun rr/refresh-org-buffers ()
@@ -238,7 +268,11 @@ Unordered lists with separator '::'
       (when (eq major-mode 'org-mode)
         (normal-mode)))))
 #+end_src
+
 ** Prefer split windows side-by-side
+
+Separate function to force emacs to split windows side by side if possible.
+
 #+begin_src emacs-lisp
 (defun split-window-prefer-side-by-side (&optional window)
   (let ((split-height-threshold (and (< (window-width window)
@@ -246,14 +280,25 @@ Unordered lists with separator '::'
                                      split-height-threshold)))
     (split-window-sensibly window)))
 #+end_src
+
 ** Set margins
+
+For major modes derived from ~text-mode~ I prefer to have some margins. This
+function set margins buffer locally. I use it in ~markdown-mode-hook~ and
+~org-mode-hook~.
+
 #+begin_src emacs-lisp
 (defun rr/set-margins ()
   "Set margins in current buffer."
   (setq left-margin-width 3)
   (setq right-margin-width 3))
 #+end_src
-** Copy file name to clipboard from dired
+
+** Copy file name to clipboard
+
+Useful function to copy current buffer file path to clipboard. Works in regular
+emacs buffers and in dired mode.
+
 #+begin_src emacs-lisp
 (defun prelude-copy-file-name-to-clipboard ()
   "Copy the current buffer file name to the clipboard."
@@ -265,7 +310,11 @@ Unordered lists with separator '::'
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
 #+end_src
+
 ** Make SVG screenshot of emacs
+
+Stolen from [[https://www.reddit.com/r/emacs/comments/idz35e/emacs_27_can_take_svg_screenshots_of_itself/][reddit]]. Emacs should be built with cairo support.
+
 #+begin_src emacs-lisp
 (defun screenshot-svg ()
   "Save a screenshot of the current frame as an SVG image.
@@ -280,6 +329,7 @@ Saves to a temp file and puts the filename in the kill ring."
 #+end_src
 
 * Create my personal keymap
+
 #+begin_src emacs-lisp
 (defvar rr-lsp-keymap
   (make-sparse-keymap)
@@ -287,6 +337,7 @@ Saves to a temp file and puts the filename in the kill ring."
 #+end_src
 
 * Define some variables
+
 #+begin_src emacs-lisp
 (defconst rr-savefile-dir (expand-file-name "savefile" user-emacs-directory)
   "Declare variable for save file directory.")
@@ -1380,7 +1431,7 @@ Better sorting for counsel/ivy
                          (no-delete-other-windows . t)
                          (mode-line-format . none))))
 
-(define-key global-map (kbd "C-c s") #'window-toggle-side-windows)
+;; (define-key global-map (kbd "C-c s") #'window-toggle-side-windows)
 
 (setq switch-to-buffer-obey-display-actions nil)
 
@@ -1388,12 +1439,15 @@ Better sorting for counsel/ivy
   '(compile-goto-error
     push-button
     magit-diff-visit-file
-    magit-todos-jump-to-item))
+    magit-todos-jump-to-item
+    deadgrep-visit-result-other-window))
 
 (defconst display-buffer-bottom-regexps
   (mapcar (lambda (s) (concat "\\*" s "\\*"))
           '("[H|h]elp.*?"
             "Disabled\sCommand"
+            "deadgrep.*?"
+            "rg"
             "cider-doc"
             "Backtrace"
             "Apropos"
@@ -1503,6 +1557,9 @@ bottom of the frame.")
           display-buffer-in-direction)
          (direction . rightmost)
          (window-width . 0.5))))
+
+(setq window-combination-resize t
+      switch-to-buffer-in-dedicated-window 'pop)
 #+end_src
 ** Rainbow delimiters
 #+BEGIN_SRC emacs-lisp
@@ -1545,16 +1602,18 @@ bottom of the frame.")
 (use-package pkgbuild-mode
   :mode "/PKGBUILD$")
 #+end_src
-** Dried
+** Dired
 *** Common settings
 #+BEGIN_SRC emacs-lisp
 (use-package dired
   :ensure nil
   :config
-  (setq dired-listing-switches "-AFhlv --group-directories-first"
+  (setq dired-listing-switches "-AGFhlv --group-directories-first --time-style=long-iso"
         dired-dwim-target t
         dired-recursive-copies 'always
-        dired-recursive-deletes 'always))
+        dired-recursive-deletes 'always)
+
+  (add-hook 'dired-mode-hook #'hl-line-mode))
 
 (use-package dired-aux
   :ensure nil
@@ -1665,6 +1724,17 @@ And disable flymake autoload:
   (global-magit-file-mode)
   (add-hook 'magit-post-refresh-hook #'rr/refresh-vc-state 5))
 #+END_SRC
+
+The settings below for the diff buffers produced by Magit. By default it
+doesn't highlight changes inside the line.
+
+#+begin_src emacs-lisp
+(use-package magit-diff
+  :ensure nil
+  :after magit
+  :config
+  (setq magit-diff-refine-hunk t))
+#+end_src
 *** Transient
 #+begin_src emacs-lisp
 (use-package transient
@@ -1718,6 +1788,7 @@ And disable flymake autoload:
 ** Search and grep utilities
 #+BEGIN_SRC emacs-lisp
 (use-package wgrep
+  :commands wgrep
   :config
   (setq wgrep-auto-save-buffer t))
 
@@ -1729,7 +1800,15 @@ And disable flymake autoload:
 (use-package helm-ag)
 (use-package helm-rg)
 (use-package deadgrep)
-(use-package rg)
+(use-package rg
+  :config
+  (setq rg-group-result t
+        rg-hide-command t
+        rg-show-columns nil
+        rg-show-header t
+        rg-custom-type-aliases nil
+        rg-default-alias-fallback "all")
+  (rg-enable-default-bindings))
 #+END_SRC
 ** Terminal emulator
 #+BEGIN_SRC emacs-lisp
@@ -1845,6 +1924,14 @@ Build in regex package:
 
 (use-package helm-pass)
 ;; (use-package ivy-pass)
+#+end_src
+** Calendar
+#+begin_src emacs-lisp
+(use-package calendar
+  :ensure nil
+  :config
+  (setq calendar-week-start-day 1
+        calendar-date-style 'iso))
 #+end_src
 ** Markdown mode
 #+begin_src emacs-lisp
