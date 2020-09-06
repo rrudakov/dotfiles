@@ -95,12 +95,12 @@ consider [[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] when it's 
 This is useful when you want to highlight some parts of long text with
 different colors to distinguish them from the rest of buffer content.
 
-| Command                              | Keybinding | Description                                                                            |
-|--------------------------------------+------------+----------------------------------------------------------------------------------------|
-| ~highlight-regexp~                   | ~M-s h r~  | Highlight by regex with given face (regex and face are prompted using completing read) |
-| ~unhighlight-regexp~                 | ~M-s h u~  | Remove highlighting for regex (Regex will be prompted using completing read)           |
-| ~highlight-phrase~                   | ~M-s h p~  | Highlight phrase (case insensitive) with given text                                    |
-| ~highlight-lines-matching-regexp~    | ~M-s h l~  | Highlight the entire line which contains given phrase                                  |
+| Command                           | Keybinding | Description                                                                            |
+|-----------------------------------+------------+----------------------------------------------------------------------------------------|
+| ~highlight-regexp~                | ~M-s h r~  | Highlight by regex with given face (regex and face are prompted using completing read) |
+| ~unhighlight-regexp~              | ~M-s h u~  | Remove highlighting for regex (Regex will be prompted using completing read)           |
+| ~highlight-phrase~                | ~M-s h p~  | Highlight phrase (case insensitive) with given text                                    |
+| ~highlight-lines-matching-regexp~ | ~M-s h l~  | Highlight the entire line which contains given phrase                                  |
 
 ** Helm
 
@@ -328,15 +328,13 @@ Saves to a temp file and puts the filename in the kill ring."
     (message filename)))
 #+end_src
 
-* Create my personal keymap
+* Variables
 
-#+begin_src emacs-lisp
-(defvar rr-lsp-keymap
-  (make-sparse-keymap)
-  "My personal keymap for LSP mode.")
-#+end_src
+** Define variables for save file and backup directory
 
-* Define some variables
+I prefer to keep my ~.emacs.d~ as clean as possible. One of the options is to
+keep all backup files and temporary files in the separate directory. Here I
+define variables for this purpose.
 
 #+begin_src emacs-lisp
 (defconst rr-savefile-dir (expand-file-name "savefile" user-emacs-directory)
@@ -346,83 +344,198 @@ Saves to a temp file and puts the filename in the kill ring."
   "Declare variable for all backup files.")
 #+end_src
 
-* Configuration
+** Define keymap for LSP-mode
+
+I don't want to use default ~lsp-mode~ keybindings. All I need is a few of
+them and I want to keep all under my control. Here I define custom keymap to
+bind all useful lsp commands later.
+
+#+begin_src emacs-lisp
+(defvar rr-lsp-keymap
+  (make-sparse-keymap)
+  "My personal keymap for LSP mode.")
+#+end_src
+
 ** Load my secret tokens
+
+All sensitive information which cannot be stored in the ~.authinfo.gpg~ I'm
+going to define in the separate emacs-lisp module which I won't keep under the
+version control. If this module doesn't exist (for example on the fresh
+installation or new machine) just ignore it. It's probably not the best way to
+keep passwords and tokens and I should consider moving to [[https://www.passwordstore.org][password-store]] or
+similar tools.
+
+I already have some packages for interacting with password-store and I don't
+have ~mysecret.el~ on my machines. Probably this will be removed in the
+future.
+
 #+BEGIN_SRC emacs-lisp
 (require 'mysecret nil t)
 #+END_SRC
-** Auth sources settings
-#+begin_src emacs-lisp
-(setq auth-source-save-behavior nil)
-#+end_src
+
+* Emacs built-in tweaks
+
+Emacs provides a lot of useful customization out of the box. I use [[https://github.com/jwiegley/use-package][use-package]]
+to keep my config clean and declarative. It's possible to declare customization
+for built-in modules as well with use-package. I set
+~use-package-always-ensure~ to ~t~ to automatically install packages from MELPA
+if it's not installed yet. For build-in packages it's required to use ~:ensure
+nil~ to prevent attempt to install it from MELPA.
+
 ** Unset some unused keybindings
+
+I find some keybindings not useful. ~C-z~ is freezing emacs GUI or something
+like this. I don't know what is it for and I don't think I will be use it. All
+such keybindings I'm going to unset to map them to something I really need.
+
 #+begin_src emacs-lisp
 (global-unset-key (kbd "C-z"))
 (global-unset-key (kbd "C-x C-z"))
 #+end_src
-** Increase amount of data which emacs reads from the process
+
+** Emacs core variables
+
+Part of the Emacs is written in C language and some crucial variables defined
+in C files but it's still possible to update them. Here is the list of such
+settings.
+
+*** Increase amount of data which emacs reads from the process
+
+This is recommended setting to increase ~lsp-mode~ performance. Increase the
+amount of data which Emacs reads from the process. Default (4k) is too low
+considering that the some of the language server responses are in 800k - 3M
+range.
+
 #+begin_src emacs-lisp
 (setq read-process-output-max (* 4 1024 1024))
 #+end_src
-** Increase max number of Lisp variable bindings
+
+*** Increase max number of Lisp variable bindings
+
+Limit on number of Lisp variable bindings and ~unwind-protects~.
+If Lisp code tries to increase the total number past this amount,
+an error is signaled.
+
 #+begin_src emacs-lisp
 (setq max-specpdl-size 3200)
 #+end_src
-** Auto saving settings
+
+*** Do not auto save messages in the minibuffer
+
+If autosave is enabled do not print annoying message to the minibuffer every
+time the file saved.
+
 #+begin_src emacs-lisp
-;; create the savefile dir if it doesn't exist
-(unless (file-exists-p rr-savefile-dir)
-  (make-directory rr-savefile-dir))
-
-;; store all backup and autosave files in the tmp dir
-(setq backup-directory-alist
-      `((".*" . ,rr-backup-dir)))
-
-;; Silently delete execess backup versions
-(setq delete-old-versions t)
-
-;; Only keep the last 10 backups of a file.
-(setq kept-old-versions 10)
-
-;; Do not print messages in the minibuffer
 (setq auto-save-no-message t)
-
-;; Even version controlled files get to be backed up.
-;; (setq vc-make-backup-files t)
-
-;; Use version numbers for backup files.
-;; (setq version-control t)
 #+end_src
-** Avoid creating lock files
+
+*** Avoid creating lock files
+
+I don't see any profits from the lock files, so I don't want emacs to create them.
+
 #+begin_src emacs-lisp
 (setq create-lockfiles nil)
 #+end_src
-** Set tab width
+
+*** Set tab width
+
+Distance between tab stops (for display of tab characters), in columns. Affects
+to ~lsp-java~ directly and set indentation size for ~newline-and-indent~
+function. I use [[https://github.com/google/google-java-format][google-java-format]] which uses 2 spaces by default for
+indentation so I set this setting to ~2~.
+
 #+begin_src emacs-lisp
 (setq-default tab-width 2)
 #+end_src
-** COMMENT Set default margins
+
+*** Display fringe outside margins
+
+To display fringes on the edge of emacs frame I need to set this setting to
+~t~. If I set this to ~nil~ fringes will be displayed between margins and
+buffer content.
+
+#+begin_src emacs-lisp
+(setq-default fringes-outside-margins t)
+#+end_src
+
+*** COMMENT Set default margins
+
+Flycheck has an option to display indicators in margins instead of fringes. By
+default margin sizes is 0 which means they are invisible. To be able to use
+margin flycheck indicators I have to set margins to at least ~1~.
+
 #+begin_src emacs-lisp
 (setq-default left-margin-width 1)
 (setq-default right-margin-width 1)
 #+end_src
-** Display fringe outside margins
+
+** Auto saving settings
+
+I want to keep maximum 10 last versions of file to be able to restore it to
+previous state. It's very rare case and I don't think I need more that 10
+backup files. To keep emacs directory clean I create separate directory where
+I'm going to store all backup and autosave files. Also I'm gonna store helm
+history file and org clock file in this directory and maybe something else
+related to restoring files and states.
+
 #+begin_src emacs-lisp
-(setq-default fringes-outside-margins t)
+(use-package files
+  :ensure nil
+  :config
+  (unless (file-exists-p rr-savefile-dir)
+    (make-directory rr-savefile-dir))
+
+  (setq backup-directory-alist
+        `((".*" . ,rr-backup-dir)))
+
+  (setq delete-old-versions t
+        kept-old-versions 10))
 #+end_src
+
+** Auth sources settings
+
+I prefer to control what should be stored in the ~.authinfo~ file manually, so
+I disable save behavior.
+
+#+begin_src emacs-lisp
+(use-package auth-source
+  :ensure nil
+  :config
+  (setq auth-source-save-behavior nil))
+#+end_src
+
 ** Replace selected text on input
+
+By default if you select some part of buffer and start typing selected part
+won't be deleted. I find this behavior not obvious and not convenient. To fix
+it I use ~delete-selection-mode~.
+
 #+BEGIN_SRC emacs-lisp
-(delete-selection-mode)
+(use-package delsel
+  :ensure nil
+  :config
+  (delete-selection-mode))
 #+END_SRC
+
 ** Built-in help mode
+
+When I use help functions (~describe-variable~ or ~describe-function~) I want
+help popup window is selected by default.
+
 #+begin_src emacs-lisp
 (use-package help
   :ensure nil
   :config
   (setq help-window-select t))
 #+end_src
-** Mouse settings
+
+** Settings related to mouse usage
+
 *** Disable tooltips completely
+
+I prefer minimum of distractions during work. One of them is tooltips. Let's
+disable them completely.
+
 #+BEGIN_SRC emacs-lisp
 (use-package tooltip
   :ensure nil
@@ -431,34 +544,50 @@ Saves to a temp file and puts the filename in the kill ring."
   (setq tooltip-use-echo-area nil
         show-help-function nil))
 #+END_SRC
+
 *** Move mouse away from text
+
+Built-in ~mouse-avoidance-mode~ allows to move cursor away from text as soon as
+you start typing.
+
 #+begin_src emacs-lisp
 (use-package avoid
+  :ensure nil
   :config
   (if (display-mouse-p)
       (mouse-avoidance-mode 'banish)))
 #+end_src
+
+* Configuration
+
 ** Common
-:PROPERTIES:
-:VISIBILITY: folded
-:END:
+
 *** TLS default settings
+
 #+BEGIN_SRC emacs-lisp
 (setq gnutls-min-prime-bits 4096)
 #+END_SRC
+
 *** Prefer newer files to load
+
 #+begin_src emacs-lisp
 (setq load-prefer-newer t)
 #+end_src
+
 *** Do not indicate empty lines at the end of the window in the left fringe
+
 #+BEGIN_SRC emacs-lisp
 (setq-default indicate-empty-lines nil)
 #+END_SRC
+
 *** Enable y/n answers instead of yes/no
+
 #+BEGIN_SRC emacs-lisp
 (fset 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
+
 *** Highlight current line
+
 #+BEGIN_SRC emacs-lisp
 (use-package hl-line
   :config
@@ -466,11 +595,14 @@ Saves to a temp file and puts the filename in the kill ring."
   (add-hook 'prog-mode-hook #'hl-line-mode)
   (add-hook 'nxml-mode-hook #'hl-line-mode))
 #+END_SRC
+
 *** Set default font
+
 Good choices:
 + [[https://slackbuilds.org/repository/14.2/system/Iosevka/][Iosevka]] :: Too narrow.
 + [[https://github.com/mozilla/Fira][Fira Mono]] :: Can't figure out how to make italic work.
 + [[https://github.com/adobe-fonts/source-code-pro][SourceCodeVariable]] :: Best option for me. Currently used.
+
 #+BEGIN_SRC emacs-lisp
 (defconst fixed-pitch-font-family "Source Code Variable"
   "Font family for default and fixed-pitch faces.")
@@ -500,21 +632,22 @@ Good choices:
 
 (rr/set-font 80)
 #+END_SRC
-*** COMMENT Disable variable pitch at all
-#+begin_src emacs-lisp
-(let ((default-font (face-attribute 'default :family)))
-  (set-face-attribute 'variable-pitch nil :family default-font))
-#+end_src
+
 *** Open files ends with "rc" in conf-unix-mode
+
 #+BEGIN_SRC emacs-lisp
 (use-package conf-mode
   :mode ("\\.*rc$" . conf-unix-mode))
 #+END_SRC
+
 *** Set specific browser to open links
+
 #+BEGIN_SRC emacs-lisp
 (setq browse-url-browser-function 'browse-url-firefox)
 #+END_SRC
+
 *** Use UTF-8 as default coding system
+
 #+BEGIN_SRC emacs-lisp
 (when (fboundp 'set-charset-priority)
   (set-charset-priority 'unicode))
@@ -525,7 +658,9 @@ Good choices:
 (setq locale-coding-system   'utf-8)
 (setq-default buffer-file-coding-system 'utf-8)
 #+END_SRC
+
 *** Some useful settings
+
 Picked mostly from doom-emacs configuration.
 #+BEGIN_SRC emacs-lisp
 (setq-default
@@ -558,13 +693,17 @@ Picked mostly from doom-emacs configuration.
  ring-bell-function #'ignore
  visible-bell nil)
 #+END_SRC
+
 *** Be quiet at startup
+
 #+BEGIN_SRC emacs-lisp
 (setq inhibit-startup-message t
       inhibit-startup-echo-area-message user-login-name
       initial-scratch-message nil)
 #+END_SRC
+
 *** Unique buffer names
+
 #+begin_src emacs-lisp
 (use-package uniquify
   :ensure nil
@@ -572,16 +711,21 @@ Picked mostly from doom-emacs configuration.
   (setq uniquify-separator "/"
         uniquify-buffer-name-style 'forward))
 #+end_src
+
 *** More reliable inter-window border
+
 The native border "consumes" a pixel of the fringe on righter-most splits,
-=window-divider= does not. Available since Emacs 25.1.
+~window-divider~ does not. Available since Emacs 25.1.
+
 #+BEGIN_SRC emacs-lisp
 (setq-default window-divider-default-places t
               window-divider-default-bottom-width 0
               window-divider-default-right-width 1)
 (window-divider-mode +1)
 #+END_SRC
+
 *** Graphic mode settings
+
 #+BEGIN_SRC emacs-lisp
 (defun rr/graphic-mode-settings ()
   "Setup for current FRAME."
@@ -593,7 +737,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
     (add-hook 'server-after-make-frame-hook #'rr/graphic-mode-settings)
   (rr/graphic-mode-settings))
 #+END_SRC
+
 *** Settings for tramp-mode
+
 #+BEGIN_SRC emacs-lisp
 (use-package tramp
   :config
@@ -610,24 +756,34 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
         auto-revert-remote-files nil)
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 #+END_SRC
+
 *** Set default input method
+
 #+BEGIN_SRC emacs-lisp
 (setq default-input-method "russian-computer")
 #+END_SRC
+
 *** EPA
+
 #+BEGIN_SRC emacs-lisp
 (setq epg-pinentry-mode 'loopback)
 #+END_SRC
+
 *** Default mode
+
 #+BEGIN_SRC emacs-lisp
 (setq-default major-mode 'text-mode)
 #+END_SRC
+
 *** Fill column
+
 #+BEGIN_SRC emacs-lisp
 (setq-default fill-column 79)
 (add-hook 'text-mode-hook #'auto-fill-mode)
 #+END_SRC
+
 *** Auto revert changes
+
 #+BEGIN_SRC emacs-lisp
 (use-package autorevert
   :ensure nil
@@ -636,7 +792,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
         global-auto-revert-non-file-buffers t)
   (global-auto-revert-mode 1))
 #+END_SRC
+
 *** Recent files
+
 #+BEGIN_SRC emacs-lisp
 (use-package recentf
   :config
@@ -646,7 +804,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   (add-to-list 'recentf-exclude (expand-file-name "~/.emacs.d/"))
   (recentf-mode +1))
 #+END_SRC
+
 *** Imenu
+
 #+BEGIN_SRC emacs-lisp
 (use-package imenu
   :config
@@ -654,7 +814,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
         imenu-max-item-length 160
         imenu-max-items 100))
 #+END_SRC
+
 *** More convenient scrolling settings
+
 #+begin_src emacs-lisp
 (setq scroll-margin 3
       scroll-conservatively 101
@@ -663,30 +825,42 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
       scroll-preserve-screen-position t
       auto-window-vscroll nil)
 #+end_src
+
 *** Single line horizontal scrolling
+
 #+BEGIN_SRC emacs-lisp
 (setq auto-hscroll-mode t)
 #+END_SRC
+
 *** Navigation by subwords
+
 #+begin_src emacs-lisp
 (add-hook 'prog-mode-hook #'subword-mode)
 #+end_src
+
 *** Set minimal height of window
+
 #+BEGIN_SRC emacs-lisp
 (setq window-min-height 10)
 #+END_SRC
+
 *** Ediff settings
+
 #+BEGIN_SRC emacs-lisp
 (use-package ediff
   :config
   (setq ediff-window-setup-function #'ediff-setup-windows-plain
         ediff-split-window-function #'split-window-right))
 #+END_SRC
+
 *** Smerge
+
 #+begin_src emacs-lisp
 (use-package smerge-mode)
 #+end_src
+
 *** ANSI colors
+
 #+BEGIN_SRC emacs-lisp
 (use-package ansi-color
   :config
@@ -700,7 +874,9 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
   (add-hook 'shell-mode-hook #'ansi-color-for-comint-mode-on)
   (add-hook 'compilation-filter-hook #'colorize-compilation-buffer))
 #+END_SRC
+
 *** Compilation mode settings
+
 #+BEGIN_SRC emacs-lisp
 (use-package compile
   :ensure nil
@@ -711,12 +887,17 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
                 confirm-nonexistent-file-or-buffer t)
   (define-key compilation-mode-map (kbd "q") #'delete-window))
 #+END_SRC
+
 *** Unclassified settings
+
 No more ugly line splitting
+
 #+BEGIN_SRC emacs-lisp
 (add-hook 'prog-mode-hook (lambda () (setq-local truncate-lines t)))
 #+END_SRC
+
 *** Save minibuffer history between sessions
+
 #+BEGIN_SRC emacs-lisp
 (use-package savehist
   :ensure nil
@@ -731,49 +912,72 @@ No more ugly line splitting
                                         shell-command-history))
   (savehist-mode 1))
 #+END_SRC
+
 *** Kill-ring
+
 Save stuff you’ve copied in other applications to the emacs kill-ring.
+
 #+begin_src emacs-lisp
 (setq save-interprogram-paste-before-kill t)
 #+end_src
+
 *** Increase max lines in messages buffer
+
 #+begin_src emacs-lisp
 (setq message-log-max 1000)
 #+end_src
+
 *** Fix helm issue
+
 #+begin_src emacs-lisp
 (setq x-wait-for-event-timeout nil)
 #+end_src
+
 *** Enable recursive minibuffers
+
 #+begin_src emacs-lisp
 (setq enable-recursive-minibuffers t)
 #+end_src
-*** Large files treshold
+
+*** Large files threshold
+
 #+begin_src emacs-lisp
 (setq large-file-warning-threshold (* 100 1024 1024))
 #+end_src
+
 *** Cleanup trailing spaces before save
+
 #+begin_src emacs-lisp
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 #+end_src
+
 *** Show column number
+
 #+begin_src emacs-lisp
 (column-number-mode)
 #+end_src
+
 *** Use built-in tooltips
+
 #+begin_src emacs-lisp
 (setq x-gtk-use-system-tooltips nil)
 #+end_src
+
 *** Windows splitting preferences
+
 #+begin_src emacs-lisp
 (setq split-window-preferred-function #'split-window-prefer-side-by-side)
 #+end_src
+
 *** Confirm kill emacs
+
 #+BEGIN_SRC emacs-lisp
 (setq confirm-kill-processes nil
       confirm-kill-emacs nil)
 #+END_SRC
-** Files local variables behaviour
+
+** Files local variables behavior
+
 #+begin_src emacs-lisp
 (use-package files
   :ensure nil
