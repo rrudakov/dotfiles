@@ -184,21 +184,21 @@ All lists can be nested in any order.
 Don't remember why I have it. Probably it can be deprecated in favor to
 ~capitalize-word~ function which built-in into emacs.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defun rr/capitalize-first-char (&optional string)
   "Capitalize only the first character of the input STRING."
   (when (and string (> (length string) 0))
     (let ((first-char (substring string nil 1))
           (rest-str   (substring string 1)))
       (concat (capitalize first-char) rest-str))))
-#+END_SRC
+#+end_src
 
 ** Replace org-link with description of if empty its address
 
 This is useful function has some kind of /unlink/ behavior. It replaces org
 link with it's description or if there is no description with its address.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defun rr/org-replace-link-by-link-description ()
   "Replace an org link by its description or if empty its address."
   (interactive)
@@ -210,7 +210,7 @@ link with it's description or if there is no description with its address.
                              (org-match-string-no-properties 1))))
           (apply 'delete-region remove)
           (insert description)))))
-#+END_SRC
+#+end_src
 
 ** Smart toggle flycheck error list window
 
@@ -218,7 +218,7 @@ Was written a long time ago. Used to use it to pop-up
 ~flycheck-error-list-buffer~ if it was opened before or create new one. Now I'm
 using [[https://github.com/yasuyk/helm-flycheck][helm-flycheck]]. Maybe someone will find it useful.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defun rr/flycheck-list-smart-toggle ()
   "Toggle flycheck error list buffer."
   (interactive)
@@ -232,7 +232,7 @@ using [[https://github.com/yasuyk/helm-flycheck][helm-flycheck]]. Maybe someone 
                        (buffer-name (window-buffer window)))
             (quit-window t window)))
       (flycheck-list-errors))))
-#+END_SRC
+#+end_src
 
 ** Update vc-state in all buffers
 
@@ -240,14 +240,14 @@ Used as ~magit-post-refresh-hook~ to update ~vc-state~ for each opened
 buffer. It will affect all modes which relies on ~vc-mode~ state (for example
 ~vc-status~ in the modeline and [[https://github.com/dgutov/diff-hl][diff-hl]]).
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defun rr/refresh-vc-state ()
   "Refresh `vc-state' on all buffers."
   (dolist (buff (buffer-list))
     (with-current-buffer buff
       (when (vc-mode)
         (vc-refresh-state)))))
-#+END_SRC
+#+end_src
 
 ** Reset font-lock for all org-mode buffers
 
@@ -369,9 +369,9 @@ I already have some packages for interacting with password-store and I don't
 have ~mysecret.el~ on my machines. Probably this will be removed in the
 future.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (require 'mysecret nil t)
-#+END_SRC
+#+end_src
 
 * Emacs built-in tweaks
 
@@ -379,8 +379,8 @@ Emacs provides a lot of useful customization out of the box. I use [[https://git
 to keep my config clean and declarative. It's possible to declare customization
 for built-in modules as well with use-package. I set
 ~use-package-always-ensure~ to ~t~ to automatically install packages from MELPA
-if it's not installed yet. For build-in packages it's required to use ~:ensure
-nil~ to prevent attempt to install it from MELPA.
+if it's not installed yet. For build-in packages option ~:ensure nil~ should be
+used to prevent attempt to install it from MELPA.
 
 ** Unset some unused keybindings
 
@@ -403,7 +403,7 @@ settings.
 
 Stolen from doom-emacs. Use UTF-8 for everything.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (when (fboundp 'set-charset-priority)
   (set-charset-priority 'unicode))
 (prefer-coding-system        'utf-8)
@@ -412,7 +412,7 @@ Stolen from doom-emacs. Use UTF-8 for everything.
 (set-selection-coding-system 'utf-8)
 (setq locale-coding-system   'utf-8)
 (setq-default buffer-file-coding-system 'utf-8)
-#+END_SRC
+#+end_src
 
 *** Enable y/n answers instead of yes/no
 
@@ -421,9 +421,9 @@ core functionality. As [[https://www.emacswiki.org/emacs/YesOrNoP][emacs-wiki]] 
 questions but I didn't have problem with just single symbol function ~y-or-n-p~
 so I'm creating the alias and forget about it.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defalias 'yes-or-no-p 'y-or-n-p)
-#+END_SRC
+#+end_src
 
 *** Increase amount of data which emacs reads from the process
 
@@ -515,9 +515,9 @@ buffer content.
 
 Disable distracting indicators in the left fringe for empty lines.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq-default indicate-empty-lines nil)
-#+END_SRC
+#+end_src
 
 Hide cursor in non-selected windows.
 
@@ -542,9 +542,9 @@ Disable visual indication of buffer boundaries and scrolling.
 Use ~text-mode~ for all new buffer by default if nothing more specific can be
 chosen.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq-default major-mode 'text-mode)
-#+END_SRC
+#+end_src
 
 Column beyond which automatic line-wrapping should happen. By default it's set
 to 70, I set it globally to 79 as it's the most used value and redefine this
@@ -619,24 +619,61 @@ Setting this value to ~nil~ fixes helm performance issue.
 (setq x-wait-for-event-timeout nil)
 #+end_src
 
+*** Single line horizontal scrolling
+
+Starting from version 26.3 emacs provides automatic horizontal scrolling
+depends on cursor position. I set this variable to ~t~ to allow horizontal
+scrolling of entire window content.
+
+#+begin_src emacs-lisp
+(setq auto-hscroll-mode t)
+#+end_src
+
+*** Enable recursive minibuffers
+
+Enable recursive minibuffers. Required for some helm functionality.
+
+#+begin_src emacs-lisp
+(setq enable-recursive-minibuffers t)
+#+end_src
+
+*** Use built-in tooltips
+
+I use Lucid emacs, so it's very unlikely that it's gonna use Gtk+ tooltips, but
+I prefer to disable it just in case.
+
+#+begin_src emacs-lisp
+(setq x-gtk-use-system-tooltips nil)
+#+end_src
+
 ** Default input method
 
 I write in 2 languages in emacs: English and Russian. To be able to switch
 between input methods without losing keybindings you have to set
 ~default-input-method~ and use ~C-\~ keybinding.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq default-input-method "russian-computer")
-#+END_SRC
+#+end_src
 
-** Auto saving settings
+** Files handling
 
-I want to keep maximum 10 last versions of file to be able to restore it to
-previous state. It's very rare case and I don't think I need more that 10
-backup files. To keep emacs directory clean I create separate directory where
-I'm going to store all backup and autosave files. Also I'm gonna store helm
-history file and org clock file in this directory and maybe something else
-related to restoring files and states.
+Defines most of Emacs's file- and directory-handling settings, including basic
+file visiting, backup generation, link handling, ITS-id version control, load-
+and write-hook handling etc.
+
+Overview of settings covered in this section:
+- Auto saving settings :: I want to keep maximum 10 last versions of file to be
+  able to restore it to previous state. It's very rare case and I don't think I
+  need more that 10 backup files. To keep emacs directory clean I create
+  separate directory where I'm going to store all backup and autosave
+  files. Also I'm gonna store helm history file and org clock file in this
+  directory and maybe something else related to restoring files and states.
+- Large files threshold :: Emacs can display warning if you try to visit very
+  large file. Default value is 10M, I'll increase it to 100M.
+- Kill confirmation :: I use emacs client and restart emacs server with
+  systemctl command. If emacs wait for confirmation restarting will stuck, so
+  disable all confirmation prompt.
 
 #+begin_src emacs-lisp
 (use-package files
@@ -649,7 +686,12 @@ related to restoring files and states.
         `((".*" . ,rr-backup-dir)))
 
   (setq delete-old-versions t
-        kept-old-versions 10))
+        kept-old-versions 10)
+
+  (setq large-file-warning-threshold (* 100 1024 1024))
+
+  (setq confirm-kill-processes nil
+        confirm-kill-emacs nil))
 #+end_src
 
 ** Auth sources
@@ -670,12 +712,12 @@ By default if you select some part of buffer and start typing selected part
 won't be deleted. I find this behavior not obvious and not convenient. To fix
 it I use ~delete-selection-mode~.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package delsel
   :ensure nil
   :config
   (delete-selection-mode))
-#+END_SRC
+#+end_src
 
 ** Built-in help
 
@@ -696,14 +738,14 @@ help popup window is selected by default.
 I prefer minimum of distractions during work. One of them is tooltips. Let's
 disable them completely.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package tooltip
   :ensure nil
   :config
   (tooltip-mode -1)
   (setq tooltip-use-echo-area nil
         show-help-function nil))
-#+END_SRC
+#+end_src
 
 *** Disable modeline on-hover tooltips
 
@@ -742,12 +784,12 @@ cursor.
 Set explicit minimum number of prime bits accepted by GnuTLS for key exchange
 to increase security.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package gnutls
   :ensure nil
   :config
   (setq gnutls-min-prime-bits 4096))
-#+END_SRC
+#+end_src
 
 ** Highlight current line
 
@@ -756,14 +798,14 @@ used to use ~global-hl-line-mode~ but for some major modes I find it not really
 useful (in org-mode buffers it shows hidden leading stars for current line), so
 I enable it manually for certain modes.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package hl-line
   :ensure nil
   :config
   (setq hl-line-sticky-flag nil)
   (add-hook 'prog-mode-hook #'hl-line-mode)
   (add-hook 'nxml-mode-hook #'hl-line-mode))
-#+END_SRC
+#+end_src
 
 ** Major mode for editing configuration files
 
@@ -771,44 +813,44 @@ By default all config files which ends with =rc= are opened in
 ~text-mode~. Emacs has built-in ~conf-unix-mode~ for such files. To set this
 mode automatically I have to modify ~auto-mode-alist~ variable.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package conf-mode
   :config
   (add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode)))
-#+END_SRC
+#+end_src
 
 ** Set specific browser to open links
 
 I use Firefox as my default browser so I want emacs to open any links in it.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package browse-url
   :ensure nil
   :config
   (setq browse-url-browser-function 'browse-url-firefox))
-#+END_SRC
+#+end_src
 
 ** Image mode
 
 Play animated images loop forever instead of just once.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package image-mode
   :ensure nil
   :config
   (setq image-animate-loop t))
-#+END_SRC
+#+end_src
 
 ** Be quiet at startup
 
 Don't show any help pages or startup messages in the echo area. On startup just
 show empty scratch buffer without any text in it.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq inhibit-startup-message t
       inhibit-startup-echo-area-message user-login-name
       initial-scratch-message nil)
-#+END_SRC
+#+end_src
 
 ** Unique buffer names
 
@@ -830,7 +872,7 @@ achieve desired behavior here.
 The native border "consumes" a pixel of the fringe on righter-most splits,
 ~window-divider~ does not. Available since Emacs 25.1.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package frame
   :ensure nil
   :config
@@ -838,14 +880,14 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
                 window-divider-default-bottom-width 0
                 window-divider-default-right-width 1)
   (window-divider-mode +1))
-#+END_SRC
+#+end_src
 
 ** Graphic mode
 
 I use emacsclient and run server as systemd unit. All graphic mode related
 settings should be applied after first frame is created.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defun rr/graphic-mode-settings ()
   "Setup for current FRAME."
   (setq-default line-spacing 0)
@@ -855,7 +897,7 @@ settings should be applied after first frame is created.
 (if (daemonp)
     (add-hook 'server-after-make-frame-hook #'rr/graphic-mode-settings)
   (rr/graphic-mode-settings))
-#+END_SRC
+#+end_src
 
 ** Tramp
 
@@ -863,7 +905,7 @@ Tramp mode is very powerful feature of emacs. You can open remote file just
 like it's local. It's a bit slow with default settings so I update some
 settings to slightly speed up this mode.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package tramp
   :ensure nil
   :config
@@ -879,41 +921,57 @@ settings to slightly speed up this mode.
         tramp-verbose 1
         auto-revert-remote-files nil)
   (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
-#+END_SRC
+#+end_src
 
-** Auto fill mode
+** Simple - tweaks not related to major mode or file handling
 
-For all modes derived from ~text-mode~ I'd like to enable ~auto-fill-mode~ to
-restrict maximum line length to ~current-fill-column~ value. When line length
-reach this value line break will be inserted automatically.
+Settings not related to any major mode or file handling.
 
-#+BEGIN_SRC emacs-lisp
+Overview of settings in this section:
+- ~auto-fill-mode~ :: For all modes derived from ~text-mode~ I'd like to enable
+  ~auto-fill-mode~ to restrict maximum line length to ~current-fill-column~
+  value. When line length reach this value line break will be inserted
+  automatically.
+- Truncate lines :: For all modes derived from ~prog-mode~ I'd like to truncate
+  long lines instead of folding them.
+- Kill-ring :: Save stuff you've copied in other applications to the emacs
+  kill-ring.
+- Trailing whitespace :: I don't think there is any reason to keep trailing
+  white spaces in text files. Let's remove them on every file save.
+- Show column number :: Sometimes I need to know the column number for
+  character at point, so let's put it to the mode-line.
+
+#+begin_src emacs-lisp
 (use-package simple
   :ensure nil
   :config
-  (add-hook 'text-mode-hook #'auto-fill-mode))
-#+END_SRC
+  (setq save-interprogram-paste-before-kill t)
+  (add-hook 'text-mode-hook #'auto-fill-mode)
+  (add-hook 'prog-mode-hook (lambda () (toggle-truncate-lines 1)))
+  (add-hook 'before-save-hook #'delete-trailing-whitespace)
+  (column-number-mode))
+#+end_src
 
 ** Auto revert
 
 If buffer file was changed externally revert buffer automatically, without
 asking and printing any messages.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package autorevert
   :ensure nil
   :config
   (setq auto-revert-verbose nil
         global-auto-revert-non-file-buffers t)
   (global-auto-revert-mode 1))
-#+END_SRC
+#+end_src
 
 ** Recent files
 
 Keep the history of recently visited files. Can be used directly using command
 ~recentf-open-files~ or in my case with help of ~helm~. Very handy.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package recentf
   :ensure nil
   :config
@@ -922,7 +980,7 @@ Keep the history of recently visited files. Can be used directly using command
         recentf-max-menu-items 15)
   (add-to-list 'recentf-exclude (expand-file-name "~/.emacs.d/"))
   (recentf-mode +1))
-#+END_SRC
+#+end_src
 
 ** EPA
 
@@ -930,100 +988,69 @@ When you need to decrypt something inside emacs you'll be asked to enter
 password for GPG key. By default it shows system dialog window but we can use
 emacs minibuffer to enter this password.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package epg-config
   :ensure nil
   :config
   (setq epg-pinentry-mode 'loopback))
-#+END_SRC
+#+end_src
 
-* Appearance
+** Imenu
 
-** Set default fonts
+Imenu provides indexed list of items in the buffer (definitions, variables,
+imports etc.) to quickly jump to the position of the particular item. Can be
+used directly by calling ~imenu~ or with some helpful incremental searching
+frameworks like ~ivy~ or ~helm~.
 
-I used to set default font through ~.Xresources~ and it was working good. But
-it wasn't flexible enough. Now I have some helpful functions to set font-size
-globally.
-
-Some good fonts I used to use or ready to consider:
-+ [[https://slackbuilds.org/repository/14.2/system/Iosevka/][Iosevka]] :: Too narrow.
-+ [[https://github.com/mozilla/Fira][Fira Mono]] :: Can't figure out how to make italic work.
-+ [[https://github.com/adobe-fonts/source-code-pro][SourceCodeVariable]] :: Best option for me. Currently used.
-+ IBM Plex Mono :: Really good but on laptop's small screen looks a bit ugly.
-
-#+BEGIN_SRC emacs-lisp
-(defconst fixed-pitch-font-family "Source Code Variable"
-  "Font family for default and fixed-pitch faces.")
-
-(defconst variable-pitch-font-family "Source Sans Pro"
-  "Font family for variable-pitch face.")
-
-(defconst font-size-alist
-  '((normal . 80)
-    (large . 120)
-    (huge . 140))
-  "List of available font sizes.")
-
-(defun rr/set-font (height)
-  "Set fonts HEIGHT for all base faces."
-  (set-face-attribute 'default nil :family fixed-pitch-font-family :weight 'semi-bold :height height)
-  (set-face-attribute 'fixed-pitch nil :family fixed-pitch-font-family :weight 'semi-bold :height height)
-  (set-face-attribute 'variable-pitch nil :family variable-pitch-font-family :weight 'semi-bold :height height))
-
-(defun rr/select-font-size ()
-  "Select font size from predefined list."
-  (interactive)
-  (let ((height (alist-get (intern (completing-read "Select font size:" font-size-alist)) font-size-alist)))
-    (rr/set-font height)))
-
-(define-key global-map (kbd "C-c r f") #'rr/select-font-size)
-
-(rr/set-font 80)
-#+END_SRC
-
-* Configuration
-
-** Common
-
-*** Imenu
-
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package imenu
   :ensure nil
   :config
   (setq imenu-auto-rescan t
         imenu-max-item-length 160
         imenu-max-items 100))
-#+END_SRC
-
-*** Single line horizontal scrolling
-
-#+BEGIN_SRC emacs-lisp
-(setq auto-hscroll-mode t)
-#+END_SRC
-
-*** Navigation by subwords
-
-#+begin_src emacs-lisp
-(add-hook 'prog-mode-hook #'subword-mode)
 #+end_src
 
-*** Ediff settings
+** Navigation by sub-words
 
-#+BEGIN_SRC emacs-lisp
+For some programming languages (like Java for example) it's common to use camel
+case naming notation. This minor mode makes emacs recognize separate words
+which are written using this notation and allows to use standard emacs
+navigation on it.
+
+#+begin_src emacs-lisp
+(use-package subword
+  :ensure nil
+  :config
+  (add-hook 'prog-mode-hook #'subword-mode))
+#+end_src
+
+** Ediff
+
+Ediff is powerful diff and merging tool in emacs. Some settings I want to
+adjust:
+- Do not produce separate frame for navigation and help
+- Change default layout
+
+#+begin_src emacs-lisp
 (use-package ediff
+  :ensure nil
   :config
   (setq ediff-window-setup-function #'ediff-setup-windows-plain
         ediff-split-window-function #'split-window-right))
-#+END_SRC
+#+end_src
 
-*** ANSI colors
+** ANSI colors
 
-#+BEGIN_SRC emacs-lisp
+Add support for ANSI colors in the shell buffers and in compilation mode
+buffers.
+
+#+begin_src emacs-lisp
 (use-package ansi-color
   :ensure nil
   :config
   (setq ansi-color-for-comint-mode t)
+
   (defun colorize-compilation-buffer ()
     "Use ansi colors to colorize compipaiton buffer."
     (toggle-read-only)
@@ -1032,32 +1059,28 @@ Some good fonts I used to use or ready to consider:
 
   (add-hook 'shell-mode-hook #'ansi-color-for-comint-mode-on)
   (add-hook 'compilation-filter-hook #'colorize-compilation-buffer))
-#+END_SRC
+#+end_src
 
-*** Compilation mode settings
+** Compilation mode settings
 
-#+BEGIN_SRC emacs-lisp
+Make compilation mode a little bit more convenient to use.
+
+#+begin_src emacs-lisp
 (use-package compile
   :ensure nil
   :config
-  (setq-default compilation-always-kill t        ; kill compilation process before starting another
-                compilation-ask-about-save nil   ; save all buffers on `compile'
-                compilation-scroll-output t
-                confirm-nonexistent-file-or-buffer t)
+  (setq compilation-always-kill t        ; kill compilation process before starting another
+        compilation-ask-about-save nil   ; save all buffers on `compile'
+        compilation-scroll-output t)
   (define-key compilation-mode-map (kbd "q") #'delete-window))
-#+END_SRC
+#+end_src
 
-*** Unclassified settings
+** Save history
 
-No more ugly line splitting
+Keep history of certain variables persistent between emacs sessions. You can
+keep minibuffer history, kill-ring, helm commands and many more.
 
-#+BEGIN_SRC emacs-lisp
-(add-hook 'prog-mode-hook (lambda () (setq-local truncate-lines t)))
-#+END_SRC
-
-*** Save minibuffer history between sessions
-
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package savehist
   :ensure nil
   :config
@@ -1070,102 +1093,30 @@ No more ugly line splitting
                                         extended-command-history
                                         shell-command-history))
   (savehist-mode 1))
-#+END_SRC
-
-*** Kill-ring
-
-Save stuff you’ve copied in other applications to the emacs kill-ring.
-
-#+begin_src emacs-lisp
-(setq save-interprogram-paste-before-kill t)
 #+end_src
 
-*** Increase max lines in messages buffer
+** Windows splitting preferences
 
-#+begin_src emacs-lisp
-(setq message-log-max 1000)
-#+end_src
-
-*** Enable recursive minibuffers
-
-#+begin_src emacs-lisp
-(setq enable-recursive-minibuffers t)
-#+end_src
-
-*** Large files threshold
-
-#+begin_src emacs-lisp
-(setq large-file-warning-threshold (* 100 1024 1024))
-#+end_src
-
-*** Cleanup trailing spaces before save
-
-#+begin_src emacs-lisp
-(add-hook 'before-save-hook #'delete-trailing-whitespace)
-#+end_src
-
-*** Show column number
-
-#+begin_src emacs-lisp
-(column-number-mode)
-#+end_src
-
-*** Use built-in tooltips
-
-#+begin_src emacs-lisp
-(setq x-gtk-use-system-tooltips nil)
-#+end_src
-
-*** Windows splitting preferences
+Do not split windows from top to bottom unless I do it explicitly. Always
+prefer side by side splitting.
 
 #+begin_src emacs-lisp
 (setq split-window-preferred-function #'split-window-prefer-side-by-side)
 #+end_src
 
-*** Confirm kill emacs
+* Appearance
 
-#+BEGIN_SRC emacs-lisp
-(setq confirm-kill-processes nil
-      confirm-kill-emacs nil)
-#+END_SRC
+All tweaks for emacs look & feel. Color themes fonts modeline etc.
 
-** Files local variables behavior
+** Color scheme
+
+*** COMMENT Zenburn theme
+
+Very nice theme. Used to use it for a long time, but I found that more contrast
+theme is more comfortable for my eyes. I'll keep this section for history with
+all my customization in case I want ever to switch back to it.
 
 #+begin_src emacs-lisp
-(use-package files
-  :ensure nil
-  :config
-  (setq enable-local-variables t))
-#+end_src
-
-** Asynchronous processing in Emacs
-#+begin_src emacs-lisp
-(use-package async
-  :config
-  (autoload 'dired-async-mode "dired-async.el" nil t)
-  (setq async-bytecomp-allowed-packages 'all)
-  (dired-async-mode 1)
-  (async-bytecomp-package-mode 1))
-#+end_src
-
-** Set the same PATH as in shell
-#+begin_src emacs-lisp
-(use-package exec-path-from-shell
-  :config
-  (exec-path-from-shell-initialize))
-#+end_src
-
-** Some useful commands
-#+begin_src emacs-lisp
-(use-package misc-cmds
-  :config
-  (define-key global-map [remap quit-window] 'quit-window-delete))
-#+end_src
-
-** Theme
-*** Color scheme
-**** COMMENT Zenburn theme
-#+BEGIN_SRC emacs-lisp
 (use-package zenburn-theme
   :config
   (setq zenburn-use-variable-pitch nil)
@@ -1245,12 +1196,18 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 
   (with-eval-after-load 'zenburn
     (rr/refresh-org-buffers)))
-#+END_SRC
-**** Modus vivendi
+#+end_src
+
+*** Modus vivendi
+
+Currently used. My favorite one and the most consistent. A lot of built-in
+customization, very actively maintained.
+
 #+begin_src emacs-lisp
 (use-package modus-vivendi-theme
   :init
   (setq modus-vivendi-theme-bold-constructs t
+        modus-vivendi-theme-slanted-constructs t
         modus-vivendi-theme-org-blocks 'greyscale
         modus-vivendi-theme-proportional-fonts nil)
   :config
@@ -1282,37 +1239,16 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 
   (if (daemonp)
       (add-hook 'server-after-make-frame-hook #'rr/apply-modus-theme)
-    (load-theme 'modus-vivendi t))
-
-  ;; (with-eval-after-load 'modus-vivendi
-  ;;   (rr/refresh-org-buffers))
-  )
+    (load-theme 'modus-vivendi t)))
 #+end_src
-**** COMMENT Tomorrow night
+
+** Modeline
+
+*** Flycheck status
+
+This is adapted variant of similar function from [[https://github.com/TheBB/spaceline][spaceline]] package.
+
 #+begin_src emacs-lisp
-(use-package color-theme-sanityinc-tomorrow
-  :config
-  (defun rr/apply-tomorrow-theme ()
-    "Apply custom theme."
-    (load-theme 'sanityinc-tomorrow-night t)
-    (let ((background "#1d1f21")
-          (selection "#373b41")
-          (red "#cc6666"))
-      (custom-theme-set-faces
-       'user
-       `(fringe ((t (:background ,background))))
-       `(org-tag ((t (:background ,selection :foreground ,red))))
-       `(org-block ((t (:extend t))))))
-    (remove-hook 'server-after-make-frame-hook #'rr/apply-tomorrow-theme))
-
-  (if (daemonp)
-      (add-hook 'server-after-make-frame-hook #'rr/apply-tomorrow-theme)
-    (rr/apply-tomorrow-theme)))
-#+end_src
-*** Modeline
-**** Custom functions
-***** Flycheck status
-#+BEGIN_SRC emacs-lisp
 (defun rr/flycheck-mode-line-status-text (&optional status)
   "Get a text describing STATUS for use in the mode line.
 
@@ -1335,15 +1271,88 @@ nil."
     (propertize text)))
 
 (add-to-list 'global-mode-string '(:eval (rr/flycheck-mode-line-status-text)))
-#+END_SRC
-**** Custom modeline
-***** Minions
+#+end_src
+
+*** Minions
+
+I don't like to see a lot of minor mode indicators in the modeline. This mode
+hide them but keep all the information accessible on mouse click.
+
 #+begin_src emacs-lisp
 (use-package minions
   :config
   (setq minions-direct '(pyvenv-mode projectile-mode))
   (minions-mode 1))
 #+end_src
+
+** Set default fonts
+
+I used to set default font through ~.Xresources~ and it was working good. But
+it wasn't flexible enough. Now I have some helpful functions to set font-size
+globally.
+
+Some good fonts I used to use or ready to consider:
++ [[https://slackbuilds.org/repository/14.2/system/Iosevka/][Iosevka]] :: Too narrow.
++ [[https://github.com/mozilla/Fira][Fira Mono]] :: Can't figure out how to make italic work.
++ [[https://github.com/adobe-fonts/source-code-pro][SourceCodeVariable]] :: Best option for me. Currently used.
++ IBM Plex Mono :: Really good but on laptop's small screen looks a bit ugly.
+
+#+begin_src emacs-lisp
+(defconst fixed-pitch-font-family "Source Code Variable"
+  "Font family for default and fixed-pitch faces.")
+
+(defconst variable-pitch-font-family "Source Sans Pro"
+  "Font family for variable-pitch face.")
+
+(defconst font-size-alist
+  '((normal . 80)
+    (large . 120)
+    (huge . 140))
+  "List of available font sizes.")
+
+(defun rr/set-font (height)
+  "Set fonts HEIGHT for all base faces."
+  (set-face-attribute 'default nil :family fixed-pitch-font-family :weight 'semi-bold :height height)
+  (set-face-attribute 'fixed-pitch nil :family fixed-pitch-font-family :weight 'semi-bold :height height)
+  (set-face-attribute 'variable-pitch nil :family variable-pitch-font-family :weight 'semi-bold :height height))
+
+(defun rr/select-font-size ()
+  "Select font size from predefined list."
+  (interactive)
+  (let ((height (alist-get (intern (completing-read "Select font size:" font-size-alist)) font-size-alist)))
+    (rr/set-font height)))
+
+(define-key global-map (kbd "C-c r f") #'rr/select-font-size)
+
+(rr/set-font 80)
+#+end_src
+
+* Configuration
+
+** Asynchronous processing in Emacs
+#+begin_src emacs-lisp
+(use-package async
+  :config
+  (autoload 'dired-async-mode "dired-async.el" nil t)
+  (setq async-bytecomp-allowed-packages 'all)
+  (dired-async-mode 1)
+  (async-bytecomp-package-mode 1))
+#+end_src
+
+** Set the same PATH as in shell
+#+begin_src emacs-lisp
+(use-package exec-path-from-shell
+  :config
+  (exec-path-from-shell-initialize))
+#+end_src
+
+** Some useful commands
+#+begin_src emacs-lisp
+(use-package misc-cmds
+  :config
+  (define-key global-map [remap quit-window] 'quit-window-delete))
+#+end_src
+
 ** Shell settings
 #+begin_src emacs-lisp
 (use-package shell
@@ -1368,14 +1377,6 @@ nil."
   (setq eshell-scroll-to-bottom-on-input t
         eshell-scroll-to-bottom-on-output t
         eshell-destroy-buffer-when-process-dies t))
-#+end_src
-** Attempt to fix performance problem with long lines
-So long mode:
-#+begin_src emacs-lisp
-(use-package so-long
-  :config
-  ;; Avoid performance issues in files with very long lines.
-  (global-so-long-mode 1))
 #+end_src
 ** Built-in web browser and HTML parser
 #+begin_src emacs-lisp
@@ -1445,34 +1446,34 @@ And third party package for proper syntax highlighting for pre tags in HTML:
   (add-hook 'sql-mode-hook #'sqlind-minor-mode))
 #+end_src
 *** Make PostgreSQL default
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (eval-after-load "sql"
   '(progn
      (sql-set-product 'postgres)))
-#+END_SRC
+#+end_src
 *** Disable line breaking
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (add-hook 'sql-interactive-mode-hook
           (lambda ()
             (toggle-truncate-lines t)))
-#+END_SRC
+#+end_src
 ** Which key
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package which-key
   :config
   (which-key-mode))
-#+END_SRC
+#+end_src
 ** YASnippet
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package yasnippet
   :config
   (setq yas-indent-line 'fixed
         yas-inhibit-overlay-modification-protection t)
   (add-hook 'prog-mode-hook #'yas-minor-mode))
-#+END_SRC
+#+end_src
 ** Auto completion
 *** Common
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package company
   :config
   (setq company-global-modes '(not org-mode markdown-mode shell-mode eshell-mode))
@@ -1482,14 +1483,14 @@ And third party package for proper syntax highlighting for pre tags in HTML:
         company-abort-manual-when-too-short t)
 
   (global-company-mode))
-#+END_SRC
+#+end_src
 *** Quick help
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package company-quickhelp
   :config
   (setq company-quickhelp-use-propertized-text t)
   (company-quickhelp-mode))
-#+END_SRC
+#+end_src
 *** COMMENT Show completion in posframe
 #+begin_src emacs-lisp
 (use-package company-posframe
@@ -1500,25 +1501,25 @@ And third party package for proper syntax highlighting for pre tags in HTML:
 #+end_src
 *** Languages
 **** LaTeX
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package company-auctex
   :config
   (company-auctex-init))
-#+END_SRC
+#+end_src
 **** WEB
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package company-web
   :config
   (add-to-list 'company-backends #'company-web-html)
   (add-to-list 'company-backends #'company-web-jade)
   (add-to-list 'company-backends #'company-web-slim))
-#+END_SRC
+#+end_src
 **** Shell
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package company-shell
   :config
   (add-to-list 'company-backends #'company-shell))
-#+END_SRC
+#+end_src
 ** Completion styles setup
 #+begin_src emacs-lisp
 (use-package minibuffer
@@ -1546,7 +1547,7 @@ And third party package for proper syntax highlighting for pre tags in HTML:
 #+end_src
 ** Helm
 *** Configuration
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package helm
   :config
   (require 'helm)
@@ -1607,15 +1608,15 @@ And third party package for proper syntax highlighting for pre tags in HTML:
 
   (helm-mode 1)
   (helm-adaptive-mode 1))
-#+END_SRC
+#+end_src
 *** Helm flycheck
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package helm-flycheck
   :after flycheck
   :config
   (eval-after-load 'flycheck
     '(define-key flycheck-mode-map (kbd "C-'") #'helm-flycheck)))
-#+END_SRC
+#+end_src
 *** Helm org rifle
 #+begin_src emacs-lisp
 (use-package helm-org-rifle
@@ -1716,7 +1717,7 @@ Better sorting for counsel/ivy
 (use-package smex)
 #+end_src
 ** Smartparens
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package smartparens-config
   :ensure smartparens
   :config
@@ -1759,9 +1760,9 @@ Better sorting for counsel/ivy
 
   (smartparens-global-strict-mode t)
   (show-smartparens-global-mode t))
-#+END_SRC
+#+end_src
 ** Workspaces
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package eyebrowse
   :config
   (setq eyebrowse-wrap-around t
@@ -1769,7 +1770,7 @@ Better sorting for counsel/ivy
         eyebrowse-switch-back-and-forth t
         eyebrowse-mode-line-style 'always)
   (eyebrowse-mode t))
-#+END_SRC
+#+end_src
 ** Emacs build-in tab-bar mode
 #+begin_src emacs-lisp
 (use-package tab-bar
@@ -1920,13 +1921,13 @@ bottom of the frame.")
       switch-to-buffer-in-dedicated-window 'pop)
 #+end_src
 ** Rainbow delimiters
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package rainbow-delimiters
   :config
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
-#+END_SRC
+#+end_src
 ** Windows navigation
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package winum
   :init
   (setq winum-keymap
@@ -1947,7 +1948,7 @@ bottom of the frame.")
   (setq winum-auto-setup-mode-line t
         winum-ignored-buffers '(" *which-key*"))
   (winum-mode))
-#+END_SRC
+#+end_src
 ** Smartscan
 #+begin_src emacs-lisp
 (use-package smartscan
@@ -1962,7 +1963,7 @@ bottom of the frame.")
 #+end_src
 ** Dired
 *** Common settings
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package dired
   :ensure nil
   :config
@@ -1979,7 +1980,7 @@ bottom of the frame.")
   (setq dired-isearch-filenames 'dwim
         dired-create-destination-dirs 'ask
         dired-vc-rename-file t))
-#+END_SRC
+#+end_src
 *** Images preview
 #+begin_src emacs-lisp
 (use-package image-dired
@@ -2004,7 +2005,7 @@ bottom of the frame.")
 #+end_src
 ** Projectile
 *** Basic setup
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package projectile
   :init
   (setq projectile-keymap-prefix (kbd "C-c p"))
@@ -2016,15 +2017,15 @@ bottom of the frame.")
                                         (format " Proj[%s]" (projectile-project-name))))
   (add-to-list 'projectile-globally-ignored-files "*.log")
   (projectile-mode +1))
-#+END_SRC
+#+end_src
 *** Helm projectile
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package helm-projectile
   :config
   (setq projectile-switch-project-action #'helm-projectile)
   (setq helm-projectile-truncate-lines t)
   (helm-projectile-on))
-#+END_SRC
+#+end_src
 *** COMMENT Counsel projectile
 #+begin_src emacs-lisp
 (use-package counsel-projectile
@@ -2032,14 +2033,14 @@ bottom of the frame.")
   (counsel-projectile-mode))
 #+end_src
 ** Htmlize
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package htmlize
   :config
   (setq org-html-htmlize-output-type 'inline-css))
-#+END_SRC
+#+end_src
 ** Syntax check
 *** Flycheck
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package flycheck
   :config
   (setq flycheck-idle-change-delay 2
@@ -2047,21 +2048,21 @@ bottom of the frame.")
   (setq flycheck-indication-mode 'left-fringe)
 
   (add-hook 'after-init-hook #'global-flycheck-mode))
-#+END_SRC
+#+end_src
 And disable flymake autoload:
 #+begin_src emacs-lisp
 (use-package flymake
   :commands flymake-mode)
 #+end_src
 *** Show errors in posframe
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package flycheck-posframe
   :config
   (with-eval-after-load 'flycheck
     (require 'flycheck-posframe)
     (setq flycheck-posframe-border-width 1)
     (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)))
-#+END_SRC
+#+end_src
 ** Highlight TODO item
 #+begin_src emacs-lisp
 (use-package hl-todo
@@ -2070,7 +2071,7 @@ And disable flymake autoload:
 #+end_src
 ** Version control
 *** GIT
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package magit
   :config
   (global-set-key (kbd "C-x g") #'magit-status)
@@ -2081,7 +2082,7 @@ And disable flymake autoload:
 
   (global-magit-file-mode)
   (add-hook 'magit-post-refresh-hook #'rr/refresh-vc-state 5))
-#+END_SRC
+#+end_src
 
 The settings below for the diff buffers produced by Magit. By default it
 doesn't highlight changes inside the line.
@@ -2100,7 +2101,7 @@ doesn't highlight changes inside the line.
   (setq transient-show-popup t))
 #+end_src
 *** Work with forges
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package forge
   :config
   (add-to-list 'forge-alist
@@ -2109,7 +2110,7 @@ doesn't highlight changes inside the line.
   (add-to-list 'forge-alist
                '("178.62.208.194" "178.62.208.194/api/v4"
                  "178.62.208.194" forge-gitlab-repository)))
-#+END_SRC
+#+end_src
 *** Diff highlight
 #+begin_src emacs-lisp
 (use-package diff-hl
@@ -2128,7 +2129,7 @@ doesn't highlight changes inside the line.
   (add-hook 'prog-mode-hook #'magit-todos-mode))
 #+end_src
 ** Multiple cursors
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package multiple-cursors
   :bind
   (("C-S-c C-S-c" . mc/edit-lines)
@@ -2136,15 +2137,15 @@ doesn't highlight changes inside the line.
    ("C-<" . mc/mark-previous-like-this)
    ("C-c C-<" . mc/mark-all-like-this)
    ("C-c d" . mc/skip-to-next-like-this)))
-#+END_SRC
+#+end_src
 ** Expand region
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package expand-region
   :bind
   (("C-=" . er/expand-region)))
-#+END_SRC
+#+end_src
 ** Search and grep utilities
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package wgrep
   :commands wgrep
   :config
@@ -2167,9 +2168,9 @@ doesn't highlight changes inside the line.
         rg-custom-type-aliases nil
         rg-default-alias-fallback "all")
   (rg-enable-default-bindings))
-#+END_SRC
+#+end_src
 ** Terminal emulator
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package sane-term
   :bind
   (("C-c t" . sane-term)
@@ -2185,25 +2186,25 @@ doesn't highlight changes inside the line.
          (term-line-mode)
          (yank)
          (term-char-mode))))))
-#+END_SRC
+#+end_src
 ** Rainbow mode
 #+BEGIN_QUOTE
 Colorize color names in buffers
 #+END_QUOTE
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package rainbow-mode
   :config
   (add-to-list 'rainbow-x-colors-major-mode-list #'web-mode)
   (add-to-list 'rainbow-x-colors-major-mode-list #'python-mode)
   (add-to-list 'rainbow-x-colors-major-mode-list #'emacs-lisp-mode))
-#+END_SRC
+#+end_src
 ** CSV
 Major mode for work with CSV files
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package csv-mode)
-#+END_SRC
+#+end_src
 ** Log files
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package vlf
   :config
   (require 'vlf-setup))
@@ -2219,11 +2220,11 @@ Major mode for work with CSV files
 
   (setq logview-additional-submodes
         '(("Python" (format . "TIMESTAMP LEVEL - [NAME]:") (levels . "Python")))))
-#+END_SRC
+#+end_src
 ** Nginx
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package nginx-mode)
-#+END_SRC
+#+end_src
 ** SSH config mode
 #+begin_src emacs-lisp
 (use-package ssh-config-mode
@@ -2234,33 +2235,33 @@ Major mode for work with CSV files
 #+end_src
 ** REST client
 Quite interesting package. I think it will replace for Postman for me.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package restclient)
-#+END_SRC
+#+end_src
 And autocompletion for it:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package company-restclient
   :config
   (add-to-list 'company-backends #'company-restclient))
-#+END_SRC
+#+end_src
 And even org-babel integration:
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package ob-restclient
   :config
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((restclient . t))))
-#+END_SRC
+#+end_src
 ** PDF tools
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package pdf-tools
   :config
   (pdf-tools-install))
-#+END_SRC
+#+end_src
 ** Gitignore templates
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package gitignore-templates)
-#+END_SRC
+#+end_src
 ** Regexps
 Build in regex package:
 #+begin_src emacs-lisp
@@ -2370,12 +2371,12 @@ Build in regex package:
   '(org-load-modules-maybe t))
 #+end_src
 *** Effort estimates
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq org-global-properties '(("Effort_ALL" . "0 0:30 1:00 2:00 4:00 6:00 8:00 16:00")))
 (setq org-columns-default-format "%40ITEM(Task) %17Effort(Estimated Effort){:} %CLOCKSUM")
-#+END_SRC
+#+end_src
 *** Agenda settings
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq org-agenda-files (quote ("~/Org/tasks/bsc.org"
                                "~/Org/tasks/epam.org"
                                "~/Org/tasks/personal.org"
@@ -2393,9 +2394,9 @@ Build in regex package:
       org-agenda-span 'week
       org-agenda-todo-ignore-scheduled 'future
       org-agenda-show-future-repeats 'next)
-#+END_SRC
+#+end_src
 *** Capture settings
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq org-default-notes-file (concat org-directory "/notes.org"))
 
 (setq org-capture-templates
@@ -2440,11 +2441,11 @@ Build in regex package:
   (delete-other-windows)
   (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
     (org-capture)))
-#+END_SRC
+#+end_src
 *** Tag list
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq org-tag-alist '(("@bug" . ?b) ("@task" . ?t) ("@story" . ?s)))
-#+END_SRC
+#+end_src
 *** Keywords list
 Maybe it's a good idea to use unicode symbols for TODO keywords:
 #+BEGIN_EXAMPLE
@@ -2452,21 +2453,21 @@ U+2611 ☑ ballot box with check
 U+2610 ☐ ballot box
 #+END_EXAMPLE
 But there is no backward compatibility.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq org-todo-keywords
       '((sequence "TODO(t)" "PROGRESS(p)" "WAITING(w)" "REVIEW(r)" "|" "DONE(d)" "CANCELLED(c@)")))
-#+END_SRC
+#+end_src
 *** Mark task as DONE if all subtasks are DONE
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (defun org-summary-todo (n-done n-not-done)
   "Switch entry to DONE when all subentries are done, to TODO otherwise."
   (let (org-log-done org-log-states)   ; turn off logging
     (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 
 (add-hook 'org-after-todo-statistics-hook #'org-summary-todo)
-#+END_SRC
+#+end_src
 *** Custom keywords faces
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 ;; Zenburn
 ;; (setq org-todo-keyword-faces
 ;;       '(("PROGRESS" . (:foreground "#93E0E3" :weight bold))
@@ -2486,18 +2487,18 @@ But there is no backward compatibility.
         ("WAITING" . (:foreground "#eecc00"))
         ("REVIEW" . (:foreground "#eecc00"))
         ("CANCELLED" . (:foreground "#a8a8a8"))))
-#+END_SRC
+#+end_src
 *** Handle local file links by extension
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq org-file-apps
       '((auto-mode . emacs)
         ("\\.x?html\\'" . "firefox %s")
         ("\\(?:xhtml\\|html\\)\\'" . "firefox %s")
         ("\\.mm\\'" . default)
         ("\\.pdf\\'" . default)))
-#+END_SRC
+#+end_src
 *** Clock settings
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq org-clock-persist-file (expand-file-name "org-clock-save.el" rr-savefile-dir))
 (setq org-clock-persist t)
 (org-clock-persistence-insinuate)
@@ -2532,12 +2533,12 @@ But there is no backward compatibility.
     (rr/read-non-clocking-state)))
 
 (setq org-clock-out-switch-to-state #'rr/after-clock-stop)
-#+END_SRC
+#+end_src
 *** Appearance
 **** Org source code
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq org-src-fontify-natively t)
-#+END_SRC
+#+end_src
 *** Unset some keybindings
 #+begin_src emacs-lisp
 (define-key orgtbl-mode-map (kbd "C-c C-w") nil)
@@ -2598,21 +2599,21 @@ But there is no backward compatibility.
   (setq org-show-notification-handler #'notifications-notify))
 #+end_src
 *** Markdown export
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (require 'ox-md nil t)
 (eval-after-load 'org
   '(require 'ox-gfm nil t))
-#+END_SRC
+#+end_src
 *** Confluence export
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (require 'ox-confluence)
-#+END_SRC
+#+end_src
 *** Slack export
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package ox-slack)
-#+END_SRC
+#+end_src
 *** Org-mime
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package org-mime
   :config
   (define-key message-mode-map (kbd "C-c M-o") #'org-mime-htmlize)
@@ -2632,9 +2633,9 @@ But there is no backward compatibility.
 
   (setq org-mime-export-options
         '(:section-numbers nil :with-author nil :with-toc nil)))
-#+END_SRC
+#+end_src
 *** LaTeX export
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (require 'ox-latex)
 (setq org-latex-inputenc-alist '(("utf8" . "utf8x")))
 (setq org-latex-default-packages-alist
@@ -2686,7 +2687,7 @@ But there is no backward compatibility.
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                ("\\paragraph{%s}" . "\\paragraph*{%s}")
                ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-#+END_SRC
+#+end_src
 *** Jira export
 #+begin_src emacs-lisp
 (use-package ox-jira
@@ -2694,7 +2695,7 @@ But there is no backward compatibility.
   (setq org-export-copy-to-kill-ring 'if-interactive))
 #+end_src
 *** Evaluate source code
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
@@ -2711,11 +2712,11 @@ But there is no backward compatibility.
       org-export-use-babel nil)
 
 (use-package ob-async)
-#+END_SRC
+#+end_src
 *** Google calendar sync
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package org-gcal)
-#+END_SRC
+#+end_src
 *** Edit program comments and strings using Org-mode
 #+begin_src emacs-lisp
 (use-package poporg)
@@ -2727,7 +2728,7 @@ But there is no backward compatibility.
       user-full-name "Roman Rudakov")
 #+end_src
 *** COMMENT ProtonMail configuration
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package mu4e
   :ensure nil
   :after message
@@ -2767,7 +2768,7 @@ But there is no backward compatibility.
 
   ;; Run mu4e in background after starting emacs
   (mu4e t))
-#+END_SRC
+#+end_src
 *** COMMENT Use helm for mail filtration
 #+begin_src emacs-lisp
 (use-package helm-mu
@@ -2784,7 +2785,7 @@ But there is no backward compatibility.
    ("s" . helm-mu)))
 #+end_src
 *** COMMENT Alerts
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package mu4e-alert
   :config
   (setq mu4e-alert-modeline-formatter (lambda (count)
@@ -2794,7 +2795,7 @@ But there is no backward compatibility.
   (mu4e-alert-set-default-style 'libnotify)
   (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
   (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
-#+END_SRC
+#+end_src
 *** Sending emails
 #+begin_src emacs-lisp
 (use-package smtpmail
@@ -2967,7 +2968,7 @@ Common tool for code formatting.
 ** Languages
 *** LSP mode
 **** Common setup
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package lsp-mode
   :config
   (define-key lsp-mode-map (kbd "C-c j") rr-lsp-keymap)
@@ -3001,7 +3002,7 @@ Common tool for code formatting.
 	      lsp-pyls-plugins-jedi-completion-include-params nil
 	      lsp-pyls-plugins-jedi-signature-help-enabled t)
   (add-hook 'python-mode-hook #'lsp))
-#+END_SRC
+#+end_src
 *** DAP mode
 **** Common setup
 #+begin_src emacs-lisp
@@ -3120,7 +3121,7 @@ Common tool for code formatting.
             (setq c-basic-offset 2)))
 #+end_src
 **** lsp-mode setup
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package lsp-java
   :after lsp-mode
   :config
@@ -3135,9 +3136,9 @@ Common tool for code formatting.
                           "-Xmx4G"
                           "-XX:+UseG1GC"
                           "-XX:+UseStringDeduplication")))
-#+END_SRC
+#+end_src
 **** Expand snippet for new class
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq auto-insert-query nil)
 (setq auto-insert-directory (expand-file-name "templates/" user-emacs-directory))
 (add-hook 'find-file-hook #'auto-insert)
@@ -3149,7 +3150,7 @@ Common tool for code formatting.
                                    (buffer-string)
                                    (point-min)
                                    (point-max)))]))
-#+END_SRC
+#+end_src
 *** Haskell
 **** Haskell mode
 #+begin_src emacs-lisp
@@ -3166,7 +3167,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 (use-package lsp-haskell)
 #+end_src
 **** Align rules
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (add-hook 'align-load-hook
           (lambda ()
             (add-to-list 'align-rules-list
@@ -3193,25 +3194,25 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
                          '(haskell-left-arrows
                            (regexp . "\\(\\s-+\\)\\(<-\\|←\\)\\s-+")
                            (modes quote (haskell-mode literate-haskell-mode))))))
-#+END_SRC
+#+end_src
 **** Haskell doc mode
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (add-hook 'haskell-mode-hook #'turn-on-haskell-doc-mode)
-#+END_SRC
+#+end_src
 **** Indentation
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package hindent
   :config
   (add-hook 'haskell-mode-hook #'hindent-mode))
-#+END_SRC
+#+end_src
 **** Stack interface
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package hasky-stack
   :config
   (global-set-key (kbd "C-c h e") #'hasky-stack-execute)
   (global-set-key (kbd "C-c h h") #'hasky-stack-package-action)
   (global-set-key (kbd "C-c h i") #'hasky-stack-new))
-#+END_SRC
+#+end_src
 **** Ligatures support
 #+begin_src emacs-lisp
 (use-package hasklig-mode
@@ -3220,7 +3221,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+end_src
 *** LaTeX
 **** AucTEX tweaks
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package tex
   :ensure nil
   :config
@@ -3246,44 +3247,44 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
   (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
   (add-hook 'LaTeX-mode-hook (lambda () (auto-fill-mode -1)))
   (add-hook 'LaTeX-mode-hook (lambda () (TeX-fold-mode 1))))
-#+END_SRC
+#+end_src
 *** Python
 **** Virtualenv
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package pyvenv
   :config
   (add-hook 'python-mode-hook 'pyvenv-tracking-mode)
   (add-hook 'pyvenv-post-activate-hooks #'lsp))
-#+END_SRC
+#+end_src
 **** Default interpreter
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (setq python-shell-interpreter "python3")
-#+END_SRC
+#+end_src
 **** Import management
 ***** Automatically sort imports
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package isortify
   :config
   (setq isortify-line-width 79
         isortify-multi-line-output 3
         isortify-trailing-comma t)
   (add-hook 'python-mode-hook #'isortify-mode))
-#+END_SRC
+#+end_src
 **** Format code
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package blacken
   :config
   (setq blacken-line-length 79
         blacken-allow-py36 t))
 
 (use-package py-yapf)
-#+END_SRC
+#+end_src
 **** Tox
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package tox
   :config
   (setq tox-runner 'py.test))
-#+END_SRC
+#+end_src
 **** Sphinx doc
 #+begin_src emacs-lisp
 (use-package sphinx-doc
@@ -3291,22 +3292,22 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
   (add-hook 'python-mode-hook #'sphinx-doc-mode))
 #+end_src
 **** Editing requirements files
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package pip-requirements)
-#+END_SRC
+#+end_src
 *** JSON
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package json-mode
   :config
   (setq json-reformat:indent-width 4
         json-reformat:pretty-string? t)
   (add-hook 'json-mode-hook #'flycheck-mode))
-#+END_SRC
+#+end_src
 *** YAML
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package yaml-mode
   :mode "\\.yml\\'")
-#+END_SRC
+#+end_src
 *** JavaScript
 **** Add node_modules to path
 #+begin_src emacs-lisp
@@ -3322,7 +3323,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
     '(add-hook 'web-mode-hook #'add-node-modules-path)))
 #+end_src
 **** TypeScript
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package typescript-mode)
 
 (use-package tide
@@ -3352,7 +3353,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
   (flycheck-add-next-checker 'typescript-tide 'javascript-eslint 'append)
   (flycheck-add-next-checker 'jsx-tide 'javascript-eslint 'append)
   (flycheck-add-next-checker 'javascript-tide 'javascript-eslint 'append))
-#+END_SRC
+#+end_src
 **** Angular support
 #+begin_src emacs-lisp
 (use-package ng2-mode
@@ -3365,7 +3366,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
   (add-to-list 'auto-mode-alist '("\\.component.html" . ng2-html-mode)))
 #+end_src
 *** WEB
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package web-mode
   :config
   (setq web-mode-markup-indent-offset 2
@@ -3414,11 +3415,11 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
   ;;           (when (string-equal "jsx" (file-name-extension buffer-file-name))
   ;;             (lsp))))
   (flycheck-add-mode 'javascript-eslint 'web-mode))
-#+END_SRC
+#+end_src
 *** Groovy
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package groovy-mode)
-#+END_SRC
+#+end_src
 *** Rust
 **** Rust-mode
 #+begin_src emacs-lisp
@@ -3549,20 +3550,20 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+end_src
 ** Funny
 *** Speed type
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package speed-type)
-#+END_SRC
+#+end_src
 *** Literate calc mode
 #+begin_src emacs-lisp
 (use-package literate-calc-mode)
 #+end_src
 ** Set keybindings
 *** Common
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (global-set-key (kbd "M-[") #'align)
-#+END_SRC
+#+end_src
 *** Org
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (global-set-key (kbd "C-c l") #'org-store-link)
 (global-set-key (kbd "C-c a") #'org-agenda)
 (global-set-key (kbd "C-c c") #'org-capture)
@@ -3573,4 +3574,4 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 (global-set-key (kbd "<f6>") #'profiler-start)
 (global-set-key (kbd "<f7>") #'profiler-report)
 (global-set-key (kbd "<f8>") #'profiler-stop)
-#+END_SRC
+#+end_src
