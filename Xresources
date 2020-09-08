@@ -15,7 +15,7 @@ Emacs.toolBar: 0
 Emacs.verticalScrollBars: off
 ! Font settings
 Emacs.FontBackend: ftcrhb
-! Emacs.font: Source Code Variable-8:weight=semi-bold:slant=normal:width=normal
+Emacs.font: Source Code Variable-8:weight=semi-bold:slant=normal:width=normal
 Emacs.lineSpacing: 0
 
 XTerm*faceName: xft:Source Code Variable:size=9:antialias=true

@@ -399,6 +399,32 @@ Part of the Emacs is written in C language and some crucial variables defined
 in C files but it's still possible to update them. Here is the list of such
 settings.
 
+*** Use UTF-8 as default coding system
+
+Stolen from doom-emacs. Use UTF-8 for everything.
+
+#+BEGIN_SRC emacs-lisp
+(when (fboundp 'set-charset-priority)
+  (set-charset-priority 'unicode))
+(prefer-coding-system        'utf-8)
+(set-terminal-coding-system  'utf-8)
+(set-keyboard-coding-system  'utf-8)
+(set-selection-coding-system 'utf-8)
+(setq locale-coding-system   'utf-8)
+(setq-default buffer-file-coding-system 'utf-8)
+#+END_SRC
+
+*** Enable y/n answers instead of yes/no
+
+Not really variable assignment or configuration change, but this is kind of
+core functionality. As [[https://www.emacswiki.org/emacs/YesOrNoP][emacs-wiki]] said ~yes-or-no-p~ is for more important
+questions but I didn't have problem with just single symbol function ~y-or-n-p~
+so I'm creating the alias and forget about it.
+
+#+BEGIN_SRC emacs-lisp
+(defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+
 *** Increase amount of data which emacs reads from the process
 
 This is recommended setting to increase ~lsp-mode~ performance. Increase the
@@ -448,16 +474,6 @@ indentation so I set this setting to ~2~.
 (setq-default tab-width 2)
 #+end_src
 
-*** Display fringe outside margins
-
-To display fringes on the edge of emacs frame I need to set this setting to
-~t~. If I set this to ~nil~ fringes will be displayed between margins and
-buffer content.
-
-#+begin_src emacs-lisp
-(setq-default fringes-outside-margins t)
-#+end_src
-
 *** COMMENT Set default margins
 
 Flycheck has an option to display indicators in margins instead of fringes. By
@@ -468,6 +484,150 @@ margin flycheck indicators I have to set margins to at least ~1~.
 (setq-default left-margin-width 1)
 (setq-default right-margin-width 1)
 #+end_src
+
+*** Prefer newer files to load
+
+When use ~load~ function always prefer the latest version of a file.
+
+#+begin_src emacs-lisp
+(setq load-prefer-newer t)
+#+end_src
+
+*** Avoid tabs
+
+Holy war tabs vs spaces :)
+
+I prefer spaces, so disable tabs globally.
+
+#+begin_src emacs-lisp
+(setq-default indent-tabs-mode nil)
+#+end_src
+
+*** Buffer settings, fringes and indicators
+
+To display fringes on the edge of emacs frame I need to set this setting to
+~t~. If I set this to ~nil~ fringes will be displayed between margins and
+buffer content.
+
+#+begin_src emacs-lisp
+(setq-default fringes-outside-margins t)
+#+end_src
+
+Disable distracting indicators in the left fringe for empty lines.
+
+#+BEGIN_SRC emacs-lisp
+(setq-default indicate-empty-lines nil)
+#+END_SRC
+
+Hide cursor in non-selected windows.
+
+#+begin_src emacs-lisp
+(setq-default cursor-in-non-selected-windows nil)
+#+end_src
+
+One more distraction is continuation arrows in the fringes. Disable it.
+
+#+begin_src emacs-lisp
+(setq-default fringe-indicator-alist
+              (delq (assq 'continuation fringe-indicator-alist)
+                    fringe-indicator-alist))
+#+end_src
+
+Disable visual indication of buffer boundaries and scrolling.
+
+#+begin_src emacs-lisp
+(setq-default indicate-buffer-boundaries nil)
+#+end_src
+
+Use ~text-mode~ for all new buffer by default if nothing more specific can be
+chosen.
+
+#+BEGIN_SRC emacs-lisp
+(setq-default major-mode 'text-mode)
+#+END_SRC
+
+Column beyond which automatic line-wrapping should happen. By default it's set
+to 70, I set it globally to 79 as it's the most used value and redefine this
+value for some specific modes.
+
+#+begin_src emacs-lisp
+(setq-default fill-column 79)
+#+end_src
+
+*** Inhibit implied resize frame
+
+I use xmonad as my window manager and it controls all window resizing
+operations. It's very unlikely that I'm gonna have some unpredictable behavior
+of frames, but I prefer to set settings explicitly.
+
+#+begin_src emacs-lisp
+(setq-default frame-inhibit-implied-resize t)
+#+end_src
+
+*** Hide highlight in non-selected windows
+
+#+begin_src emacs-lisp
+(setq-default highlight-nonselected-windows nil)
+#+end_src
+
+*** Hide help echo text
+
+#+begin_src emacs-lisp
+(setq-default show-help-function nil)
+#+end_src
+
+*** Always avoid GUI
+
+Do not use dialog boxes to ask questions for mouse commands.
+
+#+begin_src emacs-lisp
+(setq-default use-dialog-box nil)
+#+end_src
+
+*** No beeping and blinking in terminal
+
+#+begin_src emacs-lisp
+(setq-default ring-bell-function #'ignore
+              visible-bell nil)
+#+end_src
+
+*** More convenient scrolling settings
+
+Default scrolling settings in emacs is a bit distracting. Achieve a smooth
+scrolling in emacs is almost impossible but it's possible to make the scrolling
+behavior more comfortable.
+
+#+begin_src emacs-lisp
+(setq scroll-margin 3
+      scroll-conservatively 101
+      scroll-up-aggressively 0.01
+      scroll-down-aggressively 0.01
+      scroll-preserve-screen-position t
+      auto-window-vscroll nil)
+#+end_src
+
+*** Limit wait for X event timeout
+
+Emacs will wait up to this many seconds to receive X events after making
+changes which affect the state of the graphical interface.  Under some window
+managers this can take an indefinite amount of time, so it is important to
+limit the wait.
+
+Setting this value to ~nil~ fixes helm performance issue.
+
+#+begin_src emacs-lisp
+(setq x-wait-for-event-timeout nil)
+#+end_src
+
+** Default input method
+
+I write in 2 languages in emacs: English and Russian. To be able to switch
+between input methods without losing keybindings you have to set
+~default-input-method~ and use ~C-\~ keybinding.
+
+#+BEGIN_SRC emacs-lisp
+(setq default-input-method "russian-computer")
+#+END_SRC
 
 ** Auto saving settings
 
@@ -492,7 +652,7 @@ related to restoring files and states.
         kept-old-versions 10))
 #+end_src
 
-** Auth sources settings
+** Auth sources
 
 I prefer to control what should be stored in the ~.authinfo~ file manually, so
 I disable save behavior.
@@ -517,7 +677,7 @@ it I use ~delete-selection-mode~.
   (delete-selection-mode))
 #+END_SRC
 
-** Built-in help mode
+** Built-in help
 
 When I use help functions (~describe-variable~ or ~describe-function~) I want
 help popup window is selected by default.
@@ -531,7 +691,7 @@ help popup window is selected by default.
 
 ** Settings related to mouse usage
 
-*** Disable tooltips completely
+*** Disable tooltips
 
 I prefer minimum of distractions during work. One of them is tooltips. Let's
 disable them completely.
@@ -544,6 +704,12 @@ disable them completely.
   (setq tooltip-use-echo-area nil
         show-help-function nil))
 #+END_SRC
+
+*** Disable modeline on-hover tooltips
+
+#+begin_src emacs-lisp
+(setq-default mode-line-default-help-echo nil)
+#+end_src
 
 *** Move mouse away from text
 
@@ -558,50 +724,232 @@ you start typing.
       (mouse-avoidance-mode 'banish)))
 #+end_src
 
-* Configuration
+*** Mouse paste behavior
 
-** Common
-
-*** TLS default settings
-
-#+BEGIN_SRC emacs-lisp
-(setq gnutls-min-prime-bits 4096)
-#+END_SRC
-
-*** Prefer newer files to load
+By default on middle click yanked text will be pasted in the place where mouse
+pointer is. But more convenient option is to paste yanked text right after
+cursor.
 
 #+begin_src emacs-lisp
-(setq load-prefer-newer t)
+(use-package mouse
+  :ensure nil
+  :config
+  (setq-default mouse-yank-at-point t))
 #+end_src
 
-*** Do not indicate empty lines at the end of the window in the left fringe
+** GnuTLS
+
+Set explicit minimum number of prime bits accepted by GnuTLS for key exchange
+to increase security.
 
 #+BEGIN_SRC emacs-lisp
-(setq-default indicate-empty-lines nil)
+(use-package gnutls
+  :ensure nil
+  :config
+  (setq gnutls-min-prime-bits 4096))
 #+END_SRC
 
-*** Enable y/n answers instead of yes/no
+** Highlight current line
 
-#+BEGIN_SRC emacs-lisp
-(fset 'yes-or-no-p 'y-or-n-p)
-#+END_SRC
-
-*** Highlight current line
+This built-in mode highlights current line where the cursor is at the moment. I
+used to use ~global-hl-line-mode~ but for some major modes I find it not really
+useful (in org-mode buffers it shows hidden leading stars for current line), so
+I enable it manually for certain modes.
 
 #+BEGIN_SRC emacs-lisp
 (use-package hl-line
+  :ensure nil
   :config
   (setq hl-line-sticky-flag nil)
   (add-hook 'prog-mode-hook #'hl-line-mode)
   (add-hook 'nxml-mode-hook #'hl-line-mode))
 #+END_SRC
 
-*** Set default font
+** Major mode for editing configuration files
 
-Good choices:
+By default all config files which ends with =rc= are opened in
+~text-mode~. Emacs has built-in ~conf-unix-mode~ for such files. To set this
+mode automatically I have to modify ~auto-mode-alist~ variable.
+
+#+BEGIN_SRC emacs-lisp
+(use-package conf-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.*rc$" . conf-unix-mode)))
+#+END_SRC
+
+** Set specific browser to open links
+
+I use Firefox as my default browser so I want emacs to open any links in it.
+
+#+BEGIN_SRC emacs-lisp
+(use-package browse-url
+  :ensure nil
+  :config
+  (setq browse-url-browser-function 'browse-url-firefox))
+#+END_SRC
+
+** Image mode
+
+Play animated images loop forever instead of just once.
+
+#+BEGIN_SRC emacs-lisp
+(use-package image-mode
+  :ensure nil
+  :config
+  (setq image-animate-loop t))
+#+END_SRC
+
+** Be quiet at startup
+
+Don't show any help pages or startup messages in the echo area. On startup just
+show empty scratch buffer without any text in it.
+
+#+BEGIN_SRC emacs-lisp
+(setq inhibit-startup-message t
+      inhibit-startup-echo-area-message user-login-name
+      initial-scratch-message nil)
+#+END_SRC
+
+** Unique buffer names
+
+If 2 buffers have similar file name or base name there should be some way to
+distinguish them. That why ~uniquify~ package for. I update some settings to
+achieve desired behavior here.
+
+#+begin_src emacs-lisp
+(use-package uniquify
+  :ensure nil
+  :config
+  (setq uniquify-separator "/"
+        uniquify-buffer-name-style 'forward
+        uniquify-strip-common-suffix t))
+#+end_src
+
+** More reliable inter-window border
+
+The native border "consumes" a pixel of the fringe on righter-most splits,
+~window-divider~ does not. Available since Emacs 25.1.
+
+#+BEGIN_SRC emacs-lisp
+(use-package frame
+  :ensure nil
+  :config
+  (setq-default window-divider-default-places t
+                window-divider-default-bottom-width 0
+                window-divider-default-right-width 1)
+  (window-divider-mode +1))
+#+END_SRC
+
+** Graphic mode
+
+I use emacsclient and run server as systemd unit. All graphic mode related
+settings should be applied after first frame is created.
+
+#+BEGIN_SRC emacs-lisp
+(defun rr/graphic-mode-settings ()
+  "Setup for current FRAME."
+  (setq-default line-spacing 0)
+  ;; buffer name  in frame title
+  (setq frame-title-format '("" "%b @ Emacs")))
+
+(if (daemonp)
+    (add-hook 'server-after-make-frame-hook #'rr/graphic-mode-settings)
+  (rr/graphic-mode-settings))
+#+END_SRC
+
+** Tramp
+
+Tramp mode is very powerful feature of emacs. You can open remote file just
+like it's local. It's a bit slow with default settings so I update some
+settings to slightly speed up this mode.
+
+#+BEGIN_SRC emacs-lisp
+(use-package tramp
+  :ensure nil
+  :config
+  (setq tramp-terminal-type "tramp"
+        tramp-default-method "ssh"
+        tramp-ssh-controlmaster-options "-o ControlMaster=auto -o ControlPath='tramp.%%C'"
+        explicit-shell-file-name "/bin/bash"
+        remote-file-name-inhibit-cache 3600
+        tramp-completion-reread-directory-timeout nil
+        vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)"
+                                     vc-ignore-dir-regexp
+                                     tramp-file-name-regexp)
+        tramp-verbose 1
+        auto-revert-remote-files nil)
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
+#+END_SRC
+
+** Auto fill mode
+
+For all modes derived from ~text-mode~ I'd like to enable ~auto-fill-mode~ to
+restrict maximum line length to ~current-fill-column~ value. When line length
+reach this value line break will be inserted automatically.
+
+#+BEGIN_SRC emacs-lisp
+(use-package simple
+  :ensure nil
+  :config
+  (add-hook 'text-mode-hook #'auto-fill-mode))
+#+END_SRC
+
+** Auto revert
+
+If buffer file was changed externally revert buffer automatically, without
+asking and printing any messages.
+
+#+BEGIN_SRC emacs-lisp
+(use-package autorevert
+  :ensure nil
+  :config
+  (setq auto-revert-verbose nil
+        global-auto-revert-non-file-buffers t)
+  (global-auto-revert-mode 1))
+#+END_SRC
+
+** Recent files
+
+Keep the history of recently visited files. Can be used directly using command
+~recentf-open-files~ or in my case with help of ~helm~. Very handy.
+
+#+BEGIN_SRC emacs-lisp
+(use-package recentf
+  :ensure nil
+  :config
+  (setq recentf-save-file (expand-file-name "recentf" rr-savefile-dir)
+        recentf-max-saved-items 50
+        recentf-max-menu-items 15)
+  (add-to-list 'recentf-exclude (expand-file-name "~/.emacs.d/"))
+  (recentf-mode +1))
+#+END_SRC
+
+** EPA
+
+When you need to decrypt something inside emacs you'll be asked to enter
+password for GPG key. By default it shows system dialog window but we can use
+emacs minibuffer to enter this password.
+
+#+BEGIN_SRC emacs-lisp
+(use-package epg-config
+  :ensure nil
+  :config
+  (setq epg-pinentry-mode 'loopback))
+#+END_SRC
+
+* Appearance
+
+** Set default fonts
+
+I used to set default font through ~.Xresources~ and it was working good. But
+it wasn't flexible enough. Now I have some helpful functions to set font-size
+globally.
+
+Some good fonts I used to use or ready to consider:
 + [[https://slackbuilds.org/repository/14.2/system/Iosevka/][Iosevka]] :: Too narrow.
 + [[https://github.com/mozilla/Fira][Fira Mono]] :: Can't figure out how to make italic work.
 + [[https://github.com/adobe-fonts/source-code-pro][SourceCodeVariable]] :: Best option for me. Currently used.
++ IBM Plex Mono :: Really good but on laptop's small screen looks a bit ugly.
 
 #+BEGIN_SRC emacs-lisp
 (defconst fixed-pitch-font-family "Source Code Variable"
@@ -633,198 +981,20 @@ Good choices:
 (rr/set-font 80)
 #+END_SRC
 
-*** Open files ends with "rc" in conf-unix-mode
+* Configuration
 
-#+BEGIN_SRC emacs-lisp
-(use-package conf-mode
-  :mode ("\\.*rc$" . conf-unix-mode))
-#+END_SRC
-
-*** Set specific browser to open links
-
-#+BEGIN_SRC emacs-lisp
-(setq browse-url-browser-function 'browse-url-firefox)
-#+END_SRC
-
-*** Use UTF-8 as default coding system
-
-#+BEGIN_SRC emacs-lisp
-(when (fboundp 'set-charset-priority)
-  (set-charset-priority 'unicode))
-(prefer-coding-system        'utf-8)
-(set-terminal-coding-system  'utf-8)
-(set-keyboard-coding-system  'utf-8)
-(set-selection-coding-system 'utf-8)
-(setq locale-coding-system   'utf-8)
-(setq-default buffer-file-coding-system 'utf-8)
-#+END_SRC
-
-*** Some useful settings
-
-Picked mostly from doom-emacs configuration.
-#+BEGIN_SRC emacs-lisp
-(setq-default
- ;; ad-redefinition-action 'accept   ; silence advised function warnings
- apropos-do-all t                 ; make `apropos' more useful
-
- ;; History & backup settings (save nothing, that's what git is for)
- history-length 50
- indent-tabs-mode nil)
-
-(setq x-wait-for-event-timeout 0)
-
-(setq-default
- cursor-in-non-selected-windows nil  ; hide cursors in other windows
- frame-inhibit-implied-resize t
- ;; remove continuation arrow on right fringe
- fringe-indicator-alist (delq (assq 'continuation fringe-indicator-alist)
-                              fringe-indicator-alist)
- highlight-nonselected-windows nil
- image-animate-loop t
- indicate-buffer-boundaries nil
- max-mini-window-height 0.3
- mode-line-default-help-echo nil ; disable mode-line mouseovers
- mouse-yank-at-point t           ; middle-click paste at point, not at click
- resize-mini-windows 'grow-only  ; Minibuffer resizing
- show-help-function nil          ; hide :help-echo text
- use-dialog-box nil              ; always avoid GUI
-
- ;; no beeping or blinking please
- ring-bell-function #'ignore
- visible-bell nil)
-#+END_SRC
-
-*** Be quiet at startup
-
-#+BEGIN_SRC emacs-lisp
-(setq inhibit-startup-message t
-      inhibit-startup-echo-area-message user-login-name
-      initial-scratch-message nil)
-#+END_SRC
-
-*** Unique buffer names
-
-#+begin_src emacs-lisp
-(use-package uniquify
-  :ensure nil
-  :config
-  (setq uniquify-separator "/"
-        uniquify-buffer-name-style 'forward))
-#+end_src
-
-*** More reliable inter-window border
-
-The native border "consumes" a pixel of the fringe on righter-most splits,
-~window-divider~ does not. Available since Emacs 25.1.
-
-#+BEGIN_SRC emacs-lisp
-(setq-default window-divider-default-places t
-              window-divider-default-bottom-width 0
-              window-divider-default-right-width 1)
-(window-divider-mode +1)
-#+END_SRC
-
-*** Graphic mode settings
-
-#+BEGIN_SRC emacs-lisp
-(defun rr/graphic-mode-settings ()
-  "Setup for current FRAME."
-  (setq-default line-spacing 0)
-  ;; buffer name  in frame title
-  (setq frame-title-format '("" "%b @ Emacs")))
-
-(if (daemonp)
-    (add-hook 'server-after-make-frame-hook #'rr/graphic-mode-settings)
-  (rr/graphic-mode-settings))
-#+END_SRC
-
-*** Settings for tramp-mode
-
-#+BEGIN_SRC emacs-lisp
-(use-package tramp
-  :config
-  (setq tramp-terminal-type "tramp"
-        tramp-default-method "ssh"
-        tramp-ssh-controlmaster-options "-o ControlMaster=auto -o ControlPath='tramp.%%C'"
-        explicit-shell-file-name "/bin/bash"
-        remote-file-name-inhibit-cache 3600
-        tramp-completion-reread-directory-timeout nil
-        vc-ignore-dir-regexp (format "\\(%s\\)\\|\\(%s\\)"
-                                     vc-ignore-dir-regexp
-                                     tramp-file-name-regexp)
-        tramp-verbose 1
-        auto-revert-remote-files nil)
-  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
-#+END_SRC
-
-*** Set default input method
-
-#+BEGIN_SRC emacs-lisp
-(setq default-input-method "russian-computer")
-#+END_SRC
-
-*** EPA
-
-#+BEGIN_SRC emacs-lisp
-(setq epg-pinentry-mode 'loopback)
-#+END_SRC
-
-*** Default mode
-
-#+BEGIN_SRC emacs-lisp
-(setq-default major-mode 'text-mode)
-#+END_SRC
-
-*** Fill column
-
-#+BEGIN_SRC emacs-lisp
-(setq-default fill-column 79)
-(add-hook 'text-mode-hook #'auto-fill-mode)
-#+END_SRC
-
-*** Auto revert changes
-
-#+BEGIN_SRC emacs-lisp
-(use-package autorevert
-  :ensure nil
-  :config
-  (setq auto-revert-verbose nil
-        global-auto-revert-non-file-buffers t)
-  (global-auto-revert-mode 1))
-#+END_SRC
-
-*** Recent files
-
-#+BEGIN_SRC emacs-lisp
-(use-package recentf
-  :config
-  (setq recentf-save-file (expand-file-name "recentf" rr-savefile-dir)
-        recentf-max-saved-items 50
-        recentf-max-menu-items 15)
-  (add-to-list 'recentf-exclude (expand-file-name "~/.emacs.d/"))
-  (recentf-mode +1))
-#+END_SRC
+** Common
 
 *** Imenu
 
 #+BEGIN_SRC emacs-lisp
 (use-package imenu
+  :ensure nil
   :config
   (setq imenu-auto-rescan t
         imenu-max-item-length 160
         imenu-max-items 100))
 #+END_SRC
-
-*** More convenient scrolling settings
-
-#+begin_src emacs-lisp
-(setq scroll-margin 3
-      scroll-conservatively 101
-      scroll-up-aggressively 0.01
-      scroll-down-aggressively 0.01
-      scroll-preserve-screen-position t
-      auto-window-vscroll nil)
-#+end_src
 
 *** Single line horizontal scrolling
 
@@ -838,12 +1008,6 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
 (add-hook 'prog-mode-hook #'subword-mode)
 #+end_src
 
-*** Set minimal height of window
-
-#+BEGIN_SRC emacs-lisp
-(setq window-min-height 10)
-#+END_SRC
-
 *** Ediff settings
 
 #+BEGIN_SRC emacs-lisp
@@ -853,16 +1017,11 @@ The native border "consumes" a pixel of the fringe on righter-most splits,
         ediff-split-window-function #'split-window-right))
 #+END_SRC
 
-*** Smerge
-
-#+begin_src emacs-lisp
-(use-package smerge-mode)
-#+end_src
-
 *** ANSI colors
 
 #+BEGIN_SRC emacs-lisp
 (use-package ansi-color
+  :ensure nil
   :config
   (setq ansi-color-for-comint-mode t)
   (defun colorize-compilation-buffer ()
@@ -927,12 +1086,6 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
 (setq message-log-max 1000)
 #+end_src
 
-*** Fix helm issue
-
-#+begin_src emacs-lisp
-(setq x-wait-for-event-timeout nil)
-#+end_src
-
 *** Enable recursive minibuffers
 
 #+begin_src emacs-lisp
@@ -984,6 +1137,7 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
   :config
   (setq enable-local-variables t))
 #+end_src
+
 ** Asynchronous processing in Emacs
 #+begin_src emacs-lisp
 (use-package async
@@ -993,18 +1147,21 @@ Save stuff you’ve copied in other applications to the emacs kill-ring.
   (dired-async-mode 1)
   (async-bytecomp-package-mode 1))
 #+end_src
+
 ** Set the same PATH as in shell
 #+begin_src emacs-lisp
 (use-package exec-path-from-shell
   :config
   (exec-path-from-shell-initialize))
 #+end_src
+
 ** Some useful commands
 #+begin_src emacs-lisp
 (use-package misc-cmds
   :config
   (define-key global-map [remap quit-window] 'quit-window-delete))
 #+end_src
+
 ** Theme
 *** Color scheme
 **** COMMENT Zenburn theme
@@ -1233,18 +1390,15 @@ So long mode:
         shr-table-corner ?\s
         shr-width (current-fill-column)))
 #+end_src
+
 And third party package for proper syntax highlighting for pre tags in HTML:
+
 #+begin_src emacs-lisp
 (use-package shr-tag-pre-highlight
-  :ensure t
   :after shr
   :config
   (add-to-list 'shr-external-rendering-functions
-               '(pre . shr-tag-pre-highlight))
-  (when (version< emacs-version "26")
-    (with-eval-after-load 'eww
-      (advice-add 'eww-display-html :around
-                  'eww-display-html--override-shr-external-rendering-functions))))
+               '(pre . shr-tag-pre-highlight)))
 #+end_src
 ** Spell checking
 #+begin_src emacs-lisp
@@ -2549,6 +2703,7 @@ But there is no backward compatibility.
    (shell . t)
    (sqlite . t)
    (haskell . t)
+   (clojure . t)
    (ditaa . t)
    (plantuml . t)))
 
