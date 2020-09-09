@@ -446,7 +446,7 @@ an error is signaled.
 (setq max-specpdl-size 3200)
 #+end_src
 
-*** Do not auto save messages in the minibuffer
+*** Do not show auto save messages in the minibuffer
 
 If autosave is enabled do not print annoying message to the minibuffer every
 time the file saved.
@@ -1104,6 +1104,125 @@ prefer side by side splitting.
 (setq split-window-preferred-function #'split-window-prefer-side-by-side)
 #+end_src
 
+** Minibuffer
+
+So far the settings below are only for completion styles. Since emacs 27.1
+there is new ~flex~ completion style available. It's written in C hence it's
+very fast. Let's include it to the ~completion-styles~ list to be able to use
+it with ~helm~ or ~capf~.
+
+#+begin_src emacs-lisp
+(use-package minibuffer
+  :ensure nil
+  :config
+  (setq completion-styles '(basic partial-completion emacs22 initials flex))
+  (minibuffer-electric-default-mode 1))
+#+end_src
+
+** Comint
+
+Command-interpreter-in-a-buffer package (comint mode). The idea is that you can
+build specific process-in-a-buffer modes on top of comint mode -- e.g., Lisp,
+shell, scheme, T, soar, etc. This way, all these specific packages share a
+common base functionality, and a common set of bindings, which makes them
+easier to use (and saves code, implementation time, etc., etc.).
+
+Several packages are already defined using comint mode:
+- ~shell.el~ :: defines a shell-in-a-buffer mode.
+- ~cmulisp.el~ :: defines a simple lisp-in-a-buffer mode.
+
+#+begin_src emacs-lisp
+(use-package comint
+  :ensure nil
+  :config
+  (setq comint-scroll-to-bottom-on-input t
+        comint-move-point-for-output t
+        comint-prompt-read-only t
+        comint-input-ignoredups t
+        comint-completion-addsuffix t))
+#+end_src
+
+** Shell
+
+Emacs has built-in shell, which behaves like normal emacs buffer and integrates
+well with built-in completion frameworks. Shell mode based on comint mode.
+
+I don't use it at the moment. I use external terminal emulator and ~eshell~.
+
+#+begin_src emacs-lisp
+(use-package shell
+  :ensure nil
+  :config
+  (setq shell-command-prompt-show-cwd t))
+#+end_src
+
+** EShell
+
+Very powerful shell written in ELisp, so it works on all platforms and has
+better integration with emacs tools and packages.
+
+Basically, Eshell is used just like shell mode (<M-x shell>). The keystrokes
+for navigating the buffer, and accessing the command history, are identical.
+Unlike shell mode, however, Eshell mode's governing process is Emacs itself.
+With shell mode, an inferior shell process is executed that communicates with
+Emacs via comint -- a mode for handling sub-process interaction. Eshell mode,
+on the other hand, is a truly native Emacs shell. No subprocess are invoked
+except the ones requested by the user at the prompt.
+
+
+#+begin_src emacs-lisp
+(use-package esh-mode
+  :ensure nil
+  :config
+  (setq eshell-scroll-to-bottom-on-input t
+        eshell-scroll-to-bottom-on-output t
+        eshell-destroy-buffer-when-process-dies t))
+#+end_src
+
+
+** Save place
+
+Remember last position in visited file and restore it after open this file next
+time. Works even after emacs restarts.
+
+#+begin_src emacs-lisp
+(use-package saveplace
+  :ensure nil
+  :config
+  (setq save-place-file (expand-file-name "saveplace" rr-savefile-dir))
+  (save-place-mode 1))
+#+end_src
+
+** Web browser and HTML parser
+
+Render HTML pages as plain text. Some settings allows to disable custom fonts
+and colors, setup better rendering for tables and images. Not perfect but at
+least HTML emails usually readable.
+
+#+begin_src emacs-lisp
+(use-package shr
+  :ensure nil
+  :commands (eww eww-browse-url)
+  :config
+  (setq shr-use-fonts nil
+        shr-use-colors nil
+        shr-max-image-proportion 0.2
+        shr-table-horizontal-line nil
+        shr-table-vertical-line ?\s
+        shr-table-corner ?\s
+        shr-width (current-fill-column)))
+#+end_src
+
+And third party package for proper syntax highlighting for pre tags in HTML:
+
+#+begin_src emacs-lisp
+(use-package shr-tag-pre-highlight
+  :after shr
+  :config
+  (add-to-list 'shr-external-rendering-functions
+               '(pre . shr-tag-pre-highlight)))
+#+end_src
+
 * Appearance
 
 All tweaks for emacs look & feel. Color themes fonts modeline etc.
@@ -1227,8 +1346,7 @@ customization, very actively maintained.
         (custom-theme-set-faces
          'user
          `(org-agenda-clocking ((((class color) (min-colors 89)) (:inherit modus-theme-special-cold :extend t))))
-         `(org-headline-done ((t (:foreground ,fg-alt :strike-through t))))
-         `(org-done ((t (:foreground ,fg-alt :strike-through t))))))))
+         `(org-headline-done ((t (:foreground ,fg-alt :strike-through t))))))))
 
   (add-hook 'after-load-theme-hook #'rr/customize-modus-vivendi-theme)
 
@@ -1327,6 +1445,249 @@ Some good fonts I used to use or ready to consider:
 (rr/set-font 80)
 #+end_src
 
+* Incremental completion
+
+I've tried ~ivy~, ~helm~ and emacs default completion framework and I find helm
+something I cannot use emacs without.
+
+** Helm
+
+Very powerful incremental completion framework with a lot of extensions and
+customization.
+
+*** Helm core
+
+This section contains custom settings for core helm package. I've described all
+settings in the comments (there is a lot of them).
+
+#+begin_src emacs-lisp
+(use-package helm
+  :config
+  (require 'helm)
+  (require 'helm-config)
+  (require 'helm-files)
+  (require 'helm-grep)
+
+  (when (executable-find "curl")
+    (setq helm-net-prefer-curl t))
+
+  ;; General settings
+  (setq helm-split-window-inside-p            nil ; open helm buffer inside current window, not occupy whole other window
+	      helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+	      helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+	      helm-echo-input-in-header-line nil      ; hide duplicated echo input
+	      helm-display-header-line nil            ; hide header line, keep the interface as clear as possible
+        helm-buffer-max-length 40               ; some buffer names too long
+	      helm-inherit-input-method nil           ; use default input method by default in helm buffers
+        helm-truncate-lines t                   ; avoid line splitting in helm buffer
+        helm-M-x-always-save-history t          ; preserve history for `helm-M-x' command
+        helm-buffers-truncate-lines t)
+
+  ;; Remove all distracting information from helm modeline
+  (setq helm-mode-line-string "\\<helm-map>"
+        helm-top-mode-line "\\<helm-top-map>"
+        helm-comp-read-mode-line "\\<helm-comp-read-map>"
+        helm-read-file-name-mode-line-string "\\<helm-read-file-map>")
+
+  ;; Helm find files custom settings
+  (setq helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+        helm-ff-file-name-history-use-recentf t ; add extra source with recently visited files
+        helm-ff-delete-files-function #'helm-delete-marked-files-async) ; Delete files asynchronously without asking for confirmation
+
+  ;; Remap built-in keybindings to use helm analogs
+  (with-eval-after-load 'helm
+    (define-key global-map [remap find-file] #'helm-find-files)
+    (define-key global-map [remap occur] #'helm-occur)
+    (define-key global-map [remap switch-to-buffer] #'helm-mini)
+    (define-key global-map [remap dabbrev-expand] #'helm-dabbrev)
+    (define-key global-map [remap execute-extended-command] #'helm-M-x)
+    (define-key global-map [remap yank-pop] #'helm-show-kill-ring)
+
+    (define-key lisp-interaction-mode-map [remap completion-at-point] #'helm-lisp-completion-at-point)
+    (define-key emacs-lisp-mode-map       [remap completion-at-point] #'helm-lisp-completion-at-point)
+
+    (define-key helm-find-files-map (kbd "C-i") #'helm-ff-TAB))
+
+  ;; TODO: Consider to remove this if EShell default behavior is good enough
+  ;; (add-hook 'eshell-mode-hook
+	;;           (lambda ()
+	;;             (eshell-cmpl-initialize)
+	;;             (define-key eshell-mode-map [remap eshell-pcomplete] #'helm-esh-pcomplete)
+	;;             (define-key eshell-mode-map (kbd "M-p") #'helm-eshell-history)))
+
+  ;; Use `display-buffer' function to show helm windows to control where they
+  ;; appear using `display-buffer-alist'.
+  (setq helm-display-function #'display-buffer)
+  (setq helm-show-completion-display-function #'display-buffer)
+
+  ;; Keep `helm-adaptive-history' in the dedicated folder
+  (setq helm-adaptive-history-file (expand-file-name "helm-adaptive-history" rr-savefile-dir))
+
+  ;; `helm-grep' custom settings. Mostly to fix colors.
+  (setq helm-grep-default-command "grep --color=never -a -d skip %e -n%cH -e %p %f"
+        helm-grep-git-grep-command "git --no-pager grep -n%cH --color=never --full-name -e %p -- %f"
+        helm-grep-ag-command "rg --color=always --smart-case --no-heading --line-number %s %s %s")
+
+  (helm-mode 1)
+  (helm-adaptive-mode 1))
+#+end_src
+
+*** Helm flycheck
+
+Show all flycheck errors in the current buffer using helm interface with all
+power of helm (navigation and search).
+
+#+begin_src emacs-lisp
+(use-package helm-flycheck
+  :after (helm flycheck)
+  :config
+  (eval-after-load 'flycheck
+    '(define-key flycheck-mode-map (kbd "C-'") #'helm-flycheck)))
+#+end_src
+
+*** Helm org rifle
+
+Quick navigation by org headings in ~org-agenda-files~ with helm interface. I
+usually have org file opened and use ~imenu~ for navigation, so I don't use
+this package.
+
+#+begin_src emacs-lisp
+(use-package helm-org-rifle
+  :after helm
+  :config
+  (define-key global-map (kbd "C-x c o") #'helm-org-rifle-agenda-files))
+#+end_src
+
+*** Helm xref
+
+Helm interface for ~xref~ package. Just install the package and it works
+without any configuration.
+
+#+begin_src emacs-lisp
+(use-package helm-xref
+  :after helm)
+#+end_src
+
+*** Helm lsp integration
+
+Search through all workspace definitions provided by ~lsp-mode~ with helm
+interface. Use it sometimes, the problem is for multiroot projects (for example
+java) it can shows duplicated definitions from different projects which makes
+it difficult to navigate to proper version.
+
+#+begin_src emacs-lisp
+(use-package helm-lsp
+  :after helm
+  :config
+  (define-key global-map (kbd "C-x c j") #'helm-lsp-workspace-symbol))
+#+end_src
+
+*** Helm describe bindings
+
+Very useful package, but I always forget about it. There is not to much cases
+when I need to search through all available keybindings for the buffer.
+
+The default keybinding is =C-h b=.
+
+#+begin_src emacs-lisp
+(use-package helm-descbinds
+  :after helm
+  :config
+  (helm-descbinds-mode))
+#+end_src
+
+** COMMENT Ivy
+
+This section is not maintained. I keep it here just for history.
+
+*** Configuration
+
+#+begin_src emacs-lisp
+(use-package ivy
+  :config
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-read-action-function #'ivy-read-action-ivy)
+
+  (setq counsel-describe-variable-function #'helpful-variable
+        counsel-describe-function-function #'helpful-function)
+
+  (setq search-default-mode #'char-fold-to-regexp)
+
+  ;; Key bindings
+  (global-set-key (kbd "C-s") #'swiper-isearch)
+  (global-set-key (kbd "C-c C-r") #'ivy-resume)
+  (define-key global-map [remap occur] #'counsel-rg)
+  (define-key global-map (kbd "C-h v") #'counsel-describe-variable)
+  (define-key global-map (kbd "C-h f") #'counsel-describe-function)
+  (global-set-key (kbd "M-x") #'counsel-M-x)
+  (global-set-key (kbd "C-x C-f") #'counsel-find-file)
+  (global-set-key (kbd "C-x j") #'counsel-semantic-or-imenu)
+  (global-set-key (kbd "C-x b") #'ivy-switch-buffer)
+  (global-set-key (kbd "M-y") #'counsel-yank-pop)
+  (define-key minibuffer-local-map (kbd "C-r") #'counsel-minibuffer-history)
+
+  (ivy-set-occur 'counsel-rg 'counsel-ag-occur)
+  (ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur)
+  (ivy-set-occur 'swiper 'swiper-occur)
+  (ivy-set-occur 'swiper-isearch 'swiper-occur)
+
+  (setq ivy-height-alist
+        '((counsel-evil-registers . 5)
+          (counsel-yank-pop . 10)
+          (counsel-el . 7)))
+
+  (setq ivy-re-builders-alist
+        '((counsel-rg . ivy--regex-or-literal)
+          (t . ivy--regex-plus))))
+
+(use-package counsel
+  :after ivy
+  :config
+  (setq counsel-yank-pop-separator "\n——————————————————\n"))
+#+end_src
+
+*** Ivy rich
+
+Add some fancy information to ivy minibuffer.
+
+#+begin_src emacs-lisp
+(use-package ivy-rich
+  :config
+  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+  (setq ivy-rich-path-style 'abbreviate)
+  (ivy-rich-mode 1))
+#+end_src
+
+*** Posframe
+
+#+begin_src emacs-lisp
+(use-package ivy-posframe
+  :config
+  (setq ivy-posframe-display-functions-alist
+      '((swiper          . nil)
+        (complete-symbol . ivy-posframe-display-at-point)
+        (t               . ivy-posframe-display-at-frame-center)))
+  (ivy-posframe-mode 1))
+#+end_src
+
+*** Ivy xref
+
+#+begin_src emacs-lisp
+(use-package ivy-xref
+  :config
+  (setq xref-show-xrefs-function 'ivy-xref-show-xrefs)
+  (setq xref-show-definitions-function #'ivy-xref-show-defs))
+#+end_src
+
+*** Smex
+
+Better sorting for counsel/ivy
+
+#+begin_src emacs-lisp
+(use-package smex)
+#+end_src
+
 * Configuration
 
 ** Asynchronous processing in Emacs
@@ -1353,54 +1714,6 @@ Some good fonts I used to use or ready to consider:
   (define-key global-map [remap quit-window] 'quit-window-delete))
 #+end_src
 
-** Shell settings
-#+begin_src emacs-lisp
-(use-package shell
-  :ensure nil
-  :config
-  (setq shell-command-prompt-show-cwd t))
-
-(use-package comint
-  :ensure nil
-  :config
-  (setq comint-scroll-to-bottom-on-input t
-        comint-move-point-for-output t
-        comint-prompt-read-only t
-        comint-input-ignoredups t
-        comint-completion-addsuffix t))
-#+end_src
-** EShell settings
-#+begin_src emacs-lisp
-(use-package esh-mode
-  :ensure nil
-  :config
-  (setq eshell-scroll-to-bottom-on-input t
-        eshell-scroll-to-bottom-on-output t
-        eshell-destroy-buffer-when-process-dies t))
-#+end_src
-** Built-in web browser and HTML parser
-#+begin_src emacs-lisp
-(use-package shr
-  :commands (eww eww-browse-url)
-  :config
-  (setq shr-use-fonts nil
-        shr-use-colors nil
-        shr-max-image-proportion 0.2
-        shr-table-horizontal-line nil
-        shr-table-vertical-line ?\s
-        shr-table-corner ?\s
-        shr-width (current-fill-column)))
-#+end_src
-
-And third party package for proper syntax highlighting for pre tags in HTML:
-
-#+begin_src emacs-lisp
-(use-package shr-tag-pre-highlight
-  :after shr
-  :config
-  (add-to-list 'shr-external-rendering-functions
-               '(pre . shr-tag-pre-highlight)))
-#+end_src
 ** Spell checking
 #+begin_src emacs-lisp
 (use-package ispell
@@ -1409,13 +1722,7 @@ And third party package for proper syntax highlighting for pre tags in HTML:
   (add-hook 'text-mode-hook #'flyspell-mode)
   (add-hook 'prog-mode-hook #'flyspell-prog-mode))
 #+end_src
-** Remember location in files
-#+begin_src emacs-lisp
-(use-package saveplace
-  :config
-  (setq save-place-file (expand-file-name "saveplace" rr-savefile-dir))
-  (save-place-mode 1))
-#+end_src
+
 ** SQL
 *** COMMENT Emacs clojure database client
 #+begin_src emacs-lisp
@@ -1457,12 +1764,14 @@ And third party package for proper syntax highlighting for pre tags in HTML:
           (lambda ()
             (toggle-truncate-lines t)))
 #+end_src
+
 ** Which key
 #+begin_src emacs-lisp
 (use-package which-key
   :config
   (which-key-mode))
 #+end_src
+
 ** YASnippet
 #+begin_src emacs-lisp
 (use-package yasnippet
@@ -1471,6 +1780,7 @@ And third party package for proper syntax highlighting for pre tags in HTML:
         yas-inhibit-overlay-modification-protection t)
   (add-hook 'prog-mode-hook #'yas-minor-mode))
 #+end_src
+
 ** Auto completion
 *** Common
 #+begin_src emacs-lisp
@@ -1520,14 +1830,7 @@ And third party package for proper syntax highlighting for pre tags in HTML:
   :config
   (add-to-list 'company-backends #'company-shell))
 #+end_src
-** Completion styles setup
-#+begin_src emacs-lisp
-(use-package minibuffer
-  :ensure nil
-  :config
-  (setq completion-styles '(basic partial-completion emacs22 initials flex))
-  (minibuffer-electric-default-mode 1))
-#+end_src
+
 ** Isearch built-in settings
 #+begin_src emacs-lisp
 (use-package isearch
@@ -1538,6 +1841,7 @@ And third party package for proper syntax highlighting for pre tags in HTML:
         lazy-count-prefix-format "(%s/%s) "
         isearch-allow-scroll 'unlimited))
 #+end_src
+
 ** Xref
 #+begin_src emacs-lisp
 (use-package xref
@@ -1545,177 +1849,7 @@ And third party package for proper syntax highlighting for pre tags in HTML:
   (setq xref-file-name-display 'nondirectory
         xref-prompt-for-identifier nil))
 #+end_src
-** Helm
-*** Configuration
-#+begin_src emacs-lisp
-(use-package helm
-  :config
-  (require 'helm)
-  (require 'helm-config)
 
-  (when (executable-find "curl")
-    (setq helm-google-suggest-use-curl-p t))
-
-  (setq helm-split-window-inside-p            nil ; open helm buffer inside current window, not occupy whole other window
-	      helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
-	      helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
-	      helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
-	      helm-ff-file-name-history-use-recentf t
-	      helm-echo-input-in-header-line nil
-	      helm-display-header-line nil
-        helm-buffer-max-length 40
-	      helm-ff-delete-files-function #'helm-delete-marked-files-async
-	      helm-inherit-input-method nil
-        helm-truncate-lines t
-        helm-M-x-always-save-history t
-        helm-buffers-truncate-lines t)
-
-  ;; Remove all distracting information from helm modeline
-  (setq helm-mode-line-string "\\<helm-map>"
-        helm-top-mode-line "\\<helm-top-map>"
-        helm-comp-read-mode-line "\\<helm-comp-read-map>"
-        helm-read-file-name-mode-line-string "\\<helm-read-file-map>")
-
-  (require 'helm-files)
-
-  (with-eval-after-load 'helm
-    (define-key global-map [remap find-file] #'helm-find-files)
-    (define-key global-map [remap occur] #'helm-occur)
-    (define-key global-map [remap switch-to-buffer] #'helm-mini)
-    (define-key global-map [remap dabbrev-expand] #'helm-dabbrev)
-    (define-key global-map [remap execute-extended-command] #'helm-M-x)
-    (define-key global-map [remap yank-pop] #'helm-show-kill-ring)
-
-    (define-key lisp-interaction-mode-map [remap completion-at-point] #'helm-lisp-completion-at-point)
-    (define-key emacs-lisp-mode-map       [remap completion-at-point] #'helm-lisp-completion-at-point)
-
-    (define-key helm-find-files-map (kbd "C-i") #'helm-ff-TAB))
-
-  (add-hook 'eshell-mode-hook
-	          (lambda ()
-	            (eshell-cmpl-initialize)
-	            (define-key eshell-mode-map [remap eshell-pcomplete] #'helm-esh-pcomplete)
-	            (define-key eshell-mode-map (kbd "M-p") #'helm-eshell-history)))
-
-  (setq helm-display-function #'display-buffer)
-  (setq helm-show-completion-display-function #'display-buffer)
-  (setq helm-adaptive-history-file (expand-file-name "helm-adaptive-history" rr-savefile-dir))
-
-  (require 'helm-grep)
-  (setq helm-grep-default-command "grep --color=never -a -d skip %e -n%cH -e %p %f"
-        helm-grep-git-grep-command "git --no-pager grep -n%cH --color=never --full-name -e %p -- %f"
-        helm-grep-ag-command "rg --color=always --smart-case --no-heading --line-number %s %s %s")
-
-  (helm-mode 1)
-  (helm-adaptive-mode 1))
-#+end_src
-*** Helm flycheck
-#+begin_src emacs-lisp
-(use-package helm-flycheck
-  :after flycheck
-  :config
-  (eval-after-load 'flycheck
-    '(define-key flycheck-mode-map (kbd "C-'") #'helm-flycheck)))
-#+end_src
-*** Helm org rifle
-#+begin_src emacs-lisp
-(use-package helm-org-rifle
-  :after helm
-  :bind (("C-x c o" . helm-org-rifle-agenda-files)))
-#+end_src
-*** Helm xref
-#+begin_src emacs-lisp
-(use-package helm-xref
-  :after helm)
-#+end_src
-*** Helm lsp integration
-#+begin_src emacs-lisp
-(use-package helm-lsp
-  :bind (("C-x c j" . helm-lsp-workspace-symbol)))
-#+end_src
-*** Helm describe bindings
-#+begin_src emacs-lisp
-(use-package helm-descbinds
-  :config
-  (helm-descbinds-mode))
-#+end_src
-** COMMENT Ivy
-*** Configuration
-#+begin_src emacs-lisp
-(use-package ivy
-  :config
-  (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-read-action-function #'ivy-read-action-ivy)
-
-  (setq counsel-describe-variable-function #'helpful-variable
-        counsel-describe-function-function #'helpful-function)
-
-  (setq search-default-mode #'char-fold-to-regexp)
-
-  ;; Key bindings
-  (global-set-key (kbd "C-s") #'swiper-isearch)
-  (global-set-key (kbd "C-c C-r") #'ivy-resume)
-  (define-key global-map [remap occur] #'counsel-rg)
-  (define-key global-map (kbd "C-h v") #'counsel-describe-variable)
-  (define-key global-map (kbd "C-h f") #'counsel-describe-function)
-  (global-set-key (kbd "M-x") #'counsel-M-x)
-  (global-set-key (kbd "C-x C-f") #'counsel-find-file)
-  (global-set-key (kbd "C-x j") #'counsel-semantic-or-imenu)
-  (global-set-key (kbd "C-x b") #'ivy-switch-buffer)
-  (global-set-key (kbd "M-y") #'counsel-yank-pop)
-  (define-key minibuffer-local-map (kbd "C-r") #'counsel-minibuffer-history)
-
-  (ivy-set-occur 'counsel-rg 'counsel-ag-occur)
-  (ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur)
-  (ivy-set-occur 'swiper 'swiper-occur)
-  (ivy-set-occur 'swiper-isearch 'swiper-occur)
-
-  (setq ivy-height-alist
-        '((counsel-evil-registers . 5)
-          (counsel-yank-pop . 10)
-          (counsel-el . 7)))
-
-  (setq ivy-re-builders-alist
-        '((counsel-rg . ivy--regex-or-literal)
-          (t . ivy--regex-plus))))
-
-(use-package counsel
-  :after ivy
-  :config
-  (setq counsel-yank-pop-separator "\n——————————————————\n"))
-#+end_src
-*** Ivy rich
-Add some fancy information to ivy minibuffer.
-#+begin_src emacs-lisp
-(use-package ivy-rich
-  :config
-  (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
-  (setq ivy-rich-path-style 'abbreviate)
-  (ivy-rich-mode 1))
-#+end_src
-*** Posframe
-#+begin_src emacs-lisp
-(use-package ivy-posframe
-  :config
-  (setq ivy-posframe-display-functions-alist
-      '((swiper          . nil)
-        (complete-symbol . ivy-posframe-display-at-point)
-        (t               . ivy-posframe-display-at-frame-center)))
-  (ivy-posframe-mode 1))
-#+end_src
-*** Ivy xref
-#+begin_src emacs-lisp
-(use-package ivy-xref
-  :config
-  (setq xref-show-xrefs-function 'ivy-xref-show-xrefs)
-  (setq xref-show-definitions-function #'ivy-xref-show-defs))
-#+end_src
-*** Smex
-Better sorting for counsel/ivy
-#+begin_src emacs-lisp
-(use-package smex)
-#+end_src
 ** Smartparens
 #+begin_src emacs-lisp
 (use-package smartparens-config
@@ -1770,13 +1904,6 @@ Better sorting for counsel/ivy
         eyebrowse-switch-back-and-forth t
         eyebrowse-mode-line-style 'always)
   (eyebrowse-mode t))
-#+end_src
-** Emacs build-in tab-bar mode
-#+begin_src emacs-lisp
-(use-package tab-bar
-  :config
-  (setq tab-bar-show nil
-        tab-bar-new-tab-choice "*scratch*"))
 #+end_src
 ** Popup windows settings
 *** Configure window behavior using display-buffer-alist
@@ -2475,18 +2602,12 @@ But there is no backward compatibility.
 ;;         ("REVIEW" . (:foreground "#DFAF8F" :weight bold))
 ;;         ("CANCELLED" . (:foreground "#DCDCCC" :weight bold))))
 
-;; (setq org-todo-keyword-faces
-;;       '(("PROGRESS" . (:foreground "#8abeb7" :weight bold))
-;;         ("WAITING" . (:foreground "#de935f"))
-;;         ("REVIEW" . (:foreground "#de935f"))
-;;         ("CANCELLED" . (:foreground "#969896"))))
-
 ;; Modus vivendi
 (setq org-todo-keyword-faces
-      '(("PROGRESS" . (:foreground "#29aeff"))
-        ("WAITING" . (:foreground "#eecc00"))
-        ("REVIEW" . (:foreground "#eecc00"))
-        ("CANCELLED" . (:foreground "#a8a8a8"))))
+      '(("PROGRESS" . (:foreground "#29aeff" :background "#110b11" :box "#3c3c3c"))
+        ("WAITING" . (:foreground "#eecc00" :background "#110b11" :box "#3c3c3c"))
+        ("REVIEW" . (:foreground "#eecc00" :background "#110b11" :box "#3c3c3c"))
+        ("CANCELLED" . (:foreground "#a8a8a8" :background "#110b11" :box "#3c3c3c"))))
 #+end_src
 *** Handle local file links by extension
 #+begin_src emacs-lisp
@@ -2953,17 +3074,16 @@ Enable notifications when new email/news is received:
   (add-hook 'prog-mode-hook 'origami-mode)
   (define-key origami-mode-map [C-tab] #'origami-recursively-toggle-node))
 #+end_src
+
 ** ElDoc
+
 Show signature of function or describe symbol at point in minibuffer.
+
 #+begin_src emacs-lisp
 (use-package eldoc
+  :ensure nil
   :config
   (global-eldoc-mode))
-#+end_src
-** Clang format
-Common tool for code formatting.
-#+begin_src emacs-lisp
-(use-package clang-format)
 #+end_src
 ** Languages
 *** LSP mode
@@ -3109,16 +3229,18 @@ Common tool for code formatting.
 *** Java
 **** Common setup
 #+begin_src emacs-lisp
-(require 'cc-mode)
-(require 'google-java-format)
+(use-package google-java-format
+  :ensure nil
+  :config
+  (setq google-java-format-executable (expand-file-name "~/.local/bin/google-java-format"))
+  (define-key java-mode-map (kbd "C-c C-f") #'google-java-format-buffer))
 
-(setq google-java-format-executable "/home/rrudakov/.local/bin/google-java-format")
-
-(define-key java-mode-map (kbd "C-c C-f") #'google-java-format-buffer)
-
-(add-hook 'java-mode-hook
-          (lambda ()
-            (setq c-basic-offset 2)))
+(use-package cc-mode
+  :ensure nil
+  :config
+  (add-hook 'java-mode-hook
+            (lambda ()
+              (setq c-basic-offset 2))))
 #+end_src
 **** lsp-mode setup
 #+begin_src emacs-lisp
@@ -3159,7 +3281,8 @@ Common tool for code formatting.
   (setq haskell-mode-stylish-haskell-path "brittany")
   (setq haskell-stylish-on-save nil)
 
-  (add-hook 'haskell-mode-hook #'haskell-auto-insert-module-template))
+  (add-hook 'haskell-mode-hook #'haskell-auto-insert-module-template)
+  (add-hook 'haskell-mode-hook #'turn-on-haskell-doc-mode))
 #+end_src
 **** lsp-haskell
 Latest update in haskell-mode introduce some incompatibility. Investigation required.
@@ -3194,10 +3317,6 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
                          '(haskell-left-arrows
                            (regexp . "\\(\\s-+\\)\\(<-\\|←\\)\\s-+")
                            (modes quote (haskell-mode literate-haskell-mode))))))
-#+end_src
-**** Haskell doc mode
-#+begin_src emacs-lisp
-(add-hook 'haskell-mode-hook #'turn-on-haskell-doc-mode)
 #+end_src
 **** Indentation
 #+begin_src emacs-lisp
