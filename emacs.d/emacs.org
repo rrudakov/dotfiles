@@ -1326,7 +1326,7 @@ customization, very actively maintained.
 (use-package modus-vivendi-theme
   :init
   (setq modus-vivendi-theme-bold-constructs t
-        modus-vivendi-theme-slanted-constructs t
+        modus-vivendi-theme-slanted-constructs nil
         modus-vivendi-theme-org-blocks 'greyscale
         modus-vivendi-theme-proportional-fonts nil)
   :config
@@ -3161,7 +3161,7 @@ Show signature of function or describe symbol at point in minibuffer.
            (current-workdir (projectile-project-root))
            (test-module (rr/find-test-module))
            (project-name (file-name-nondirectory (directory-file-name current-workdir)))
-           (command (format "mvn -Dit.test=%s verify -pl %s -P tests-for-development -Dmaven.failsafe.debug=\"-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%s -Xnoagent\"" test-name test-module port)))
+           (command (format "mvn clean -Dit.test=%s verify -pl %s -P tests-for-development -Dmaven.failsafe.debug=\"-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%s -Xnoagent\"" test-name test-module port)))
       (dap-debug
        (list :type "java"
              :request "attach"
@@ -3177,7 +3177,7 @@ Show signature of function or describe symbol at point in minibuffer.
     "Run java test class or method depends on TEST-NAME."
     (let ((default-directory (projectile-project-root))
           (test-module (rr/find-test-module)))
-      (projectile-run-compilation (format "mvn -Dit.test=%s verify -pl %s -P tests-for-development" test-name test-module))))
+      (projectile-run-compilation (format "mvn clean -Dit.test=%s verify -pl %s -P tests-for-development" test-name test-module))))
 
   (defun rr/run-test-method ()
     (interactive)
