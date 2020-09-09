@@ -1508,13 +1508,6 @@ settings in the comments (there is a lot of them).
 
     (define-key helm-find-files-map (kbd "C-i") #'helm-ff-TAB))
 
-  ;; TODO: Consider to remove this if EShell default behavior is good enough
-  ;; (add-hook 'eshell-mode-hook
-	;;           (lambda ()
-	;;             (eshell-cmpl-initialize)
-	;;             (define-key eshell-mode-map [remap eshell-pcomplete] #'helm-esh-pcomplete)
-	;;             (define-key eshell-mode-map (kbd "M-p") #'helm-eshell-history)))
-
   ;; Use `display-buffer' function to show helm windows to control where they
   ;; appear using `display-buffer-alist'.
   (setq helm-display-function #'display-buffer)
@@ -1786,7 +1779,7 @@ Better sorting for counsel/ivy
 #+begin_src emacs-lisp
 (use-package company
   :config
-  (setq company-global-modes '(not org-mode markdown-mode shell-mode eshell-mode))
+  (setq company-global-modes '(not org-mode markdown-mode shell-mode))
   (setq company-tooltip-align-annotations t
         company-idle-delay 0.1
         company-require-match nil
@@ -3230,12 +3223,14 @@ Show signature of function or describe symbol at point in minibuffer.
 **** Common setup
 #+begin_src emacs-lisp
 (use-package google-java-format
+  :after cc-mode
   :ensure nil
   :config
   (setq google-java-format-executable (expand-file-name "~/.local/bin/google-java-format"))
   (define-key java-mode-map (kbd "C-c C-f") #'google-java-format-buffer))
 
-(use-package cc-mode
+(use-package cc-vars
+  :after cc-mode
   :ensure nil
   :config
   (add-hook 'java-mode-hook
