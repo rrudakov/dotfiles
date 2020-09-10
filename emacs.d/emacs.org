@@ -2,13 +2,13 @@
 #+AUTHOR: Roman Rudakov
 #+EMAIL: rrudakov@pm.me
 
-[[https://www.gnu.org/software/emacs/][https://img.shields.io/badge/GNU%20Emacs-27.1-b1.svg?style=plastic]]
-[[https://orgmode.org/][https://img.shields.io/badge/org--mode-9.3.7-elpalus.svg?style=plastic]]
+[[https://www.gnu.org/software/emacs/][https://img.shields.io/badge/GNU%20Emacs-27.1-b1.svg]]
+[[https://orgmode.org/][https://img.shields.io/badge/org--mode-9.3.8-elpalus.svg]]
 
 This file is my literate config for [[https://www.gnu.org/software/emacs/][GNU/Emacs]] written using [[https://orgmode.org/][org-mode]] syntax and
 tangle automatically to emacs lisp file which loaded from ~.emacs.d/init.el~.
 
-* Keybindings
+* Keybindings help
 
 This section is just some kind of reference card where I keep all the
 keybindings which I find useful and probably will use.
@@ -694,6 +694,156 @@ Overview of settings covered in this section:
         confirm-kill-emacs nil))
 #+end_src
 
+** Configure new windows display position
+
+By default when you open new window it's not predictable where it's going to
+appear. It's possible to fix it and adjust to your needs. All you need is
+variable ~display-buffer-alist~. I used [[https://depp.brause.cc/shackle/][shackle]] for a while but I want to have
+better understanding of what I'm doing and avoid usage of external packages if
+it's possible to achieve the same with built-in functionality.
+
+I don't use side windows, because they're fixed at the edge of emacs frame and
+sometimes lead to unpredictable behavior.
+
+#+begin_src emacs-lisp
+(defconst parameters
+  '(window-parameters . ((no-other-window . t)
+                         (no-delete-other-windows . t))))
+
+(defconst parameters-no-mode-line
+  '(window-parameters . ((no-other-window . t)
+                         (no-delete-other-windows . t)
+                         (mode-line-format . none))))
+
+(setq switch-to-buffer-obey-display-actions nil)
+
+(defconst display-buffer-same-window-commands
+  '(compile-goto-error
+    push-button
+    magit-diff-visit-file
+    magit-todos-jump-to-item
+    deadgrep-visit-result-other-window))
+
+(defconst display-buffer-bottom-regexps
+  (mapcar (lambda (s) (concat "\\*" s "\\*"))
+          '("[H|h]elp.*?"
+            "Disabled\sCommand"
+            "deadgrep.*?"
+            "rg"
+            "cider-doc"
+            "Backtrace"
+            "Apropos"
+            "Python.*?"
+            "grep"
+            "lsp-help"
+            "compilation"
+            ".*?\sserver\slog"
+            "Completions"
+            "Compile-Log"
+            "Async\sShell\sCommand"
+            "Shell\sCommand\sOutput"))
+  "List of buffer name regexps.
+All matched buffers should be displayed at
+bottom of the frame.")
+
+(defconst helm-buffers-regexps
+  '("\\*helm.*?\\*"
+    "\\*cljr.*?\\*")
+  "List of helm buffer regexps.")
+
+(defun bottom-special-buffer-p (buf &rest _)
+  "Predicate to display BUF in bottom of the frame."
+  (seq-contains-p display-buffer-bottom-regexps buf #'string-match-p))
+
+(defun helm-buffer-p (buf &rest _)
+  "Predicate for helm BUF."
+  (seq-contains-p helm-buffers-regexps buf #'string-match-p))
+
+(setq display-buffer-alist
+      `(
+        ;; Magit
+        ("magit:.*"
+         (display-buffer-reuse-mode-window
+          display-buffer-at-bottom)
+         (window-height . 0.4))
+        ("magit-log:.*"
+         (display-buffer-reuse-mode-window
+          display-buffer-same-window))
+        ("magit-refs:.*"
+         (display-buffer-reuse-mode-window
+          display-buffer-same-window))
+        ("magit-diff.*"
+         (display-buffer-reuse-mode-window
+          display-buffer-in-direction)
+         (direction . rightmost)
+         (window-width . 0.5))
+        ("magit-revision:.*"
+         (display-buffer-reuse-mode-window
+          display-buffer-in-direction)
+         (direction . rightmost)
+         (window-width . 0.5))
+        ("COMMIT_EDITMSG"
+         (display-buffer-reuse-mode-window
+          display-buffer-same-window))
+        ;; Google translate buffer
+        ("\\*Google\sTranslate\\*"
+         (display-buffer-reuse-mode-window
+          display-buffer-in-direction)
+         (direction . rightmost)
+         (window-width . 0.5))
+        ;; Flycheck error list
+        ("\\*Flycheck\serrors.*\\*"
+         (display-buffer-reuse-mode-window
+          display-buffer-in-side-window)
+         (window-height . 0.2)
+         (side . bottom)
+         (slot . 0)
+         (preserve-size . (nil . t))
+         ,parameters)
+        ;; Org mode
+        ("\\*Org\sSrc.*\\*"
+         (display-buffer-reuse-mode-window)
+         (direction . rightmost)
+         (window-width . 0.5))
+        ;; Helm
+        (,#'helm-buffer-p
+         (display-buffer-in-direction)
+         (window-height . 0.4)
+         (direction . bottom)
+         ,parameters)
+        ;; Bottom special buffers
+        (,#'bottom-special-buffer-p
+         (display-buffer-reuse-mode-window
+          display-buffer-in-direction)
+         (window-height . 0.4)
+         (direction . bottom)
+         ,parameters)
+        ("\\*cider-error\\*"
+         (display-buffer-reuse-mode-window
+          display-buffer-in-direction)
+         (direction . rightmost)
+         (window-width . 0.5))
+        ("\\*cider-test-report"
+         (display-buffer-reuse-mode-window
+          display-buffer-in-direction)
+         (direction . rightmost)
+         (window-width . 0.5))
+        ("\\*cider-repl.*$"
+         (display-buffer-reuse-mode-window
+          display-buffer-at-bottom)
+         (window-height . 0.3))
+        ;; Open clickable text
+        ((lambda (&rest _)
+           (memq this-command display-buffer-same-window-commands))
+         (display-buffer-reuse-mode-window
+          display-buffer-in-direction)
+         (direction . rightmost)
+         (window-width . 0.5))))
+
+(setq window-combination-resize t
+      switch-to-buffer-in-dedicated-window 'pop)
+#+end_src
+
 ** Auth sources
 
 I prefer to control what should be stored in the ~.authinfo~ file manually, so
@@ -1223,6 +1373,153 @@ And third party package for proper syntax highlighting for pre tags in HTML:
                '(pre . shr-tag-pre-highlight)))
 #+end_src
 
+** Isearch
+
+Built-in searching package. Starting from version 27.1 has some useful
+settings.
+
+Some settings I use:
+- Treat whitespace symbol as =.*?= regexp.
+- Include counter of found items into the prompt.
+
+#+begin_src emacs-lisp
+(use-package isearch
+  :ensure nil
+  :config
+  (setq search-whitespace-regexp ".*?"
+        isearch-lazy-count t
+        lazy-count-prefix-format "(%s/%s) "
+        isearch-allow-scroll 'unlimited))
+#+end_src
+
+** Xref
+
+Built-in package which provides a somewhat generic infrastructure for cross
+referencing commands, in particular =find-definition=. The implementation
+itself is language specific but some common settings are placed in this
+package.
+
+Overview of my xref settings:
+- Do not prompt for identifier if there is resolvable symbol at point.
+- Show only the non-directory (a.k.a. "base name") part of the file name.
+
+#+begin_src emacs-lisp
+(use-package xref
+  :config
+  (setq xref-file-name-display 'nondirectory
+        xref-prompt-for-identifier nil))
+#+end_src
+
+** ElDoc
+
+Show signature of function or describe symbol at point in minibuffer.
+
+#+begin_src emacs-lisp
+(use-package eldoc
+  :ensure nil
+  :config
+  (global-eldoc-mode))
+#+end_src
+
+** Dired
+
+Very powerful file manager inside of emacs.
+
+Some descriptions for my settings:
+- If 2 dired buffers are opened and you want to move or copy file or directory
+  the other dired buffer location will be suggested as destination by default.
+- Copy or delete directory is recursive by default.
+- Activate ~hl-line-mode~ in all dired buffers.
+
+#+begin_src emacs-lisp
+(use-package dired
+  :ensure nil
+  :config
+  (setq dired-listing-switches "-AGFhlv --group-directories-first --time-style=long-iso"
+        dired-dwim-target t
+        dired-recursive-copies 'always
+        dired-recursive-deletes 'always)
+
+  (add-hook 'dired-mode-hook #'hl-line-mode))
+
+(use-package dired-aux
+  :ensure nil
+  :config
+  (setq dired-isearch-filenames 'dwim
+        dired-create-destination-dirs 'ask
+        dired-vc-rename-file t))
+#+end_src
+
+*** Image dired
+
+Show images preview and perform some image-specific operations in the
+dired-like way. Can be used also as image viewer.
+
+#+begin_src emacs-lisp
+(use-package image-dired
+  :ensure nil
+  :config
+  (setq image-dired-thumb-size 200
+        image-dired-thumb-margin 2
+        image-dired-thumbs-per-row 4))
+#+end_src
+
+*** Dired plus
+
+Not built-in package. I have this only for one function (and probably the
+entire emacs wiki repository). I don't know why the default behavior is so
+weird: dired creates new buffer every time I navigate by directory tree. This
+package fixes it.
+
+#+begin_src emacs-lisp
+(use-package dired+
+  :config
+  (toggle-diredp-find-file-reuse-dir 1))
+#+end_src
+
+*** Dired GIT info
+
+Also third party package. Show GIT information in dired buffers. Quiet handy
+sometimes, I disable it by default and activate manually by pressing =)= key.
+
+#+begin_src emacs-lisp
+(use-package dired-git-info
+  :config
+  (with-eval-after-load 'dired
+    (define-key dired-mode-map ")" #'dired-git-info-mode)))
+#+end_src
+
+** Calendar
+
+Some tweaks for built-in calendar. I want the week starts from Monday and
+display date in ISO format.
+
+#+begin_src emacs-lisp
+(use-package calendar
+  :ensure nil
+  :config
+  (setq calendar-week-start-day 1
+        calendar-date-style 'iso))
+#+end_src
+
+** Spell checking
+
+Spell checking in emacs relies on some external utility, which should be
+installed on the OS level. I use ~aspell~.
+
+Besides standard spell checking for ~text-mode~ derived modes there is smart
+spell checking mode for programming, which check typos in comments and constant
+strings but not in the rest of source code.
+
+#+begin_src emacs-lisp
+(use-package ispell
+  :ensure nil
+  :config
+  (setq ispell-program-name "aspell")
+  (add-hook 'text-mode-hook #'flyspell-mode)
+  (add-hook 'prog-mode-hook #'flyspell-prog-mode))
+#+end_src
+
 * Appearance
 
 All tweaks for emacs look & feel. Color themes fonts modeline etc.
@@ -1590,6 +1887,9 @@ The default keybinding is =C-h b=.
 #+end_src
 
 ** COMMENT Ivy
+:PROPERTIES:
+:VISIBILITY: folded
+:END:
 
 This section is not maintained. I keep it here just for history.
 
@@ -1681,9 +1981,65 @@ Better sorting for counsel/ivy
 (use-package smex)
 #+end_src
 
-* Configuration
+* In buffer automatic completion
+
+** Company
+
+The most powerful emacs auto-completion framework nowadays. Actively supported
+and maintained, easy to setup.
+
+I disabled it for some modes (mostly derived from ~text-mode~) and for shell
+mode (because I use tab completion for shell).
+
+#+begin_src emacs-lisp
+(use-package company
+  :config
+  (setq company-global-modes '(not org-mode markdown-mode shell-mode))
+  (setq company-tooltip-align-annotations t
+        company-idle-delay 0.1
+        company-require-match nil
+        company-abort-manual-when-too-short t)
+
+  (global-company-mode))
+#+end_src
+
+** Quick help
+
+Good addition to ~company-mode~ which automatically shows documentation for
+candidate in the separate pop-up window.
+
+#+begin_src emacs-lisp
+(use-package company-quickhelp
+  :config
+  (setq company-quickhelp-use-propertized-text t)
+  (company-quickhelp-mode))
+#+end_src
+
+** COMMENT Show completion in posframe
+
+Kind of /modern/ front-end for ~company-mode~ which shows candidates in the
+~posframe~. It doesn't have some issues which the original front-end has
+(broken layout when you have large fonts for example). I've tried it a few
+times, it has some issues and performance is still worse than the original
+front-end.
+
+I hope one day it will be good enough to replace original one.
+
+#+begin_src emacs-lisp
+(use-package company-posframe
+  :config
+  (setq company-posframe-show-indicator nil
+        company-posframe-quickhelp-show-header nil)
+  (company-posframe-mode 1))
+#+end_src
+
+* Fixes and improvements
 
 ** Asynchronous processing in Emacs
+
+Emacs is synchronous by default and has very limited multi-threading
+support. This package makes some commands asynchronous.
+
 #+begin_src emacs-lisp
 (use-package async
   :config
@@ -1694,27 +2050,528 @@ Better sorting for counsel/ivy
 #+end_src
 
 ** Set the same PATH as in shell
+
+Emacs doesn't pick up shell environment variables by default. This package
+fixes it.
+
 #+begin_src emacs-lisp
 (use-package exec-path-from-shell
   :config
   (exec-path-from-shell-initialize))
 #+end_src
 
-** Some useful commands
+** Misc-cmds
+
+Small package with bunch of handy functions. I remap built-in ~quit-window~ to
+~quit-window-delete~ which kill the buffer and make sure the window is
+closed. The original one not always does it.
+
 #+begin_src emacs-lisp
 (use-package misc-cmds
   :config
   (define-key global-map [remap quit-window] 'quit-window-delete))
 #+end_src
 
-** Spell checking
+** Which key
+
+Very handy package. Setup once and forget :)
+
+Show keybindings in the minibuffer after pressing prefix key.
+
 #+begin_src emacs-lisp
-(use-package ispell
+(use-package which-key
   :config
-  (setq ispell-program-name "aspell")
-  (add-hook 'text-mode-hook #'flyspell-mode)
-  (add-hook 'prog-mode-hook #'flyspell-prog-mode))
+  (which-key-mode))
 #+end_src
+
+* Org-mode
+
+One of the emacs killer features :)
+
+Org-mode can do almost everything:
+- Manage tasks and TODO lists
+- Track time of tasks
+- Execute source blocks and export source code blocks to files
+- Schedule events, set deadlines and track them in the agenda buffer
+- Literate programming
+- Can be used as markup language
+- Many more...
+
+Org-mode has a lot of settings and it's possible to setup it any way you like.
+
+Below some settings for UI and common behavior.
+
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook #'rr/set-margins)
+
+;; Setup ui
+(setq org-adapt-indentation nil
+      org-eldoc-breadcrumb-separator " → "
+      org-ellipsis "…"
+      org-hide-leading-stars t
+      org-hide-leading-stars-before-indent-mode t
+      org-indent-mode-turns-on-hiding-stars t
+      org-list-description-max-indent 4
+      org-pretty-entities t
+      org-pretty-entities-include-sub-superscripts t
+      org-priority-faces '((?a . error) (?b . warning) (?c . success))
+      org-tags-column 0
+      org-startup-folded 'content
+      org-startup-indented nil
+      org-startup-shrink-all-tables t
+      org-edit-src-content-indentation 0
+      org-cycle-separator-lines 1
+      org-startup-with-inline-images nil
+      org-cycle-include-plain-lists t
+      org-hide-emphasis-markers nil
+      org-insert-heading-respect-content t
+      org-fontify-quote-and-verse-blocks t
+      org-fontify-done-headline t
+      org-fontify-whole-heading-line nil
+      ;; org-fontify-todo-headline t
+      org-src-fontify-natively t
+      org-image-actual-width 500
+      org-use-sub-superscripts '{})
+
+(setq org-special-ctrl-a/e t
+      org-special-ctrl-k t
+      org-ctrl-k-protect-subtree t
+      org-imenu-depth 4
+      org-export-with-sub-superscripts nil
+      org-src-window-setup 'split-window-below
+      org-catch-invisible-edits 'show-and-error
+      org-return-follows-link t
+      ;; org-M-RET-may-split-line nil
+      org-list-use-circular-motion t
+      org-export-with-drawers t
+      org-export-with-properties t
+      org-reverse-note-order t
+      org-use-speed-commands t
+      org-enforce-todo-dependencies t
+      org-enforce-todo-checkbox-dependencies t)
+
+(setq org-link-frame-setup
+      '((vm . vm-visit-folder-other-frame)
+        (vm-imap . vm-visit-imap-folder-other-frame)
+        (gnus . org-gnus-no-new-news)
+        (file . find-file)
+        (wl . wl-other-frame)))
+
+(org-display-inline-images)
+(add-to-list 'org-modules 'org-habit)
+(add-to-list 'org-modules 'org-notify)
+
+(eval-after-load 'org
+  '(org-load-modules-maybe t))
+#+end_src
+
+** Effort estimates
+
+It's possible to put estimation to the headline and then track time of the
+task.
+
+#+begin_src emacs-lisp
+(setq org-global-properties '(("Effort_ALL" . "0 0:30 1:00 2:00 4:00 6:00 8:00 16:00")))
+(setq org-columns-default-format "%40ITEM(Task) %17Effort(Estimated Effort){:} %CLOCKSUM")
+#+end_src
+
+** Agenda settings
+
+Setup files which should be used by ~agenda-mode~ and some tweaks for agenda.
+
+#+begin_src emacs-lisp
+(setq org-agenda-files (quote ("~/Org/tasks/bsc.org"
+                               "~/Org/tasks/epam.org"
+                               "~/Org/tasks/personal.org"
+                               "~/Org/tasks/index.org"
+                               "~/Org/tasks/libertyglobal.org"
+                               "~/Org-mobile/home.org")))
+(setq org-directory "~/Org")
+(setq org-agenda-restore-windows-after-quit t
+      org-agenda-compact-blocks t
+      org-agenda-archives-mode t
+      org-agenda-start-with-follow-mode nil
+      org-agenda-follow-indirect nil
+      org-agenda-show-log t
+      org-agenda-window-setup 'only-window
+      org-agenda-span 'week
+      org-agenda-todo-ignore-scheduled 'future
+      org-agenda-show-future-repeats 'next)
+#+end_src
+
+** Capture settings
+
+#+begin_src emacs-lisp
+(setq org-default-notes-file (concat org-directory "/notes.org"))
+
+(setq org-capture-templates
+      '(("t" "Todo" entry (file+headline "~/Org/tasks/index.org" "Unsorted tasks")
+         "* TODO %?\n%i")
+        ("n" "Note" entry (file+headline "" "Notes")
+         "* TODO %?\n%i")
+        ("l" "Link" entry (file+headline "~/Org/links.org" "Links")
+         "* %? %^L \n%T"
+         :prepend t)))
+
+(setq org-refile-targets
+      (quote ((nil :maxlevel . 6)
+              (org-agenda-files :maxlevel . 6))))
+
+(defadvice org-capture-finalize (after delete-capture-frame activate)
+  "Advise capture-finalize to close the frame."
+  (if (equal "capture" (frame-parameter nil 'name))
+      (delete-frame)))
+
+(defadvice org-capture-destroy (after delete-capture-frame activate)
+  "Advise capture-destroy to close the frame."
+  (if (equal "capture" (frame-parameter nil 'name))
+    (delete-frame)))
+
+(defadvice org-capture-select-template (around delete-capture-frame activate)
+  "Advise org-capture-select-template to close the frame on abort."
+  (unless (ignore-errors ad-do-it t)
+    (setq ad-return-value "q"))
+  (if (and
+       (equal "q" ad-return-value)
+       (equal "capture" (frame-parameter nil 'name)))
+      (delete-frame)))
+
+(use-package noflet)
+
+(defun make-capture-frame ()
+  "Create a new frame and run 'org-capture'."
+  (interactive)
+  (make-frame '((name . "capture")))
+  (select-frame-by-name "capture")
+  (delete-other-windows)
+  (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
+    (org-capture)))
+#+end_src
+
+** Tag list
+
+#+begin_src emacs-lisp
+(setq org-tag-alist '(("@bug" . ?b) ("@task" . ?t) ("@story" . ?s)))
+#+end_src
+
+** Keywords list
+
+Define my personal list of TODO keywords.
+
+#+begin_src emacs-lisp
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "PROGRESS(p)" "WAITING(w)" "REVIEW(r)" "|" "DONE(d)" "CANCELLED(c@)")))
+#+end_src
+
+** Mark task as DONE if all subtasks are DONE
+
+Stolen from the org-mode documentation. Not sure whether it actually works.
+
+#+begin_src emacs-lisp
+(defun org-summary-todo (n-done n-not-done)
+  "Switch entry to DONE when all subentries are done, to TODO otherwise."
+  (let (org-log-done org-log-states)   ; turn off logging
+    (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+
+(add-hook 'org-after-todo-statistics-hook #'org-summary-todo)
+#+end_src
+
+** Custom keywords faces
+
+Maybe it's better to keep this in the [[*Appearance][appearance]] section, but so far I keep all
+org-mode related settings together.
+
+#+begin_src emacs-lisp
+;; Zenburn
+;; (setq org-todo-keyword-faces
+;;       '(("PROGRESS" . (:foreground "#93E0E3" :weight bold))
+;;         ("WAITING" . (:foreground "#DFAF8F" :weight bold))
+;;         ("REVIEW" . (:foreground "#DFAF8F" :weight bold))
+;;         ("CANCELLED" . (:foreground "#DCDCCC" :weight bold))))
+
+;; Modus vivendi
+(setq org-todo-keyword-faces
+      '(("PROGRESS" . (:foreground "#29aeff" :background "#110b11" :box "#3c3c3c"))
+        ("WAITING" . (:foreground "#eecc00" :background "#110b11" :box "#3c3c3c"))
+        ("REVIEW" . (:foreground "#eecc00" :background "#110b11" :box "#3c3c3c"))
+        ("CANCELLED" . (:foreground "#a8a8a8" :background "#110b11" :box "#3c3c3c"))))
+#+end_src
+
+** Extra Org-mode export packages
+
+Org-mode documents can be exported to a various type of documents (PDF, HTML,
+ODT etc.). Besides there are a lot of packages which provide support for export
+to more specific formats or file types.
+
+*** Slack export
+
+Export org-mode buffer (or part of it) to markup compatible with slack messenger.
+
+#+begin_src emacs-lisp
+(use-package ox-slack)
+#+end_src
+
+*** Confluence export
+
+Built into org-mode package but not enabled by default. Export org buffer to
+markup compatible with atlassian confluence.
+
+#+begin_src emacs-lisp
+(require 'ox-confluence)
+#+end_src
+
+*** Markdown export
+
+Also built into org-mode package and not enabled. That's obviously export org
+mode buffer to markdown.
+
+#+begin_src emacs-lisp
+(require 'ox-md nil t)
+(eval-after-load 'org
+  '(require 'ox-gfm nil t))
+#+end_src
+
+*** LaTeX export
+
+Org-mode buffer can be exported to PDF using LaTeX. Here I define custom
+templates. To use it special header should be included to org document.
+
+#+begin_example
+#+LATEX_CLASS: org-article-en
+#+LATEX_CLASS: org-article
+#+end_example
+
+One of them for documents which contains Russian letters, second for those
+which doesn't.
+
+#+begin_src emacs-lisp
+(require 'ox-latex)
+(setq org-latex-inputenc-alist '(("utf8" . "utf8x")))
+(setq org-latex-default-packages-alist
+      '(("AUTO" "inputenc"  t ("pdflatex"))
+        (""     "graphicx"  t)
+        (""     "grffile"   t)
+        (""     "longtable" nil)
+        (""     "wrapfig"   nil)
+        (""     "rotating"  nil)
+        ("normalem" "ulem"  t)
+        (""     "amsmath"   t)
+        (""     "textcomp"  t)
+        (""     "amssymb"   t)
+        (""     "capt-of"   nil)
+        (""     "hyperref"  nil)))
+(unless (boundp 'org-latex-classes)
+  (setq org-latex-classes nil))
+
+(add-to-list 'org-latex-classes
+             '("org-article"
+               "\\documentclass[11pt,a4paper]{article}
+\\usepackage[sfdefault]{noto}
+\\usepackage{sourcecodepro}
+\\usepackage[T2A]{fontenc}
+\\usepackage[english, russian]{babel}
+\\usepackage[hidelinks]{hyperref}
+\\usepackage{geometry}
+\\geometry{a4paper}
+\\geometry{left=2cm,right=1cm,top=1cm,bottom=1cm,includeheadfoot,headheight=1.2cm}"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+(add-to-list 'org-latex-classes
+             '("org-article-en"
+               "\\documentclass[11pt,a4paper]{article}
+\\usepackage[default]{sourcesanspro}
+\\usepackage{sourcecodepro}
+\\usepackage[T1]{fontenc}
+\\usepackage[english]{babel}
+\\usepackage[hidelinks]{hyperref}
+\\usepackage{geometry}
+\\geometry{a4paper}
+\\geometry{left=2cm,right=1cm,top=1cm,bottom=1cm,includeheadfoot,headheight=1.2cm}"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+#+end_src
+
+*** JIRA export
+
+Third party package. Export org-mode buffer to paste to JIRA ticket
+description. Not perfect, some markup should be fixed after pasting.
+
+#+begin_src emacs-lisp
+(use-package ox-jira
+  :config
+  (setq org-export-copy-to-kill-ring 'if-interactive))
+#+end_src
+
+** Notifications
+#+begin_src emacs-lisp
+(use-package appt
+  :ensure nil
+  :after notifications
+  :config
+  (appt-activate t)
+  (setq appt-message-warning-time 15) ;Show notification 15 minutes before event
+  (setq appt-display-mode-line nil)   ;Don't show anything in mode line
+
+  ;; Use appointment data from org-mode
+  (defun rr/org-agenda-to-appt ()
+    (interactive)
+    (setq appt-time-msg-list nil)
+    (org-agenda-to-appt))
+
+  (defun rr/format-minutes (min-rest)
+    "Format minutes for notification."
+    (cond ((equal "0" min-rest) "Now.")
+          ((equal "1" min-rest) (format "In %s minute." min-rest))
+          (t (format "In %s minutes." min-rest))))
+
+  (defun rr/show-appt-notification (min-to-app new-time appt-msg)
+    "Show notifications function."
+    (let ((mins-to-app (if (listp min-to-app)
+                           min-to-app
+                         (list min-to-app)))
+          (appt-msgs (if (listp appt-msg)
+                         appt-msg
+                       (list appt-msg))))
+      (let ((msgs (mapcar* #'cons appt-msgs mins-to-app)))
+        (dolist (msg msgs)
+          (let ((title (car msg))
+                (min-rest (cdr msg)))
+            (notifications-notify :title title
+                                  :timeout (if (equal min-rest "0") 0 -1)
+                                  :body (format "%s\n%s"
+                                                (rr/format-minutes min-rest)
+                                                new-time)))))))
+
+  ;; Update after emacs start
+  (add-hook 'after-init-hook #'rr/org-agenda-to-appt)
+
+  ;; Every day at 0:05
+  (run-at-time "0:05" (* 24 3600) #'rr/org-agenda-to-appt)
+
+  (add-hook 'after-save-hook
+            (lambda ()
+              (if (org-agenda-file-p (buffer-file-name))
+                  (rr/org-agenda-to-appt))))
+
+  (setq appt-disp-window-function #'rr/show-appt-notification)
+  (setq appt-delete-window-function (lambda () t))
+  (setq org-show-notification-handler #'notifications-notify))
+#+end_src
+
+** Unset some keybindings
+#+begin_src emacs-lisp
+(define-key orgtbl-mode-map (kbd "C-c C-w") nil)
+#+end_src
+
+** Clock settings
+#+begin_src emacs-lisp
+(setq org-clock-persist-file (expand-file-name "org-clock-save.el" rr-savefile-dir))
+(setq org-clock-persist t)
+(org-clock-persistence-insinuate)
+(setq org-log-into-drawer t)
+(setq org-log-done nil)
+(setq org-log-repeat nil)
+(setq org-log-redeadline 'time)
+(setq org-log-reschedule 'time)
+(setq org-clock-out-when-done t)
+(setq org-clock-in-resume t)
+(setq org-clock-out-remove-zero-time-clocks t)
+(setq org-clock-report-include-clocking-task t)
+(setq org-clock-persist-query-resume nil)
+
+(setq org-clock-in-switch-to-state "PROGRESS")
+
+(defvar non-clocking-states '("WAITING" "REVIEW" "DONE" "TODO" "CANCELLED")
+  "New state for current clocking task.")
+
+(defun rr/read-non-clocking-state ()
+  "Prompt to select non-clocking state."
+  (interactive)
+  (message "%s" (completing-read "Select state: " non-clocking-states)))
+
+(defun rr/after-clock-stop (last)
+  "Change TASK state after clock stop depends on LAST state."
+  (when (not (or (string-equal last "WAITING")
+                 (string-equal last "DONE")
+                 (string-equal last "REVIEW")
+                 (string-equal last "TODO")
+                 (string-equal last "CANCELED")))
+    (rr/read-non-clocking-state)))
+
+(setq org-clock-out-switch-to-state #'rr/after-clock-stop)
+#+end_src
+
+** Org-mime
+#+begin_src emacs-lisp
+(use-package org-mime
+  :config
+  (define-key message-mode-map (kbd "C-c M-o") #'org-mime-htmlize)
+  (define-key org-mode-map (kbd "C-c M-o") #'org-mime-org-buffer-htmlize)
+
+  (add-hook 'org-mime-html-hook
+            (lambda ()
+              (org-mime-change-element-style
+               "pre" (format "color: %s; background-color: %s; padding: 0.5em;"
+                             "#DCDCCC" "#3F3F3F"))))
+
+  ;; the following can be used to nicely offset block quotes in email bodies
+  (add-hook 'org-mime-html-hook
+            (lambda ()
+              (org-mime-change-element-style
+               "blockquote" "border-left: 2px solid gray; padding-left: 4px;")))
+
+  (setq org-mime-export-options
+        '(:section-numbers nil :with-author nil :with-toc nil)))
+#+end_src
+
+** Handle local file links by extension
+#+begin_src emacs-lisp
+(setq org-file-apps
+      '((auto-mode . emacs)
+        ("\\.x?html\\'" . "firefox %s")
+        ("\\(?:xhtml\\|html\\)\\'" . "firefox %s")
+        ("\\.mm\\'" . default)
+        ("\\.pdf\\'" . default)))
+#+end_src
+
+** Evaluate source code
+#+begin_src emacs-lisp
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (python . t)
+   (sql . t)
+   (shell . t)
+   (sqlite . t)
+   (haskell . t)
+   (clojure . t)
+   (ditaa . t)
+   (plantuml . t)))
+
+(setq org-confirm-babel-evaluate t
+      org-export-use-babel nil)
+
+(use-package ob-async)
+#+end_src
+
+** Google calendar sync
+#+begin_src emacs-lisp
+(use-package org-gcal)
+#+end_src
+
+** Edit program comments and strings using Org-mode
+#+begin_src emacs-lisp
+(use-package poporg)
+#+end_src
+
+* Configuration
 
 ** SQL
 *** COMMENT Emacs clojure database client
@@ -1758,50 +2615,17 @@ Better sorting for counsel/ivy
             (toggle-truncate-lines t)))
 #+end_src
 
-** Which key
-#+begin_src emacs-lisp
-(use-package which-key
-  :config
-  (which-key-mode))
-#+end_src
-
 ** YASnippet
 #+begin_src emacs-lisp
 (use-package yasnippet
   :config
   (setq yas-indent-line 'fixed
         yas-inhibit-overlay-modification-protection t)
+
   (add-hook 'prog-mode-hook #'yas-minor-mode))
 #+end_src
 
 ** Auto completion
-*** Common
-#+begin_src emacs-lisp
-(use-package company
-  :config
-  (setq company-global-modes '(not org-mode markdown-mode shell-mode))
-  (setq company-tooltip-align-annotations t
-        company-idle-delay 0.1
-        company-require-match nil
-        company-abort-manual-when-too-short t)
-
-  (global-company-mode))
-#+end_src
-*** Quick help
-#+begin_src emacs-lisp
-(use-package company-quickhelp
-  :config
-  (setq company-quickhelp-use-propertized-text t)
-  (company-quickhelp-mode))
-#+end_src
-*** COMMENT Show completion in posframe
-#+begin_src emacs-lisp
-(use-package company-posframe
-  :config
-  (setq company-posframe-show-indicator nil
-        company-posframe-quickhelp-show-header nil)
-  (company-posframe-mode 1))
-#+end_src
 *** Languages
 **** LaTeX
 #+begin_src emacs-lisp
@@ -1822,25 +2646,6 @@ Better sorting for counsel/ivy
 (use-package company-shell
   :config
   (add-to-list 'company-backends #'company-shell))
-#+end_src
-
-** Isearch built-in settings
-#+begin_src emacs-lisp
-(use-package isearch
-  :ensure nil
-  :config
-  (setq search-whitespace-regexp ".*?"
-        isearch-lazy-count t
-        lazy-count-prefix-format "(%s/%s) "
-        isearch-allow-scroll 'unlimited))
-#+end_src
-
-** Xref
-#+begin_src emacs-lisp
-(use-package xref
-  :config
-  (setq xref-file-name-display 'nondirectory
-        xref-prompt-for-identifier nil))
 #+end_src
 
 ** Smartparens
@@ -1898,148 +2703,6 @@ Better sorting for counsel/ivy
         eyebrowse-mode-line-style 'always)
   (eyebrowse-mode t))
 #+end_src
-** Popup windows settings
-*** Configure window behavior using display-buffer-alist
-#+begin_src emacs-lisp
-(defconst parameters
-  '(window-parameters . ((no-other-window . t)
-                         (no-delete-other-windows . t))))
-
-(defconst parameters-no-mode-line
-  '(window-parameters . ((no-other-window . t)
-                         (no-delete-other-windows . t)
-                         (mode-line-format . none))))
-
-;; (define-key global-map (kbd "C-c s") #'window-toggle-side-windows)
-
-(setq switch-to-buffer-obey-display-actions nil)
-
-(defconst display-buffer-same-window-commands
-  '(compile-goto-error
-    push-button
-    magit-diff-visit-file
-    magit-todos-jump-to-item
-    deadgrep-visit-result-other-window))
-
-(defconst display-buffer-bottom-regexps
-  (mapcar (lambda (s) (concat "\\*" s "\\*"))
-          '("[H|h]elp.*?"
-            "Disabled\sCommand"
-            "deadgrep.*?"
-            "rg"
-            "cider-doc"
-            "Backtrace"
-            "Apropos"
-            "Python.*?"
-            "grep"
-            "lsp-help"
-            "compilation"
-            ".*?\sserver\slog"
-            "Completions"
-            "Compile-Log"
-            "Async\sShell\sCommand"
-            "Shell\sCommand\sOutput"))
-  "List of buffer name regexps.
-All matched buffers should be displayed at
-bottom of the frame.")
-
-(defconst helm-buffers-regexps
-  '("\\*helm.*?\\*"
-    "\\*cljr.*?\\*")
-  "List of helm buffer regexps.")
-
-(defun bottom-special-buffer-p (buf &rest _)
-  "Predicate to display BUF in bottom of the frame."
-  (seq-contains-p display-buffer-bottom-regexps buf #'string-match-p))
-
-(defun helm-buffer-p (buf &rest _)
-  "Predicate for helm BUF."
-  (seq-contains-p helm-buffers-regexps buf #'string-match-p))
-
-(setq display-buffer-alist
-      `(
-        ;; Magit
-        ("magit:.*"
-         (display-buffer-reuse-mode-window
-          display-buffer-at-bottom)
-         (window-height . 0.4))
-        ("magit-log:.*"
-         (display-buffer-reuse-mode-window
-          display-buffer-same-window))
-        ("magit-refs:.*"
-         (display-buffer-reuse-mode-window
-          display-buffer-same-window))
-        ("magit-diff.*"
-         (display-buffer-reuse-mode-window
-          display-buffer-in-direction)
-         (direction . rightmost)
-         (window-width . 0.5))
-        ("magit-revision:.*"
-         (display-buffer-reuse-mode-window
-          display-buffer-in-direction)
-         (direction . rightmost)
-         (window-width . 0.5))
-        ("COMMIT_EDITMSG"
-         (display-buffer-reuse-mode-window
-          display-buffer-same-window))
-        ;; Google translate buffer
-        ("\\*Google\sTranslate\\*"
-         (display-buffer-reuse-mode-window
-          display-buffer-in-direction)
-         (direction . rightmost)
-         (window-width . 0.5))
-        ;; Flycheck error list
-        ("\\*Flycheck\serrors.*\\*"
-         (display-buffer-reuse-mode-window
-          display-buffer-in-side-window)
-         (window-height . 0.2)
-         (side . bottom)
-         (slot . 0)
-         (preserve-size . (nil . t))
-         ,parameters)
-        ;; Org mode
-        ("\\*Org\sSrc.*\\*"
-         (display-buffer-reuse-mode-window)
-         (direction . rightmost)
-         (window-width . 0.5))
-        ;; Helm
-        (,#'helm-buffer-p
-         (display-buffer-in-direction)
-         (window-height . 0.4)
-         (direction . bottom)
-         ,parameters)
-        ;; Bottom special buffers
-        (,#'bottom-special-buffer-p
-         (display-buffer-reuse-mode-window
-          display-buffer-in-direction)
-         (window-height . 0.4)
-         (direction . bottom)
-         ,parameters)
-        ("\\*cider-error\\*"
-         (display-buffer-reuse-mode-window
-          display-buffer-in-direction)
-         (direction . rightmost)
-         (window-width . 0.5))
-        ("\\*cider-test-report"
-         (display-buffer-reuse-mode-window
-          display-buffer-in-direction)
-         (direction . rightmost)
-         (window-width . 0.5))
-        ("\\*cider-repl.*$"
-         (display-buffer-reuse-mode-window
-          display-buffer-at-bottom)
-         (window-height . 0.3))
-        ;; Open clickable text
-        ((lambda (&rest _)
-           (memq this-command display-buffer-same-window-commands))
-         (display-buffer-reuse-mode-window
-          display-buffer-in-direction)
-         (direction . rightmost)
-         (window-width . 0.5))))
-
-(setq window-combination-resize t
-      switch-to-buffer-in-dedicated-window 'pop)
-#+end_src
 ** Rainbow delimiters
 #+begin_src emacs-lisp
 (use-package rainbow-delimiters
@@ -2080,48 +2743,6 @@ bottom of the frame.")
 #+begin_src emacs-lisp
 (use-package pkgbuild-mode
   :mode "/PKGBUILD$")
-#+end_src
-** Dired
-*** Common settings
-#+begin_src emacs-lisp
-(use-package dired
-  :ensure nil
-  :config
-  (setq dired-listing-switches "-AGFhlv --group-directories-first --time-style=long-iso"
-        dired-dwim-target t
-        dired-recursive-copies 'always
-        dired-recursive-deletes 'always)
-
-  (add-hook 'dired-mode-hook #'hl-line-mode))
-
-(use-package dired-aux
-  :ensure nil
-  :config
-  (setq dired-isearch-filenames 'dwim
-        dired-create-destination-dirs 'ask
-        dired-vc-rename-file t))
-#+end_src
-*** Images preview
-#+begin_src emacs-lisp
-(use-package image-dired
-  :ensure nil
-  :config
-  (setq image-dired-thumb-size 100
-        image-dired-thumb-margin 2
-        image-dired-thumbs-per-row 4))
-#+end_src
-*** Do not create new buffer every time I change directory
-#+begin_src emacs-lisp
-(use-package dired+
-  :config
-  (toggle-diredp-find-file-reuse-dir 1))
-#+end_src
-*** Show git information in dired
-#+begin_src emacs-lisp
-(use-package dired-git-info
-  :config
-  (with-eval-after-load 'dired
-    (define-key dired-mode-map ")" #'dired-git-info-mode)))
 #+end_src
 ** Projectile
 *** Basic setup
@@ -2404,14 +3025,6 @@ Build in regex package:
 (use-package helm-pass)
 ;; (use-package ivy-pass)
 #+end_src
-** Calendar
-#+begin_src emacs-lisp
-(use-package calendar
-  :ensure nil
-  :config
-  (setq calendar-week-start-day 1
-        calendar-date-style 'iso))
-#+end_src
 ** Markdown mode
 #+begin_src emacs-lisp
 (use-package markdown-mode
@@ -2425,415 +3038,6 @@ Build in regex package:
 ** Edit region in indirect buffer
 #+begin_src emacs-lisp
 (use-package edit-indirect)
-#+end_src
-** Org
-*** Some tweaks
-#+begin_src emacs-lisp
-(add-hook 'org-mode-hook #'rr/set-margins)
-
-;; Setup ui
-(setq org-adapt-indentation nil
-      org-eldoc-breadcrumb-separator " → "
-      org-ellipsis "…"
-      org-hide-leading-stars t
-      org-hide-leading-stars-before-indent-mode t
-      org-indent-mode-turns-on-hiding-stars t
-      org-list-description-max-indent 4
-      org-pretty-entities t
-      org-pretty-entities-include-sub-superscripts t
-      org-priority-faces '((?a . error) (?b . warning) (?c . success))
-      org-tags-column 0
-      org-startup-folded 'content
-      org-startup-indented nil
-      org-startup-shrink-all-tables t
-      org-edit-src-content-indentation 0
-      org-cycle-separator-lines 1
-      org-startup-with-inline-images nil
-      org-cycle-include-plain-lists t
-      org-hide-emphasis-markers nil
-      org-insert-heading-respect-content t
-      org-fontify-quote-and-verse-blocks t
-      org-fontify-done-headline t
-      org-fontify-whole-heading-line nil
-      ;; org-fontify-todo-headline t
-      org-image-actual-width 500
-      org-use-sub-superscripts '{})
-
-(setq org-special-ctrl-a/e t
-      org-special-ctrl-k t
-      org-ctrl-k-protect-subtree t
-      org-imenu-depth 4
-      org-export-with-sub-superscripts nil
-      org-src-window-setup 'split-window-below
-      org-catch-invisible-edits 'show-and-error
-      org-return-follows-link t
-      ;; org-M-RET-may-split-line nil
-      org-list-use-circular-motion t
-      org-export-with-drawers t
-      org-export-with-properties t
-      org-reverse-note-order t
-      org-use-speed-commands t
-      org-enforce-todo-dependencies t
-      org-enforce-todo-checkbox-dependencies t)
-
-(setq org-link-frame-setup
-      '((vm . vm-visit-folder-other-frame)
-        (vm-imap . vm-visit-imap-folder-other-frame)
-        (gnus . org-gnus-no-new-news)
-        (file . find-file)
-        (wl . wl-other-frame)))
-
-(org-display-inline-images)
-(add-to-list 'org-modules 'org-habit)
-(add-to-list 'org-modules 'org-notify)
-
-(eval-after-load 'org
-  '(org-load-modules-maybe t))
-#+end_src
-*** Effort estimates
-#+begin_src emacs-lisp
-(setq org-global-properties '(("Effort_ALL" . "0 0:30 1:00 2:00 4:00 6:00 8:00 16:00")))
-(setq org-columns-default-format "%40ITEM(Task) %17Effort(Estimated Effort){:} %CLOCKSUM")
-#+end_src
-*** Agenda settings
-#+begin_src emacs-lisp
-(setq org-agenda-files (quote ("~/Org/tasks/bsc.org"
-                               "~/Org/tasks/epam.org"
-                               "~/Org/tasks/personal.org"
-                               "~/Org/tasks/index.org"
-                               "~/Org/tasks/libertyglobal.org"
-                               "~/Org-mobile/home.org")))
-(setq org-directory "~/Org")
-(setq org-agenda-restore-windows-after-quit t
-      org-agenda-compact-blocks t
-      org-agenda-archives-mode t
-      org-agenda-start-with-follow-mode nil
-      org-agenda-follow-indirect nil
-      org-agenda-show-log t
-      org-agenda-window-setup 'only-window
-      org-agenda-span 'week
-      org-agenda-todo-ignore-scheduled 'future
-      org-agenda-show-future-repeats 'next)
-#+end_src
-*** Capture settings
-#+begin_src emacs-lisp
-(setq org-default-notes-file (concat org-directory "/notes.org"))
-
-(setq org-capture-templates
-      '(("t" "Todo" entry (file+headline "~/Org/tasks/index.org" "Unsorted tasks")
-         "* TODO %?\n%i")
-        ("n" "Note" entry (file+headline "" "Notes")
-         "* TODO %?\n%i")
-        ("l" "Link" entry (file+headline "~/Org/links.org" "Links")
-         "* %? %^L \n%T"
-         :prepend t)))
-
-(setq org-refile-targets
-      (quote ((nil :maxlevel . 6)
-              (org-agenda-files :maxlevel . 6))))
-
-(defadvice org-capture-finalize (after delete-capture-frame activate)
-  "Advise capture-finalize to close the frame."
-  (if (equal "capture" (frame-parameter nil 'name))
-      (delete-frame)))
-
-(defadvice org-capture-destroy (after delete-capture-frame activate)
-  "Advise capture-destroy to close the frame."
-  (if (equal "capture" (frame-parameter nil 'name))
-    (delete-frame)))
-
-(defadvice org-capture-select-template (around delete-capture-frame activate)
-  "Advise org-capture-select-template to close the frame on abort."
-  (unless (ignore-errors ad-do-it t)
-    (setq ad-return-value "q"))
-  (if (and
-       (equal "q" ad-return-value)
-       (equal "capture" (frame-parameter nil 'name)))
-      (delete-frame)))
-
-(use-package noflet)
-
-(defun make-capture-frame ()
-  "Create a new frame and run 'org-capture'."
-  (interactive)
-  (make-frame '((name . "capture")))
-  (select-frame-by-name "capture")
-  (delete-other-windows)
-  (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
-    (org-capture)))
-#+end_src
-*** Tag list
-#+begin_src emacs-lisp
-(setq org-tag-alist '(("@bug" . ?b) ("@task" . ?t) ("@story" . ?s)))
-#+end_src
-*** Keywords list
-Maybe it's a good idea to use unicode symbols for TODO keywords:
-#+BEGIN_EXAMPLE
-U+2611 ☑ ballot box with check
-U+2610 ☐ ballot box
-#+END_EXAMPLE
-But there is no backward compatibility.
-#+begin_src emacs-lisp
-(setq org-todo-keywords
-      '((sequence "TODO(t)" "PROGRESS(p)" "WAITING(w)" "REVIEW(r)" "|" "DONE(d)" "CANCELLED(c@)")))
-#+end_src
-*** Mark task as DONE if all subtasks are DONE
-#+begin_src emacs-lisp
-(defun org-summary-todo (n-done n-not-done)
-  "Switch entry to DONE when all subentries are done, to TODO otherwise."
-  (let (org-log-done org-log-states)   ; turn off logging
-    (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
-
-(add-hook 'org-after-todo-statistics-hook #'org-summary-todo)
-#+end_src
-*** Custom keywords faces
-#+begin_src emacs-lisp
-;; Zenburn
-;; (setq org-todo-keyword-faces
-;;       '(("PROGRESS" . (:foreground "#93E0E3" :weight bold))
-;;         ("WAITING" . (:foreground "#DFAF8F" :weight bold))
-;;         ("REVIEW" . (:foreground "#DFAF8F" :weight bold))
-;;         ("CANCELLED" . (:foreground "#DCDCCC" :weight bold))))
-
-;; Modus vivendi
-(setq org-todo-keyword-faces
-      '(("PROGRESS" . (:foreground "#29aeff" :background "#110b11" :box "#3c3c3c"))
-        ("WAITING" . (:foreground "#eecc00" :background "#110b11" :box "#3c3c3c"))
-        ("REVIEW" . (:foreground "#eecc00" :background "#110b11" :box "#3c3c3c"))
-        ("CANCELLED" . (:foreground "#a8a8a8" :background "#110b11" :box "#3c3c3c"))))
-#+end_src
-*** Handle local file links by extension
-#+begin_src emacs-lisp
-(setq org-file-apps
-      '((auto-mode . emacs)
-        ("\\.x?html\\'" . "firefox %s")
-        ("\\(?:xhtml\\|html\\)\\'" . "firefox %s")
-        ("\\.mm\\'" . default)
-        ("\\.pdf\\'" . default)))
-#+end_src
-*** Clock settings
-#+begin_src emacs-lisp
-(setq org-clock-persist-file (expand-file-name "org-clock-save.el" rr-savefile-dir))
-(setq org-clock-persist t)
-(org-clock-persistence-insinuate)
-(setq org-log-into-drawer t)
-(setq org-log-done nil)
-(setq org-log-repeat nil)
-(setq org-log-redeadline 'time)
-(setq org-log-reschedule 'time)
-(setq org-clock-out-when-done t)
-(setq org-clock-in-resume t)
-(setq org-clock-out-remove-zero-time-clocks t)
-(setq org-clock-report-include-clocking-task t)
-(setq org-clock-persist-query-resume nil)
-
-(setq org-clock-in-switch-to-state "PROGRESS")
-
-(defvar non-clocking-states '("WAITING" "REVIEW" "DONE" "TODO" "CANCELLED")
-  "New state for current clocking task.")
-
-(defun rr/read-non-clocking-state ()
-  "Prompt to select non-clocking state."
-  (interactive)
-  (message "%s" (completing-read "Select state: " non-clocking-states)))
-
-(defun rr/after-clock-stop (last)
-  "Change TASK state after clock stop depends on LAST state."
-  (when (not (or (string-equal last "WAITING")
-                 (string-equal last "DONE")
-                 (string-equal last "REVIEW")
-                 (string-equal last "TODO")
-                 (string-equal last "CANCELED")))
-    (rr/read-non-clocking-state)))
-
-(setq org-clock-out-switch-to-state #'rr/after-clock-stop)
-#+end_src
-*** Appearance
-**** Org source code
-#+begin_src emacs-lisp
-(setq org-src-fontify-natively t)
-#+end_src
-*** Unset some keybindings
-#+begin_src emacs-lisp
-(define-key orgtbl-mode-map (kbd "C-c C-w") nil)
-#+end_src
-*** Notifications
-#+begin_src emacs-lisp
-(use-package appt
-  :ensure nil
-  :after notifications
-  :config
-  (appt-activate t)
-  (setq appt-message-warning-time 15) ;Show notification 15 minutes before event
-  (setq appt-display-mode-line nil)   ;Don't show anything in mode line
-
-  ;; Use appointment data from org-mode
-  (defun rr/org-agenda-to-appt ()
-    (interactive)
-    (setq appt-time-msg-list nil)
-    (org-agenda-to-appt))
-
-  (defun rr/format-minutes (min-rest)
-    "Format minutes for notification."
-    (cond ((equal "0" min-rest) "Now.")
-          ((equal "1" min-rest) (format "In %s minute." min-rest))
-          (t (format "In %s minutes." min-rest))))
-
-  (defun rr/show-appt-notification (min-to-app new-time appt-msg)
-    "Show notifications function."
-    (let ((mins-to-app (if (listp min-to-app)
-                           min-to-app
-                         (list min-to-app)))
-          (appt-msgs (if (listp appt-msg)
-                         appt-msg
-                       (list appt-msg))))
-      (let ((msgs (mapcar* #'cons appt-msgs mins-to-app)))
-        (dolist (msg msgs)
-          (let ((title (car msg))
-                (min-rest (cdr msg)))
-            (notifications-notify :title title
-                                  :timeout (if (equal min-rest "0") 0 -1)
-                                  :body (format "%s\n%s"
-                                                (rr/format-minutes min-rest)
-                                                new-time)))))))
-
-  ;; Update after emacs start
-  (add-hook 'after-init-hook #'rr/org-agenda-to-appt)
-
-  ;; Every day at 0:05
-  (run-at-time "0:05" (* 24 3600) #'rr/org-agenda-to-appt)
-
-  (add-hook 'after-save-hook
-            (lambda ()
-              (if (org-agenda-file-p (buffer-file-name))
-                  (rr/org-agenda-to-appt))))
-
-  (setq appt-disp-window-function #'rr/show-appt-notification)
-  (setq appt-delete-window-function (lambda () t))
-  (setq org-show-notification-handler #'notifications-notify))
-#+end_src
-*** Markdown export
-#+begin_src emacs-lisp
-(require 'ox-md nil t)
-(eval-after-load 'org
-  '(require 'ox-gfm nil t))
-#+end_src
-*** Confluence export
-#+begin_src emacs-lisp
-(require 'ox-confluence)
-#+end_src
-*** Slack export
-#+begin_src emacs-lisp
-(use-package ox-slack)
-#+end_src
-*** Org-mime
-#+begin_src emacs-lisp
-(use-package org-mime
-  :config
-  (define-key message-mode-map (kbd "C-c M-o") #'org-mime-htmlize)
-  (define-key org-mode-map (kbd "C-c M-o") #'org-mime-org-buffer-htmlize)
-
-  (add-hook 'org-mime-html-hook
-            (lambda ()
-              (org-mime-change-element-style
-               "pre" (format "color: %s; background-color: %s; padding: 0.5em;"
-                             "#DCDCCC" "#3F3F3F"))))
-
-  ;; the following can be used to nicely offset block quotes in email bodies
-  (add-hook 'org-mime-html-hook
-            (lambda ()
-              (org-mime-change-element-style
-               "blockquote" "border-left: 2px solid gray; padding-left: 4px;")))
-
-  (setq org-mime-export-options
-        '(:section-numbers nil :with-author nil :with-toc nil)))
-#+end_src
-*** LaTeX export
-#+begin_src emacs-lisp
-(require 'ox-latex)
-(setq org-latex-inputenc-alist '(("utf8" . "utf8x")))
-(setq org-latex-default-packages-alist
-      '(("AUTO" "inputenc"  t ("pdflatex"))
-        (""     "graphicx"  t)
-        (""     "grffile"   t)
-        (""     "longtable" nil)
-        (""     "wrapfig"   nil)
-        (""     "rotating"  nil)
-        ("normalem" "ulem"  t)
-        (""     "amsmath"   t)
-        (""     "textcomp"  t)
-        (""     "amssymb"   t)
-        (""     "capt-of"   nil)
-        (""     "hyperref"  nil)))
-(unless (boundp 'org-latex-classes)
-  (setq org-latex-classes nil))
-
-(add-to-list 'org-latex-classes
-             '("org-article"
-               "\\documentclass[11pt,a4paper]{article}
-\\usepackage[sfdefault]{noto}
-\\usepackage{sourcecodepro}
-\\usepackage[T2A]{fontenc}
-\\usepackage[english, russian]{babel}
-\\usepackage[hidelinks]{hyperref}
-\\usepackage{geometry}
-\\geometry{a4paper}
-\\geometry{left=2cm,right=1cm,top=1cm,bottom=1cm,includeheadfoot,headheight=1.2cm}"
-               ("\\section{%s}" . "\\section*{%s}")
-               ("\\subsection{%s}" . "\\subsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\paragraph{%s}" . "\\paragraph*{%s}")
-               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-
-(add-to-list 'org-latex-classes
-             '("org-article-en"
-               "\\documentclass[11pt,a4paper]{article}
-\\usepackage[default]{sourcesanspro}
-\\usepackage{sourcecodepro}
-\\usepackage[T1]{fontenc}
-\\usepackage[english]{babel}
-\\usepackage[hidelinks]{hyperref}
-\\usepackage{geometry}
-\\geometry{a4paper}
-\\geometry{left=2cm,right=1cm,top=1cm,bottom=1cm,includeheadfoot,headheight=1.2cm}"
-               ("\\section{%s}" . "\\section*{%s}")
-               ("\\subsection{%s}" . "\\subsection*{%s}")
-               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-               ("\\paragraph{%s}" . "\\paragraph*{%s}")
-               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-#+end_src
-*** Jira export
-#+begin_src emacs-lisp
-(use-package ox-jira
-  :config
-  (setq org-export-copy-to-kill-ring 'if-interactive))
-#+end_src
-*** Evaluate source code
-#+begin_src emacs-lisp
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((emacs-lisp . t)
-   (python . t)
-   (sql . t)
-   (shell . t)
-   (sqlite . t)
-   (haskell . t)
-   (clojure . t)
-   (ditaa . t)
-   (plantuml . t)))
-
-(setq org-confirm-babel-evaluate t
-      org-export-use-babel nil)
-
-(use-package ob-async)
-#+end_src
-*** Google calendar sync
-#+begin_src emacs-lisp
-(use-package org-gcal)
-#+end_src
-*** Edit program comments and strings using Org-mode
-#+begin_src emacs-lisp
-(use-package poporg)
 #+end_src
 ** Email
 *** Setup username and email address
@@ -3068,16 +3272,6 @@ Enable notifications when new email/news is received:
   (define-key origami-mode-map [C-tab] #'origami-recursively-toggle-node))
 #+end_src
 
-** ElDoc
-
-Show signature of function or describe symbol at point in minibuffer.
-
-#+begin_src emacs-lisp
-(use-package eldoc
-  :ensure nil
-  :config
-  (global-eldoc-mode))
-#+end_src
 ** Languages
 *** LSP mode
 **** Common setup
