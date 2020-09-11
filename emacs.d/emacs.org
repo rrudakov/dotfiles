@@ -1,6 +1,7 @@
 #+TITLE: My Emacs configuration
 #+AUTHOR: Roman Rudakov
 #+EMAIL: rrudakov@pm.me
+#+STARTUP: fold
 
 [[https://www.gnu.org/software/emacs/][https://img.shields.io/badge/GNU%20Emacs-27.1-b1.svg]]
 [[https://orgmode.org/][https://img.shields.io/badge/org--mode-9.3.8-elpalus.svg]]
@@ -1887,9 +1888,6 @@ The default keybinding is =C-h b=.
 #+end_src
 
 ** COMMENT Ivy
-:PROPERTIES:
-:VISIBILITY: folded
-:END:
 
 This section is not maintained. I keep it here just for history.
 
@@ -2099,70 +2097,67 @@ Org-mode can do almost everything:
 
 Org-mode has a lot of settings and it's possible to setup it any way you like.
 
-Below some settings for UI and common behavior.
+Below some settings for UI and common behavior. All the modifications are
+documented in the comment strings.
 
 #+begin_src emacs-lisp
-(add-hook 'org-mode-hook #'rr/set-margins)
+(use-package org
+  :config
+  ;; Set increased margins for all org mode buffers
+  (add-hook 'org-mode-hook #'rr/set-margins)
 
-;; Setup ui
-(setq org-adapt-indentation nil
-      org-eldoc-breadcrumb-separator " → "
-      org-ellipsis "…"
-      org-hide-leading-stars t
-      org-hide-leading-stars-before-indent-mode t
-      org-indent-mode-turns-on-hiding-stars t
-      org-list-description-max-indent 4
-      org-pretty-entities t
-      org-pretty-entities-include-sub-superscripts t
-      org-priority-faces '((?a . error) (?b . warning) (?c . success))
-      org-tags-column 0
-      org-startup-folded 'content
-      org-startup-indented nil
-      org-startup-shrink-all-tables t
-      org-edit-src-content-indentation 0
-      org-cycle-separator-lines 1
-      org-startup-with-inline-images nil
-      org-cycle-include-plain-lists t
-      org-hide-emphasis-markers nil
-      org-insert-heading-respect-content t
-      org-fontify-quote-and-verse-blocks t
-      org-fontify-done-headline t
-      org-fontify-whole-heading-line nil
-      ;; org-fontify-todo-headline t
-      org-src-fontify-natively t
-      org-image-actual-width 500
-      org-use-sub-superscripts '{})
+  ;; Setup ui
+  (setq org-adapt-indentation nil                                        ; Do not align content with headline level
+        org-eldoc-breadcrumb-separator " → "                             ; Headline levels separator for ElDoc mode
+        org-ellipsis "…"                                                 ; If headline has content and folded show this at the end of line
+        org-hide-leading-stars t                                         ; Hide leading stars for subheading
+        org-indent-mode-turns-on-hiding-stars t                          ; Enable hiding leading stars when `org-indent-mode' is active
+        org-priority-faces '((?a . error) (?b . warning) (?c . success)) ; Faces for priority indicators
+        org-tags-column 0                                                ; Place tags just after headline
+        org-startup-folded 'content                                      ; Show all heading and subheading folded on open org file
+        org-startup-indented nil                                         ; Disable `org-indent-mode' by default, I prefer to enable it file locally
+        org-startup-shrink-all-tables t                                  ; Makes tables more compact by default
+        org-edit-src-content-indentation 0                               ; Do not place additional indentation inside source blocks
+        org-cycle-separator-lines 1                                      ; How many empty lines should be between headings to keep it in folded mode
+        org-startup-with-inline-images nil                               ; Do not show images in org mode buffers by default
+        org-hide-emphasis-markers nil                                    ; Show emphasis markers in org mode buffers, otherwise it will lead to align problems
+        org-insert-heading-respect-content t                             ; Insert new headings after content and not after point
+        org-fontify-done-headline t                                      ; Add special face for the entire done heading and not only keyword
+        ;; org-fontify-todo-headline t
+        org-src-fontify-natively t                                       ; Enable native syntax highlighting inside source code block
+        org-image-actual-width 500                                       ; Limit maximum images width
+        org-use-sub-superscripts '{})                                    ; Do not treat symbols after "_" as subscripts on export
 
-(setq org-special-ctrl-a/e t
-      org-special-ctrl-k t
-      org-ctrl-k-protect-subtree t
-      org-imenu-depth 4
-      org-export-with-sub-superscripts nil
-      org-src-window-setup 'split-window-below
-      org-catch-invisible-edits 'show-and-error
-      org-return-follows-link t
-      ;; org-M-RET-may-split-line nil
-      org-list-use-circular-motion t
-      org-export-with-drawers t
-      org-export-with-properties t
-      org-reverse-note-order t
-      org-use-speed-commands t
-      org-enforce-todo-dependencies t
-      org-enforce-todo-checkbox-dependencies t)
+  (setq org-special-ctrl-a/e t                                           ; When you press `C-e' or `C-a' on heading navigation is more smart
+        org-special-ctrl-k t                                             ; Kill the headline with all content on `C-k'
+        org-ctrl-k-protect-subtree t                                     ; Protect from killing folded content
+        org-imenu-depth 4                                                ; Maximum allowed level of heading which will be present in `imenu'
+        org-export-with-sub-superscripts nil                             ; Avoid superscripts on export
+        org-src-window-setup 'split-window-below                         ; When you edit source code block, the edit window will appear below current one
+        org-catch-invisible-edits 'show-and-error                        ; If you try to edit folded or invisible area it will be unfolded and warning will be shown
+        org-return-follows-link t                                        ; Open links just by pressing ENTER
+        org-list-use-circular-motion t                                   ; Go through list levels circularly
+        org-export-with-drawers t                                        ; Export drawers along with content
+        org-export-with-properties t                                     ; Export properties along with content
+        org-reverse-note-order t                                         ; Put new notes below old
+        org-use-speed-commands t                                         ; Very useful setting, allow `org-speed-command'
+        org-enforce-todo-dependencies t                                  ; Do not allow moving heading to DONE if it has subheading in TODO status
+        org-enforce-todo-checkbox-dependencies t                         ; The same as above but for checkboxes
+        )
 
-(setq org-link-frame-setup
-      '((vm . vm-visit-folder-other-frame)
-        (vm-imap . vm-visit-imap-folder-other-frame)
-        (gnus . org-gnus-no-new-news)
-        (file . find-file)
-        (wl . wl-other-frame)))
+  ;; Open different kind of links different way
+  (setq org-link-frame-setup
+        '((vm . vm-visit-folder-other-frame)
+          (vm-imap . vm-visit-imap-folder-other-frame)
+          (gnus . org-gnus-no-new-news)
+          (file . find-file)
+          (wl . wl-other-frame)))
 
-(org-display-inline-images)
-(add-to-list 'org-modules 'org-habit)
-(add-to-list 'org-modules 'org-notify)
+  ;; Enable some modules
+  (add-to-list 'org-modules 'org-notify)  ; Add support for notifications
 
-(eval-after-load 'org
-  '(org-load-modules-maybe t))
+  (eval-after-load 'org
+    '(org-load-modules-maybe t)))
 #+end_src
 
 ** Effort estimates
@@ -2170,9 +2165,15 @@ Below some settings for UI and common behavior.
 It's possible to put estimation to the headline and then track time of the
 task.
 
+The following settings define default time grid for task estimations and
+columns for ~org-columns~ (this mode can be enabled by ~C-c C-x C-c~) with task
+name, estimated effort and actual clocking time.
+
 #+begin_src emacs-lisp
-(setq org-global-properties '(("Effort_ALL" . "0 0:30 1:00 2:00 4:00 6:00 8:00 16:00")))
-(setq org-columns-default-format "%40ITEM(Task) %17Effort(Estimated Effort){:} %CLOCKSUM")
+(use-package org
+  :config
+  (setq org-global-properties '(("Effort_ALL" . "0 0:30 1:00 2:00 4:00 6:00 8:00 16:00")))
+  (setq org-columns-default-format "%40ITEM(Task) %17Effort(Estimated Effort){:} %CLOCKSUM"))
 #+end_src
 
 ** Agenda settings
@@ -2180,87 +2181,113 @@ task.
 Setup files which should be used by ~agenda-mode~ and some tweaks for agenda.
 
 #+begin_src emacs-lisp
-(setq org-agenda-files (quote ("~/Org/tasks/bsc.org"
-                               "~/Org/tasks/epam.org"
-                               "~/Org/tasks/personal.org"
-                               "~/Org/tasks/index.org"
-                               "~/Org/tasks/libertyglobal.org"
-                               "~/Org-mobile/home.org")))
-(setq org-directory "~/Org")
-(setq org-agenda-restore-windows-after-quit t
-      org-agenda-compact-blocks t
-      org-agenda-archives-mode t
-      org-agenda-start-with-follow-mode nil
-      org-agenda-follow-indirect nil
-      org-agenda-show-log t
-      org-agenda-window-setup 'only-window
-      org-agenda-span 'week
-      org-agenda-todo-ignore-scheduled 'future
-      org-agenda-show-future-repeats 'next)
+(use-package org-agenda
+  :ensure nil
+  :after org
+  :config
+  ;; Set files which will be used for building agenda
+  (setq org-agenda-files (quote ("~/Org/tasks/index.org"
+                                 "~/Org/tasks/bsc.org"
+                                 "~/Org/tasks/epam.org"
+                                 "~/Org/tasks/personal.org"
+                                 "~/Org/tasks/libertyglobal.org"
+                                 "~/Org-mobile/home.org")))
+
+  ;; Default org directory, don't think this setting changes something for my
+  ;; setup
+  (setq org-directory "~/Org")
+
+  (setq org-agenda-restore-windows-after-quit t    ; Restore windows layout after quit agenda
+        org-agenda-archives-mode t                 ; Include archived items into agenda
+        org-agenda-start-with-clockreport-mode nil ; Do not activate `clockreport-mode' in agenda buffer
+        org-agenda-start-with-log-mode t           ; Activate `log-mode' in agenda buffers
+        org-agenda-window-setup 'only-window       ; Hide all other windows when open agenda
+        org-agenda-span 'week                      ; Start agenda for week interval
+        org-agenda-todo-ignore-scheduled 'future   ; Do not include future items to global TODO list
+        org-agenda-show-future-repeats 'next       ; Show only first next repeating task in the agenda
+        ))
 #+end_src
 
-** Capture settings
+** Org capture
+
+Very powerful feature of org-mode, but I don't use it too much. One useful
+thing here is capture links using emacs client. I bind ~make-capture-frame~
+function to OS hotkey, which creates new emacs frame with org capture buffer.
 
 #+begin_src emacs-lisp
-(setq org-default-notes-file (concat org-directory "/notes.org"))
+(use-package org
+  :config
+  ;; Default file for org captures
+  (setq org-default-notes-file (concat org-directory "/notes.org"))
 
-(setq org-capture-templates
-      '(("t" "Todo" entry (file+headline "~/Org/tasks/index.org" "Unsorted tasks")
-         "* TODO %?\n%i")
-        ("n" "Note" entry (file+headline "" "Notes")
-         "* TODO %?\n%i")
-        ("l" "Link" entry (file+headline "~/Org/links.org" "Links")
-         "* %? %^L \n%T"
-         :prepend t)))
+  ;; Define some custom capture templates
+  (setq org-capture-templates
+        '(("t" "Todo" entry (file+headline "~/Org/tasks/index.org" "Unsorted tasks")
+           "* TODO %?\n%i")
+          ("n" "Note" entry (file+headline "" "Notes")
+           "* TODO %?\n%i")
+          ("l" "Link" entry (file+headline "~/Org/links.org" "Links")
+           "* %? %^L \n%T"
+           :prepend t)))
 
-(setq org-refile-targets
-      (quote ((nil :maxlevel . 6)
-              (org-agenda-files :maxlevel . 6))))
+  ;; Set max sub-level for refile org headings
+  (setq org-refile-targets
+        (quote ((nil :maxlevel . 6)
+                (org-agenda-files :maxlevel . 6))))
 
-(defadvice org-capture-finalize (after delete-capture-frame activate)
-  "Advise capture-finalize to close the frame."
-  (if (equal "capture" (frame-parameter nil 'name))
-      (delete-frame)))
+  ;; The following was taken from one of Mike Zamansky videos
+  (defadvice org-capture-finalize (after delete-capture-frame activate)
+    "Advise capture-finalize to close the frame."
+    (if (equal "capture" (frame-parameter nil 'name))
+        (delete-frame)))
 
-(defadvice org-capture-destroy (after delete-capture-frame activate)
-  "Advise capture-destroy to close the frame."
-  (if (equal "capture" (frame-parameter nil 'name))
-    (delete-frame)))
+  (defadvice org-capture-destroy (after delete-capture-frame activate)
+    "Advise capture-destroy to close the frame."
+    (if (equal "capture" (frame-parameter nil 'name))
+        (delete-frame)))
 
-(defadvice org-capture-select-template (around delete-capture-frame activate)
-  "Advise org-capture-select-template to close the frame on abort."
-  (unless (ignore-errors ad-do-it t)
-    (setq ad-return-value "q"))
-  (if (and
-       (equal "q" ad-return-value)
-       (equal "capture" (frame-parameter nil 'name)))
-      (delete-frame)))
+  (defadvice org-capture-select-template (around delete-capture-frame activate)
+    "Advise org-capture-select-template to close the frame on abort."
+    (unless (ignore-errors ad-do-it t)
+      (setq ad-return-value "q"))
+    (if (and
+         (equal "q" ad-return-value)
+         (equal "capture" (frame-parameter nil 'name)))
+        (delete-frame)))
 
-(use-package noflet)
+  (use-package noflet)
 
-(defun make-capture-frame ()
-  "Create a new frame and run 'org-capture'."
-  (interactive)
-  (make-frame '((name . "capture")))
-  (select-frame-by-name "capture")
-  (delete-other-windows)
-  (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
-    (org-capture)))
+  (defun make-capture-frame ()
+    "Create a new frame and run 'org-capture'."
+    (interactive)
+    (make-frame '((name . "capture")))
+    (select-frame-by-name "capture")
+    (delete-other-windows)
+    (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
+      (org-capture))))
 #+end_src
 
 ** Tag list
 
+I use tags for working tasks. Here I define possible tags, but it's always
+possible to create new tags on the fly.
+
 #+begin_src emacs-lisp
-(setq org-tag-alist '(("@bug" . ?b) ("@task" . ?t) ("@story" . ?s)))
+(use-package org
+  :config
+  (setq org-tag-alist '(("@bug" . ?b) ("@task" . ?t) ("@story" . ?s))))
 #+end_src
 
 ** Keywords list
 
-Define my personal list of TODO keywords.
+Define my personal list of TODO keywords. Besides default I want to have some
+additional statuses of tasks.
 
 #+begin_src emacs-lisp
-(setq org-todo-keywords
-      '((sequence "TODO(t)" "PROGRESS(p)" "WAITING(w)" "REVIEW(r)" "|" "DONE(d)" "CANCELLED(c@)")))
+(use-package org
+  :config
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "PROGRESS(p)" "WAITING(w)" "REVIEW(r)" "|" "DONE(d)" "CANCELLED(c@)"))))
 #+end_src
 
 ** Mark task as DONE if all subtasks are DONE
@@ -2268,33 +2295,33 @@ Define my personal list of TODO keywords.
 Stolen from the org-mode documentation. Not sure whether it actually works.
 
 #+begin_src emacs-lisp
-(defun org-summary-todo (n-done n-not-done)
-  "Switch entry to DONE when all subentries are done, to TODO otherwise."
-  (let (org-log-done org-log-states)   ; turn off logging
-    (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+(use-package org
+  :config
+  (defun org-summary-todo (n-done n-not-done)
+    "Switch entry to DONE when all subentries are done, to TODO otherwise."
+    (let (org-log-done org-log-states)   ; turn off logging
+      (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 
-(add-hook 'org-after-todo-statistics-hook #'org-summary-todo)
+  (add-hook 'org-after-todo-statistics-hook #'org-summary-todo))
 #+end_src
 
 ** Custom keywords faces
 
 Maybe it's better to keep this in the [[*Appearance][appearance]] section, but so far I keep all
-org-mode related settings together.
+org-mode related settings together. I use colors directly from the color scheme.
 
 #+begin_src emacs-lisp
-;; Zenburn
-;; (setq org-todo-keyword-faces
-;;       '(("PROGRESS" . (:foreground "#93E0E3" :weight bold))
-;;         ("WAITING" . (:foreground "#DFAF8F" :weight bold))
-;;         ("REVIEW" . (:foreground "#DFAF8F" :weight bold))
-;;         ("CANCELLED" . (:foreground "#DCDCCC" :weight bold))))
-
-;; Modus vivendi
-(setq org-todo-keyword-faces
-      '(("PROGRESS" . (:foreground "#29aeff" :background "#110b11" :box "#3c3c3c"))
-        ("WAITING" . (:foreground "#eecc00" :background "#110b11" :box "#3c3c3c"))
-        ("REVIEW" . (:foreground "#eecc00" :background "#110b11" :box "#3c3c3c"))
-        ("CANCELLED" . (:foreground "#a8a8a8" :background "#110b11" :box "#3c3c3c"))))
+(use-package org-faces
+  :ensure nil
+  :after (org modus-vivendi-theme)
+  :config
+  ;; Modus vivendi
+  (modus-vivendi-theme-with-color-variables
+    (setq org-todo-keyword-faces
+          `(("PROGRESS" . (:inherit 'org-todo :foreground ,blue))
+            ("WAITING" . (:inherit 'org-todo :foreground ,yellow))
+            ("REVIEW" . (:inherit 'org-todo :foreground ,yellow))
+            ("CANCELLED" . (:inherit 'org-todo :foreground ,fg-alt))))))
 #+end_src
 
 ** Extra Org-mode export packages
@@ -2410,14 +2437,21 @@ description. Not perfect, some markup should be fixed after pasting.
 #+end_src
 
 ** Notifications
+
+To show notifications from the org mode I use built-in ~appt~ package along
+with ~notifications~. On some events (once a day, after saving org mode file
+which is part of agenda files, on startup) I save scheduled org mode entities
+of with set deadlines to appointment. 15 minutes before scheduled event OS
+notification will be shown.
+
 #+begin_src emacs-lisp
 (use-package appt
   :ensure nil
-  :after notifications
+  :after (notifications org)
   :config
   (appt-activate t)
-  (setq appt-message-warning-time 15) ;Show notification 15 minutes before event
-  (setq appt-display-mode-line nil)   ;Don't show anything in mode line
+  (setq appt-message-warning-time 15) ; Show notification 15 minutes before event
+  (setq appt-display-mode-line nil)   ; Don't show anything in mode line
 
   ;; Use appointment data from org-mode
   (defun rr/org-agenda-to-appt ()
@@ -2465,50 +2499,87 @@ description. Not perfect, some markup should be fixed after pasting.
   (setq org-show-notification-handler #'notifications-notify))
 #+end_src
 
-** Unset some keybindings
+** Unset conflicting keybindings
+
+This keybinding conflicts with ~eyebrowse~ default prefix and I don't use it in
+org-mode, so I unbind it.
+
 #+begin_src emacs-lisp
-(define-key orgtbl-mode-map (kbd "C-c C-w") nil)
+(use-package org-table
+  :ensure nil
+  :after org
+  :config
+  (define-key orgtbl-mode-map (kbd "C-c C-w") nil))
 #+end_src
 
-** Clock settings
+** Org clock
+
+I use org clocking a lot to track how much time I've spent on particular
+task. I don't set status of TODO headlines directly through ~org-todo~
+command.
+
+Short description of my flow:
+- I execute ~org-clock-in~ and the task moves to =PROGRESS= status
+  automatically.
+- When I execute ~org-clock-out~ I'm getting the prompt to which state should I
+  set the headline.
+- If I have clocking headline and I execute ~org-clock-in~ on another headline,
+  I'm getting the prompt to which status should I set the previously clocked
+  headline.
+
+I prefer to have persistent clocking between emacs sessions to not lose any
+statistics. Some settings described in the comment strings.
+
 #+begin_src emacs-lisp
-(setq org-clock-persist-file (expand-file-name "org-clock-save.el" rr-savefile-dir))
-(setq org-clock-persist t)
-(org-clock-persistence-insinuate)
-(setq org-log-into-drawer t)
-(setq org-log-done nil)
-(setq org-log-repeat nil)
-(setq org-log-redeadline 'time)
-(setq org-log-reschedule 'time)
-(setq org-clock-out-when-done t)
-(setq org-clock-in-resume t)
-(setq org-clock-out-remove-zero-time-clocks t)
-(setq org-clock-report-include-clocking-task t)
-(setq org-clock-persist-query-resume nil)
+(use-package org-clock
+  :ensure nil
+  :after org
+  :config
+  (setq org-clock-persist-file (expand-file-name "org-clock-save.el" rr-savefile-dir) ; Keep saved clock state in separate file
+        org-log-into-drawer t                                                         ; Put clocking information into drawers
+        org-log-done nil                                                              ; Do not add separate entry to log when task is done
+        org-log-repeat nil                                                            ; Keep org files clear and do not include extra logging
+        org-log-redeadline 'time                                                      ; Id deadline has changed write time for this event
+        org-log-reschedule 'time                                                      ; The same as above but for scheduled tasks
+        org-clock-out-when-done t                                                     ; Move to DONE on `org-clock-out'
+        org-clock-in-resume t                                                         ; If task has opened clock, resume clock from the last point
+        org-clock-out-remove-zero-time-clocks t                                       ; Remove clocking entries if duration less that 1 minute
+        org-clock-report-include-clocking-task t                                      ; Include currently clocked tasks to clock report
+        org-clock-persist-query-resume nil                                            ; Do not ask to restore clock on emacs startup
+        )
 
-(setq org-clock-in-switch-to-state "PROGRESS")
+  ;; Automatically move task to PROGRESS status on `org-clock-in'
+  (setq org-clock-in-switch-to-state "PROGRESS")
 
-(defvar non-clocking-states '("WAITING" "REVIEW" "DONE" "TODO" "CANCELLED")
-  "New state for current clocking task.")
+  (defvar non-clocking-states '("WAITING" "REVIEW" "DONE" "TODO" "CANCELLED")
+    "New state for current clocking task.")
 
-(defun rr/read-non-clocking-state ()
-  "Prompt to select non-clocking state."
-  (interactive)
-  (message "%s" (completing-read "Select state: " non-clocking-states)))
+  (defun rr/read-non-clocking-state ()
+    "Prompt to select non-clocking state."
+    (interactive)
+    (message "%s" (completing-read "Select state: " non-clocking-states)))
 
-(defun rr/after-clock-stop (last)
-  "Change TASK state after clock stop depends on LAST state."
-  (when (not (or (string-equal last "WAITING")
-                 (string-equal last "DONE")
-                 (string-equal last "REVIEW")
-                 (string-equal last "TODO")
-                 (string-equal last "CANCELED")))
-    (rr/read-non-clocking-state)))
+  (defun rr/after-clock-stop (last)
+    "Change TASK state after clock stop depends on LAST state."
+    (when (not (or (string-equal last "WAITING")
+                   (string-equal last "DONE")
+                   (string-equal last "REVIEW")
+                   (string-equal last "TODO")
+                   (string-equal last "CANCELED")))
+      (rr/read-non-clocking-state)))
 
-(setq org-clock-out-switch-to-state #'rr/after-clock-stop)
+  ;; On `org-clock-out' ask which status move the headline to
+  (setq org-clock-out-switch-to-state #'rr/after-clock-stop)
+
+  ;; Restore clock on emacs startup
+  (org-clock-persistence-insinuate))
 #+end_src
 
 ** Org-mime
+
+Convert org-mode buffer to nice looking HTML. On of the use cases is emails
+with HTML markup.
+
 #+begin_src emacs-lisp
 (use-package org-mime
   :config
@@ -2532,41 +2603,60 @@ description. Not perfect, some markup should be fixed after pasting.
 #+end_src
 
 ** Handle local file links by extension
+
+Open links to different type of files in the different way.
+
 #+begin_src emacs-lisp
-(setq org-file-apps
-      '((auto-mode . emacs)
-        ("\\.x?html\\'" . "firefox %s")
-        ("\\(?:xhtml\\|html\\)\\'" . "firefox %s")
-        ("\\.mm\\'" . default)
-        ("\\.pdf\\'" . default)))
+(use-package org
+  :config
+  (setq org-file-apps
+        '((auto-mode . emacs)
+          ("\\.x?html\\'" . "firefox %s")
+          ("\\(?:xhtml\\|html\\)\\'" . "firefox %s")
+          ("\\.mm\\'" . default)
+          ("\\.pdf\\'" . default))))
 #+end_src
 
 ** Evaluate source code
+
+As I mentioned before org mode is able to execute source code blocks and can be
+used for literate programming. Below I define which languages can be used for
+~org-babel~ package.
+
 #+begin_src emacs-lisp
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((emacs-lisp . t)
-   (python . t)
-   (sql . t)
-   (shell . t)
-   (sqlite . t)
-   (haskell . t)
-   (clojure . t)
-   (ditaa . t)
-   (plantuml . t)))
+(use-package ob-core
+  :ensure nil
+  :after org
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (python . t)
+     (sql . t)
+     (shell . t)
+     (sqlite . t)
+     (haskell . t)
+     (clojure . t)
+     (ditaa . t)
+     (plantuml . t)))
 
-(setq org-confirm-babel-evaluate t
-      org-export-use-babel nil)
+  (setq org-confirm-babel-evaluate t
+        org-export-use-babel nil))
+#+end_src
 
+Add support for asynchronous execution of source code blocks.
+
+#+begin_src emacs-lisp
 (use-package ob-async)
 #+end_src
 
-** Google calendar sync
-#+begin_src emacs-lisp
-(use-package org-gcal)
-#+end_src
+** Poporg
 
-** Edit program comments and strings using Org-mode
+Edit program comments and strings using Org-mode. I don't use it because I
+don't write a lot of docstrings and when I write it I forget about this
+package. But the idea is nice and probably one day I'm gonna use it more
+often.
+
 #+begin_src emacs-lisp
 (use-package poporg)
 #+end_src
