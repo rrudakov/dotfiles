@@ -2661,10 +2661,149 @@ often.
 (use-package poporg)
 #+end_src
 
+* Virtual workspace
+
+To simulate the workspace behavior I use [[https://depp.brause.cc/eyebrowse/][eyebrowse]] package. One good
+alternative which I also used to use is [[https://github.com/nex3/perspective-el][perspective.el]] but I found it to strict
+regarding buffer list per workspace. Another alternative is ~tab-line-mode~ or
+~tab-bar-mode~ which are included into emacs since version 27.1. The
+functionality is the same but tabs itself are space-consuming and I prefer to
+have small indicators in the mode line.
+
+The configuration is pretty straightforward and the package works well out of
+the box.
+
+#+begin_src emacs-lisp
+(use-package eyebrowse
+  :config
+  (setq eyebrowse-wrap-around t
+        eyebrowse-new-workspace t
+        eyebrowse-switch-back-and-forth t
+        eyebrowse-mode-line-style 'always)
+  (eyebrowse-mode t))
+#+end_src
+
+* Windows navigation
+
+I was looking for quick way to navigate between windows and found winum the
+best option for me. I've bound navigation to the =C-<number>= keybinding. Each
+window has indicator in the mode line with the number which should be used for
+navigation.
+
+#+begin_src emacs-lisp
+(use-package winum
+  :init
+  (setq winum-keymap
+        (let ((map (make-sparse-keymap)))
+          (define-key map (kbd "C-`") #'winum-select-window-by-number)
+          (define-key map (kbd "C-²") #'winum-select-window-by-number)
+          (define-key map (kbd "M-0") #'winum-select-window-0-or-10)
+          (define-key map (kbd "M-1") #'winum-select-window-1)
+          (define-key map (kbd "M-2") #'winum-select-window-2)
+          (define-key map (kbd "M-3") #'winum-select-window-3)
+          (define-key map (kbd "M-4") #'winum-select-window-4)
+          (define-key map (kbd "M-5") #'winum-select-window-5)
+          (define-key map (kbd "M-6") #'winum-select-window-6)
+          (define-key map (kbd "M-7") #'winum-select-window-7)
+          (define-key map (kbd "M-8") #'winum-select-window-8)
+          map))
+  :config
+  (setq winum-auto-setup-mode-line t
+        winum-ignored-buffers '(" *which-key*"))
+  (winum-mode))
+#+end_src
+
+* Version control
+
+Emacs has built-in support for various version control systems by means of
+~vc-mode~. Some third-party packages relies on this mode and some don't. This
+section contains all the packages related to work with version control systems
+inside of emacs.
+
+** Magit
+
+I used to use only command line interface for git. Not I use only magit. It has
+everything I need for work with git. Here is not too much customization because
+default behavior fit perfectly into my needs.
+
+#+begin_src emacs-lisp
+(use-package magit
+  :config
+  (global-set-key (kbd "C-x g") #'magit-status)
+  (setq magit-revision-use-hash-sections 'quick
+        magit-pull-or-fetch t)
+
+  (global-magit-file-mode)
+  (add-hook 'magit-post-refresh-hook #'rr/refresh-vc-state 5))
+#+end_src
+
+The settings below for the diff buffers produced by Magit. By default it
+doesn't highlight changes inside the line. It's still in testing for me,
+probably I won't like it and disable in the future.
+
+#+begin_src emacs-lisp
+(use-package magit-diff
+  :ensure nil
+  :after magit
+  :config
+  (setq magit-diff-refine-hunk t))
+#+end_src
+
+** Transient
+
+This package used to be part of Magit package, but now it's moved to separate
+package. It provides pop-up menu to execute commands with single keypress and
+support some additional options.
+
+#+begin_src emacs-lisp
+(use-package transient
+  :config
+  (setq transient-show-popup 1))
+#+end_src
+
+** Forges
+
+Very interesting package, which adds support work with git forges (like GitHub,
+Gitlab etc.). Actually this package supports good only GitHub and Gitlab, I use
+Bitbucket at work so I don't have a chance to estimate full power of this
+package, but looks impressive.
+
+#+begin_src emacs-lisp
+(use-package forge)
+#+end_src
+
+** Diff highlight
+
+Highlights uncommitted changes on the side of the window (using the fringe, by
+default), allows you to jump between the hunks and revert them selectively.
+
+#+begin_src emacs-lisp
+(use-package diff-hl
+  :init
+  (global-diff-hl-mode)
+  :config
+  (setq diff-hl-draw-borders nil
+        diff-hl-side 'right)
+  (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh 3))
+#+end_src
+
+** Magit TODOs
+
+Show TODO items from the entire repo in magit buffer.
+
+#+begin_src emacs-lisp
+(use-package magit-todos
+  :config
+  (add-hook 'prog-mode-hook #'magit-todos-mode))
+#+end_src
+
 * Configuration
 
 ** SQL
+
 *** COMMENT Emacs clojure database client
+
 #+begin_src emacs-lisp
 (use-package ejc-sql
   :config
@@ -2685,20 +2824,26 @@ often.
   (when (require 'databases nil t)
     (rr/setup-connections)))
 #+end_src
+
 *** Tweaks for sql-mode and sql-indent package
+
 #+begin_src emacs-lisp
 (use-package sql-indent
   :config
   (setq sql-use-indent-support t)
   (add-hook 'sql-mode-hook #'sqlind-minor-mode))
 #+end_src
+
 *** Make PostgreSQL default
+
 #+begin_src emacs-lisp
 (eval-after-load "sql"
   '(progn
      (sql-set-product 'postgres)))
 #+end_src
+
 *** Disable line breaking
+
 #+begin_src emacs-lisp
 (add-hook 'sql-interactive-mode-hook
           (lambda ()
@@ -2706,6 +2851,7 @@ often.
 #+end_src
 
 ** YASnippet
+
 #+begin_src emacs-lisp
 (use-package yasnippet
   :config
@@ -2783,45 +2929,14 @@ often.
   (smartparens-global-strict-mode t)
   (show-smartparens-global-mode t))
 #+end_src
-** Workspaces
-#+begin_src emacs-lisp
-(use-package eyebrowse
-  :config
-  (setq eyebrowse-wrap-around t
-        eyebrowse-new-workspace t
-        eyebrowse-switch-back-and-forth t
-        eyebrowse-mode-line-style 'always)
-  (eyebrowse-mode t))
-#+end_src
+
 ** Rainbow delimiters
 #+begin_src emacs-lisp
 (use-package rainbow-delimiters
   :config
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 #+end_src
-** Windows navigation
-#+begin_src emacs-lisp
-(use-package winum
-  :init
-  (setq winum-keymap
-        (let ((map (make-sparse-keymap)))
-          (define-key map (kbd "C-`") #'winum-select-window-by-number)
-          (define-key map (kbd "C-²") #'winum-select-window-by-number)
-          (define-key map (kbd "M-0") #'winum-select-window-0-or-10)
-          (define-key map (kbd "M-1") #'winum-select-window-1)
-          (define-key map (kbd "M-2") #'winum-select-window-2)
-          (define-key map (kbd "M-3") #'winum-select-window-3)
-          (define-key map (kbd "M-4") #'winum-select-window-4)
-          (define-key map (kbd "M-5") #'winum-select-window-5)
-          (define-key map (kbd "M-6") #'winum-select-window-6)
-          (define-key map (kbd "M-7") #'winum-select-window-7)
-          (define-key map (kbd "M-8") #'winum-select-window-8)
-          map))
-  :config
-  (setq winum-auto-setup-mode-line t
-        winum-ignored-buffers '(" *which-key*"))
-  (winum-mode))
-#+end_src
+
 ** Smartscan
 #+begin_src emacs-lisp
 (use-package smartscan
@@ -2829,11 +2944,13 @@ often.
   (setq smartscan-symbol-selector "symbol")
   (add-hook 'prog-mode-hook #'smartscan-mode))
 #+end_src
+
 ** PKGBUILD major mode
 #+begin_src emacs-lisp
 (use-package pkgbuild-mode
   :mode "/PKGBUILD$")
 #+end_src
+
 ** Projectile
 *** Basic setup
 #+begin_src emacs-lisp
@@ -2863,12 +2980,14 @@ often.
   :config
   (counsel-projectile-mode))
 #+end_src
+
 ** Htmlize
 #+begin_src emacs-lisp
 (use-package htmlize
   :config
   (setq org-html-htmlize-output-type 'inline-css))
 #+end_src
+
 ** Syntax check
 *** Flycheck
 #+begin_src emacs-lisp
@@ -2894,71 +3013,14 @@ And disable flymake autoload:
     (setq flycheck-posframe-border-width 1)
     (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)))
 #+end_src
+
 ** Highlight TODO item
 #+begin_src emacs-lisp
 (use-package hl-todo
   :config
   (global-hl-todo-mode))
 #+end_src
-** Version control
-*** GIT
-#+begin_src emacs-lisp
-(use-package magit
-  :config
-  (global-set-key (kbd "C-x g") #'magit-status)
-  (setq magit-revision-insert-related-refs 'all
-        magit-revision-use-hash-sections 'quick
-        magit-diff-refine-hunk nil
-        magit-pull-or-fetch t)
 
-  (global-magit-file-mode)
-  (add-hook 'magit-post-refresh-hook #'rr/refresh-vc-state 5))
-#+end_src
-
-The settings below for the diff buffers produced by Magit. By default it
-doesn't highlight changes inside the line.
-
-#+begin_src emacs-lisp
-(use-package magit-diff
-  :ensure nil
-  :after magit
-  :config
-  (setq magit-diff-refine-hunk t))
-#+end_src
-*** Transient
-#+begin_src emacs-lisp
-(use-package transient
-  :config
-  (setq transient-show-popup t))
-#+end_src
-*** Work with forges
-#+begin_src emacs-lisp
-(use-package forge
-  :config
-  (add-to-list 'forge-alist
-               '("git.eoadm.com" "git.eoadm.com/api/v4"
-                 "git.eoadm.com" forge-gitlab-repository))
-  (add-to-list 'forge-alist
-               '("178.62.208.194" "178.62.208.194/api/v4"
-                 "178.62.208.194" forge-gitlab-repository)))
-#+end_src
-*** Diff highlight
-#+begin_src emacs-lisp
-(use-package diff-hl
-  :init
-  (global-diff-hl-mode)
-  :config
-  (setq diff-hl-draw-borders nil
-        diff-hl-side 'right)
-  (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh 3))
-#+end_src
-*** Show TODO items in magit buffer
-#+begin_src emacs-lisp
-(use-package magit-todos
-  :config
-  (add-hook 'prog-mode-hook #'magit-todos-mode))
-#+end_src
 ** Multiple cursors
 #+begin_src emacs-lisp
 (use-package multiple-cursors
@@ -2969,12 +3031,14 @@ doesn't highlight changes inside the line.
    ("C-c C-<" . mc/mark-all-like-this)
    ("C-c d" . mc/skip-to-next-like-this)))
 #+end_src
+
 ** Expand region
 #+begin_src emacs-lisp
 (use-package expand-region
   :bind
   (("C-=" . er/expand-region)))
 #+end_src
+
 ** Search and grep utilities
 #+begin_src emacs-lisp
 (use-package wgrep
@@ -3000,6 +3064,7 @@ doesn't highlight changes inside the line.
         rg-default-alias-fallback "all")
   (rg-enable-default-bindings))
 #+end_src
+
 ** Terminal emulator
 #+begin_src emacs-lisp
 (use-package sane-term
@@ -3018,6 +3083,7 @@ doesn't highlight changes inside the line.
          (yank)
          (term-char-mode))))))
 #+end_src
+
 ** Rainbow mode
 #+BEGIN_QUOTE
 Colorize color names in buffers
@@ -3029,11 +3095,13 @@ Colorize color names in buffers
   (add-to-list 'rainbow-x-colors-major-mode-list #'python-mode)
   (add-to-list 'rainbow-x-colors-major-mode-list #'emacs-lisp-mode))
 #+end_src
+
 ** CSV
 Major mode for work with CSV files
 #+begin_src emacs-lisp
 (use-package csv-mode)
 #+end_src
+
 ** Log files
 #+begin_src emacs-lisp
 (use-package vlf
@@ -3052,10 +3120,12 @@ Major mode for work with CSV files
   (setq logview-additional-submodes
         '(("Python" (format . "TIMESTAMP LEVEL - [NAME]:") (levels . "Python")))))
 #+end_src
+
 ** Nginx
 #+begin_src emacs-lisp
 (use-package nginx-mode)
 #+end_src
+
 ** SSH config mode
 #+begin_src emacs-lisp
 (use-package ssh-config-mode
@@ -3064,6 +3134,7 @@ Major mode for work with CSV files
   :config
   (autoload 'ssh-config-mode "ssh-config-mode" t))
 #+end_src
+
 ** REST client
 Quite interesting package. I think it will replace for Postman for me.
 #+begin_src emacs-lisp
@@ -3083,16 +3154,19 @@ And even org-babel integration:
    'org-babel-load-languages
    '((restclient . t))))
 #+end_src
+
 ** PDF tools
 #+begin_src emacs-lisp
 (use-package pdf-tools
   :config
   (pdf-tools-install))
 #+end_src
+
 ** Gitignore templates
 #+begin_src emacs-lisp
 (use-package gitignore-templates)
 #+end_src
+
 ** Regexps
 Build in regex package:
 #+begin_src emacs-lisp
@@ -3102,6 +3176,7 @@ Build in regex package:
   (setq reb-re-syntax 'read)
   (global-set-key (kbd "C-c R") #'re-builder))
 #+end_src
+
 ** Password store
 #+begin_src emacs-lisp
 (use-package password-store
@@ -3115,6 +3190,7 @@ Build in regex package:
 (use-package helm-pass)
 ;; (use-package ivy-pass)
 #+end_src
+
 ** Markdown mode
 #+begin_src emacs-lisp
 (use-package markdown-mode
@@ -3125,10 +3201,12 @@ Build in regex package:
   (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
   (add-hook 'markdown-mode-hook #'rr/set-margins))
 #+end_src
+
 ** Edit region in indirect buffer
 #+begin_src emacs-lisp
 (use-package edit-indirect)
 #+end_src
+
 ** Email
 *** Setup username and email address
 #+begin_src emacs-lisp
@@ -3323,6 +3401,7 @@ Enable notifications when new email/news is received:
   (setq gnus-notifications-use-google-contacts nil)
   (add-hook 'gnus-after-getting-new-news-hook 'gnus-notifications))
 #+end_src
+
 ** Google translate interface
 #+begin_src emacs-lisp
 (use-package google-translate-default-ui
@@ -3330,6 +3409,7 @@ Enable notifications when new email/news is received:
   :config
   (setq google-translate-pop-up-buffer-set-focus t))
 #+end_src
+
 ** Auto set indentation settings
 #+begin_src emacs-lisp
 (use-package dtrt-indent
@@ -3337,6 +3417,7 @@ Enable notifications when new email/news is received:
   (setq dtrt-indent-verbosity 0)
   (add-hook 'prog-mode-hook #'dtrt-indent-mode))
 #+end_src
+
 ** XML
 *** Common settings
 #+begin_src emacs-lisp
@@ -3348,12 +3429,14 @@ Enable notifications when new email/news is received:
   :demand t
   :after nxml-mode)
 #+end_src
+
 ** NIX
 *** Edit .nix configuration files
 #+begin_src emacs-lisp
 (use-package nix-mode
   :mode "\\.nix\\'")
 #+end_src
+
 ** Code folding
 #+begin_src emacs-lisp
 (use-package origami
@@ -3894,6 +3977,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+begin_src emacs-lisp
 (use-package protobuf-mode)
 #+end_src
+
 ** Kubernetes
 *** Major mode for kubernetes configs
 #+begin_src emacs-lisp
@@ -3907,10 +3991,12 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 (use-package kubernetes
   :commands (kubernetes-overview))
 #+end_src
+
 ** Dockerfile mode
 #+begin_src emacs-lisp
 (use-package dockerfile-mode)
 #+end_src
+
 ** IRC Client for emacs (ERC)
 #+begin_src emacs-lisp
 (use-package erc
@@ -3926,6 +4012,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
   (setq erc-autojoin-channels-alist
         '(("irc.gitter.im" "#emacs-lsp/lsp-mode"))))
 #+end_src
+
 ** Emacs everywhere
 #+begin_src emacs-lisp
 (defun pull-request-conversation-p (window-title)
@@ -3942,10 +4029,12 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 
 (add-hook 'ea-popup-hook 'popup-handler)
 #+end_src
+
 ** Create GIF screencasts
 #+begin_src emacs-lisp
 (use-package gif-screencast)
 #+end_src
+
 ** Funny
 *** Speed type
 #+begin_src emacs-lisp
@@ -3955,6 +4044,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+begin_src emacs-lisp
 (use-package literate-calc-mode)
 #+end_src
+
 ** Set keybindings
 *** Common
 #+begin_src emacs-lisp
