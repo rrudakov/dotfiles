@@ -80,17 +80,6 @@ key press.
 | ~F~       | Follow mode (corresponding headlines will be shown in the separate buffer)           |
 | ~<space>~ | Open org-mode file with corresponding headline in the separate buffer                |
 
-** Terminal
-
-I don't use ~ansi-term~ anymore or any packages which provide some terminal
-emulator inside emacs. Currently I have setup [[*Terminal emulator][sane-term]] package. Maybe I'll
-consider [[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] when it's stable.
-
-| Keybinding | Description                                                                                       |
-|------------+---------------------------------------------------------------------------------------------------|
-| ~C-c C-j~  | Switch to ~term-line-mode~, which you can then treat like a normal emacs buffer (move, yank etc.) |
-| ~C-c C-k~  | Return to ~term-char-mode~, which will act like a traditional ~ansi-term~                         |
-
 ** Highlight text in buffer (hi-lock-mode)
 
 This is useful when you want to highlight some parts of long text with
@@ -737,7 +726,9 @@ sometimes lead to unpredictable behavior.
             "Python.*?"
             "grep"
             "lsp-help"
-            "compilation"
+            "compilation"               ;
+            "Calendar"
+            "Org\sSelect"
             ".*?\sserver\slog"
             "Completions"
             "Compile-Log"
@@ -802,10 +793,11 @@ bottom of the frame.")
          (preserve-size . (nil . t))
          ,parameters)
         ;; Org mode
-        ("\\*Org\sSrc.*\\*"
-         (display-buffer-reuse-mode-window)
-         (direction . rightmost)
-         (window-width . 0.5))
+        ;; ("\\*Org\sSrc.*\\*"
+        ;;  (display-buffer-reuse-mode-window
+        ;;   display-buffer-in-direction)
+        ;;  (direction . rightmost)
+        ;;  (window-width . 0.5))
         ;; Helm
         (,#'helm-buffer-p
          (display-buffer-in-direction)
@@ -841,8 +833,8 @@ bottom of the frame.")
          (direction . rightmost)
          (window-width . 0.5))))
 
-(setq window-combination-resize t
-      switch-to-buffer-in-dedicated-window 'pop)
+(setq window-combination-resize nil
+      switch-to-buffer-in-dedicated-window nil)
 #+end_src
 
 ** Auth sources
@@ -1252,7 +1244,11 @@ Do not split windows from top to bottom unless I do it explicitly. Always
 prefer side by side splitting.
 
 #+begin_src emacs-lisp
-(setq split-window-preferred-function #'split-window-prefer-side-by-side)
+;; (setq split-window-preferred-function #'split-window-prefer-side-by-side)
+(setq display-buffer-reuse-frames t
+      split-height-threshold 80
+      split-width-threshold 160)
+(setq split-window-preferred-function #'split-window-sensibly)
 #+end_src
 
 ** Minibuffer
@@ -1521,6 +1517,19 @@ strings but not in the rest of source code.
   (add-hook 'prog-mode-hook #'flyspell-prog-mode))
 #+end_src
 
+** Regexps
+
+Built-in regex package. I don't use regex too much so I don't really need some
+powerful packages like =visual-regex= or something like this.
+
+#+begin_src emacs-lisp
+(use-package re-builder
+  :ensure nil
+  :config
+  (setq reb-re-syntax 'read)
+  (global-set-key (kbd "C-c R") #'re-builder))
+#+end_src
+
 * Appearance
 
 All tweaks for emacs look & feel. Color themes fonts modeline etc.
@@ -1625,6 +1634,7 @@ customization, very actively maintained.
   :init
   (setq modus-vivendi-theme-bold-constructs t
         modus-vivendi-theme-slanted-constructs nil
+        modus-vivendi-theme-faint-syntax nil
         modus-vivendi-theme-org-blocks 'greyscale
         modus-vivendi-theme-proportional-fonts nil)
   :config
@@ -1638,13 +1648,12 @@ customization, very actively maintained.
   (advice-add #'load-theme :after #'run-after-load-theme-hook)
 
   (defun rr/customize-modus-vivendi-theme ()
-    (message "Run customizaitons")
     (when (member 'modus-vivendi custom-enabled-themes)
       (modus-vivendi-theme-with-color-variables
-        (custom-theme-set-faces
-         'user
-         `(org-agenda-clocking ((((class color) (min-colors 89)) (:inherit modus-theme-special-cold :extend t))))
-         `(org-headline-done ((t (:foreground ,fg-alt :strike-through t))))))))
+        ;; (set-face-attribute 'org-agenda-date-today nil :extend t)
+        ;; (set-face-attribute 'org-agenda-clocking nil :extend t)
+        ;; (set-face-attribute 'org-agenda-dimmed-todo-face nil :extend t)
+        )))
 
   (add-hook 'after-load-theme-hook #'rr/customize-modus-vivendi-theme)
 
@@ -1655,7 +1664,50 @@ customization, very actively maintained.
 
   (if (daemonp)
       (add-hook 'server-after-make-frame-hook #'rr/apply-modus-theme)
-    (load-theme 'modus-vivendi t)))
+    (rr/apply-modus-theme)))
+#+end_src
+
+*** COMMENT Modus operandi
+
+Currently used. My favorite one and the most consistent. A lot of built-in
+customization, very actively maintained.
+
+#+begin_src emacs-lisp
+(use-package modus-operandi-theme
+  :init
+  (setq modus-operandi-theme-bold-constructs t
+        modus-operandi-theme-slanted-constructs nil
+        modus-operandi-theme-faint-syntax nil
+        modus-operandi-theme-org-blocks 'greyscale
+        modus-operandi-theme-proportional-fonts nil)
+  :config
+  (defvar after-load-theme-hook nil
+    "Hook run after a color theme is loaded using `load-theme'.")
+
+  (defun run-after-load-theme-hook (&rest _)
+    "Run `after-load-theme-hook'."
+    (run-hooks 'after-load-theme-hook))
+
+  (advice-add #'load-theme :after #'run-after-load-theme-hook)
+
+  (defun rr/customize-modus-operandi-theme ()
+    (when (member 'modus-operandi custom-enabled-themes)
+      (modus-operandi-theme-with-color-variables
+        (custom-theme-set-faces
+         'user
+         `(org-agenda-clocking ((((class color) (min-colors 89)) (:inherit modus-theme-special-cold :extend t))))
+         `(org-headline-done ((t (:foreground ,fg-alt :strike-through t))))))))
+
+  (add-hook 'after-load-theme-hook #'rr/customize-modus-operandi-theme)
+
+  (defun rr/apply-modus-theme ()
+    "Apply custom theme."
+    (load-theme 'modus-operandi t)
+    (remove-hook 'server-after-make-frame-hook #'rr/apply-modus-theme))
+
+  (if (daemonp)
+      (add-hook 'server-after-make-frame-hook #'rr/apply-modus-theme)
+    (rr/apply-modus-theme)))
 #+end_src
 
 ** Modeline
@@ -1993,10 +2045,7 @@ mode (because I use tab completion for shell).
 (use-package company
   :config
   (setq company-global-modes '(not org-mode markdown-mode shell-mode))
-  (setq company-tooltip-align-annotations t
-        company-idle-delay 0.1
-        company-require-match nil
-        company-abort-manual-when-too-short t)
+  (setq company-tooltip-align-annotations t)
 
   (global-company-mode))
 #+end_src
@@ -2120,13 +2169,16 @@ documented in the comment strings.
         org-edit-src-content-indentation 0                               ; Do not place additional indentation inside source blocks
         org-cycle-separator-lines 1                                      ; How many empty lines should be between headings to keep it in folded mode
         org-startup-with-inline-images nil                               ; Do not show images in org mode buffers by default
+        org-display-remote-inline-images nil                             ; Do not download remote images
         org-hide-emphasis-markers nil                                    ; Show emphasis markers in org mode buffers, otherwise it will lead to align problems
         org-insert-heading-respect-content t                             ; Insert new headings after content and not after point
         org-fontify-done-headline t                                      ; Add special face for the entire done heading and not only keyword
-        ;; org-fontify-todo-headline t
+        org-fontify-todo-headline t                                      ; Add special face for the entire todo heading and not only keyword
         org-src-fontify-natively t                                       ; Enable native syntax highlighting inside source code block
         org-image-actual-width 500                                       ; Limit maximum images width
-        org-use-sub-superscripts '{})                                    ; Do not treat symbols after "_" as subscripts on export
+        org-use-sub-superscripts '{}                                     ; Do not treat symbols after "_" as subscripts on export
+        org-archive-subtree-save-file-p t                                ; Save archive file automatically after archive subtree is done
+        org-table-header-line-p nil)                                     ; Do not activate `org-table-header-line-mode' by default
 
   (setq org-special-ctrl-a/e t                                           ; When you press `C-e' or `C-a' on heading navigation is more smart
         org-special-ctrl-k t                                             ; Kill the headline with all content on `C-k'
@@ -2144,6 +2196,9 @@ documented in the comment strings.
         org-enforce-todo-dependencies t                                  ; Do not allow moving heading to DONE if it has subheading in TODO status
         org-enforce-todo-checkbox-dependencies t                         ; The same as above but for checkboxes
         )
+
+  ;; Fix face for org-priority cookie
+  (setq org-priority-regexp ".*?\\(\\[#\\([A-Z0-9]+\\)\\]\\) ?")
 
   ;; Open different kind of links different way
   (setq org-link-frame-setup
@@ -2546,6 +2601,7 @@ statistics. Some settings described in the comment strings.
         org-clock-out-remove-zero-time-clocks t                                       ; Remove clocking entries if duration less that 1 minute
         org-clock-report-include-clocking-task t                                      ; Include currently clocked tasks to clock report
         org-clock-persist-query-resume nil                                            ; Do not ask to restore clock on emacs startup
+        org-clock-persist t                                                           ; Restore clock after restart emacs
         )
 
   ;; Automatically move task to PROGRESS status on `org-clock-in'
@@ -2798,93 +2854,84 @@ Show TODO items from the entire repo in magit buffer.
   (add-hook 'prog-mode-hook #'magit-todos-mode))
 #+end_src
 
-* Configuration
+** Gitignore templates
 
-** SQL
-
-*** COMMENT Emacs clojure database client
+Insert template for =.gitignore= file at point.
 
 #+begin_src emacs-lisp
-(use-package ejc-sql
+(use-package gitignore-templates)
+#+end_src
+
+* Projects management
+
+To manage projects in emacs I use projectile. It allows to perform many project
+specific operations:
+- Search inside project
+- Run some commands in the root of project
+- Build/test/compile project
+- Open shell/eshell/terminal for current project
+- switch between projects
+- And many more...
+
+Since version 27.1 emacs has built-in ~project.el~ module which is probably a
+replacement for projectile, but I think projectile is more powerful and fit
+perfectly into my needs.
+
+** Projectile
+
+Basic settings for =projectile=. It used to have prefix key =C-c p= by default
+but now it has =C-c C-p= which conflicts with some bindings for other modes, so
+I've changed prefix to the old value.
+
+#+begin_src emacs-lisp
+(use-package projectile
+  :init
+  (setq projectile-keymap-prefix (kbd "C-c p"))
   :config
-  (defun rr/ejc-sql-connected-hook ()
-    (ejc-set-rows-limit 500)
-    (ejc-set-column-width-limit nil))
-
-  (add-hook 'ejc-sql-connected-hook #'rr/ejc-sql-connected-hook)
-
-  (setq ejc-org-mode-show-results nil)
-
-  (add-hook 'ejc-sql-minor-mode-hook
-            (lambda ()
-              (auto-complete-mode t)
-              (ejc-ac-setup)))
-
-  ;; Define connections
-  (when (require 'databases nil t)
-    (rr/setup-connections)))
+  (setq projectile-completion-system 'helm
+        ;; projectile-completion-system 'ivy
+        projectile-sort-order 'recently-active
+        projectile-mode-line-function (lambda ()
+                                        (format " Proj[%s]" (projectile-project-name))))
+  (add-to-list 'projectile-globally-ignored-files "*.log")
+  (projectile-mode +1))
 #+end_src
 
-*** Tweaks for sql-mode and sql-indent package
+** Helm projectile
+
+Nice addition to default projectile package. This package introduces some
+useful commands which use helm interface for search and navigation.
 
 #+begin_src emacs-lisp
-(use-package sql-indent
+(use-package helm-projectile
   :config
-  (setq sql-use-indent-support t)
-  (add-hook 'sql-mode-hook #'sqlind-minor-mode))
+  (setq projectile-switch-project-action #'helm-projectile)
+  (setq helm-projectile-truncate-lines t)
+  (helm-projectile-on))
 #+end_src
 
-*** Make PostgreSQL default
+** COMMENT Counsel projectile
+
+In case I will ever switch to ivy/swiper/counsel here is an alternative to
+=helm-projectile= which uses ivy interface. Less powerful but still better than
+default one.
 
 #+begin_src emacs-lisp
-(eval-after-load "sql"
-  '(progn
-     (sql-set-product 'postgres)))
-#+end_src
-
-*** Disable line breaking
-
-#+begin_src emacs-lisp
-(add-hook 'sql-interactive-mode-hook
-          (lambda ()
-            (toggle-truncate-lines t)))
-#+end_src
-
-** YASnippet
-
-#+begin_src emacs-lisp
-(use-package yasnippet
+(use-package counsel-projectile
   :config
-  (setq yas-indent-line 'fixed
-        yas-inhibit-overlay-modification-protection t)
-
-  (add-hook 'prog-mode-hook #'yas-minor-mode))
+  (counsel-projectile-mode))
 #+end_src
 
-** Auto completion
-*** Languages
-**** LaTeX
-#+begin_src emacs-lisp
-(use-package company-auctex
-  :config
-  (company-auctex-init))
-#+end_src
-**** WEB
-#+begin_src emacs-lisp
-(use-package company-web
-  :config
-  (add-to-list 'company-backends #'company-web-html)
-  (add-to-list 'company-backends #'company-web-jade)
-  (add-to-list 'company-backends #'company-web-slim))
-#+end_src
-**** Shell
-#+begin_src emacs-lisp
-(use-package company-shell
-  :config
-  (add-to-list 'company-backends #'company-shell))
-#+end_src
+* Work with text and navigation inside buffer
+
+Here I'll keep useful packages which not related to programming modes directly
+and can be helpful when you need to edit and navigate inside buffer.
 
 ** Smartparens
+
+Keep the parenthesis balanced. This is applicable mostly to programming modes
+but still can be used with plain text.
+
 #+begin_src emacs-lisp
 (use-package smartparens-config
   :ensure smartparens
@@ -2930,98 +2977,12 @@ Show TODO items from the entire repo in magit buffer.
   (show-smartparens-global-mode t))
 #+end_src
 
-** Rainbow delimiters
-#+begin_src emacs-lisp
-(use-package rainbow-delimiters
-  :config
-  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
-#+end_src
-
-** Smartscan
-#+begin_src emacs-lisp
-(use-package smartscan
-  :config
-  (setq smartscan-symbol-selector "symbol")
-  (add-hook 'prog-mode-hook #'smartscan-mode))
-#+end_src
-
-** PKGBUILD major mode
-#+begin_src emacs-lisp
-(use-package pkgbuild-mode
-  :mode "/PKGBUILD$")
-#+end_src
-
-** Projectile
-*** Basic setup
-#+begin_src emacs-lisp
-(use-package projectile
-  :init
-  (setq projectile-keymap-prefix (kbd "C-c p"))
-  :config
-  (setq projectile-completion-system 'helm
-        ;; projectile-completion-system 'ivy
-        projectile-sort-order 'recently-active
-        projectile-mode-line-function (lambda ()
-                                        (format " Proj[%s]" (projectile-project-name))))
-  (add-to-list 'projectile-globally-ignored-files "*.log")
-  (projectile-mode +1))
-#+end_src
-*** Helm projectile
-#+begin_src emacs-lisp
-(use-package helm-projectile
-  :config
-  (setq projectile-switch-project-action #'helm-projectile)
-  (setq helm-projectile-truncate-lines t)
-  (helm-projectile-on))
-#+end_src
-*** COMMENT Counsel projectile
-#+begin_src emacs-lisp
-(use-package counsel-projectile
-  :config
-  (counsel-projectile-mode))
-#+end_src
-
-** Htmlize
-#+begin_src emacs-lisp
-(use-package htmlize
-  :config
-  (setq org-html-htmlize-output-type 'inline-css))
-#+end_src
-
-** Syntax check
-*** Flycheck
-#+begin_src emacs-lisp
-(use-package flycheck
-  :config
-  (setq flycheck-idle-change-delay 2
-        flycheck-check-syntax-automatically '(save new-line mode-enabled))
-  (setq flycheck-indication-mode 'left-fringe)
-
-  (add-hook 'after-init-hook #'global-flycheck-mode))
-#+end_src
-And disable flymake autoload:
-#+begin_src emacs-lisp
-(use-package flymake
-  :commands flymake-mode)
-#+end_src
-*** Show errors in posframe
-#+begin_src emacs-lisp
-(use-package flycheck-posframe
-  :config
-  (with-eval-after-load 'flycheck
-    (require 'flycheck-posframe)
-    (setq flycheck-posframe-border-width 1)
-    (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)))
-#+end_src
-
-** Highlight TODO item
-#+begin_src emacs-lisp
-(use-package hl-todo
-  :config
-  (global-hl-todo-mode))
-#+end_src
-
 ** Multiple cursors
+
+Very useful tool. You can put many cursors in the different places of buffer
+and edit different part of buffer simultaneously. Has some helpful functions to
+choose the proper places where to put cursors.
+
 #+begin_src emacs-lisp
 (use-package multiple-cursors
   :bind
@@ -3033,27 +2994,61 @@ And disable flymake autoload:
 #+end_src
 
 ** Expand region
+
+Increases the selected region by semantic units. Just keep pressing the key
+until it selects what you want.
+
 #+begin_src emacs-lisp
 (use-package expand-region
-  :bind
-  (("C-=" . er/expand-region)))
+  :config
+  (global-set-key (kbd "C-=") #'er/expand-region))
 #+end_src
 
-** Search and grep utilities
+* Search and grep utilities
+
+** Wgrep
+
+Writable grep. After searching you can edit results of search directly and
+write changes to all affected files.
+
 #+begin_src emacs-lisp
 (use-package wgrep
   :commands wgrep
   :config
   (setq wgrep-auto-save-buffer t))
+#+end_src
 
+*** Wgrep-ag
+
+Allow ~wgrep~ for results of ~the_silver_searcher~ results.
+
+#+begin_src emacs-lisp
 (use-package wgrep-ag)
+#+end_src
 
-(use-package ag
-  :after wgrep-ag)
+** the_silver_searcher (ag)
 
-(use-package helm-ag)
-(use-package helm-rg)
-(use-package deadgrep)
+Emacs interface for [[https://github.com/ggreer/the_silver_searcher][the_silver_searcher]] grep tool. I don't use it directly but
+I have it installed to be able to use =helm-ag= functionality.
+
+#+begin_src emacs-lisp
+(use-package ag :after wgrep-ag)
+#+end_src
+
+** Ripgrep
+
+Different interfaces for [[https://github.com/BurntSushi/ripgrep][ripgrep]] tool for Emacs. There are 2 great packages:
+
+- deadgrep
+- rg
+
+I've tried both. Both have their own pros and cons but both are great.
+
+*** rg
+
+Currently use it because it has global keybinding.
+
+#+begin_src emacs-lisp
 (use-package rg
   :config
   (setq rg-group-result t
@@ -3065,29 +3060,70 @@ And disable flymake autoload:
   (rg-enable-default-bindings))
 #+end_src
 
-** Terminal emulator
+*** Deadgrep
+
 #+begin_src emacs-lisp
-(use-package sane-term
-  :bind
-  (("C-c t" . sane-term)
-   ("C-c T" . sane-term-create))
+(use-package deadgrep)
+#+end_src
+
+** Helm interface for grep tools
+
+I'm not sure I need it. I don't use this packages directly, but usually I use
+corresponding =projectile= commands which provide helm interface to search
+across the project files using =ag= or =rg=.
+
+#+begin_src emacs-lisp
+(use-package helm-ag)
+(use-package helm-rg)
+#+end_src
+
+* Programming
+
+** YASnippet
+
+#+begin_quote
+YASnippet is a template system for Emacs. It allows you to type an abbreviation
+and automatically expand it into function templates.
+#+end_quote
+
+#+begin_src emacs-lisp
+(use-package yasnippet
   :config
-  ;; Optional convenience binding. This allows C-y to paste even when in term-char-mode (see below).
-  (add-hook
-   'term-mode-hook
-   (lambda ()
-     (define-key term-raw-map (kbd "C-y")
-       (lambda ()
-         (interactive)
-         (term-line-mode)
-         (yank)
-         (term-char-mode))))))
+  (setq yas-indent-line 'fixed
+        yas-inhibit-overlay-modification-protection t)
+
+  (yas-reload-all)
+  (add-hook 'prog-mode-hook #'yas-minor-mode)
+  (add-hook 'tex-mode-hook #'yas-minor-mode))
+#+end_src
+
+** Rainbow delimiters
+
+Allows to distinguish different levels of nested delimiters by coloring them to
+different colors.
+
+#+begin_src emacs-lisp
+(use-package rainbow-delimiters
+  :config
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+#+end_src
+
+** Smartscan
+
+Navigate between symbol occurrences by pressing =M-n= and =M-p=.
+
+#+begin_src emacs-lisp
+(use-package smartscan
+  :config
+  (setq smartscan-symbol-selector "symbol")
+  (add-hook 'prog-mode-hook #'smartscan-mode))
 #+end_src
 
 ** Rainbow mode
-#+BEGIN_QUOTE
-Colorize color names in buffers
-#+END_QUOTE
+
+Colorize color names in buffers. Quite handy when you work with CSS of color
+themes.
+
 #+begin_src emacs-lisp
 (use-package rainbow-mode
   :config
@@ -3096,321 +3132,12 @@ Colorize color names in buffers
   (add-to-list 'rainbow-x-colors-major-mode-list #'emacs-lisp-mode))
 #+end_src
 
-** CSV
-Major mode for work with CSV files
-#+begin_src emacs-lisp
-(use-package csv-mode)
-#+end_src
-
-** Log files
-#+begin_src emacs-lisp
-(use-package vlf
-  :config
-  (require 'vlf-setup))
-
-(use-package logview
-  :config
-  (setq logview-additional-level-mappings
-        '(("Python" . ((error       "CRITICAL")
-                       (error       "ERROR")
-                       (warning     "WARNING")
-                       (information "INFO")
-                       (debug       "DEBUG")))))
-
-  (setq logview-additional-submodes
-        '(("Python" (format . "TIMESTAMP LEVEL - [NAME]:") (levels . "Python")))))
-#+end_src
-
-** Nginx
-#+begin_src emacs-lisp
-(use-package nginx-mode)
-#+end_src
-
-** SSH config mode
-#+begin_src emacs-lisp
-(use-package ssh-config-mode
-  :mode ("/\\.ssh/config\\'" "/system/ssh\\'" "/sshd?_config\\'" "/known_hosts\\'" "/authorized_keys2?\\'")
-  :hook (ssh-config-mode . turn-on-font-lock)
-  :config
-  (autoload 'ssh-config-mode "ssh-config-mode" t))
-#+end_src
-
-** REST client
-Quite interesting package. I think it will replace for Postman for me.
-#+begin_src emacs-lisp
-(use-package restclient)
-#+end_src
-And autocompletion for it:
-#+begin_src emacs-lisp
-(use-package company-restclient
-  :config
-  (add-to-list 'company-backends #'company-restclient))
-#+end_src
-And even org-babel integration:
-#+begin_src emacs-lisp
-(use-package ob-restclient
-  :config
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((restclient . t))))
-#+end_src
-
-** PDF tools
-#+begin_src emacs-lisp
-(use-package pdf-tools
-  :config
-  (pdf-tools-install))
-#+end_src
-
-** Gitignore templates
-#+begin_src emacs-lisp
-(use-package gitignore-templates)
-#+end_src
-
-** Regexps
-Build in regex package:
-#+begin_src emacs-lisp
-(use-package re-builder
-  :ensure nil
-  :config
-  (setq reb-re-syntax 'read)
-  (global-set-key (kbd "C-c R") #'re-builder))
-#+end_src
-
-** Password store
-#+begin_src emacs-lisp
-(use-package password-store
-  :config
-  (setq password-store-password-length 12))
-
-(use-package password-store-otp)
-
-(use-package pass)
-
-(use-package helm-pass)
-;; (use-package ivy-pass)
-#+end_src
-
-** Markdown mode
-#+begin_src emacs-lisp
-(use-package markdown-mode
-  :config
-  (setq markdown-fontify-code-blocks-natively t)
-  (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
-  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-  (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
-  (add-hook 'markdown-mode-hook #'rr/set-margins))
-#+end_src
-
-** Edit region in indirect buffer
-#+begin_src emacs-lisp
-(use-package edit-indirect)
-#+end_src
-
-** Email
-*** Setup username and email address
-#+begin_src emacs-lisp
-(setq user-mail-address "rrudakov@pm.me"
-      user-full-name "Roman Rudakov")
-#+end_src
-*** COMMENT ProtonMail configuration
-#+begin_src emacs-lisp
-(use-package mu4e
-  :ensure nil
-  :after message
-  :bind
-  (:map mu4e-main-mode-map
-        ([remap mu4e-quit] . kill-current-buffer))
-  :config
-  (setq mu4e-maildir (expand-file-name "~/.mail/ProtonMail")
-        mu4e-reply-to-address user-mail-address
-        mu4e-sent-folder "/Sent"
-        mu4e-trash-folder "/Trash"
-        mu4e-sent-messages-behavior 'delete
-        mu4e-view-use-gnus nil
-        mu4e-hide-index-messages t
-        mu4e-headers-auto-update t
-        mu4e-compose-signature-auto-include nil
-        mu4e-completing-read-function 'completing-read
-        mu4e-maildir-shortcuts '(("/INBOX" . ?i)
-                                 ("/Sent" . ?s)
-                                 ("/Trash" . ?t)
-                                 ("/All Mail" . ?a))
-        mu4e-use-fancy-chars nil
-        mu4e-view-show-images t
-        mu4e-view-prefer-html nil
-        ;; mu4e-html2text-command "w3m -dump -T text/html -O utf8 -graph"
-        mu4e-headers-fields '((:human-date . 25)
-                              (:flags . 6)
-                              (:from . 22)
-                              (:subject . nil))
-        message-kill-buffer-on-exit t
-        mail-user-agent 'mu4e-user-agent)
-
-  (when (fboundp 'imagemagick-register-types)
-    (imagemagick-register-types))
-
-  (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t)
-
-  ;; Run mu4e in background after starting emacs
-  (mu4e t))
-#+end_src
-*** COMMENT Use helm for mail filtration
-#+begin_src emacs-lisp
-(use-package helm-mu
-  :after (helm mu4e)
-  :bind
-  (:map
-   mu4e-main-mode-map
-   ("s" . helm-mu)
-   :map
-   mu4e-headers-mode-map
-   ("s" . helm-mu)
-   :map
-   mu4e-view-mode-map
-   ("s" . helm-mu)))
-#+end_src
-*** COMMENT Alerts
-#+begin_src emacs-lisp
-(use-package mu4e-alert
-  :config
-  (setq mu4e-alert-modeline-formatter (lambda (count)
-                                        (if (> count 0)
-                                            (format "[Unread emails: %d]" count)
-                                          "")))
-  (mu4e-alert-set-default-style 'libnotify)
-  (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
-  (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
-#+end_src
-*** Sending emails
-#+begin_src emacs-lisp
-(use-package smtpmail
-  :ensure nil
-  :after message
-  :config
-  (setq message-send-mail-function #'smtpmail-send-it
-        smtpmail-smtp-server "127.0.0.1"
-        smtpmail-smtp-service 1025
-        smtpmail-stream-type 'starttls))
-#+end_src
-*** GNUS
-**** Basic setup
-GNUS split into many packages. I use ~use-package~ to setup each of them.
-
-First setup groups and IMAP.
-#+begin_src emacs-lisp
-(use-package gnus
-  :config
-  (setq gnus-select-method '(nntp "news.gwene.org"))
-  (setq gnus-secondary-select-methods
-        '((nnimap "protonmail"
-                  (nnimap-address "127.0.0.1")
-                  (nnimap-server-port 1143)
-                  (nnimap-stream starttls))))
-  (setq gnus-agent t
-        gnus-novice-user t
-        gnus-use-cache t))
-#+end_src
-
-Do not save ~.newsrc~ file. I don't use another newsreaders.
-#+begin_src emacs-lisp
-(use-package gnus-start
-  :ensure gnus
-  :config
-  (setq gnus-save-newsrc-file nil))
-#+end_src
-
-Setup groups view.
-#+begin_src emacs-lisp
-(use-package gnus-group
-  :ensure gnus
-  :config
-  (setq gnus-group-mode-line-format "%%b"
-        gnus-list-groups-with-ticked-articles nil
-        gnus-group-sort-function
-        '((gnus-group-sort-by-unread)
-          (gnus-group-sort-by-alphabet)
-          (gnus-group-sort-by-rank))))
-#+end_src
-
-Enable topics by default in groups view.
-#+begin_src emacs-lisp
-(use-package gnus-topic
-  :ensure gnus
-  :config
-  (setq gnus-topic-display-empty-topics t)
-  (add-hook 'gnus-group-mode-hook 'gnus-topic-mode))
-#+end_src
-
-Prettify summary view. Setup mode line and continuations arrow for threads.
-#+begin_src emacs-lisp
-(use-package gnus-sum
-  :ensure gnus
-  :demand t
-  :config
-  (setq gnus-auto-select-first nil
-        gnus-summary-mode-line-format "%p"
-        gnus-fetch-old-headers 'some)
-  (setq gnus-user-date-format-alist
-        '(((gnus-seconds-today) . "Today at %R")
-          ((+ 86400 (gnus-seconds-today)) . "Yesterday, %R")
-          (t . "%Y-%m-%d %R")))
-  (setq gnus-summary-line-format "%U%R%z %-16,16&user-date;  %4L:%-30,30f  %B%S\n")
-  (setq gnus-sum-thread-tree-false-root ""
-        gnus-sum-thread-tree-indent " "
-        gnus-sum-thread-tree-leaf-with-other "├─➤ "
-        gnus-sum-thread-tree-root ""
-        gnus-sum-thread-tree-single-leaf "└─➤ "
-        gnus-sum-thread-tree-vertical "│"))
-#+end_src
-
-Enable asynchronous operations in GNUS.
-#+begin_src emacs-lisp
-(use-package gnus-async
-  :ensure nil
-  :config
-  (setq gnus-asynchronous t))
-#+end_src
-
-Prefer plain text over HTML (not sure if it is actually works):
-#+begin_src emacs-lisp
-(use-package mm-decode
-  :ensure nil
-  :config
-  (with-eval-after-load "mm-decode"
-    (add-to-list 'mm-discouraged-alternatives "text/html")
-    (add-to-list 'mm-discouraged-alternatives "text/richtext")))
-#+end_src
-
-Enable demon on GNUS startup to check new mail periodically.
-#+begin_src emacs-lisp
-(use-package gnus-demon
-  :ensure gnus
-  :config
-  (add-hook 'gnus-startup-hook
-            (lambda ()
-              (gnus-demon-add-handler #'gnus-demon-scan-news 5 nil)
-              (gnus-demon-init))))
-#+end_src
-
-Enable notifications when new email/news is received:
-#+begin_src emacs-lisp
-(use-package gnus-notifications
-  :ensure gnus
-  :config
-  (setq gnus-notifications-use-google-contacts nil)
-  (add-hook 'gnus-after-getting-new-news-hook 'gnus-notifications))
-#+end_src
-
-** Google translate interface
-#+begin_src emacs-lisp
-(use-package google-translate-default-ui
-  :ensure google-translate
-  :config
-  (setq google-translate-pop-up-buffer-set-focus t))
-#+end_src
-
 ** Auto set indentation settings
+
+Useful if you have to work in the repository with different indentation
+settings. It determines indentation level and set proper value per
+buffer/file.
+
 #+begin_src emacs-lisp
 (use-package dtrt-indent
   :config
@@ -3418,26 +3145,91 @@ Enable notifications when new email/news is received:
   (add-hook 'prog-mode-hook #'dtrt-indent-mode))
 #+end_src
 
-** XML
-*** Common settings
+** Highlight TODO item
+
+Highlight number of special text items (like =TODO=, =FIXME= etc.) with a
+special face and allows to navigate between them or show list in the =occur=
+buffer.
+
 #+begin_src emacs-lisp
-(setq nxml-child-indent 4 nxml-attribute-indent 4)
-#+end_src
-*** Format XML
-#+begin_src emacs-lisp
-(use-package xml-format
-  :demand t
-  :after nxml-mode)
+(use-package hl-todo
+  :config
+  (global-hl-todo-mode))
 #+end_src
 
-** NIX
-*** Edit .nix configuration files
+** Syntax check
+
+Emacs has built-in module for show syntax errors - =flymake=. In version 26.1
+it was rewritten and redesigned and should be useful now, but flycheck has more
+plugins and integration with linters. So far I use flycheck.
+
+*** Flycheck
+
+Enable flycheck globally.
+
 #+begin_src emacs-lisp
-(use-package nix-mode
-  :mode "\\.nix\\'")
+(use-package flycheck
+  :config
+  (setq flycheck-idle-change-delay 2
+        flycheck-check-syntax-automatically '(save new-line mode-enabled))
+  (setq flycheck-indication-mode 'left-fringe)
+
+  (add-hook 'after-init-hook #'global-flycheck-mode))
+#+end_src
+
+And disable flymake autoload:
+
+#+begin_src emacs-lisp
+(use-package flymake
+  :commands flymake-mode)
+#+end_src
+
+*** Show errors in posframe
+
+I like the idea to see error message at point in the posframe. This package
+implements it. I use it even for =lsp-mode= which by default uses =lsp-ui= for
+showing error messages.
+
+#+begin_src emacs-lisp
+(use-package flycheck-posframe
+  :config
+  (with-eval-after-load 'flycheck
+    (require 'flycheck-posframe)
+    (setq flycheck-posframe-border-width 1
+          flycheck-posframe-position 'window-bottom-left-corner)
+    (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)))
+#+end_src
+
+** Auto insert
+
+Insert default file templates automatically when create new file.
+
+When I create new java source file I want to insert default class template
+automatically.
+
+#+begin_src emacs-lisp
+(use-package autoinsert
+  :ensure nil
+  :after yasnippet
+  :config
+  (setq auto-insert-query nil)
+  (setq auto-insert-directory (expand-file-name "templates/" user-emacs-directory))
+  (add-hook 'find-file-hook #'auto-insert)
+  (auto-insert-mode 1)
+
+  (add-to-list 'auto-insert-alist
+               '("\\.java" . ["default-java.el"
+                              (lambda () (yas-expand-snippet
+                                          (buffer-string)
+                                          (point-min)
+                                          (point-max)))])))
 #+end_src
 
 ** Code folding
+
+Code folding support based on =outline-mode=. I don't use it too much despite
+it works pretty good.
+
 #+begin_src emacs-lisp
 (use-package origami
   :config
@@ -3445,9 +3237,59 @@ Enable notifications when new email/news is received:
   (define-key origami-mode-map [C-tab] #'origami-recursively-toggle-node))
 #+end_src
 
-** Languages
-*** LSP mode
-**** Common setup
+** Google c-style
+
+Fixes some code formatting and indentation problems in modes derived from
+=c-mode=. One of the /install and forget/ packages.
+
+#+begin_src emacs-lisp
+(use-package google-c-style
+  :config
+  (add-hook 'c-mode-common-hook #'google-set-c-style)
+  (add-hook 'c-mode-common-hook #'google-make-newline-indent))
+#+end_src
+
+** Treemacs
+
+Tree-style directory browser for emacs. I don't really use it, I use helm for
+navigation, but =lsp-mode= has some useful integration with treemacs (show call
+hierarchy, show list of dependencies etc.) so I have to keep it as
+dependency. I don't need all those fancy icons, so I disable it.
+
+#+begin_src emacs-lisp
+(use-package treemacs
+  :after lsp-mode
+  :config
+  (define-key lsp-mode-map (kbd "C-c *") #'treemacs)
+  (setq treemacs-no-png-images t
+        treemacs-width 70
+        treemacs-follow-after-init t
+        treemacs-project-follow-cleanup t))
+#+end_src
+
+*** Treemacs LSP
+
+As I mentioned before I have treemacs only for LSP integration. Here is some
+settings for this package.
+
+#+begin_src emacs-lisp
+(use-package lsp-treemacs
+  :after (treemacs lsp-mode)
+  :config
+  (lsp-treemacs-sync-mode 1)
+  (define-key rr-lsp-keymap (kbd "h") #'lsp-treemacs-call-hierarchy))
+#+end_src
+
+** LSP
+
+Great mode which implements client for Microsoft Language Server protocol. By
+default has a lot of distracting UI features enabled from [[https://github.com/emacs-lsp/lsp-ui][lsp-ui]] package. I
+don't use it and try to disable as much as possible distracting behavior.
+
+Some settings below set to default values explicitly. It's either because I've
+experimented with those settings or to prevent unpredictable behavior in case
+default value is changed (the project's development is very active).
+
 #+begin_src emacs-lisp
 (use-package lsp-mode
   :config
@@ -3457,7 +3299,8 @@ Enable notifications when new email/news is received:
   (define-key rr-lsp-keymap (kbd "r") #'lsp-rename)
   (define-key rr-lsp-keymap (kbd "d") #'lsp-describe-thing-at-point)
 
-  (setq lsp-signature-auto-activate nil
+  (setq lsp-signature-auto-activate t
+        lsp-signature-render-documentation nil
         lsp-file-watch-threshold 2000
         lsp-imenu-sort-methods '(kind position)
         lsp-modeline-diagnostics-enable nil
@@ -3465,7 +3308,8 @@ Enable notifications when new email/news is received:
         lsp-enable-on-type-formatting nil
         lsp-enable-indentation nil
         lsp-modeline-diagnostics-scope :file
-        lsp-diagnostic-clean-after-change t)
+        lsp-diagnostic-clean-after-change t
+        lsp-completion-use-last-result t)
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
 
@@ -3483,8 +3327,13 @@ Enable notifications when new email/news is received:
 	      lsp-pyls-plugins-jedi-signature-help-enabled t)
   (add-hook 'python-mode-hook #'lsp))
 #+end_src
-*** DAP mode
-**** Common setup
+
+** DAP
+
+Emacs client for Microsoft Debug Adapter Protocol. I have some custom functions
+to run test method/test class at point using maven failsafe plugin (I use it
+for work and probably it won't be helpful for anybody else).
+
 #+begin_src emacs-lisp
 (use-package dap-mode
   :after (lsp-java s)
@@ -3562,32 +3411,191 @@ Enable notifications when new email/news is received:
     (interactive)
     (rr/debug-test (dap-java-test-class))))
 #+end_src
-*** Treemacs integration
-#+begin_src emacs-lisp
-(use-package treemacs
-  :after lsp-mode
-  :config
-  (define-key lsp-mode-map (kbd "C-c *") #'treemacs)
-  (setq treemacs-no-png-images t
-        treemacs-width 70
-        treemacs-follow-after-init t
-        treemacs-project-follow-cleanup t))
 
-(use-package lsp-treemacs
-  :after (treemacs lsp-mode)
-  :config
-  (lsp-treemacs-sync-mode 1)
-  (define-key rr-lsp-keymap (kbd "h") #'lsp-treemacs-call-hierarchy))
-#+end_src
-*** Google c-style
+** Languages and major modes
+
+Programming, text editing, configuration files editing modes etc. Handy
+packages to speed-up development for some languages. Language specific
+packages.
+
+*** Markdown mode
+
+Usually I use org-mode as markup language. The most of forges support org-mode
+syntax and can render org documents very nice way. But sometimes when I need to
+contribute to some existing repository I have to deal with markdown. Here are
+some settings for third party =markdown-mode= package.
+
 #+begin_src emacs-lisp
-(use-package google-c-style
+(use-package markdown-mode
   :config
-  (add-hook 'c-mode-common-hook #'google-set-c-style)
-  (add-hook 'c-mode-common-hook #'google-make-newline-indent))
+  (setq markdown-fontify-code-blocks-natively t)
+  (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+  (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+  (add-hook 'markdown-mode-hook #'rr/set-margins))
 #+end_src
+
+**** Edit region in indirect buffer
+
+To be able to edit source code blocks in markdown buffers just like it's done
+in org-mode I use special package. It integrates with ~markdown-mode~
+automatically and provides the way to edit source blocks by pressing =C-c '=.
+
+#+begin_src emacs-lisp
+(use-package edit-indirect)
+#+end_src
+
+*** XML
+
+Built-in major mode for working with XML files. I need to set indentation to 4
+spaces instead of 2 by default.
+
+#+begin_src emacs-lisp
+(use-package nxml-mode
+  :ensure nil
+  :config
+  (setq nxml-child-indent 4
+        nxml-attribute-indent 4))
+#+end_src
+
+**** Format XML
+
+Third party package for reformatting XML documents. The command =xmlling=
+should be available in the =PATH= (package name is =libxml2-utils=).
+
+#+begin_src emacs-lisp
+(use-package xml-format
+  :demand t
+  :after nxml-mode)
+#+end_src
+
+*** SSH config mode
+
+Special mode to edit SSH configuration files.
+
+#+begin_src emacs-lisp
+(use-package ssh-config-mode
+  :config
+  (add-to-list 'auto-mode-alist '("/\\.ssh/config\\'" . ssh-config-mode))
+  (add-to-list 'auto-mode-alist '("/system/ssh\\'" . ssh-config-mode))
+  (add-to-list 'auto-mode-alist '("/sshd?_config\\'" . ssh-config-mode))
+  (add-to-list 'auto-mode-alist '("/known_hosts\\'" . ssh-config-mode))
+  (add-to-list 'auto-mode-alist '("/authorized_keys2?\\'" . ssh-config-mode))
+  (add-hook 'ssh-config-mode-hook #'turn-on-font-lock)
+  (autoload 'ssh-config-mode "ssh-config-mode" t))
+#+end_src
+
+*** Nginx
+
+Syntax highlighting for nginx configuration files.
+
+#+begin_src emacs-lisp
+(use-package nginx-mode)
+#+end_src
+
+*** CSV
+
+Major mode for work with CSV files.
+
+#+begin_src emacs-lisp
+(use-package csv-mode)
+#+end_src
+
+*** PKGBUILD major mode
+
+Edit =PKGBUILD= files for Arch Linux.
+
+#+begin_src emacs-lisp
+(use-package pkgbuild-mode
+  :config
+  (add-to-list 'auto-mode-alist '("/PKGBUILD$" . pkgbuild-mode)))
+#+end_src
+
+*** SQL
+
+To perform SQL queries I use =org-mode= and =ob-sql=. Emacs has built-in
+facilities to connect to databases and perform as SQL client through
+=comint-mode=.
+
+**** COMMENT Emacs clojure database client
+
+I used to use this package. It's quite good but requires CIDER as dependency
+and I found it a bit too heavy for such kind of things. If you need to analyze
+results of queries it separate buffers you probably should take a look at this
+package.
+
+Now it's not enabled in my config and probably will be removed in future.
+
+#+begin_src emacs-lisp
+(use-package ejc-sql
+  :config
+  (defun rr/ejc-sql-connected-hook ()
+    (ejc-set-rows-limit 500)
+    (ejc-set-column-width-limit nil))
+
+  (add-hook 'ejc-sql-connected-hook #'rr/ejc-sql-connected-hook)
+
+  (setq ejc-org-mode-show-results nil)
+
+  (add-hook 'ejc-sql-minor-mode-hook
+            (lambda ()
+              (auto-complete-mode t)
+              (ejc-ac-setup)))
+
+  ;; Define connections
+  (when (require 'databases nil t)
+    (rr/setup-connections)))
+#+end_src
+
+**** Tweaks for sql-mode and sql-indent package
+
+Better indentation support for =sql-mode= buffers.
+
+#+begin_src emacs-lisp
+(use-package sql-indent
+  :config
+  (setq sql-use-indent-support t)
+  (add-hook 'sql-mode-hook #'sqlind-minor-mode))
+#+end_src
+
+**** Make PostgreSQL default
+
+I use mostly PostgreSQL so I set this engine by default.
+
+#+begin_src emacs-lisp
+(eval-after-load "sql"
+  '(progn
+     (sql-set-product 'postgres)))
+#+end_src
+
+**** Disable line breaking
+
+Fix broken tables for results of SQL queries.
+
+#+begin_src emacs-lisp
+(add-hook 'sql-interactive-mode-hook
+          (lambda ()
+            (toggle-truncate-lines t)))
+#+end_src
+
+*** Shell
+
+Nothing special, just add company backend for company mode to complete
+environment variables, binaries found on your $PATH and fish shell functions.
+
+#+begin_src emacs-lisp
+(use-package company-shell
+  :config
+  (add-to-list 'company-backends #'company-shell))
+#+end_src
+
 *** Java
-**** Common setup
+
+Java development in emacs is still quite painful. LSP mode is pretty good but
+if you work in the team where everybody uses Intellij IDEA there are some
+inconsistency (code formatting, code linting). I use [[https://github.com/google/google-java-format][google-java-format]] for
+automatic code reformat and set default indentation to 2 spaces.
+
 #+begin_src emacs-lisp
 (use-package google-java-format
   :after cc-mode
@@ -3604,7 +3612,12 @@ Enable notifications when new email/news is received:
             (lambda ()
               (setq c-basic-offset 2))))
 #+end_src
-**** lsp-mode setup
+
+**** lsp-java
+
+LSP mode support for java distributed as a separate package and exposes some
+extra settings.
+
 #+begin_src emacs-lisp
 (use-package lsp-java
   :after lsp-mode
@@ -3621,176 +3634,110 @@ Enable notifications when new email/news is received:
                           "-XX:+UseG1GC"
                           "-XX:+UseStringDeduplication")))
 #+end_src
-**** Expand snippet for new class
-#+begin_src emacs-lisp
-(setq auto-insert-query nil)
-(setq auto-insert-directory (expand-file-name "templates/" user-emacs-directory))
-(add-hook 'find-file-hook #'auto-insert)
-(auto-insert-mode 1)
 
-(add-to-list 'auto-insert-alist
-             '("\\.java" . ["default-java.el"
-                            (lambda () (yas-expand-snippet
-                                   (buffer-string)
-                                   (point-min)
-                                   (point-max)))]))
-#+end_src
-*** Haskell
-**** Haskell mode
-#+begin_src emacs-lisp
-(use-package haskell-mode
-  :config
-  (setq haskell-mode-stylish-haskell-path "brittany")
-  (setq haskell-stylish-on-save nil)
+*** Clojure
 
-  (add-hook 'haskell-mode-hook #'haskell-auto-insert-module-template)
-  (add-hook 'haskell-mode-hook #'turn-on-haskell-doc-mode))
-#+end_src
-**** lsp-haskell
-Latest update in haskell-mode introduce some incompatibility. Investigation required.
-#+begin_src emacs-lisp
-(use-package lsp-haskell)
-#+end_src
-**** Align rules
-#+begin_src emacs-lisp
-(add-hook 'align-load-hook
-          (lambda ()
-            (add-to-list 'align-rules-list
-                         '(haskell-types
-                           (regexp . "\\(\\s-+\\)\\(::\\|∷\\)\\s-+")
-                           (modes quote (haskell-mode literate-haskell-mode))))))
-(add-hook 'align-load-hook
-          (lambda ()
-            (add-to-list 'align-rules-list
-                         '(haskell-assignment
-                           (regexp . "\\(\\s-+\\)=\\s-+")
-                           (modes quote (haskell-mode literate-haskell-mode))))))
+JVM based LISP. One of my favorite languages.
 
-(add-hook 'align-load-hook
-          (lambda ()
-            (add-to-list 'align-rules-list
-                         '(haskell-arrows
-                           (regexp . "\\(\\s-+\\)\\(->\\|→\\)\\s-+")
-                           (modes quote (haskell-mode literate-haskell-mode))))))
+**** Clojure kondo linter
 
-(add-hook 'align-load-hook
-          (lambda ()
-            (add-to-list 'align-rules-list
-                         '(haskell-left-arrows
-                           (regexp . "\\(\\s-+\\)\\(<-\\|←\\)\\s-+")
-                           (modes quote (haskell-mode literate-haskell-mode))))))
-#+end_src
-**** Indentation
-#+begin_src emacs-lisp
-(use-package hindent
-  :config
-  (add-hook 'haskell-mode-hook #'hindent-mode))
-#+end_src
-**** Stack interface
-#+begin_src emacs-lisp
-(use-package hasky-stack
-  :config
-  (global-set-key (kbd "C-c h e") #'hasky-stack-execute)
-  (global-set-key (kbd "C-c h h") #'hasky-stack-package-action)
-  (global-set-key (kbd "C-c h i") #'hasky-stack-new))
-#+end_src
-**** Ligatures support
-#+begin_src emacs-lisp
-(use-package hasklig-mode
-  :config
-  (add-hook 'haskell-mode-hook 'hasklig-mode))
-#+end_src
-*** LaTeX
-**** AucTEX tweaks
-#+begin_src emacs-lisp
-(use-package tex
-  :ensure nil
-  :config
-  (setq TeX-auto-save t
-        TeX-parse-self t
-        TeX-view-program-selection '((output-pdf "PDF Tools"))
-        TeX-source-correlate-start-server t)
-  (setq-default TeX-master nil))
+Static code analyzer [[https://github.com/borkdude/clj-kondo][clj-kondo]]. Works well together with CIDER and helps to fix
+a lot of common issues in clojure code.
 
-(use-package font-latex
-  :ensure nil
-  :config
-  (setq font-latex-fontify-sectioning 'color))
+No needs any special configuration.
 
-(use-package latex
-  :ensure nil
-  :config
-  (eval-after-load 'latex
-    '(add-to-list 'LaTeX-verbatim-environments "lstlisting"))
-  (add-hook 'LaTeX-mode-hook #'visual-line-mode)
-  (add-hook 'LaTeX-mode-hook #'flyspell-mode)
-  (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
-  (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
-  (add-hook 'LaTeX-mode-hook (lambda () (auto-fill-mode -1)))
-  (add-hook 'LaTeX-mode-hook (lambda () (TeX-fold-mode 1))))
-#+end_src
-*** Python
-**** Virtualenv
 #+begin_src emacs-lisp
-(use-package pyvenv
-  :config
-  (add-hook 'python-mode-hook 'pyvenv-tracking-mode)
-  (add-hook 'pyvenv-post-activate-hooks #'lsp))
+(use-package flycheck-clj-kondo)
 #+end_src
-**** Default interpreter
-#+begin_src emacs-lisp
-(setq python-shell-interpreter "python3")
-#+end_src
-**** Import management
-***** Automatically sort imports
-#+begin_src emacs-lisp
-(use-package isortify
-  :config
-  (setq isortify-line-width 79
-        isortify-multi-line-output 3
-        isortify-trailing-comma t)
-  (add-hook 'python-mode-hook #'isortify-mode))
-#+end_src
-**** Format code
-#+begin_src emacs-lisp
-(use-package blacken
-  :config
-  (setq blacken-line-length 79
-        blacken-allow-py36 t))
 
-(use-package py-yapf)
-#+end_src
-**** Tox
+**** Clojure mode
+
+Major mode for Clojure and ClojureScript source files. Syntax highlighting and
+many useful commands. See full list of them [[https://github.com/clojure-emacs/clojure-mode/#refactoring-support][here]].
+
 #+begin_src emacs-lisp
-(use-package tox
+(use-package clojure-mode
+  :after flycheck-clj-kondo
   :config
-  (setq tox-runner 'py.test))
+  (require 'flycheck-clj-kondo))
 #+end_src
-**** Sphinx doc
+
+**** CIDER
+
+Clojure Interactive Development Environment which Rocks :)
+
+Very nice IDE. Works good out of the box with clojure. For clojure script I
+found it not perfect, but alternatives even worse.
+
 #+begin_src emacs-lisp
-(use-package sphinx-doc
+(use-package cider
   :config
-  (add-hook 'python-mode-hook #'sphinx-doc-mode))
+  (setq cider-prompt-for-symbol nil
+        cider-repl-wrap-history t
+        nrepl-hide-special-buffers t
+        cider-repl-display-help-banner nil)
+  (add-hook 'clojure-mode-hook #'cider-mode)
+  (add-hook 'clojurescript-mode-hook #'cider-mode))
 #+end_src
-**** Editing requirements files
+
+**** Clojure refactoring
+
+Nice addition to CIDER. Introduce a lot of useful interactive functions to
+interact with =refactoring-nrepl=.
+
 #+begin_src emacs-lisp
-(use-package pip-requirements)
-#+end_src
-*** JSON
-#+begin_src emacs-lisp
-(use-package json-mode
+(use-package clj-refactor
   :config
-  (setq json-reformat:indent-width 4
-        json-reformat:pretty-string? t)
-  (add-hook 'json-mode-hook #'flycheck-mode))
+  (defun my-clojure-mode-hook ()
+    (clj-refactor-mode 1))
+
+  (setq cljr-hotload-dependencies t
+        cljr-warn-on-eval nil)
+  (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
+  (add-hook 'clojurescript-mode-hook #'my-clojure-mode-hook))
 #+end_src
-*** YAML
+
+***** Clojure refactoring helm integration
+
+Helm interface for =clj-refactor= package.
+
 #+begin_src emacs-lisp
-(use-package yaml-mode
-  :mode "\\.yml\\'")
+(use-package cljr-helm
+  :after clj-refactor
+  :config
+  (define-key clojure-mode-map (kbd "C-c C-r") #'cljr-helm)
+  (define-key clojurescript-mode-map (kbd "C-c C-r") #'cljr-helm))
 #+end_src
+
+**** CIDER helm integration
+
+#+begin_src emacs-lisp
+(use-package helm-cider
+  :config
+  (helm-cider-mode 1))
+#+end_src
+
 *** JavaScript
+
+**** Prettier
+
+Format JavaScript and TypeScript code. Also has support for another languages
+(HTML, YAML). Full list can be found on [[https://prettier.io/docs/en/index.html][Prettier page]].
+
+I don't use =prettier-js-mode= (sometimes after =tide= refactoring commands it
+goes crazy) and prefer to format code manually.
+
+#+begin_src emacs-lisp
+(use-package prettier-js
+  :config
+  (setq prettier-js-args '("--single-quote")))
+#+end_src
+
 **** Add node_modules to path
+
+When open file from any kind of JS project, add =node_modules= to =PATH=
+variable. It makes some project local binaries (tsserver, eslint) available.
+
 #+begin_src emacs-lisp
 (use-package add-node-modules-path
   :config
@@ -3803,11 +3750,20 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
   (eval-after-load 'web-mode
     '(add-hook 'web-mode-hook #'add-node-modules-path)))
 #+end_src
+
 **** TypeScript
+
+So far =tide= is the best option for me for working with TypeScript
+projects. Comparing with =lsp-mode= it's faster, because interacts directly
+with =tsserver=.
+
+I have keybindings similar to my =lsp-mode= bindings.
+
 #+begin_src emacs-lisp
 (use-package typescript-mode)
 
 (use-package tide
+  :after prettier-js
   :config
   (defun setup-tide-mode ()
     (interactive)
@@ -3827,7 +3783,7 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
   (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil))
 
   (define-key tide-mode-map (kbd "C-c j a") #'tide-fix)
-  (define-key tide-mode-map (kbd "C-c C-f") #'tide-organize-imports)
+  (define-key tide-mode-map (kbd "C-c C-f") #'prettier-js)
   (define-key tide-mode-map (kbd "C-c j r") #'tide-rename-symbol)
 
   (flycheck-add-next-checker 'tsx-tide 'javascript-eslint 'append)
@@ -3835,7 +3791,12 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
   (flycheck-add-next-checker 'jsx-tide 'javascript-eslint 'append)
   (flycheck-add-next-checker 'javascript-tide 'javascript-eslint 'append))
 #+end_src
-**** Angular support
+
+**** COMMENT Angular support
+
+Used to use it on one of my jobs. Probably will remove this configuration in
+future.
+
 #+begin_src emacs-lisp
 (use-package ng2-mode
   :after tide
@@ -3846,7 +3807,9 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
   (flycheck-add-mode 'typescript-tide 'ng2-ts-mode)
   (add-to-list 'auto-mode-alist '("\\.component.html" . ng2-html-mode)))
 #+end_src
+
 *** WEB
+
 #+begin_src emacs-lisp
 (use-package web-mode
   :config
@@ -3881,91 +3844,247 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
             (lambda ()
               (when (string-equal "tsx" (file-name-extension buffer-file-name))
                 (setup-tide-mode))))
-  ;; (add-hook 'web-mode-hook
-  ;;           (lambda ()
-  ;;             (when (string-equal "tsx" (file-name-extension buffer-file-name))
-  ;;               (lsp))))
   (flycheck-add-mode 'javascript-eslint 'web-mode)
 
   (add-hook 'web-mode-hook
             (lambda ()
               (when (string-equal "jsx" (file-name-extension buffer-file-name))
                 (setup-tide-mode))))
-  ;; (add-hook 'web-mode-hook
-  ;;         (lambda ()
-  ;;           (when (string-equal "jsx" (file-name-extension buffer-file-name))
-  ;;             (lsp))))
   (flycheck-add-mode 'javascript-eslint 'web-mode))
 #+end_src
-*** Groovy
+
+**** Company WEB
+
 #+begin_src emacs-lisp
-(use-package groovy-mode)
+(use-package company-web
+  :config
+  (add-to-list 'company-backends #'company-web-html)
+  (add-to-list 'company-backends #'company-web-jade)
+  (add-to-list 'company-backends #'company-web-slim))
 #+end_src
+
 *** Rust
-**** Rust-mode
+
 #+begin_src emacs-lisp
 (use-package rust-mode)
 #+end_src
-*** Clojure
-**** Clojure condo linter
-#+begin_src emacs-lisp
-(use-package flycheck-clj-kondo)
-#+end_src
-**** Clojure mode
-#+begin_src emacs-lisp
-(use-package clojure-mode
-  :after flycheck-clj-kondo
-  :config
-  (require 'flycheck-clj-kondo)
-  ;; (add-to-list 'lsp-language-id-configuration `(clojurescript-mode . "clojure"))
-  ;; (add-hook 'clojurescript-mode-hook #'lsp)
-  )
-#+end_src
-**** CIDER
-#+begin_src emacs-lisp
-(use-package cider
-  :config
-  (setq cider-prompt-for-symbol nil
-        cider-repl-wrap-history t
-        nrepl-hide-special-buffers t
-        cider-repl-display-help-banner nil)
-  (add-hook 'clojure-mode-hook #'cider-mode)
-  (add-hook 'clojurescript-mode-hook #'cider-mode))
-#+end_src
-**** Clojure refactoring
-#+begin_src emacs-lisp
-(use-package clj-refactor
-  :config
-  (defun my-clojure-mode-hook ()
-    (clj-refactor-mode 1))
 
-  (setq cljr-hotload-dependencies t
-        cljr-warn-on-eval nil)
-  (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
-  (add-hook 'clojurescript-mode-hook #'my-clojure-mode-hook))
-#+end_src
-**** Clojure refactoring helm integration
+*** Python
+
+**** Virtualenv
+
 #+begin_src emacs-lisp
-(use-package cljr-helm
-  :after clj-refactor
+(use-package pyvenv
   :config
-  (define-key clojure-mode-map (kbd "C-c C-r") #'cljr-helm)
-  (define-key clojurescript-mode-map (kbd "C-c C-r") #'cljr-helm))
+  (add-hook 'python-mode-hook 'pyvenv-tracking-mode)
+  (add-hook 'pyvenv-post-activate-hooks #'lsp))
 #+end_src
-**** CIDER helm integration
+
+**** Default interpreter
+
 #+begin_src emacs-lisp
-(use-package helm-cider
+(use-package python
+  :ensure nil
   :config
-  (helm-cider-mode 1))
+  (setq python-shell-interpreter "python3"))
 #+end_src
+
+**** Automatically sort imports
+
+#+begin_src emacs-lisp
+(use-package isortify
+  :config
+  (setq isortify-line-width 79
+        isortify-multi-line-output 3
+        isortify-trailing-comma t)
+  (add-hook 'python-mode-hook #'isortify-mode))
+#+end_src
+
+**** Format code
+
+#+begin_src emacs-lisp
+(use-package blacken
+  :config
+  (setq blacken-line-length 79
+        blacken-allow-py36 t))
+
+(use-package py-yapf)
+#+end_src
+
+**** Tox
+
+#+begin_src emacs-lisp
+(use-package tox
+  :config
+  (setq tox-runner 'py.test))
+#+end_src
+
+**** Sphinx doc
+
+#+begin_src emacs-lisp
+(use-package sphinx-doc
+  :config
+  (add-hook 'python-mode-hook #'sphinx-doc-mode))
+#+end_src
+
+**** Editing requirements files
+
+#+begin_src emacs-lisp
+(use-package pip-requirements)
+#+end_src
+
+*** LaTeX
+
+**** AucTEX tweaks
+
+#+begin_src emacs-lisp
+(use-package tex
+  :ensure nil
+  :config
+  (setq TeX-auto-save t
+        TeX-parse-self t
+        TeX-view-program-selection '((output-pdf "PDF Tools"))
+        TeX-source-correlate-start-server t)
+  (setq-default TeX-master nil))
+
+(use-package font-latex
+  :ensure nil
+  :config
+  (setq font-latex-fontify-sectioning 'color))
+
+(use-package latex
+  :ensure nil
+  :config
+  (eval-after-load 'latex
+    '(add-to-list 'LaTeX-verbatim-environments "lstlisting"))
+  (add-hook 'LaTeX-mode-hook #'visual-line-mode)
+  (add-hook 'LaTeX-mode-hook #'flyspell-mode)
+  (add-hook 'LaTeX-mode-hook #'LaTeX-math-mode)
+  (add-hook 'LaTeX-mode-hook #'turn-on-reftex)
+  (add-hook 'LaTeX-mode-hook (lambda () (auto-fill-mode -1)))
+  (add-hook 'LaTeX-mode-hook (lambda () (TeX-fold-mode 1))))
+#+end_src
+
+**** Company AucTEX
+
+#+begin_src emacs-lisp
+(use-package company-auctex
+  :config
+  (company-auctex-init))
+#+end_src
+
+*** Haskell
+
+**** Haskell mode
+
+#+begin_src emacs-lisp
+(use-package haskell-mode
+  :config
+  (setq haskell-mode-stylish-haskell-path "brittany")
+  (setq haskell-stylish-on-save nil)
+
+  (add-hook 'haskell-mode-hook #'haskell-auto-insert-module-template)
+  (add-hook 'haskell-mode-hook #'turn-on-haskell-doc-mode))
+#+end_src
+
+**** lsp-haskell
+
+#+begin_src emacs-lisp
+(use-package lsp-haskell)
+#+end_src
+
+**** Align rules
+
+#+begin_src emacs-lisp
+(add-hook 'align-load-hook
+          (lambda ()
+            (add-to-list 'align-rules-list
+                         '(haskell-types
+                           (regexp . "\\(\\s-+\\)\\(::\\|∷\\)\\s-+")
+                           (modes quote (haskell-mode literate-haskell-mode))))))
+(add-hook 'align-load-hook
+          (lambda ()
+            (add-to-list 'align-rules-list
+                         '(haskell-assignment
+                           (regexp . "\\(\\s-+\\)=\\s-+")
+                           (modes quote (haskell-mode literate-haskell-mode))))))
+
+(add-hook 'align-load-hook
+          (lambda ()
+            (add-to-list 'align-rules-list
+                         '(haskell-arrows
+                           (regexp . "\\(\\s-+\\)\\(->\\|→\\)\\s-+")
+                           (modes quote (haskell-mode literate-haskell-mode))))))
+
+(add-hook 'align-load-hook
+          (lambda ()
+            (add-to-list 'align-rules-list
+                         '(haskell-left-arrows
+                           (regexp . "\\(\\s-+\\)\\(<-\\|←\\)\\s-+")
+                           (modes quote (haskell-mode literate-haskell-mode))))))
+#+end_src
+
+**** Indentation
+
+#+begin_src emacs-lisp
+(use-package hindent
+  :config
+  (add-hook 'haskell-mode-hook #'hindent-mode))
+#+end_src
+
+**** Stack interface
+
+#+begin_src emacs-lisp
+(use-package hasky-stack
+  :config
+  (global-set-key (kbd "C-c h e") #'hasky-stack-execute)
+  (global-set-key (kbd "C-c h h") #'hasky-stack-package-action)
+  (global-set-key (kbd "C-c h i") #'hasky-stack-new))
+#+end_src
+
+**** Ligatures support
+
+#+begin_src emacs-lisp
+(use-package hasklig-mode
+  :config
+  (add-hook 'haskell-mode-hook 'hasklig-mode))
+#+end_src
+
+*** JSON
+
+#+begin_src emacs-lisp
+(use-package json-mode
+  :config
+  (setq json-reformat:indent-width 4
+        json-reformat:pretty-string? t)
+  (add-hook 'json-mode-hook #'flycheck-mode))
+#+end_src
+
+*** YAML
+
+#+begin_src emacs-lisp
+(use-package yaml-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+  (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-mode)))
+#+end_src
+
+*** Groovy
+
+#+begin_src emacs-lisp
+(use-package groovy-mode)
+#+end_src
+
 *** Gherkin
-**** Syntax highlighting
+
 #+begin_src emacs-lisp
 (use-package feature-mode
-  :mode "\\.story$")
+  :config
+  (add-to-list 'auto-mode-alist '("\\.story$" . feature-mode)))
 #+end_src
+
 *** PlantUML
-**** Major mode
+
 #+begin_src emacs-lisp
 (use-package plantuml-mode
   :config
@@ -3973,9 +4092,305 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
         plantuml-default-exec-mode 'executable)
   (add-to-list 'org-src-lang-modes '("plantuml" . plantuml)))
 #+end_src
+
 *** Protobuf
+
 #+begin_src emacs-lisp
 (use-package protobuf-mode)
+#+end_src
+
+* Email
+
+** Setup username and email address
+
+#+begin_src emacs-lisp
+(setq user-mail-address "rrudakov@pm.me"
+      user-full-name "Roman Rudakov")
+#+end_src
+
+** COMMENT ProtonMail configuration
+
+#+begin_src emacs-lisp
+(use-package mu4e
+  :ensure nil
+  :after message
+  :bind
+  (:map mu4e-main-mode-map
+        ([remap mu4e-quit] . kill-current-buffer))
+  :config
+  (setq mu4e-maildir (expand-file-name "~/.mail/ProtonMail")
+        mu4e-reply-to-address user-mail-address
+        mu4e-sent-folder "/Sent"
+        mu4e-trash-folder "/Trash"
+        mu4e-sent-messages-behavior 'delete
+        mu4e-view-use-gnus nil
+        mu4e-hide-index-messages t
+        mu4e-headers-auto-update t
+        mu4e-compose-signature-auto-include nil
+        mu4e-completing-read-function 'completing-read
+        mu4e-maildir-shortcuts '(("/INBOX" . ?i)
+                                 ("/Sent" . ?s)
+                                 ("/Trash" . ?t)
+                                 ("/All Mail" . ?a))
+        mu4e-use-fancy-chars nil
+        mu4e-view-show-images t
+        mu4e-view-prefer-html nil
+        ;; mu4e-html2text-command "w3m -dump -T text/html -O utf8 -graph"
+        mu4e-headers-fields '((:human-date . 25)
+                              (:flags . 6)
+                              (:from . 22)
+                              (:subject . nil))
+        message-kill-buffer-on-exit t
+        mail-user-agent 'mu4e-user-agent)
+
+  (when (fboundp 'imagemagick-register-types)
+    (imagemagick-register-types))
+
+  (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+
+  ;; Run mu4e in background after starting emacs
+  (mu4e t))
+#+end_src
+
+** COMMENT Use helm for mail filtration
+
+#+begin_src emacs-lisp
+(use-package helm-mu
+  :after (helm mu4e)
+  :bind
+  (:map
+   mu4e-main-mode-map
+   ("s" . helm-mu)
+   :map
+   mu4e-headers-mode-map
+   ("s" . helm-mu)
+   :map
+   mu4e-view-mode-map
+   ("s" . helm-mu)))
+#+end_src
+
+** COMMENT Alerts
+
+#+begin_src emacs-lisp
+(use-package mu4e-alert
+  :config
+  (setq mu4e-alert-modeline-formatter (lambda (count)
+                                        (if (> count 0)
+                                            (format "[Unread emails: %d]" count)
+                                          "")))
+  (mu4e-alert-set-default-style 'libnotify)
+  (add-hook 'after-init-hook #'mu4e-alert-enable-notifications)
+  (add-hook 'after-init-hook #'mu4e-alert-enable-mode-line-display))
+#+end_src
+
+** Sending emails
+
+#+begin_src emacs-lisp
+(use-package smtpmail
+  :ensure nil
+  :after message
+  :config
+  (setq message-send-mail-function #'smtpmail-send-it
+        smtpmail-smtp-server "127.0.0.1"
+        smtpmail-smtp-service 1025
+        smtpmail-stream-type 'starttls))
+#+end_src
+
+** GNUS
+
+GNUS split into many packages. I use ~use-package~ to setup each of them.
+
+First setup groups and IMAP.
+
+#+begin_src emacs-lisp
+(use-package gnus
+  :config
+  (setq gnus-select-method '(nntp "news.gwene.org"))
+  (setq gnus-secondary-select-methods
+        '((nnimap "protonmail"
+                  (nnimap-address "127.0.0.1")
+                  (nnimap-server-port 1143)
+                  (nnimap-stream starttls))))
+  (setq gnus-agent t
+        gnus-novice-user t
+        gnus-use-cache t))
+#+end_src
+
+Do not save ~.newsrc~ file. I don't use another newsreaders.
+
+#+begin_src emacs-lisp
+(use-package gnus-start
+  :ensure gnus
+  :config
+  (setq gnus-save-newsrc-file nil))
+#+end_src
+
+Setup groups view.
+
+#+begin_src emacs-lisp
+(use-package gnus-group
+  :ensure gnus
+  :config
+  (setq gnus-group-mode-line-format "%%b"
+        gnus-list-groups-with-ticked-articles nil
+        gnus-group-sort-function
+        '((gnus-group-sort-by-unread)
+          (gnus-group-sort-by-alphabet)
+          (gnus-group-sort-by-rank))))
+#+end_src
+
+Enable topics by default in groups view.
+
+#+begin_src emacs-lisp
+(use-package gnus-topic
+  :ensure gnus
+  :config
+  (setq gnus-topic-display-empty-topics t)
+  (add-hook 'gnus-group-mode-hook 'gnus-topic-mode))
+#+end_src
+
+Prettify summary view. Setup mode line and continuations arrow for threads.
+
+#+begin_src emacs-lisp
+(use-package gnus-sum
+  :ensure gnus
+  :demand t
+  :config
+  (setq gnus-auto-select-first nil
+        gnus-summary-mode-line-format "%p"
+        gnus-fetch-old-headers 'some)
+  (setq gnus-user-date-format-alist
+        '(((gnus-seconds-today) . "Today at %R")
+          ((+ 86400 (gnus-seconds-today)) . "Yesterday, %R")
+          (t . "%Y-%m-%d %R")))
+  (setq gnus-summary-line-format "%U%R%z %-16,16&user-date;  %4L:%-30,30f  %B%S\n")
+  (setq gnus-sum-thread-tree-false-root ""
+        gnus-sum-thread-tree-indent " "
+        gnus-sum-thread-tree-leaf-with-other "├─➤ "
+        gnus-sum-thread-tree-root ""
+        gnus-sum-thread-tree-single-leaf "└─➤ "
+        gnus-sum-thread-tree-vertical "│")
+
+  (add-hook 'gnus-summary-mode #'hl-line-mode))
+#+end_src
+
+Enable asynchronous operations in GNUS.
+
+#+begin_src emacs-lisp
+(use-package gnus-async
+  :ensure nil
+  :config
+  (setq gnus-asynchronous t))
+#+end_src
+
+Prefer plain text over HTML (not sure if it is actually works):
+
+#+begin_src emacs-lisp
+(use-package mm-decode
+  :ensure nil
+  :config
+  (with-eval-after-load "mm-decode"
+    (add-to-list 'mm-discouraged-alternatives "text/html")
+    (add-to-list 'mm-discouraged-alternatives "text/richtext")))
+#+end_src
+
+Enable demon on GNUS startup to check new mail periodically.
+
+#+begin_src emacs-lisp
+(use-package gnus-demon
+  :ensure gnus
+  :config
+  (add-hook 'gnus-startup-hook
+            (lambda ()
+              (gnus-demon-add-handler #'gnus-demon-scan-news 5 nil)
+              (gnus-demon-init))))
+#+end_src
+
+Enable notifications when new email/news is received:
+
+#+begin_src emacs-lisp
+(use-package gnus-notifications
+  :ensure gnus
+  :config
+  (setq gnus-notifications-use-google-contacts nil)
+  (add-hook 'gnus-after-getting-new-news-hook 'gnus-notifications))
+#+end_src
+
+* Configuration
+
+** Htmlize
+#+begin_src emacs-lisp
+(use-package htmlize
+  :config
+  (setq org-html-htmlize-output-type 'inline-css))
+#+end_src
+
+** Log files
+#+begin_src emacs-lisp
+(use-package vlf
+  :config
+  (require 'vlf-setup))
+
+(use-package logview
+  :config
+  (setq logview-additional-level-mappings
+        '(("Python" . ((error       "CRITICAL")
+                       (error       "ERROR")
+                       (warning     "WARNING")
+                       (information "INFO")
+                       (debug       "DEBUG")))))
+
+  (setq logview-additional-submodes
+        '(("Python" (format . "TIMESTAMP LEVEL - [NAME]:") (levels . "Python")))))
+#+end_src
+
+** REST client
+Quite interesting package. I think it will replace for Postman for me.
+#+begin_src emacs-lisp
+(use-package restclient)
+#+end_src
+And autocompletion for it:
+#+begin_src emacs-lisp
+(use-package company-restclient
+  :config
+  (add-to-list 'company-backends #'company-restclient))
+#+end_src
+And even org-babel integration:
+#+begin_src emacs-lisp
+(use-package ob-restclient
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((restclient . t))))
+#+end_src
+
+** PDF tools
+#+begin_src emacs-lisp
+(use-package pdf-tools
+  :config
+  (pdf-tools-install))
+#+end_src
+
+** Password store
+#+begin_src emacs-lisp
+(use-package password-store
+  :config
+  (setq password-store-password-length 12))
+
+(use-package password-store-otp)
+
+(use-package pass)
+
+(use-package helm-pass)
+;; (use-package ivy-pass)
+#+end_src
+
+** Google translate interface
+#+begin_src emacs-lisp
+(use-package google-translate-default-ui
+  :ensure google-translate
+  :config
+  (setq google-translate-pop-up-buffer-set-focus t))
 #+end_src
 
 ** Kubernetes
@@ -4036,10 +4451,13 @@ Latest update in haskell-mode introduce some incompatibility. Investigation requ
 #+end_src
 
 ** Funny
+
 *** Speed type
+
 #+begin_src emacs-lisp
 (use-package speed-type)
 #+end_src
+
 *** Literate calc mode
 #+begin_src emacs-lisp
 (use-package literate-calc-mode)

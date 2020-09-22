@@ -58,9 +58,16 @@ source $HOME/.local/bin/virtualenvwrapper.sh
 # Set default editor
 export EDITOR="emacsclient -c"
 
+# Set xmllint default intentation size to 4 spaces
+export XMLLINT_INDENT="    "
+
 # Add completion for stack tool
 eval "$(stack --bash-completion-script stack)"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="/home/rrudakov/.sdkman"
+[[ -s "/home/rrudakov/.sdkman/bin/sdkman-init.sh" ]] && source "/home/rrudakov/.sdkman/bin/sdkman-init.sh"
