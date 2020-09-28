@@ -2045,7 +2045,8 @@ mode (because I use tab completion for shell).
 (use-package company
   :config
   (setq company-global-modes '(not org-mode markdown-mode shell-mode))
-  (setq company-tooltip-align-annotations t)
+  (setq company-tooltip-align-annotations t
+        company-idle-delay .2)
 
   (global-company-mode))
 #+end_src
@@ -2208,6 +2209,9 @@ documented in the comment strings.
           (file . find-file)
           (wl . wl-other-frame)))
 
+  ;; Set keybinding to replace link with its description
+  (define-key org-mode-map (kbd "C-c u") #'rr/org-replace-link-by-link-description)
+
   ;; Enable some modules
   (add-to-list 'org-modules 'org-notify)  ; Add support for notifications
 
@@ -2260,7 +2264,10 @@ Setup files which should be used by ~agenda-mode~ and some tweaks for agenda.
         org-agenda-span 'week                      ; Start agenda for week interval
         org-agenda-todo-ignore-scheduled 'future   ; Do not include future items to global TODO list
         org-agenda-show-future-repeats 'next       ; Show only first next repeating task in the agenda
-        ))
+        )
+
+  ;; Set keybinding to easily switch to month view
+  (define-key org-agenda-mode-map (kbd "C-c m") #'org-agenda-month-view))
 #+end_src
 
 ** Org capture
@@ -2814,7 +2821,7 @@ support some additional options.
 #+begin_src emacs-lisp
 (use-package transient
   :config
-  (setq transient-show-popup 1))
+  (setq transient-show-popup t))
 #+end_src
 
 ** Forges
@@ -2970,6 +2977,14 @@ but still can be used with plain text.
   (sp-local-pair 'prog-mode "[" nil :post-handlers '(("||\n[i]" "RET")))
   (sp-local-pair 'prog-mode "(" nil :post-handlers '(("||\n[i]" "RET")))
   (sp-local-pair 'java-mode "/*" "*/" :post-handlers '(("* ||\n[i]" "RET")))
+
+  ;; Special settings for `web-mode'
+  (defun sp-web-mode-is-code-context (id action context)
+    (and (eq action 'insert)
+         (not (or (get-text-property (point) 'part-side)
+                  (get-text-property (point) 'block-side)))))
+
+  (sp-local-pair 'web-mode "<" nil :when '(sp-web-mode-is-code-context))
 
   (add-hook 'eshell-mode-hook #'smartparens-strict-mode)
 
@@ -3501,6 +3516,33 @@ Major mode for work with CSV files.
 (use-package csv-mode)
 #+end_src
 
+*** Log files
+
+I used to use this nice mode to work with log files. Now logs mostly moved to
+JSON format and stored in elastic search database and can be viewed in
+Kibana. I find old way for convenient, so I keep this settings so far.
+
+Log files can be quite large, so I use =logview= along with built-in =vlf=
+package.
+
+#+begin_src emacs-lisp
+(use-package vlf
+  :config
+  (require 'vlf-setup))
+
+(use-package logview
+  :config
+  (setq logview-additional-level-mappings
+        '(("Python" . ((error       "CRITICAL")
+                       (error       "ERROR")
+                       (warning     "WARNING")
+                       (information "INFO")
+                       (debug       "DEBUG")))))
+
+  (setq logview-additional-submodes
+        '(("Python" (format . "TIMESTAMP LEVEL - [NAME]:") (levels . "Python")))))
+#+end_src
+
 *** PKGBUILD major mode
 
 Edit =PKGBUILD= files for Arch Linux.
@@ -3581,7 +3623,7 @@ Fix broken tables for results of SQL queries.
 *** Shell
 
 Nothing special, just add company backend for company mode to complete
-environment variables, binaries found on your $PATH and fish shell functions.
+environment variables, binaries found on your =$PATH= and fish shell functions.
 
 #+begin_src emacs-lisp
 (use-package company-shell
@@ -3624,12 +3666,14 @@ extra settings.
   :config
   (add-hook 'java-mode-hook #'lsp)
   (setq lsp-java-save-actions-organize-imports nil
-        lsp-java-format-on-type-enabled nil)
+        lsp-java-format-on-type-enabled nil
+        lsp-java-completion-max-results 0)
 
   (setq lsp-java-format-settings-url "file:///home/rrudakov/Work/EPAM/eclipse-java-code-style.xml"
         lsp-java-format-settings-profile "GoogleStyle")
 
   (setq lsp-java-vmargs '("-javaagent:/home/rrudakov/Soft/lombok/lombok.jar"
+                          "-noverify"
                           "-Xmx4G"
                           "-XX:+UseG1GC"
                           "-XX:+UseStringDeduplication")))
@@ -3777,13 +3821,16 @@ I have keybindings similar to my =lsp-mode= bindings.
         tide-completion-show-source t)
 
   ;; formats the buffer before saving
-  (add-hook 'before-save-hook #'tide-format-before-save)
+  (add-hook 'before-save-hook
+            (lambda ()
+              (when (bound-and-true-p tide-mode)
+                (prettier-js))))
 
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
   (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil))
 
   (define-key tide-mode-map (kbd "C-c j a") #'tide-fix)
-  (define-key tide-mode-map (kbd "C-c C-f") #'prettier-js)
+  (define-key tide-mode-map (kbd "C-c C-f") #'tide-organize-imports)
   (define-key tide-mode-map (kbd "C-c j r") #'tide-rename-symbol)
 
   (flycheck-add-next-checker 'tsx-tide 'javascript-eslint 'append)
@@ -3808,7 +3855,10 @@ future.
   (add-to-list 'auto-mode-alist '("\\.component.html" . ng2-html-mode)))
 #+end_src
 
-*** WEB
+*** Web-mode
+
+Super powerful major mode for editing *web templates*. Support various template
+engines, embedded CSS and JavaScript.
 
 #+begin_src emacs-lisp
 (use-package web-mode
@@ -3818,6 +3868,7 @@ future.
         web-mode-code-indent-offset 2
         web-mode-enable-auto-closing t
         web-mode-enable-auto-pairing nil
+        web-mode-enable-auto-quoting t
         web-mode-enable-auto-opening t
         web-mode-enable-css-colorization t)
 
@@ -3853,7 +3904,7 @@ future.
   (flycheck-add-mode 'javascript-eslint 'web-mode))
 #+end_src
 
-**** Company WEB
+**** COMMENT Company-web
 
 #+begin_src emacs-lisp
 (use-package company-web
@@ -3864,6 +3915,8 @@ future.
 #+end_src
 
 *** Rust
+
+I use =lsp-mode= for RUST. Here I just explicitly add =rust-mode= support.
 
 #+begin_src emacs-lisp
 (use-package rust-mode)
@@ -4316,103 +4369,11 @@ Enable notifications when new email/news is received:
   (add-hook 'gnus-after-getting-new-news-hook 'gnus-notifications))
 #+end_src
 
-* Configuration
+* IRC Client for emacs (ERC)
 
-** Htmlize
-#+begin_src emacs-lisp
-(use-package htmlize
-  :config
-  (setq org-html-htmlize-output-type 'inline-css))
-#+end_src
+This is built-in package. I'm trying to use it for gitter. It's in testing, not
+sure if I'll keep this settings in my config.
 
-** Log files
-#+begin_src emacs-lisp
-(use-package vlf
-  :config
-  (require 'vlf-setup))
-
-(use-package logview
-  :config
-  (setq logview-additional-level-mappings
-        '(("Python" . ((error       "CRITICAL")
-                       (error       "ERROR")
-                       (warning     "WARNING")
-                       (information "INFO")
-                       (debug       "DEBUG")))))
-
-  (setq logview-additional-submodes
-        '(("Python" (format . "TIMESTAMP LEVEL - [NAME]:") (levels . "Python")))))
-#+end_src
-
-** REST client
-Quite interesting package. I think it will replace for Postman for me.
-#+begin_src emacs-lisp
-(use-package restclient)
-#+end_src
-And autocompletion for it:
-#+begin_src emacs-lisp
-(use-package company-restclient
-  :config
-  (add-to-list 'company-backends #'company-restclient))
-#+end_src
-And even org-babel integration:
-#+begin_src emacs-lisp
-(use-package ob-restclient
-  :config
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((restclient . t))))
-#+end_src
-
-** PDF tools
-#+begin_src emacs-lisp
-(use-package pdf-tools
-  :config
-  (pdf-tools-install))
-#+end_src
-
-** Password store
-#+begin_src emacs-lisp
-(use-package password-store
-  :config
-  (setq password-store-password-length 12))
-
-(use-package password-store-otp)
-
-(use-package pass)
-
-(use-package helm-pass)
-;; (use-package ivy-pass)
-#+end_src
-
-** Google translate interface
-#+begin_src emacs-lisp
-(use-package google-translate-default-ui
-  :ensure google-translate
-  :config
-  (setq google-translate-pop-up-buffer-set-focus t))
-#+end_src
-
-** Kubernetes
-*** Major mode for kubernetes configs
-#+begin_src emacs-lisp
-(use-package k8s-mode
- :config
- (setq k8s-search-documentation-browser-function 'browse-url-firefox)
- (add-hook 'k8s-mode-hook #'yas-minor-mode))
-#+end_src
-*** Kubernetes client for emacs
-#+begin_src emacs-lisp
-(use-package kubernetes
-  :commands (kubernetes-overview))
-#+end_src
-
-** Dockerfile mode
-#+begin_src emacs-lisp
-(use-package dockerfile-mode)
-#+end_src
-
-** IRC Client for emacs (ERC)
 #+begin_src emacs-lisp
 (use-package erc
   :ensure nil
@@ -4428,7 +4389,106 @@ And even org-babel integration:
         '(("irc.gitter.im" "#emacs-lsp/lsp-mode"))))
 #+end_src
 
-** Emacs everywhere
+* REST client
+
+Very powerful and at the same time simple package. It replaced Postman for me.
+
+#+begin_src emacs-lisp
+(use-package restclient)
+#+end_src
+
+And completion backend for it:
+
+#+begin_src emacs-lisp
+(use-package company-restclient
+  :config
+  (add-to-list 'company-backends #'company-restclient))
+#+end_src
+
+And even org-babel integration:
+
+#+begin_src emacs-lisp
+(use-package ob-restclient
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((restclient . t))))
+#+end_src
+
+* PDF tools
+
+View and navigate PDF file inside emacs.
+
+#+begin_src emacs-lisp
+(use-package pdf-tools
+  :config
+  (pdf-tools-install))
+#+end_src
+
+* Htmlize
+
+#+begin_src emacs-lisp
+(use-package htmlize
+  :config
+  (setq org-html-htmlize-output-type 'inline-css))
+#+end_src
+
+* Password store
+
+#+begin_src emacs-lisp
+(use-package password-store
+  :config
+  (setq password-store-password-length 12))
+
+(use-package password-store-otp)
+
+(use-package pass)
+
+(use-package helm-pass)
+;; (use-package ivy-pass)
+#+end_src
+
+* Google translate interface
+
+#+begin_src emacs-lisp
+(use-package google-translate-smooth-ui
+  :ensure google-translate
+  :config
+  (setq google-translate-pop-up-buffer-set-focus t
+        google-translate-translation-directions-alist
+        '(("en" . "ru")
+          ("ru" . "en")
+          ("nl" . "en")
+          ("en" . "nl")))
+  (global-set-key (kbd "C-c t") 'google-translate-smooth-translate))
+#+end_src
+
+* Kubernetes
+
+** Major mode for kubernetes config files
+
+#+begin_src emacs-lisp
+(use-package k8s-mode
+ :config
+ (setq k8s-search-documentation-browser-function 'browse-url-firefox)
+ (add-hook 'k8s-mode-hook #'yas-minor-mode))
+#+end_src
+
+** Kubernetes client for emacs
+
+#+begin_src emacs-lisp
+(use-package kubernetes
+  :commands (kubernetes-overview))
+#+end_src
+
+* Dockerfile mode
+
+#+begin_src emacs-lisp
+(use-package dockerfile-mode)
+#+end_src
+
+* Emacs everywhere
+
 #+begin_src emacs-lisp
 (defun pull-request-conversation-p (window-title)
   "Predicate to make sure WINDOW-TITLE match PR conversation."
@@ -4445,39 +4505,49 @@ And even org-babel integration:
 (add-hook 'ea-popup-hook 'popup-handler)
 #+end_src
 
-** Create GIF screencasts
+* Create GIF screencasts
+
 #+begin_src emacs-lisp
 (use-package gif-screencast)
 #+end_src
 
-** Funny
+* Funny
 
-*** Speed type
+** Speed type
 
 #+begin_src emacs-lisp
 (use-package speed-type)
 #+end_src
 
-*** Literate calc mode
+** Literate calc mode
+
 #+begin_src emacs-lisp
 (use-package literate-calc-mode)
 #+end_src
 
-** Set keybindings
-*** Common
+* Set keybindings
+
+I set the most important global keybindings at the end of my configuration in
+case I used the same key already somewhere earlier. This bindings will
+overwrite previous if they exist.
+
+** Common
+
 #+begin_src emacs-lisp
 (global-set-key (kbd "M-[") #'align)
+(global-set-key (kbd "<f6>") #'profiler-start)
+(global-set-key (kbd "<f7>") #'profiler-report)
+(global-set-key (kbd "<f8>") #'profiler-stop)
 #+end_src
-*** Org
+
+** Org
+
+Global =org-mode= invocation commands.
+
 #+begin_src emacs-lisp
 (global-set-key (kbd "C-c l") #'org-store-link)
 (global-set-key (kbd "C-c a") #'org-agenda)
 (global-set-key (kbd "C-c c") #'org-capture)
 (global-set-key (kbd "C-c b") #'org-switchb)
 (global-set-key (kbd "<f5>") #'org-clock-goto)
-(define-key org-agenda-mode-map (kbd "C-c m") #'org-agenda-month-view)
-(define-key org-mode-map (kbd "C-c u") #'rr/org-replace-link-by-link-description)
-(global-set-key (kbd "<f6>") #'profiler-start)
-(global-set-key (kbd "<f7>") #'profiler-report)
-(global-set-key (kbd "<f8>") #'profiler-stop)
 #+end_src
