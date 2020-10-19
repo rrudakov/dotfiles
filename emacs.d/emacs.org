@@ -404,6 +404,16 @@ Stolen from doom-emacs. Use UTF-8 for everything.
 (setq-default buffer-file-coding-system 'utf-8)
 #+end_src
 
+*** Disable bidirectional text rendering
+
+Emacs support rendering text for some languages which should be written from
+right to left (for example Arabic), but this feature slows down emacs a little
+bit, so I disable it globally.
+
+#+begin_src emacs-lisp
+(setq-default bidi-paragraph-direction 'left-to-right)
+#+end_src
+
 *** Enable y/n answers instead of yes/no
 
 Not really variable assignment or configuration change, but this is kind of
@@ -878,14 +888,13 @@ help popup window is selected by default.
 
 *** Disable tooltips
 
-I prefer minimum of distractions during work. One of them is tooltips. Let's
-disable them completely.
+I prefer minimum of distractions during work. One of them is tooltips. I
+disable =tooltip-mode= in =early-init.el=. Here some related settings.
 
 #+begin_src emacs-lisp
 (use-package tooltip
   :ensure nil
   :config
-  (tooltip-mode -1)
   (setq tooltip-use-echo-area nil
         show-help-function nil))
 #+end_src
@@ -1090,7 +1099,7 @@ Overview of settings in this section:
   :config
   (setq save-interprogram-paste-before-kill t)
   (add-hook 'text-mode-hook #'auto-fill-mode)
-  (add-hook 'prog-mode-hook (lambda () (toggle-truncate-lines 1)))
+  (add-hook 'prog-mode-hook (lambda () (setq truncate-lines t)))
   (add-hook 'before-save-hook #'delete-trailing-whitespace)
   (column-number-mode))
 #+end_src
@@ -1608,12 +1617,13 @@ all my customization in case I want ever to switch back to it.
         ;; Clickable text
         `(button ((t (:foreground ,zenburn-yellow :weight bold))))
         ;; Some org-mode faces
-        `(org-done ((t (:strike-through t))))
-        `(org-checkbox ((t (:box nil :background nil))))
-        `(org-headline-done ((t (:foreground ,dim :strike-through t))))
-        `(org-mode-line-clock ((t (:background nil))))
-        `(org-table ((t (:background ,zenburn-bg-05))))
-        `(org-tag ((t (:background ,zenburn-bg+1 :foreground ,zenburn-red)))))))
+        ;; `(org-done ((t (:strike-through t))))
+        ;; `(org-checkbox ((t (:box nil :background nil))))
+        ;; `(org-headline-done ((t (:foreground ,dim :strike-through t))))
+        ;; `(org-mode-line-clock ((t (:background nil))))
+        ;; `(org-table ((t (:background ,zenburn-bg-05))))
+        ;; `(org-tag ((t (:background ,zenburn-bg+1 :foreground ,zenburn-red))))
+        )))
     (remove-hook 'server-after-make-frame-hook 'rr/apply-theme))
 
   (if (daemonp)
@@ -2077,7 +2087,8 @@ I hope one day it will be good enough to replace original one.
 (use-package company-posframe
   :config
   (setq company-posframe-show-indicator nil
-        company-posframe-quickhelp-show-header nil)
+        company-posframe-quickhelp-show-header nil
+        company-posframe-quickhelp-delay .5)
   (company-posframe-mode 1))
 #+end_src
 
@@ -2198,9 +2209,6 @@ documented in the comment strings.
         org-enforce-todo-checkbox-dependencies t                         ; The same as above but for checkboxes
         )
 
-  ;; Fix face for org-priority cookie
-  (setq org-priority-regexp ".*?\\(\\[#\\([A-Z0-9]+\\)\\]\\) ?")
-
   ;; Open different kind of links different way
   (setq org-link-frame-setup
         '((vm . vm-visit-folder-other-frame)
@@ -2264,7 +2272,17 @@ Setup files which should be used by ~agenda-mode~ and some tweaks for agenda.
         org-agenda-span 'week                      ; Start agenda for week interval
         org-agenda-todo-ignore-scheduled 'future   ; Do not include future items to global TODO list
         org-agenda-show-future-repeats 'next       ; Show only first next repeating task in the agenda
+        org-agenda-breadcrumbs-separator " → "     ; The separator of breadcrumbs in agenda lines
+        org-agenda-skip-scheduled-if-deadline-is-shown t
+        org-agenda-skip-timestamp-if-deadline-is-shown t
         )
+
+  ;; Make time grid more detailed
+  (setq org-agenda-time-grid
+        '((daily today require-timed)
+          (800 900 1000 1100 1200 1300 1400 1500 1600 1700 1800 1900 2000 2100)
+          "......"
+          "----------------"))
 
   ;; Set keybinding to easily switch to month view
   (define-key org-agenda-mode-map (kbd "C-c m") #'org-agenda-month-view))
@@ -2495,6 +2513,12 @@ description. Not perfect, some markup should be fixed after pasting.
 #+begin_src emacs-lisp
 (use-package ox-jira
   :config
+  (defun rr/replace-org-with-jira-markup (_frame)
+    (remove-hook 'delete-frame-functions #'rr/replace-org-with-jira-markup)
+    (let ((markup-text (org-export-as 'jira)))
+      (erase-buffer)
+      (insert markup-text)))
+
   (setq org-export-copy-to-kill-ring 'if-interactive))
 #+end_src
 
@@ -2707,6 +2731,15 @@ used for literate programming. Below I define which languages can be used for
         org-export-use-babel nil))
 #+end_src
 
+Set custom path to =ditaa.jar=.
+
+#+begin_src emacs-lisp
+(use-package ob-ditaa
+  :ensure nil
+  :config
+  (setq org-ditaa-jar-path "~/Soft/ditaa/ditaa.jar"))
+#+end_src
+
 Add support for asynchronous execution of source code blocks.
 
 #+begin_src emacs-lisp
@@ -2722,6 +2755,23 @@ often.
 
 #+begin_src emacs-lisp
 (use-package poporg)
+#+end_src
+
+* Org-roam
+
+I've been looking forward to try this package to figure out what is it and what
+is it for. Finally I've found time for it.
+
+#+begin_src emacs-lisp
+(use-package org-roam
+  :config
+  (setq org-roam-directory "~/Org-roam")
+  (add-hook 'after-init-hook #'org-roam-mode)
+  (define-key org-roam-mode-map (kbd "C-c n l") #'org-roam)
+  (define-key org-roam-mode-map (kbd "C-c n f") #'org-roam-find-file)
+  (define-key org-roam-mode-map (kbd "C-c n g") #'org-roam-graph)
+  (define-key org-mode-map (kbd "C-c n i") #'org-roam-insert)
+  (define-key org-mode-map (kbd "C-c n I") #'org-roam-insert-immediate))
 #+end_src
 
 * Virtual workspace
@@ -2977,14 +3027,6 @@ but still can be used with plain text.
   (sp-local-pair 'prog-mode "[" nil :post-handlers '(("||\n[i]" "RET")))
   (sp-local-pair 'prog-mode "(" nil :post-handlers '(("||\n[i]" "RET")))
   (sp-local-pair 'java-mode "/*" "*/" :post-handlers '(("* ||\n[i]" "RET")))
-
-  ;; Special settings for `web-mode'
-  (defun sp-web-mode-is-code-context (id action context)
-    (and (eq action 'insert)
-         (not (or (get-text-property (point) 'part-side)
-                  (get-text-property (point) 'block-side)))))
-
-  (sp-local-pair 'web-mode "<" nil :when '(sp-web-mode-is-code-context))
 
   (add-hook 'eshell-mode-hook #'smartparens-strict-mode)
 
@@ -3324,7 +3366,8 @@ default value is changed (the project's development is very active).
         lsp-enable-indentation nil
         lsp-modeline-diagnostics-scope :file
         lsp-diagnostic-clean-after-change t
-        lsp-completion-use-last-result t)
+        lsp-completion-use-last-result t
+        lsp-log-max 10000)
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
 
@@ -3616,8 +3659,7 @@ Fix broken tables for results of SQL queries.
 
 #+begin_src emacs-lisp
 (add-hook 'sql-interactive-mode-hook
-          (lambda ()
-            (toggle-truncate-lines t)))
+          (lambda () (setq truncate-lines t)))
 #+end_src
 
 *** Shell
@@ -3666,8 +3708,7 @@ extra settings.
   :config
   (add-hook 'java-mode-hook #'lsp)
   (setq lsp-java-save-actions-organize-imports nil
-        lsp-java-format-on-type-enabled nil
-        lsp-java-completion-max-results 0)
+        lsp-java-format-on-type-enabled nil)
 
   (setq lsp-java-format-settings-url "file:///home/rrudakov/Work/EPAM/eclipse-java-code-style.xml"
         lsp-java-format-settings-profile "GoogleStyle")
@@ -3774,7 +3815,8 @@ goes crazy) and prefer to format code manually.
 #+begin_src emacs-lisp
 (use-package prettier-js
   :config
-  (setq prettier-js-args '("--single-quote")))
+  (setq prettier-js-args '("--single-quote")
+        prettier-js-show-errors nil))
 #+end_src
 
 **** Add node_modules to path
@@ -3804,7 +3846,9 @@ with =tsserver=.
 I have keybindings similar to my =lsp-mode= bindings.
 
 #+begin_src emacs-lisp
-(use-package typescript-mode)
+(use-package typescript-mode
+  :config
+  (setq typescript-indent-level 2))
 
 (use-package tide
   :after prettier-js
@@ -3839,6 +3883,20 @@ I have keybindings similar to my =lsp-mode= bindings.
   (flycheck-add-next-checker 'javascript-tide 'javascript-eslint 'append))
 #+end_src
 
+**** COMMENT JSX-mode
+
+Since version 27.1 emacs has built-in support for JSX syntax.
+
+#+begin_src emacs-lisp
+(use-package js
+  :ensure nil
+  :config
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . js-jsx-mode))
+  (add-to-list 'auto-mode-alist '("\\.jsx\\'" . js-jsx-mode))
+  (add-hook 'js-jsx-mode-hook #'setup-tide-mode)
+  (flycheck-add-mode 'javascript-eslint 'js-jsx-mode))
+#+end_src
+
 **** COMMENT Angular support
 
 Used to use it on one of my jobs. Probably will remove this configuration in
@@ -3868,7 +3926,7 @@ engines, embedded CSS and JavaScript.
         web-mode-code-indent-offset 2
         web-mode-enable-auto-closing t
         web-mode-enable-auto-pairing nil
-        web-mode-enable-auto-quoting t
+        web-mode-enable-auto-quoting nil
         web-mode-enable-auto-opening t
         web-mode-enable-css-colorization t)
 
@@ -4161,25 +4219,27 @@ I use =lsp-mode= for RUST. Here I just explicitly add =rust-mode= support.
       user-full-name "Roman Rudakov")
 #+end_src
 
-** COMMENT ProtonMail configuration
+** ProtonMail configuration
 
 #+begin_src emacs-lisp
 (use-package mu4e
   :ensure nil
   :after message
-  :bind
-  (:map mu4e-main-mode-map
-        ([remap mu4e-quit] . kill-current-buffer))
   :config
+  (define-key mu4e-main-mode-map [remap mu4e-quit] #'kill-current-buffer)
+  (global-set-key (kbd "C-c e") #'mu4e)
   (setq mu4e-maildir (expand-file-name "~/.mail/ProtonMail")
-        mu4e-reply-to-address user-mail-address
+        mu4e-compose-reply-to-address user-mail-address
         mu4e-sent-folder "/Sent"
         mu4e-trash-folder "/Trash"
+        mu4e-drafts-folder "/Drafts"
         mu4e-sent-messages-behavior 'delete
         mu4e-view-use-gnus nil
         mu4e-hide-index-messages t
         mu4e-headers-auto-update t
-        mu4e-compose-signature-auto-include nil
+        mu4e-compose-signature "Best regards.\n\nRoman Rudakov."
+        mu4e-compose-signature-auto-include t
+        mu4e-compose-dont-reply-to-self t
         mu4e-completing-read-function 'completing-read
         mu4e-maildir-shortcuts '(("/INBOX" . ?i)
                                  ("/Sent" . ?s)
@@ -4194,10 +4254,8 @@ I use =lsp-mode= for RUST. Here I just explicitly add =rust-mode= support.
                               (:from . 22)
                               (:subject . nil))
         message-kill-buffer-on-exit t
+        mu4e-split-view 'single-window
         mail-user-agent 'mu4e-user-agent)
-
-  (when (fboundp 'imagemagick-register-types)
-    (imagemagick-register-types))
 
   (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t)
 
@@ -4205,24 +4263,18 @@ I use =lsp-mode= for RUST. Here I just explicitly add =rust-mode= support.
   (mu4e t))
 #+end_src
 
-** COMMENT Use helm for mail filtration
+** Use helm for mail filtration
 
 #+begin_src emacs-lisp
 (use-package helm-mu
   :after (helm mu4e)
-  :bind
-  (:map
-   mu4e-main-mode-map
-   ("s" . helm-mu)
-   :map
-   mu4e-headers-mode-map
-   ("s" . helm-mu)
-   :map
-   mu4e-view-mode-map
-   ("s" . helm-mu)))
+  :config
+  (define-key mu4e-main-mode-map (kbd "s") #'helm-mu)
+  (define-key mu4e-headers-mode-map (kbd "s") #'helm-mu)
+  (define-key mu4e-view-mode-map (kbd "s") #'helm-mu))
 #+end_src
 
-** COMMENT Alerts
+** Alerts
 
 #+begin_src emacs-lisp
 (use-package mu4e-alert
@@ -4492,15 +4544,23 @@ View and navigate PDF file inside emacs.
 #+begin_src emacs-lisp
 (defun pull-request-conversation-p (window-title)
   "Predicate to make sure WINDOW-TITLE match PR conversation."
-  (or (string-match-p "Pull request" window-title)))
+  (or (string-match-p "Pull Request" window-title)))
+
+(defun jira-ticket-p (window-title)
+  "Predicate to make sure WINDOW-TITLE match JIRA ticket creation page."
+  (or (string-match-p "Create issue" window-title)))
 
 (defun popup-handler (app-name window-title x y w h)
   "Set major mode based on APP-NAME and WINDOW-TITLE."
   (cond
-    ((pull-request-conversation-p window-title) (gfm-mode))
-    (t (markdown-mode)))
-  (when (gui-get-selection 'PRIMARY)
-    (insert (gui-get-selection 'PRIMARY))))
+   ((pull-request-conversation-p window-title) (gfm-mode))
+   ((jira-ticket-p window-title) (progn
+                                   (org-mode)
+                                   (add-hook 'delete-frame-functions #'rr/replace-org-with-jira-markup -100 t)))
+   (t (markdown-mode)))
+  ;; (when (gui-get-selection 'PRIMARY)
+  ;;   (insert (gui-get-selection 'PRIMARY)))
+  )
 
 (add-hook 'ea-popup-hook 'popup-handler)
 #+end_src

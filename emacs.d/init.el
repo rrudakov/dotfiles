@@ -31,6 +31,7 @@ There are two things you can do about this warning:
   (package-refresh-contents))
 
 (add-to-list 'load-path "~/.emacs.d/custom/")
+(add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
 
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
