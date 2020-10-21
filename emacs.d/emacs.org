@@ -3876,6 +3876,14 @@ I have keybindings similar to my =lsp-mode= bindings.
     (setq flycheck-check-syntax-automatically '(save mode-enabled))
     (tide-hl-identifier-mode +1))
 
+  (defun rr/tide-clean-imports-and-reformat ()
+    "Run two commands sequentially `tide-organize-imports' and `prettier-js'."
+    (interactive)
+    (save-excursion
+      (tide-organize-imports)
+      (prettier-js)
+      (save-buffer)))
+
   ;; aligns annotation to the right hand side
   (setq tide-sort-completions-by-kind t
         tide-completion-detailed t
@@ -3885,7 +3893,7 @@ I have keybindings similar to my =lsp-mode= bindings.
   (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil))
 
   (define-key tide-mode-map (kbd "C-c j a") #'tide-fix)
-  (define-key tide-mode-map (kbd "C-c C-f") #'prettier-js)
+  (define-key tide-mode-map (kbd "C-c C-f") #'rr/tide-clean-imports-and-reformat)
   (define-key tide-mode-map (kbd "C-c j r") #'tide-rename-symbol)
 
   (flycheck-add-next-checker 'tsx-tide 'javascript-eslint 'append)
