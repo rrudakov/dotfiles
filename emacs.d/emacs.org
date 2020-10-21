@@ -750,7 +750,8 @@ bottom of the frame.")
 
 (defconst helm-buffers-regexps
   '("\\*helm.*?\\*"
-    "\\*cljr.*?\\*")
+    "\\*cljr.*?\\*"
+    "\\*lsp-java select\\*")
   "List of helm buffer regexps.")
 
 (defun bottom-special-buffer-p (buf &rest _)
@@ -1896,6 +1897,20 @@ power of helm (navigation and search).
   :config
   (eval-after-load 'flycheck
     '(define-key flycheck-mode-map (kbd "C-'") #'helm-flycheck)))
+#+end_src
+
+*** Helm flyspell correct
+
+Correct spelling errors using helm interface.
+
+#+begin_src emacs-lisp
+(use-package flyspell-correct
+  :after flyspell
+  :config
+  (define-key flyspell-mode-map (kbd "C-;") #'flyspell-correct-wrapper))
+
+(use-package flyspell-correct-helm
+  :after flyspell-correct)
 #+end_src
 
 *** Helm org rifle
@@ -3853,7 +3868,9 @@ I have keybindings similar to my =lsp-mode= bindings.
 (use-package tide
   :after prettier-js
   :config
+
   (defun setup-tide-mode ()
+    "Bunch of settings for `tide-mode'."
     (interactive)
     (tide-setup)
     (setq flycheck-check-syntax-automatically '(save mode-enabled))
@@ -3864,17 +3881,11 @@ I have keybindings similar to my =lsp-mode= bindings.
         tide-completion-detailed t
         tide-completion-show-source t)
 
-  ;; formats the buffer before saving
-  (add-hook 'before-save-hook
-            (lambda ()
-              (when (bound-and-true-p tide-mode)
-                (prettier-js))))
-
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
   (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil))
 
   (define-key tide-mode-map (kbd "C-c j a") #'tide-fix)
-  (define-key tide-mode-map (kbd "C-c C-f") #'tide-organize-imports)
+  (define-key tide-mode-map (kbd "C-c C-f") #'prettier-js)
   (define-key tide-mode-map (kbd "C-c j r") #'tide-rename-symbol)
 
   (flycheck-add-next-checker 'tsx-tide 'javascript-eslint 'append)
