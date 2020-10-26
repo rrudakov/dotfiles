@@ -2073,7 +2073,8 @@ mode (because I use tab completion for shell).
   (setq company-tooltip-align-annotations t
         company-idle-delay .2)
 
-  (global-company-mode))
+  (global-company-mode)
+  (company-tng-mode))
 #+end_src
 
 ** Quick help
@@ -3166,7 +3167,14 @@ and automatically expand it into function templates.
 
   (yas-reload-all)
   (add-hook 'prog-mode-hook #'yas-minor-mode)
-  (add-hook 'tex-mode-hook #'yas-minor-mode))
+  (add-hook 'tex-mode-hook #'yas-minor-mode)
+
+  ;; Expand and navigate between items by `C-j' to prevent conflicts with `company-tng'
+  (define-key yas-minor-mode-map "\C-j" 'yas-expand)
+  (define-key yas-keymap "\C-j" 'yas-next-field-or-maybe-expand)
+  (dolist (keymap (list yas-minor-mode-map yas-keymap))
+    (define-key keymap (kbd "TAB") nil)
+    (define-key keymap [(tab)] nil)))
 #+end_src
 
 ** Rainbow delimiters
@@ -3382,7 +3390,8 @@ default value is changed (the project's development is very active).
         lsp-modeline-diagnostics-scope :file
         lsp-diagnostic-clean-after-change t
         lsp-completion-use-last-result t
-        lsp-log-max 10000)
+        lsp-log-max 10000
+        lsp-enable-snippet t)
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
 
@@ -3701,7 +3710,14 @@ automatic code reformat and set default indentation to 2 spaces.
   :ensure nil
   :config
   (setq google-java-format-executable (expand-file-name "~/.local/bin/google-java-format"))
-  (define-key java-mode-map (kbd "C-c C-f") #'google-java-format-buffer))
+
+  (defun rr/java-format-and-save ()
+    (interactive)
+    (save-excursion
+      (google-java-format-buffer)
+      (save-buffer)))
+
+  (define-key java-mode-map (kbd "C-c C-f") #'rr/java-format-and-save))
 
 (use-package cc-vars
   :after cc-mode
@@ -4036,7 +4052,7 @@ I use =lsp-mode= for RUST. Here I just explicitly add =rust-mode= support.
 (use-package blacken
   :config
   (setq blacken-line-length 79
-        blacken-allow-py36 t))
+        blacken-allow-py36 nil))
 
 (use-package py-yapf)
 #+end_src
