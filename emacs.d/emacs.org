@@ -1145,7 +1145,7 @@ emacs minibuffer to enter this password.
 (use-package epg-config
   :ensure nil
   :config
-  (setq epg-pinentry-mode 'loopback))
+  (setq epg-pinentry-mode nil))
 #+end_src
 
 ** Imenu
