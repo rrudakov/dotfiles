@@ -736,7 +736,8 @@ sometimes lead to unpredictable behavior.
             "Python.*?"
             "grep"
             "lsp-help"
-            "compilation"               ;
+            "compilation"
+            "cider-inspect"
             "Calendar"
             "Org\sSelect"
             ".*?\sserver\slog"
