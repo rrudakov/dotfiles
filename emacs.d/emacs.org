@@ -1555,85 +1555,25 @@ all my customization in case I want ever to switch back to it.
 
 #+begin_src emacs-lisp
 (use-package zenburn-theme
+  :ensure nil
   :config
   (setq zenburn-use-variable-pitch nil)
+
+  ;; (zenburn-with-color-variables
+  ;;   (custom-theme-set-faces
+  ;;    'zenburn
+  ;;    ;; Some org-mode faces
+  ;;    ;; `(org-table ((t (:background ,zenburn-bg-05))))
+  ;;    ))
 
   (defun rr/apply-theme ()
     "Apply some customizaitons to current theme."
     (load-theme 'zenburn t)
-    (let ((dim "dim gray")
-          (default-font (face-attribute 'default :family)))
-      (zenburn-with-color-variables
-       (custom-theme-set-faces
-        'user
-        ;; Helm
-        `(helm-delete-async-message ((t (:foreground ,zenburn-yellow))))
-        `(helm-selection ((t (:extend t))))
-        `(helm-ff-file ((t (:foreground ,zenburn-fg :background ,zenburn-bg :weight semi-bold))))
-        `(helm-ff-executable ((t (:foreground ,zenburn-green+2 :background ,zenburn-bg :weight semi-bold))))
-        `(helm-ff-prefix ((t (:foreground ,zenburn-bg :background ,zenburn-yellow :weight semi-bold))))
-        `(helm-ff-file-extension ((t (:foreground ,zenburn-magenta :extend t))))
-        ;; Highlight line
-        ;; `(hl-line ((t (:extend t :background "#5F5F5F"))))
-        ;; `(hl-line-face ((((class color) (min-colors 89)) (:background "#5F5F5F")) (t :weight bold)))
-        ;; Different
-        `(link-visited ((t (:foreground ,zenburn-yellow-2 :underline t))))
-        ;; CIDER
-        `(cider-stacktrace-filter-inactive-face ((t (:inherit button :underline nil :weight semi-bold))))
-        `(cider-stacktrace-filter-active-face ((t (:inherit button :underline t :weight semi-bold))))
-        ;; Flycheck posframe
-        `(flycheck-posframe-info-face ((t (:inherit 'success))))
-        `(flycheck-posframe-warning-face ((t (:inherit 'warning))))
-        `(flycheck-posframe-error-face ((t (:inherit 'error))))
-        `(flycheck-posframe-background-face ((t (:background ,zenburn-bg+05))))
-        `(flycheck-posframe-border-face ((t (:foreground ,dim))))
-        ;; Eyebrowse
-        `(eyebrowse-mode-line-active ((t (:inherit 'mode-line-emphasis :foreground ,zenburn-yellow))))
-        `(eyebrowse-mode-line-inactive ((t (:foreground ,dim))))
-        ;; Magit
-        `(magit-popup-disabled-argument ((t (:foreground ,zenburn-fg-1 :weight semi-bold))))
-        `(magit-filename ((t (:weight semi-bold))))
-        ;; VC state
-        `(vc-edited-state ((t :inherit 'vc-state-base :foreground ,zenburn-blue)))
-        `(vc-up-to-date-state ((t :inherit 'vc-state-base :foreground ,zenburn-green+4)))
-        `(vc-removed-state ((t :inherit 'vc-state-base :foreground ,zenburn-red)))
-        `(vc-conflict-state ((t :inherit 'vc-state-base :foreground ,zenburn-orange)))
-        `(vc-locally-added-state ((t :inherit 'vc-state-base :foreground ,zenburn-fg)))
-        `(vc-needs-update-state ((t :inherit 'vc-state-base :foreground ,zenburn-yellow)))
-        `(vc-missing-state ((t :inherit 'vc-state-base :foreground ,zenburn-fg-05)))
-        ;; Set fringe color the same as background
-        `(fringe ((t (:background ,zenburn-bg))))
-        ;; Less contrast window divider
-        `(window-divider ((t (:foreground ,dim))))
-        ;; Emphasize code block in markdown mode
-        `(markdown-code-face ((t (:background ,zenburn-bg+05 :extend t))))
-        ;; Less contrast lsp-ui code actions
-        `(lsp-ui-sideline-code-action ((t (:foreground ,dim))))
-        `(lsp-face-highlight-textual ((t (:inherit 'highlight :weight bold))))
-        ;; LaTeX
-        `(font-latex-slide-title-face ((t (:height 1.0 :inherit font-lock-type-face))))
-        ;; Tab bar mode
-        `(tab-bar ((t (:family ,default-font :background ,zenburn-bg-05))))
-        `(tab-bar-tab ((t (:family ,default-font :background ,zenburn-bg))))
-        `(tab-bar-tab-inactive ((t (:family ,default-font))))
-        ;; Clickable text
-        `(button ((t (:foreground ,zenburn-yellow :weight bold))))
-        ;; Some org-mode faces
-        ;; `(org-done ((t (:strike-through t))))
-        ;; `(org-checkbox ((t (:box nil :background nil))))
-        ;; `(org-headline-done ((t (:foreground ,dim :strike-through t))))
-        ;; `(org-mode-line-clock ((t (:background nil))))
-        ;; `(org-table ((t (:background ,zenburn-bg-05))))
-        ;; `(org-tag ((t (:background ,zenburn-bg+1 :foreground ,zenburn-red))))
-        )))
     (remove-hook 'server-after-make-frame-hook 'rr/apply-theme))
 
   (if (daemonp)
       (add-hook 'server-after-make-frame-hook #'rr/apply-theme)
-    (rr/apply-theme))
-
-  (with-eval-after-load 'zenburn
-    (rr/refresh-org-buffers)))
+    (rr/apply-theme)))
 #+end_src
 
 *** Modus vivendi
@@ -1646,29 +1586,9 @@ customization, very actively maintained.
   :init
   (setq modus-vivendi-theme-bold-constructs t
         modus-vivendi-theme-slanted-constructs nil
-        modus-vivendi-theme-faint-syntax nil
         modus-vivendi-theme-org-blocks 'greyscale
         modus-vivendi-theme-proportional-fonts nil)
   :config
-  (defvar after-load-theme-hook nil
-    "Hook run after a color theme is loaded using `load-theme'.")
-
-  (defun run-after-load-theme-hook (&rest _)
-    "Run `after-load-theme-hook'."
-    (run-hooks 'after-load-theme-hook))
-
-  (advice-add #'load-theme :after #'run-after-load-theme-hook)
-
-  (defun rr/customize-modus-vivendi-theme ()
-    (when (member 'modus-vivendi custom-enabled-themes)
-      (modus-vivendi-theme-with-color-variables
-        ;; (set-face-attribute 'org-agenda-date-today nil :extend t)
-        ;; (set-face-attribute 'org-agenda-clocking nil :extend t)
-        ;; (set-face-attribute 'org-agenda-dimmed-todo-face nil :extend t)
-        )))
-
-  (add-hook 'after-load-theme-hook #'rr/customize-modus-vivendi-theme)
-
   (defun rr/apply-modus-theme ()
     "Apply custom theme."
     (load-theme 'modus-vivendi t)
@@ -1681,37 +1601,16 @@ customization, very actively maintained.
 
 *** COMMENT Modus operandi
 
-Currently used. My favorite one and the most consistent. A lot of built-in
-customization, very actively maintained.
+Light variant of modus theme. I use it on demand in very rare cases.
 
 #+begin_src emacs-lisp
 (use-package modus-operandi-theme
   :init
   (setq modus-operandi-theme-bold-constructs t
-        modus-operandi-theme-slanted-constructs nil
-        modus-operandi-theme-faint-syntax nil
+        modus-operandi-theme-slanted-constructs t
         modus-operandi-theme-org-blocks 'greyscale
         modus-operandi-theme-proportional-fonts nil)
   :config
-  (defvar after-load-theme-hook nil
-    "Hook run after a color theme is loaded using `load-theme'.")
-
-  (defun run-after-load-theme-hook (&rest _)
-    "Run `after-load-theme-hook'."
-    (run-hooks 'after-load-theme-hook))
-
-  (advice-add #'load-theme :after #'run-after-load-theme-hook)
-
-  (defun rr/customize-modus-operandi-theme ()
-    (when (member 'modus-operandi custom-enabled-themes)
-      (modus-operandi-theme-with-color-variables
-        (custom-theme-set-faces
-         'user
-         `(org-agenda-clocking ((((class color) (min-colors 89)) (:inherit modus-theme-special-cold :extend t))))
-         `(org-headline-done ((t (:foreground ,fg-alt :strike-through t))))))))
-
-  (add-hook 'after-load-theme-hook #'rr/customize-modus-operandi-theme)
-
   (defun rr/apply-modus-theme ()
     "Apply custom theme."
     (load-theme 'modus-operandi t)
@@ -2384,7 +2283,7 @@ additional statuses of tasks.
 (use-package org
   :config
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "PROGRESS(p)" "WAITING(w)" "REVIEW(r)" "|" "DONE(d)" "CANCELLED(c@)"))))
+        '((sequence "TODO(t)" "PROGRESS(p)" "WAITING(w)" "REVIEW(r)" "|" "DONE(d)" "CANCELED(c@)"))))
 #+end_src
 
 ** Mark task as DONE if all subtasks are DONE
@@ -2418,7 +2317,16 @@ org-mode related settings together. I use colors directly from the color scheme.
           `(("PROGRESS" . (:inherit 'org-todo :foreground ,blue))
             ("WAITING" . (:inherit 'org-todo :foreground ,yellow))
             ("REVIEW" . (:inherit 'org-todo :foreground ,yellow))
-            ("CANCELLED" . (:inherit 'org-todo :foreground ,fg-alt))))))
+            ("CANCELED" . (:inherit 'org-todo :foreground ,fg-alt)))))
+
+  ;; Zenburn
+  ;; (zenburn-with-color-variables
+  ;;   (setq org-todo-keyword-faces
+  ;;         `(("PROGRESS" . (:inherit 'org-todo :foreground ,zenburn-blue))
+  ;;           ("WAITING" . (:inherit 'org-todo :foreground ,zenburn-orange))
+  ;;           ("REVIEW" . (:inherit 'org-todo :foreground ,zenburn-orange))
+  ;;           ("CANCELED" .(:inherit 'org-todo :foreground ,zenburn-fg-1)))))
+  )
 #+end_src
 
 ** Extra Org-mode export packages
@@ -2655,7 +2563,7 @@ statistics. Some settings described in the comment strings.
   ;; Automatically move task to PROGRESS status on `org-clock-in'
   (setq org-clock-in-switch-to-state "PROGRESS")
 
-  (defvar non-clocking-states '("WAITING" "REVIEW" "DONE" "TODO" "CANCELLED")
+  (defvar non-clocking-states '("WAITING" "REVIEW" "DONE" "TODO" "CANCELED")
     "New state for current clocking task.")
 
   (defun rr/read-non-clocking-state ()
@@ -4475,6 +4383,21 @@ sure if I'll keep this settings in my config.
   :config
   (setq erc-autojoin-channels-alist
         '(("irc.gitter.im" "#emacs-lsp/lsp-mode"))))
+#+end_src
+
+* Elfeed
+
+Elfeed is and extensible web feed reader for Emacs, supporting both Atom and
+RSS.
+
+#+begin_src emacs-lisp
+(use-package elfeed
+  :config
+  (setq-default elfeed-search-filter "@1-week-ago +unread ")
+  (setq elfeed-feeds
+        '(("https://updates.orgmode.org/feed/updates" org)
+          ("https://www.reddit.com/r/emacs.rss" reddit emacs)))
+  (global-set-key (kbd "C-x w") 'elfeed))
 #+end_src
 
 * REST client
