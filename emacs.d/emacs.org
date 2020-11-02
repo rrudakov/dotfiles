@@ -411,6 +411,7 @@ right to left (for example Arabic), but this feature slows down emacs a little
 bit, so I disable it globally.
 
 #+begin_src emacs-lisp
+(setq bidi-inhibit-bpa t)
 (setq-default bidi-paragraph-direction 'left-to-right)
 #+end_src
 
@@ -1555,7 +1556,6 @@ all my customization in case I want ever to switch back to it.
 
 #+begin_src emacs-lisp
 (use-package zenburn-theme
-  :ensure nil
   :config
   (setq zenburn-use-variable-pitch nil)
 
@@ -1586,6 +1586,7 @@ customization, very actively maintained.
   :init
   (setq modus-vivendi-theme-bold-constructs t
         modus-vivendi-theme-slanted-constructs nil
+        modus-vivendi-theme-syntax nil
         modus-vivendi-theme-org-blocks 'greyscale
         modus-vivendi-theme-proportional-fonts nil)
   :config
@@ -4045,7 +4046,9 @@ I use =lsp-mode= for RUST. Here I just explicitly add =rust-mode= support.
 **** lsp-haskell
 
 #+begin_src emacs-lisp
-(use-package lsp-haskell)
+(use-package lsp-haskell
+  :config
+  (add-hook 'haskell-mode-hook #'lsp))
 #+end_src
 
 **** Align rules
