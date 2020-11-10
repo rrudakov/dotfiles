@@ -1576,6 +1576,60 @@ all my customization in case I want ever to switch back to it.
     (rr/apply-theme)))
 #+end_src
 
+*** COMMENT Gruvbox
+
+#+begin_src emacs-lisp
+(use-package gruvbox-theme
+  :config
+  (defun rr/apply-gruvbox-theme ()
+    "Apply gruvbox theme."
+    (load-theme 'gruvbox-dark-medium t)
+    (enable-theme 'gruvbox-dark-medium)
+    (remove-hook 'server-after-make-frame-hook #'rr/apply-gruvbox-theme))
+
+  (if (daemonp)
+      (add-hook 'server-after-make-frame-hook #'rr/apply-gruvbox-theme)
+    (rr/apply-gruvbox-theme)))
+#+end_src
+
+*** COMMENT Tomorrow theme
+
+#+begin_src emacs-lisp
+(use-package color-theme-sanityinc-tomorrow
+  :config
+  (defun rr/apply-tomorrow-theme ()
+    "Apply tomorrow theme."
+    (load-theme 'sanityinc-tomorrow-night t)
+    (let ((background "#1d1f21")
+          (alt-background "#22a224a427a7")
+          (current-line "#282a2e")
+          (selection "#373b41")
+          (foreground "#c5c8c6")
+          (comment "#969896")
+          (red "#cc6666")
+          (orange "#de935f")
+          (yellow "#f0c674")
+          (green "#b5bd68")
+          (aqua "#8abeb7")
+          (blue "#81a2be")
+          (purple "#b294bb"))
+      (custom-theme-set-faces
+       'sanityinc-tomorrow-night
+       `(helm-ff-file-extension ((t (:foreground ,red :extend t))))
+       `(helm-match ((t :foreground ,blue :bold t)))
+       `(org-headline-done ((t (:foreground ,green))))
+       `(org-headline-todo ((t (:foreground ,orange))))
+       `(org-priority ((t (:foreground ,yellow))))
+       `(fringe ((t (:background ,background))))
+       `(org-mode-line-clock ((t (:background nil))))))
+    (enable-theme 'sanityinc-tomorrow-night)
+    (remove-hook 'server-after-make-frame-hook #'rr/apply-tomorrow-theme))
+
+  (if (daemonp)
+      (add-hook 'server-after-make-frame-hook #'rr/apply-tomorrow-theme)
+    (rr/apply-tomorrow-theme)))
+#+end_src
+
 *** Modus vivendi
 
 Currently used. My favorite one and the most consistent. A lot of built-in
@@ -1593,6 +1647,11 @@ customization, very actively maintained.
   (defun rr/apply-modus-theme ()
     "Apply custom theme."
     (load-theme 'modus-vivendi t)
+    (modus-vivendi-theme-with-color-variables
+      (custom-theme-set-faces
+       'modus-vivendi
+       `(font-lock-type-face ((t (:foreground ,magenta-alt))))))
+    (enable-theme 'modus-vivendi)
     (remove-hook 'server-after-make-frame-hook #'rr/apply-modus-theme))
 
   (if (daemonp)
@@ -2314,11 +2373,11 @@ org-mode related settings together. I use colors directly from the color scheme.
   :config
   ;; Modus vivendi
   (modus-vivendi-theme-with-color-variables
-    (setq org-todo-keyword-faces
-          `(("PROGRESS" . (:inherit 'org-todo :foreground ,blue))
-            ("WAITING" . (:inherit 'org-todo :foreground ,yellow))
-            ("REVIEW" . (:inherit 'org-todo :foreground ,yellow))
-            ("CANCELED" . (:inherit 'org-todo :foreground ,fg-alt)))))
+   (setq org-todo-keyword-faces
+         `(("PROGRESS" . (:inherit 'org-todo :foreground ,blue))
+           ("WAITING" . (:inherit 'org-todo :foreground ,yellow))
+           ("REVIEW" . (:inherit 'org-todo :foreground ,yellow))
+           ("CANCELED" . (:inherit 'org-todo :foreground ,fg-alt)))))
 
   ;; Zenburn
   ;; (zenburn-with-color-variables
@@ -2327,6 +2386,16 @@ org-mode related settings together. I use colors directly from the color scheme.
   ;;           ("WAITING" . (:inherit 'org-todo :foreground ,zenburn-orange))
   ;;           ("REVIEW" . (:inherit 'org-todo :foreground ,zenburn-orange))
   ;;           ("CANCELED" .(:inherit 'org-todo :foreground ,zenburn-fg-1)))))
+
+  ;; Tomorrow night
+  ;; (let ((comment "#969896")
+  ;;       (yellow "#f0c674")
+  ;;       (aqua "#8abeb7"))
+  ;;   (setq org-todo-keyword-faces
+  ;;         `(("PROGRESS" . (:inherit 'org-todo :foreground ,aqua))
+  ;;           ("WAITING" . (:inherit 'org-todo :foreground ,yellow))
+  ;;           ("REVIEW" . (:inherit 'org-todo :foreground ,yellow))
+  ;;           ("CANCELED" . (:inherit 'org-todo :foreground ,comment)))))
   )
 #+end_src
 
@@ -2768,11 +2837,9 @@ default behavior fit perfectly into my needs.
 #+begin_src emacs-lisp
 (use-package magit
   :config
-  (global-set-key (kbd "C-x g") #'magit-status)
   (setq magit-revision-use-hash-sections 'quick
         magit-pull-or-fetch t)
 
-  (global-magit-file-mode)
   (add-hook 'magit-post-refresh-hook #'rr/refresh-vc-state 5))
 #+end_src
 
@@ -3308,7 +3375,7 @@ default value is changed (the project's development is very active).
   ;; Rust lsp settings
   (require 'lsp-rust)
   (setq lsp-rust-clippy-preference "on")
-  (add-hook 'rust-mode-hook 'lsp)
+  (add-hook 'rust-mode-hook #'lsp)
 
   ;; Python lsp settings
   (require 'lsp-pyls)
@@ -3335,6 +3402,7 @@ for work and probably it won't be helpful for anybody else).
 
   (setq dap-java-test-runner (expand-file-name (locate-user-emacs-file ".cache/lsp/eclipse.jdt.ls/test-runner/junit-platform-console-standalone.jar")))
   (setq dap-auto-show-output nil)
+  (setq dap-auto-configure-features '(locals))
 
   (require 'dap-lldb)
   (require 'dap-java)
@@ -3342,9 +3410,13 @@ for work and probably it won't be helpful for anybody else).
   (define-key rr-lsp-keymap (kbd "t") #'dap-java-run-test-method)
   (define-key rr-lsp-keymap (kbd "c") #'dap-java-run-test-class)
   (define-key rr-lsp-keymap (kbd "b") #'dap-breakpoint-toggle)
+  (define-key rr-lsp-keymap (kbd ";") #'dap-hydra)
+  (define-key rr-lsp-keymap (kbd "e s") #'dap-eval-thing-at-point)
+  (define-key rr-lsp-keymap (kbd "e r") #'dap-eval-region)
+  (define-key rr-lsp-keymap (kbd "e e") #'dap-eval)
 
-  (add-hook 'dap-stopped-hook
-            (lambda (arg) (call-interactively #'dap-hydra)))
+  ;; (add-hook 'dap-stopped-hook
+  ;;           (lambda (arg) (call-interactively #'dap-hydra)))
 
   ;; Run build with args:
   ;; -Dmaven.failsafe.debug="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1044 -Xnoagent"
@@ -3368,14 +3440,31 @@ for work and probably it won't be helpful for anybody else).
            (port "1044")
            (current-workdir (projectile-project-root))
            (test-module (rr/find-test-module))
-           (project-name (file-name-nondirectory (directory-file-name current-workdir)))
+           ;; (project-name (file-name-nondirectory (directory-file-name current-workdir)))
            (command (format "mvn clean -Dit.test=%s verify -pl %s -P tests-for-development -Dmaven.failsafe.debug=\"-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%s -Xnoagent\"" test-name test-module port)))
       (dap-debug
        (list :type "java"
              :request "attach"
              :hostName "localhost"
              :port port
-             :projectName project-name
+             :wait-for-port t
+             :program-to-start command
+             :name test-name
+             :cwd current-workdir))))
+
+  (defun rr/debug-test-ci-stage (test-name)
+    "Debug java test class or method depends on TEST-NAME with ci-stage profile."
+    (let* ((dap-connect-retry-interval 0.5)
+           (dap-connect-retry-count 1200)
+           (port "1044")
+           (current-workdir (projectile-project-root))
+           ;; (project-name (file-name-nondirectory (directory-file-name current-workdir)))
+           (command (format "mvn clean -Dit.test=%s verify -Dci-stage=integration-tests -Dmaven.failsafe.debug=\"-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%s -Xnoagent\"" test-name port)))
+      (dap-debug
+       (list :type "java"
+             :request "attach"
+             :hostName "localhost"
+             :port port
              :wait-for-port t
              :program-to-start command
              :name test-name
@@ -3385,23 +3474,44 @@ for work and probably it won't be helpful for anybody else).
     "Run java test class or method depends on TEST-NAME."
     (let ((default-directory (projectile-project-root))
           (test-module (rr/find-test-module)))
-      (projectile-run-compilation (format "mvn clean -Dit.test=%s verify -pl %s -P tests-for-development" test-name test-module))))
+      (compilation-start (format "mvn clean -Dit.test=%s verify -pl %s -P tests-for-development" test-name test-module))))
+
+  (defun rr/run-test-ci-stage (test-name)
+    "Run java test class or method depends on TEST-NAME with ci-stage profile."
+    (let ((default-directory (projectile-project-root)))
+      (compilation-start (format "mvn clean -Dit.test=%s verify -Dci-stage=integration-tests" test-name))))
 
   (defun rr/run-test-method ()
     (interactive)
     (rr/run-test (dap-java-test-method-at-point)))
 
+  (defun rr/run-test-method-ci-stage ()
+    (interactive)
+    (rr/run-test-ci-stage (dap-java-test-method-at-point)))
+
   (defun rr/run-test-class ()
     (interactive)
     (rr/run-test (dap-java-test-class)))
+
+  (defun rr/run-test-class-ci-stage ()
+    (interactive)
+    (rr/run-test-ci-stage (dap-java-test-class)))
 
   (defun rr/debug-test-mehtod ()
     (interactive)
     (rr/debug-test (dap-java-test-method-at-point)))
 
+  (defun rr/debug-test-method-ci-stage ()
+    (interactive)
+    (rr/debug-test-ci-stage (dap-java-test-method-at-point)))
+
   (defun rr/debug-test-class ()
     (interactive)
-    (rr/debug-test (dap-java-test-class))))
+    (rr/debug-test (dap-java-test-class)))
+
+  (defun rr/debug-test-class-ci-stage ()
+    (interactive)
+    (rr/debug-test-ci-stage (dap-java-test-class))))
 #+end_src
 
 ** Languages and major modes
@@ -3623,9 +3733,8 @@ automatic code reformat and set default indentation to 2 spaces.
 
   (defun rr/java-format-and-save ()
     (interactive)
-    (save-excursion
-      (google-java-format-buffer)
-      (save-buffer)))
+    (google-java-format-buffer)
+    (save-buffer))
 
   (define-key java-mode-map (kbd "C-c C-f") #'rr/java-format-and-save))
 
