@@ -1875,7 +1875,11 @@ Alternative to built-in syntax highlighting.
 
   ;; TypeScript
   (tree-sitter-require 'typescript)
-  (add-hook 'typescript-mode-hook #'tree-sitter-hl-mode))
+  (add-hook 'typescript-mode-hook #'tree-sitter-hl-mode)
+
+  ;; Rust
+  (tree-sitter-require 'rust)
+  (add-hook 'rust-mode-hook #'tree-sitter-hl-mode))
 #+end_src
 
 * Incremental completion
