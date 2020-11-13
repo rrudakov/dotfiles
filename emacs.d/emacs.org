@@ -1766,6 +1766,118 @@ Some good fonts I used to use or ready to consider:
 (rr/set-font 80)
 #+end_src
 
+** Show eldoc in child frame
+
+Display =eldoc= function signatures in child frame at point.
+
+#+begin_src emacs-lisp
+(use-package eldoc-box
+  :disabled)
+#+end_src
+
+** Tree sitter
+
+Alternative to built-in syntax highlighting.
+
+#+begin_src emacs-lisp
+(use-package tree-sitter)
+
+(use-package tree-sitter-langs
+  :after tree-sitter
+  :config
+  (tree-sitter-require 'java)
+  (tree-sitter-hl-add-patterns 'java
+    [
+     ;; import scope
+     (import_declaration
+      (identifier) @attribute
+      (.match? @attribute "^[a-z]"))
+
+     ;; import class name
+     (import_declaration
+      (identifier) @type
+      (.match? @type "^[A-Z]"))
+
+     ;; local variable name
+     (local_variable_declaration
+      (variable_declarator (identifier) @variable))
+
+     ;; Method argument name
+     (formal_parameter
+      (identifier) @variable)
+
+     ;; Catch exception argument name
+     (catch_formal_parameter
+      (identifier) @variable)
+
+     ;; Class field
+     (field_declaration
+      (modifiers)
+      (variable_declarator
+       (identifier) @variable.parameter
+       (.match? @variable.parameter "^[a-z]")))
+
+     ;; Constant
+     (field_declaration
+      (modifiers "final")
+      (variable_declarator
+       (identifier) @constant
+       (.match? @constant "^[A-Z]")))
+
+     ;; var keyword (for java 11)
+     ((type_identifier) @keyword
+      (.match? @keyword "^var$"))
+
+     ;; @interface name
+     (annotation_type_declaration
+      name: (identifier) @type)
+
+     ;; @interface keyword
+     ("@interface" @keyword)
+
+     ;; method name declaration
+     (method_declaration
+      name: (identifier) @function)
+
+     ;; method call
+     (method_invocation
+      name: (identifier) @function.call)
+
+     ;; Scoped annotations
+     (annotation
+      (scoped_identifier) @attribute)
+
+     (marker_annotation
+      (scoped_identifier) @attribute)
+
+     ;; class as argument
+     (class_literal
+      (identifier) @type)
+
+     ;; Use keyword face for super
+     ((super) @keyword)
+
+     ;; Use keyword face for this
+     ((this) @keyword)
+     ])
+
+  (add-hook 'java-mode-hook #'tree-sitter-hl-mode)
+  (add-hook 'java-mode-hook
+            (lambda ()
+              (add-function :before-until (local 'tree-sitter-hl-face-mapping-function)
+                            (lambda (capture-name)
+                              (pcase capture-name
+                                ("attribute" 'font-lock-constant-face)
+                                ("operator" 'font-lock-constant-face)
+                                ("variable.parameter" 'font-lock-function-name-face)
+                                ("type.builtin" 'font-lock-keyword-face)
+                                ("function.call" 'default))))))
+
+  ;; TypeScript
+  (tree-sitter-require 'typescript)
+  (add-hook 'typescript-mode-hook #'tree-sitter-hl-mode))
+#+end_src
+
 * Incremental completion
 
 I've tried ~ivy~, ~helm~ and emacs default completion framework and I find helm
@@ -2373,19 +2485,19 @@ org-mode related settings together. I use colors directly from the color scheme.
   :config
   ;; Modus vivendi
   (modus-vivendi-theme-with-color-variables
-   (setq org-todo-keyword-faces
-         `(("PROGRESS" . (:inherit 'org-todo :foreground ,blue))
-           ("WAITING" . (:inherit 'org-todo :foreground ,yellow))
-           ("REVIEW" . (:inherit 'org-todo :foreground ,yellow))
-           ("CANCELED" . (:inherit 'org-todo :foreground ,fg-alt)))))
+    (setq org-todo-keyword-faces
+          `(("PROGRESS" . (:inherit org-todo :foreground ,blue))
+            ("WAITING" . (:inherit org-todo :foreground ,yellow))
+            ("REVIEW" . (:inherit org-todo :foreground ,yellow))
+            ("CANCELED" . (:inherit org-todo :foreground ,fg-alt)))))
 
   ;; Zenburn
   ;; (zenburn-with-color-variables
   ;;   (setq org-todo-keyword-faces
   ;;         `(("PROGRESS" . (:inherit 'org-todo :foreground ,zenburn-blue))
-  ;;           ("WAITING" . (:inherit 'org-todo :foreground ,zenburn-orange))
-  ;;           ("REVIEW" . (:inherit 'org-todo :foreground ,zenburn-orange))
-  ;;           ("CANCELED" .(:inherit 'org-todo :foreground ,zenburn-fg-1)))))
+  ;;           ("WAITING" . (:inherit org-todo :foreground ,zenburn-orange))
+  ;;           ("REVIEW" . (:inherit org-todo :foreground ,zenburn-orange))
+  ;;           ("CANCELED" .(:inherit org-todo :foreground ,zenburn-fg-1)))))
 
   ;; Tomorrow night
   ;; (let ((comment "#969896")
@@ -2393,9 +2505,9 @@ org-mode related settings together. I use colors directly from the color scheme.
   ;;       (aqua "#8abeb7"))
   ;;   (setq org-todo-keyword-faces
   ;;         `(("PROGRESS" . (:inherit 'org-todo :foreground ,aqua))
-  ;;           ("WAITING" . (:inherit 'org-todo :foreground ,yellow))
-  ;;           ("REVIEW" . (:inherit 'org-todo :foreground ,yellow))
-  ;;           ("CANCELED" . (:inherit 'org-todo :foreground ,comment)))))
+  ;;           ("WAITING" . (:inherit org-todo :foreground ,yellow))
+  ;;           ("REVIEW" . (:inherit org-todo :foreground ,yellow))
+  ;;           ("CANCELED" . (:inherit org-todo :foreground ,comment)))))
   )
 #+end_src
 
@@ -3758,14 +3870,18 @@ extra settings.
   :config
   (add-hook 'java-mode-hook #'lsp)
   (setq lsp-java-save-actions-organize-imports nil
-        lsp-java-format-on-type-enabled nil)
+        lsp-java-format-enabled nil
+        lsp-java-format-on-type-enabled nil
+        lsp-java-code-generation-use-blocks t
+        lsp-java-maven-download-sources t
+        lsp-java-signature-help-enabled nil)
 
   (setq lsp-java-format-settings-url "file:///home/rrudakov/Work/EPAM/eclipse-java-code-style.xml"
         lsp-java-format-settings-profile "GoogleStyle")
 
   (setq lsp-java-vmargs '("-javaagent:/home/rrudakov/Soft/lombok/lombok.jar"
                           "-noverify"
-                          "-Xmx4G"
+                          "-Xmx2G"
                           "-XX:+UseG1GC"
                           "-XX:+UseStringDeduplication")))
 #+end_src
