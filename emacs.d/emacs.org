@@ -1806,6 +1806,11 @@ Alternative to built-in syntax highlighting.
      (formal_parameter
       (identifier) @variable)
 
+     ;; Method argument name array
+     (spread_parameter
+      (variable_declarator
+       (identifier) @variable))
+
      ;; Catch exception argument name
      (catch_formal_parameter
       (identifier) @variable)
