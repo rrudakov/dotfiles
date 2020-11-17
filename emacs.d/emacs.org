@@ -1590,6 +1590,8 @@ all my customization in case I want ever to switch back to it.
        `(fringe ((t (:background ,zenburn-bg))))
        ;; Less contrast window divider
        `(window-divider ((t (:foreground ,zenburn-fg-1))))
+       ;; Mu4e
+       `(mu4e-header-highlight-face ((t (:inherit 'hl-line :weight bold))))
        ;; Some org-mode faces
        `(org-mode-line-clock ((t (:background nil))))
        `(org-headline-todo ((t (:foreground ,zenburn-red+2))))
