@@ -1548,7 +1548,7 @@ All tweaks for emacs look & feel. Color themes fonts modeline etc.
 
 ** Color scheme
 
-*** COMMENT Zenburn theme
+*** Zenburn theme
 
 Very nice theme. Used to use it for a long time, but I found that more contrast
 theme is more comfortable for my eyes. I'll keep this section for history with
@@ -1559,16 +1559,65 @@ all my customization in case I want ever to switch back to it.
   :config
   (setq zenburn-use-variable-pitch nil)
 
-  ;; (zenburn-with-color-variables
-  ;;   (custom-theme-set-faces
-  ;;    'zenburn
-  ;;    ;; Some org-mode faces
-  ;;    ;; `(org-table ((t (:background ,zenburn-bg-05))))
-  ;;    ))
-
   (defun rr/apply-theme ()
     "Apply some customizaitons to current theme."
     (load-theme 'zenburn t)
+    (zenburn-with-color-variables
+      (custom-theme-set-faces
+       'zenburn
+       `(helm-delete-async-message ((t (:foreground ,zenburn-yellow))))
+       `(helm-ff-file-extension ((t (:foreground ,zenburn-red+2))))
+       ;; Button
+       `(button ((t (:foreground ,zenburn-yellow :underline t))))
+       ;; Flycheck posframe
+       `(flycheck-posframe-info-face ((t (:inherit 'success))))
+       `(flycheck-posframe-warning-face ((t (:inherit 'warning))))
+       `(flycheck-posframe-error-face ((t (:inherit 'error))))
+       `(flycheck-posframe-background-face ((t (:background ,zenburn-bg+05))))
+       `(flycheck-posframe-border-face ((t (:foreground ,zenburn-fg-1))))
+       ;; Eyebrowse
+       `(eyebrowse-mode-line-active ((t (:inherit 'mode-line-emphasis :foreground ,zenburn-yellow))))
+       `(eyebrowse-mode-line-inactive ((t (:foreground ,zenburn-fg-1))))
+       ;; VC state
+       `(vc-edited-state ((t :inherit 'vc-state-base :foreground ,zenburn-blue)))
+       `(vc-up-to-date-state ((t :inherit 'vc-state-base :foreground ,zenburn-green+4)))
+       `(vc-removed-state ((t :inherit 'vc-state-base :foreground ,zenburn-red)))
+       `(vc-conflict-state ((t :inherit 'vc-state-base :foreground ,zenburn-orange)))
+       `(vc-locally-added-state ((t :inherit 'vc-state-base :foreground ,zenburn-fg)))
+       `(vc-needs-update-state ((t :inherit 'vc-state-base :foreground ,zenburn-yellow)))
+       `(vc-missing-state ((t :inherit 'vc-state-base :foreground ,zenburn-fg-05)))
+       ;; Set fringe color the same as background
+       `(fringe ((t (:background ,zenburn-bg))))
+       ;; Less contrast window divider
+       `(window-divider ((t (:foreground ,zenburn-fg-1))))
+       ;; Some org-mode faces
+       `(org-mode-line-clock ((t (:background nil))))
+       `(org-headline-todo ((t (:foreground ,zenburn-red+2))))
+       `(org-drawer ((t (:foreground ,zenburn-blue-2))))
+       `(org-ellipsis ((t (:foreground ,zenburn-yellow-1))))
+       `(org-checkbox ((t (:background ,zenburn-bg+2 :foreground ,zenburn-fg+1
+                                       :box (:line-width 1 :color ,zenburn-fg-1)))))
+       ;; `(org-table ((t (:background ,zenburn-bg-05))))
+       ;; Make all normal weight -> semi-bold
+       `(link-visited ((t (:foreground ,zenburn-yellow-2 :underline t))))
+       `(w3m-arrived-anchor ((t (:foreground ,zenburn-yellow-2 :underline t))))
+       `(git-annex-dired-annexed-available ((t (:inherit success))))
+       `(git-annex-dired-annexed-unavailable ((t (:inherit error))))
+       `(helm-ff-file ((t (:foreground ,zenburn-fg :background ,zenburn-bg))))
+       `(helm-ff-executable ((t (:foreground ,zenburn-green+2 :background ,zenburn-bg))))
+       `(helm-ff-prefix ((t (:foreground ,zenburn-bg :background ,zenburn-yellow))))
+       `(ledger-font-payee-cleared-face ((t (:foreground ,zenburn-fg))))
+       `(ledger-font-payee-pending-face ((t (:foreground ,zenburn-red))))
+       `(ledger-font-auto-xact-face ((t (:foreground ,zenburn-yellow-1))))
+       `(ledger-font-periodic-xact-face ((t (:foreground ,zenburn-green))))
+       `(ledger-font-pending-face ((t (:foreground ,zenburn-orange))))
+       `(ledger-font-posting-date-face ((t (:foreground ,zenburn-orange))))
+       `(ledger-font-reconciler-cleared-face ((t (:foreground ,zenburn-fg))))
+       `(ledger-font-reconciler-pending-face ((t (:foreground ,zenburn-orange))))
+       `(ledger-font-report-clickable-face ((t (:foreground ,zenburn-orange))))
+       `(magit-popup-disabled-argument ((t (:foreground ,zenburn-fg-1))))
+       `(magit-filename ((t ())))))
+    (enable-theme 'zenburn)
     (remove-hook 'server-after-make-frame-hook 'rr/apply-theme))
 
   (if (daemonp)
@@ -1630,7 +1679,7 @@ all my customization in case I want ever to switch back to it.
     (rr/apply-tomorrow-theme)))
 #+end_src
 
-*** Modus vivendi
+*** COMMENT Modus vivendi
 
 Currently used. My favorite one and the most consistent. A lot of built-in
 customization, very actively maintained.
@@ -1642,6 +1691,7 @@ customization, very actively maintained.
         modus-vivendi-theme-slanted-constructs nil
         modus-vivendi-theme-syntax nil
         modus-vivendi-theme-org-blocks 'greyscale
+        modus-vivendi-theme-prompts 'subtle
         modus-vivendi-theme-proportional-fonts nil)
   :config
   (defun rr/apply-modus-theme ()
@@ -1737,7 +1787,7 @@ Some good fonts I used to use or ready to consider:
 + IBM Plex Mono :: Really good but on laptop's small screen looks a bit ugly.
 
 #+begin_src emacs-lisp
-(defconst fixed-pitch-font-family "Source Code Variable"
+(defconst fixed-pitch-font-family "Source Code Pro"
   "Font family for default and fixed-pitch faces.")
 
 (defconst variable-pitch-font-family "Source Sans Pro"
@@ -2490,23 +2540,23 @@ org-mode related settings together. I use colors directly from the color scheme.
 #+begin_src emacs-lisp
 (use-package org-faces
   :ensure nil
-  :after (org modus-vivendi-theme)
+  :after (org zenburn-theme)
   :config
   ;; Modus vivendi
-  (modus-vivendi-theme-with-color-variables
-    (setq org-todo-keyword-faces
-          `(("PROGRESS" . (:inherit org-todo :foreground ,blue))
-            ("WAITING" . (:inherit org-todo :foreground ,yellow))
-            ("REVIEW" . (:inherit org-todo :foreground ,yellow))
-            ("CANCELED" . (:inherit org-todo :foreground ,fg-alt)))))
+  ;; (modus-vivendi-theme-with-color-variables
+  ;;   (setq org-todo-keyword-faces
+  ;;         `(("PROGRESS" . (:inherit org-todo :foreground ,blue))
+  ;;           ("WAITING" . (:inherit org-todo :foreground ,yellow))
+  ;;           ("REVIEW" . (:inherit org-todo :foreground ,yellow))
+  ;;           ("CANCELED" . (:inherit org-todo :foreground ,fg-alt)))))
 
   ;; Zenburn
-  ;; (zenburn-with-color-variables
-  ;;   (setq org-todo-keyword-faces
-  ;;         `(("PROGRESS" . (:inherit 'org-todo :foreground ,zenburn-blue))
-  ;;           ("WAITING" . (:inherit org-todo :foreground ,zenburn-orange))
-  ;;           ("REVIEW" . (:inherit org-todo :foreground ,zenburn-orange))
-  ;;           ("CANCELED" .(:inherit org-todo :foreground ,zenburn-fg-1)))))
+  (zenburn-with-color-variables
+    (setq org-todo-keyword-faces
+          `(("PROGRESS" . (:inherit 'org-todo :foreground ,zenburn-blue))
+            ("WAITING" . (:inherit org-todo :foreground ,zenburn-orange))
+            ("REVIEW" . (:inherit org-todo :foreground ,zenburn-orange))
+            ("CANCELED" .(:inherit org-todo :foreground ,zenburn-fg-1)))))
 
   ;; Tomorrow night
   ;; (let ((comment "#969896")
@@ -2973,7 +3023,7 @@ probably I won't like it and disable in the future.
   :ensure nil
   :after magit
   :config
-  (setq magit-diff-refine-hunk t))
+  (setq magit-diff-refine-hunk nil))
 #+end_src
 
 ** Transient

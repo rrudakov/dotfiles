@@ -73,7 +73,7 @@ font:
     #   - (macOS) Menlo
     #   - (Linux) monospace
     #   - (Windows) Consolas
-    family: Source Code Variable
+    family: Source Code Pro
 
     # The `style` can be specified to pick a specific face.
     style: Semibold
@@ -84,7 +84,7 @@ font:
     #
     # If the bold family is not specified, it will fall back to the
     # value specified for the normal font.
-    family: Source Code Variable
+    family: Source Code Pro
 
     # The `style` can be specified to pick a specific face.
     style: Bold
@@ -95,7 +95,7 @@ font:
     #
     # If the italic family is not specified, it will fall back to the
     # value specified for the normal font.
-    family: Source Code Variable
+    family: Source Code Pro
 
     # The `style` can be specified to pick a specific face.
     style: Italic
@@ -135,64 +135,65 @@ font:
 # If `true`, bold text is drawn using the bright color variants.
 draw_bold_text_with_bright_colors: true
 
-# Colors (Tomorrow Night Bright)
+# Basic Zenburn Color Scheme - Colors cribbed from the putty version https://gist.github.com/danidiaz/88406bf002009fd97454
+# Dimmed colors needed
 colors:
   # Default colors
   primary:
-    background: '0x000000'
-    foreground: '0xffffff'
+    background: '0x3F3F3F'
+    foreground: '0xDCDCCC'
 
     # Bright and dim foreground colors
     #
     # The dimmed foreground color is calculated automatically if it is not present.
     # If the bright foreground color is not set, or `draw_bold_text_with_bright_colors`
     # is `false`, the normal foreground color will be used.
-    dim_foreground: '0xe0e6f0'
-    bright_foreground: '0xa8a8a8'
+    #dim_foreground: '0x9a9a9a'
+    #bright_foreground: '0xffffff'
 
   # Cursor colors
   #
   # Colors which should be used to draw the terminal cursor. If these are unset,
   # the cursor color will be the inverse of the cell color.
-  #cursor:
-  #  text: '0x000000'
-  #  cursor: '0xffffff'
+  cursor:
+    text:    '#3F3F3F'
+    cursor:  '#DCDCCC'
 
   # Normal colors
   normal:
-    black:   '0x000000'
-    red:     '0xff8059'
-    green:   '0x44bc44'
-    yellow:  '0xeecc00'
-    blue:    '0x29aeff'
-    magenta: '0xfeacd0'
-    cyan:    '0x00d3d0'
-    white:   '0xffffff'
+    black:   '0x3F3F3F'
+    red:     '0xBC8383'
+    green:   '0x5F7F5F'
+    yellow:  '0xE0CF9F'
+    blue:    '0x7CB8BB'
+    magenta: '0xDC8CC3'
+    cyan:    '0x93E0E3'
+    white:   '0xDCDCCC'
 
   # Bright colors
   bright:
-    black:   '0x181a20'
-    red:     '0xfb6859'
-    green:   '0x00fc50'
-    yellow:  '0xffdd00'
-    blue:    '0x00a2ff'
-    magenta: '0xff8bd4'
-    cyan:    '0x30ffc0'
-    white:   '0xa8a8a8'
+    black:   '0x5F5F5F'
+    red:     '0xCC9393'
+    green:   '0x7F9F7F'
+    yellow:  '0xF0DFAF'
+    blue:    '0x8CD0D3'
+    magenta: '0xDC8CC3'
+    cyan:    '0x93E0E3'
+    white:   '0xFFFFFF'
 
   # Dim colors
   #
   # If the dim colors are not set, they will be calculated automatically based
   # on the `normal` colors.
-  dim:
-   black:   '0x110b11'
-   red:     '0x762422'
-   green:   '0x2f4a00'
-   yellow:  '0x604200'
-   blue:    '0x10387c'
-   magenta: '0x49366e'
-   cyan:    '0x00415e'
-   white:   '0xe0e6f0'
+  #dim:
+  #  black:   '0x000000'
+  #  red:     '0x8c3336'
+  #  green:   '0x7a8530'
+  #  yellow:  '0x97822e'
+  #  blue:    '0x506d8f'
+  #  magenta: '0x80638e'
+  #  cyan:    '0x497e7a'
+  #  white:   '0x9a9a9a'
 
   # Indexed Colors
   #
@@ -203,6 +204,75 @@ colors:
   #   `- { index: 16, color: '0xff00ff' }`
   #
   indexed_colors: []
+
+# # Colors (Modus Vivendi)
+# colors:
+#   # Default colors
+#   primary:
+#     background: '0x000000'
+#     foreground: '0xffffff'
+
+#     # Bright and dim foreground colors
+#     #
+#     # The dimmed foreground color is calculated automatically if it is not present.
+#     # If the bright foreground color is not set, or `draw_bold_text_with_bright_colors`
+#     # is `false`, the normal foreground color will be used.
+#     dim_foreground: '0xe0e6f0'
+#     bright_foreground: '0xa8a8a8'
+
+#   # Cursor colors
+#   #
+#   # Colors which should be used to draw the terminal cursor. If these are unset,
+#   # the cursor color will be the inverse of the cell color.
+#   #cursor:
+#   #  text: '0x000000'
+#   #  cursor: '0xffffff'
+
+#   # Normal colors
+#   normal:
+#     black:   '0x000000'
+#     red:     '0xff8059'
+#     green:   '0x44bc44'
+#     yellow:  '0xeecc00'
+#     blue:    '0x29aeff'
+#     magenta: '0xfeacd0'
+#     cyan:    '0x00d3d0'
+#     white:   '0xffffff'
+
+#   # Bright colors
+#   bright:
+#     black:   '0x181a20'
+#     red:     '0xfb6859'
+#     green:   '0x00fc50'
+#     yellow:  '0xffdd00'
+#     blue:    '0x00a2ff'
+#     magenta: '0xff8bd4'
+#     cyan:    '0x30ffc0'
+#     white:   '0xa8a8a8'
+
+#   # Dim colors
+#   #
+#   # If the dim colors are not set, they will be calculated automatically based
+#   # on the `normal` colors.
+#   dim:
+#    black:   '0x110b11'
+#    red:     '0x762422'
+#    green:   '0x2f4a00'
+#    yellow:  '0x604200'
+#    blue:    '0x10387c'
+#    magenta: '0x49366e'
+#    cyan:    '0x00415e'
+#    white:   '0xe0e6f0'
+
+#   # Indexed Colors
+#   #
+#   # The indexed colors include all colors from 16 to 256.
+#   # When these are not set, they're filled with sensible defaults.
+#   #
+#   # Example:
+#   #   `- { index: 16, color: '0xff00ff' }`
+#   #
+#   indexed_colors: []
 
 # Visual Bell
 #
