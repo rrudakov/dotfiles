@@ -475,7 +475,7 @@ indentation so I set this setting to ~2~.
 (setq-default tab-width 2)
 #+end_src
 
-*** COMMENT Set default margins
+*** Set default margins
 
 Flycheck has an option to display indicators in margins instead of fringes. By
 default margin sizes is 0 which means they are invisible. To be able to use
@@ -483,7 +483,7 @@ margin flycheck indicators I have to set margins to at least ~1~.
 
 #+begin_src emacs-lisp
 (setq-default left-margin-width 1)
-(setq-default right-margin-width 1)
+;; (setq-default right-margin-width 1)
 #+end_src
 
 *** Prefer newer files to load
@@ -1789,7 +1789,7 @@ Some good fonts I used to use or ready to consider:
 + IBM Plex Mono :: Really good but on laptop's small screen looks a bit ugly.
 
 #+begin_src emacs-lisp
-(defconst fixed-pitch-font-family "Source Code Pro"
+(defconst fixed-pitch-font-family "Source Code Pro Semibold"
   "Font family for default and fixed-pitch faces.")
 
 (defconst variable-pitch-font-family "Source Sans Pro"
@@ -3402,7 +3402,7 @@ Enable flycheck globally.
   :config
   (setq flycheck-idle-change-delay 2
         flycheck-check-syntax-automatically '(save new-line mode-enabled))
-  (setq flycheck-indication-mode 'left-fringe)
+  (setq flycheck-indication-mode 'left-margin)
 
   (add-hook 'after-init-hook #'global-flycheck-mode))
 #+end_src
