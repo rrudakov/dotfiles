@@ -1,4 +1,4 @@
-Config { font = "xft:Source Code Variable:semibold:size=8:antialias=true"
+Config { font = "xft:Source Code Pro:bold:size=8:antialias=true"
        , additionalFonts = ["xft:Droid Sans Mono:size=8"]
        , bgColor = "#000000"
        , fgColor = "#ffffff"

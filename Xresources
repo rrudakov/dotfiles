@@ -15,10 +15,10 @@ Emacs.toolBar: 0
 Emacs.verticalScrollBars: off
 ! Font settings
 Emacs.FontBackend: ftcrhb
-Emacs.font: Source Code Variable-8:weight=semi-bold:slant=normal:width=normal
+Emacs.font: Source Code Pro-8:weight=semi-bold:slant=normal:width=normal
 Emacs.lineSpacing: 0
 
-XTerm*faceName: xft:Source Code Variable:size=9:antialias=true
+XTerm*faceName: xft:Source Code Pro:size=9:antialias=true
 XTerm*loginShell: true
 XTerm*termName: xterm-256color
 XTerm*borderWidth: 0
@@ -60,8 +60,8 @@ URxvt*saveLines: 5000
 
 !URxvt.font: -*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-1
 !URxvt.boldFont: -*-terminus-bold-*-*-*-12-*-*-*-*-*-iso10646-1
-URxvt.font: xft:Source Code Variable:size=9:medium:antialias=true
-URxvt.boldFont: xft:Source Code Variable:size=9:bold:antialias=true
+URxvt.font: xft:Source Code Pro:size=9:medium:antialias=true
+URxvt.boldFont: xft:Source Code Pro:size=9:bold:antialias=true
 
 URxvt.internalBorder: 0
 URxvt.jumpScroll: true

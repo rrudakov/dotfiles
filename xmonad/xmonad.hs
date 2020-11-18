@@ -106,7 +106,7 @@ spotifyStop =
 myPromptConfig :: XPConfig
 myPromptConfig =
   XPC
-    { font = "xft:Source Code Variable:size=8:semibold:antialias=true"
+    { font = "xft:Source Code Pro:size=8:semibold:antialias=true"
     , bgColor = "#000000"
     , fgColor = "#ffffff"
     , fgHLight = "black"
