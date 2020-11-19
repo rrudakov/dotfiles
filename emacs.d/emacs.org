@@ -1682,6 +1682,23 @@ all my customization in case I want ever to switch back to it.
     (rr/apply-tomorrow-theme)))
 #+end_src
 
+*** COMMENT Modus theme
+
+#+begin_src emacs-lisp
+(use-package modus-themes
+  :load-path "/home/rrudakov/Projects/modus-themes"
+  :config
+  (require 'modus-vivendi-theme)
+  (setq modus-themes-bold-constructs t
+        modus-themes-slanted-constructs t
+        modus-themes-syntax nil
+        modus-themes-org-blocks 'greyscale
+        modus-themes-prompts 'subtle
+        modus-themes-no-mixed-fonts t)
+  (load-theme 'modus-vivendi t)
+  (enable-theme 'modus-vivendi))
+#+end_src
+
 *** COMMENT Modus vivendi
 
 Currently used. My favorite one and the most consistent. A lot of built-in
@@ -3404,9 +3421,6 @@ Enable flycheck globally.
   (setq flycheck-idle-change-delay 2
         flycheck-check-syntax-automatically '(save new-line mode-enabled))
   (setq flycheck-indication-mode 'left-margin)
-  (setq flycheck-default-margin-str "»"
-        flycheck-default-margin-continuation-str "¦")
-
   (add-hook 'after-init-hook #'global-flycheck-mode))
 #+end_src
 
