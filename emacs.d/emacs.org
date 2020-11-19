@@ -3404,6 +3404,8 @@ Enable flycheck globally.
   (setq flycheck-idle-change-delay 2
         flycheck-check-syntax-automatically '(save new-line mode-enabled))
   (setq flycheck-indication-mode 'left-margin)
+  (setq flycheck-default-margin-str "»"
+        flycheck-default-margin-continuation-str "¦")
 
   (add-hook 'after-init-hook #'global-flycheck-mode))
 #+end_src
