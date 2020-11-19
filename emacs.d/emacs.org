@@ -1567,6 +1567,7 @@ all my customization in case I want ever to switch back to it.
        'zenburn
        `(helm-delete-async-message ((t (:foreground ,zenburn-yellow))))
        `(helm-ff-file-extension ((t (:foreground ,zenburn-red+2))))
+       `(helm-selection ((t (:background ,zenburn-bg+1 :underline nil :distant-foreground nil))))
        ;; Button
        `(button ((t (:foreground ,zenburn-yellow :underline t))))
        ;; Flycheck posframe
