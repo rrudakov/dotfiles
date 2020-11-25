@@ -3208,9 +3208,34 @@ but still can be used with plain text.
   (define-key smartparens-strict-mode-map [remap c-electric-backspace] #'sp-backward-delete-char)
   (define-key smartparens-strict-mode-map [remap c-electric-delete-forward] #'sp-delete-char)
 
-  (sp-local-pair 'prog-mode "{" nil :post-handlers '(("||\n[i]" "RET")))
-  (sp-local-pair 'prog-mode "[" nil :post-handlers '(("||\n[i]" "RET")))
-  (sp-local-pair 'prog-mode "(" nil :post-handlers '(("||\n[i]" "RET")))
+  ;; (sp-local-pair 'prog-mode "{" nil :post-handlers '(("||\n[i]" "RET")))
+  ;; (sp-local-pair 'prog-mode "[" nil :post-handlers '(("||\n[i]" "RET")))
+  ;; (sp-local-pair 'prog-mode "(" nil :post-handlers '(("||\n[i]" "RET")))
+
+  ;; The following code was taken from the emacs wiki
+  (defvar electrify-return-match
+    "{}\\|\\[\\]\\|\(\)\\|\"\""
+    "If this regexp matches the text after the cursor, do an \"electric\"
+  return.")
+
+  (defun electrify-return-if-match (arg)
+    "If the text after the cursor matches `electrify-return-match' then
+  open and indent an empty line between the cursor and the text.  Move the
+  cursor to the new line."
+    (interactive "P")
+    (let ((case-fold-search nil))
+      (save-excursion
+        (backward-char 1)
+        (save-match-data
+          (when (looking-at electrify-return-match)
+            (forward-char)
+            (newline-and-indent))))
+      (newline arg)
+      (indent-according-to-mode)))
+
+  (define-key prog-mode-map (kbd "RET") #'electrify-return-if-match)
+  (define-key prog-mode-map [remap newline-and-indent] #'electrify-return-if-match)
+
   (sp-local-pair 'java-mode "/*" "*/" :post-handlers '(("* ||\n[i]" "RET")))
 
   (add-hook 'eshell-mode-hook #'smartparens-strict-mode)
