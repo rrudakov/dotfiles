@@ -1861,13 +1861,13 @@ Alternative to built-in syntax highlighting.
     [
      ;; import scope
      (import_declaration
-      (identifier) @attribute
-      (.match? @attribute "^[a-z]"))
+      (identifier) @type
+      (.match? @type "^[a-z]"))
 
      ;; import class name
      (import_declaration
-      (identifier) @type
-      (.match? @type "^[A-Z]"))
+      (identifier) @attribute
+      (.match? @attribute "^[A-Z]"))
 
      ;; local variable name
      (local_variable_declaration
@@ -1890,8 +1890,8 @@ Alternative to built-in syntax highlighting.
      (field_declaration
       (modifiers)
       (variable_declarator
-       (identifier) @variable.parameter
-       (.match? @variable.parameter "^[a-z]")))
+       (identifier) @property.definition
+       (.match? @property.definition "^[a-z]")))
 
      ;; Constant
      (field_declaration
@@ -1935,6 +1935,9 @@ Alternative to built-in syntax highlighting.
 
      ;; Use keyword face for this
      ((this) @keyword)
+
+     (constructor_declaration
+      (identifier) @constructor)
      ])
 
   (add-hook 'java-mode-hook #'tree-sitter-hl-mode)
@@ -1945,6 +1948,8 @@ Alternative to built-in syntax highlighting.
                               (pcase capture-name
                                 ("attribute" 'font-lock-constant-face)
                                 ("operator" 'font-lock-constant-face)
+                                ("constant" 'font-lock-variable-name-face)
+                                ("constructor" 'font-lock-builtin-face)
                                 ("variable.parameter" 'font-lock-function-name-face)
                                 ("type.builtin" 'font-lock-keyword-face)
                                 ("function.call" 'default))))))
@@ -1952,6 +1957,10 @@ Alternative to built-in syntax highlighting.
   ;; TypeScript
   (tree-sitter-require 'typescript)
   (add-hook 'typescript-mode-hook #'tree-sitter-hl-mode)
+
+  ;; Python
+  (tree-sitter-require 'python)
+  (add-hook 'python-mode-hook #'tree-sitter-hl-mode)
 
   ;; Rust
   (tree-sitter-require 'rust)
