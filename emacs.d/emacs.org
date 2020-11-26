@@ -482,7 +482,7 @@ default margin sizes is 0 which means they are invisible. To be able to use
 margin flycheck indicators I have to set margins to at least ~1~.
 
 #+begin_src emacs-lisp
-(setq-default left-margin-width 1)
+;; (setq-default left-margin-width 1)
 ;; (setq-default right-margin-width 1)
 #+end_src
 
@@ -3227,11 +3227,11 @@ but still can be used with plain text.
     "If this regexp matches the text after the cursor, do an \"electric\"
   return.")
 
-  (defun electrify-return-if-match (arg)
+  (defun electrify-return-if-match (&optional arg)
     "If the text after the cursor matches `electrify-return-match' then
   open and indent an empty line between the cursor and the text.  Move the
   cursor to the new line."
-    (interactive "P")
+    (interactive "*p")
     (let ((case-fold-search nil))
       (save-excursion
         (backward-char 1)
@@ -3239,11 +3239,9 @@ but still can be used with plain text.
           (when (looking-at electrify-return-match)
             (forward-char)
             (newline-and-indent))))
-      (newline arg)
-      (indent-according-to-mode)))
+      (newline-and-indent arg)))
 
   (define-key prog-mode-map (kbd "RET") #'electrify-return-if-match)
-  (define-key prog-mode-map [remap newline-and-indent] #'electrify-return-if-match)
 
   (sp-local-pair 'java-mode "/*" "*/" :post-handlers '(("* ||\n[i]" "RET")))
 
@@ -3455,7 +3453,7 @@ Enable flycheck globally.
   :config
   (setq flycheck-idle-change-delay 2
         flycheck-check-syntax-automatically '(save new-line mode-enabled))
-  (setq flycheck-indication-mode 'left-margin)
+  (setq flycheck-indication-mode 'left-fringe)
   (add-hook 'after-init-hook #'global-flycheck-mode))
 #+end_src
 
@@ -3951,7 +3949,7 @@ automatic code reformat and set default indentation to 2 spaces.
 
 #+begin_src emacs-lisp
 (use-package google-java-format
-  :after cc-mode
+  :after (cc-mode smartparens)
   :ensure nil
   :config
   (setq google-java-format-executable (expand-file-name "~/.local/bin/google-java-format"))
@@ -3961,7 +3959,8 @@ automatic code reformat and set default indentation to 2 spaces.
     (google-java-format-buffer)
     (save-buffer))
 
-  (define-key java-mode-map (kbd "C-c C-f") #'rr/java-format-and-save))
+  (define-key java-mode-map (kbd "C-c C-f") #'rr/java-format-and-save)
+  (define-key java-mode-map [remap newline-and-indent] #'electrify-return-if-match))
 
 (use-package cc-vars
   :after cc-mode
@@ -4203,6 +4202,7 @@ engines, embedded CSS and JavaScript.
 
 #+begin_src emacs-lisp
 (use-package web-mode
+  :after smartparens
   :config
   (setq web-mode-markup-indent-offset 2
         web-mode-css-indent-offset 2
@@ -4224,6 +4224,8 @@ engines, embedded CSS and JavaScript.
   (add-to-list 'auto-mode-alist '("\\.jinja2\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+
+  (define-key web-mode-map (kbd "RET") #'newline-and-indent)
 
   ;; Set django engine for django projects
   (defun rr/django-project-hook ()
