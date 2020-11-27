@@ -3221,23 +3221,17 @@ but still can be used with plain text.
   ;; (sp-local-pair 'prog-mode "[" nil :post-handlers '(("||\n[i]" "RET")))
   ;; (sp-local-pair 'prog-mode "(" nil :post-handlers '(("||\n[i]" "RET")))
 
-  ;; The following code was taken from the emacs wiki
-  (defvar electrify-return-match
-    "{}\\|\\[\\]\\|\(\)\\|\"\""
-    "If this regexp matches the text after the cursor, do an \"electric\"
-  return.")
-
   (defun electrify-return-if-match (&optional arg)
-    "If the text after the cursor matches `electrify-return-match' then
-  open and indent an empty line between the cursor and the text.  Move the
-  cursor to the new line."
+    "If the cursor inside parenthesis then open and indent an
+empty line between the cursor and the text. Move the cursor to
+the new line."
     (interactive "*p")
     (let ((case-fold-search nil))
-      (save-excursion
-        (backward-char 1)
-        (save-match-data
-          (when (looking-at electrify-return-match)
-            (forward-char)
+      (save-match-data
+        (when (or (and (looking-back (rx "(") nil) (looking-at (rx ")")))
+                  (and (looking-back (rx "[") nil) (looking-at (rx "]")))
+                  (and (looking-back (rx "{") nil) (looking-at (rx "}"))))
+          (save-excursion
             (newline-and-indent))))
       (newline-and-indent arg)))
 
