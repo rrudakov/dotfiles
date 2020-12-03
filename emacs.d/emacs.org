@@ -3194,10 +3194,6 @@ but still can be used with plain text.
         sp-wrap-respect-direction nil
         sp-navigate-interactive-always-progress-point t)
 
-  (sp-with-modes 'web-mode
-    (sp-local-pair "%" "%" :wrap "C-%")
-    (sp-local-pair "<" ">" :wrap "C->"))
-
   (define-key smartparens-mode-map (kbd "C-c (") #'sp-wrap-round)
   (define-key smartparens-mode-map (kbd "C-c {") #'sp-wrap-curly)
   (define-key smartparens-mode-map (kbd "C-c [") #'sp-wrap-square)
@@ -3217,10 +3213,6 @@ but still can be used with plain text.
   (define-key smartparens-strict-mode-map [remap c-electric-backspace] #'sp-backward-delete-char)
   (define-key smartparens-strict-mode-map [remap c-electric-delete-forward] #'sp-delete-char)
 
-  ;; (sp-local-pair 'prog-mode "{" nil :post-handlers '(("||\n[i]" "RET")))
-  ;; (sp-local-pair 'prog-mode "[" nil :post-handlers '(("||\n[i]" "RET")))
-  ;; (sp-local-pair 'prog-mode "(" nil :post-handlers '(("||\n[i]" "RET")))
-
   (defun electrify-return-if-match (&optional arg)
     "If the cursor inside parenthesis then open and indent an
 empty line between the cursor and the text. Move the cursor to
@@ -3237,7 +3229,108 @@ the new line."
 
   (define-key prog-mode-map (kbd "RET") #'electrify-return-if-match)
 
+  ;; Some improvements for java-mode
   (sp-local-pair 'java-mode "/*" "*/" :post-handlers '(("* ||\n[i]" "RET")))
+
+  (defun rr/sp-java-skip-match-angle-bracket (_ms _mb me)
+    "Non-nil if we should ignore the bracket as valid delimiter."
+    (save-excursion
+      (goto-char me)
+      (let ((on-lambda (sp--looking-back-p (rx "->") nil))
+            (on-comparison
+             (sp--looking-back-p (rx (or
+                                      (seq space "<")
+                                      (seq space ">")
+                                      (seq space "<<")
+                                      (seq space ">>")))
+                                 nil)))
+        (or on-lambda on-comparison))))
+
+  (defun rr/sp-java-filter-angle-brackets (_id action context)
+    "Non-nil if we should allow ID's ACTION in CONTEXT for angle
+brackets."
+    (cond
+     ;; Inside strings, don't do anything with < or >
+     ((eq context 'string)
+      nil)
+     ;; Don't do any smart pairing inside comments either.
+     ((eq context 'comment)
+      nil)
+     ;; Otherwise we're in code
+     ((eq context 'code)
+      (let ((on-lambda (looking-back (rx "->") nil))
+            (on-comparison
+             (looking-back (rx (or
+                                (seq space "<")
+                                (seq space ">")
+                                (seq space "<<")
+                                (seq space ">>")))
+                           nil)))
+        (cond
+         ;; Only insert a matching > if we're not looking at a comparison.
+         ((eq action 'insert)
+          (and (not on-comparison) (not on-lambda)))
+         ;; Always allow wrapping in a pair if the region is active.
+         ((eq action 'wrap)
+          t)
+         ;; When pressing >, autoskip if we're not looking at a comparison.
+         ((eq action 'autoskip)
+          (and (not on-comparison) (not on-lambda)))
+         ;; Allow navigation, highlighting and strictness if it's not a
+         ;; comparison.
+         ((eq action 'navigate)
+          (and (not on-comparison) (not on-lambda))))))))
+
+  (sp-with-modes 'java-mode
+    (sp-local-pair "<" ">"
+                   :when '(rr/sp-java-filter-angle-brackets)
+                   :skip-match 'rr/sp-java-skip-match-angle-bracket))
+
+  ;; Web mode
+  (defun rr/sp-web-skip-match-angle-bracket (_ms _mb me)
+    "Non-nil if we should ignore the bracket as valid delimiter."
+    (save-excursion
+      (goto-char me)
+      (sp--looking-back-p (rx "=>") nil)))
+
+  (defun rr/sp-web-filter-angle-brackets (_id action context)
+    "Non-nil if we should allow ID's ACTION in CONTEXT for angle
+brackets."
+    (cond
+     ;; Inside strings, don't do anything with < or >
+     ((eq context 'string)
+      nil)
+     ;; Don't do any smart pairing inside comments either.
+     ((eq context 'comment)
+      nil)
+     ;; Otherwise we're in code
+     ((eq context 'code)
+      (let ((on-fn-return (looking-back (rx "=>") nil)))
+        (cond
+         ;; Only insert a matching > if we're not looking at a comparison.
+         ((eq action 'insert)
+          (not on-fn-return))
+         ;; Always allow wrapping in a pair if the region is active.
+         ((eq action 'wrap)
+          t)
+         ;; When pressing >, autoskip if we're not looking at a comparison.
+         ((eq action 'autoskip)
+          (not on-fn-return))
+         ;; Allow navigation, highlighting and strictness if it's not a
+         ;; comparison.
+         ((eq action 'navigate)
+          (not on-fn-return)))))))
+
+  (sp-with-modes 'web-mode
+    (sp-local-pair "%" "%")
+    (sp-local-pair "<" ">"
+                   :when '(rr/sp-web-filter-angle-brackets)
+                   :skip-match 'rr/sp-web-skip-match-angle-bracket))
+
+  (sp-local-pair 'web-mode "{" nil :post-handlers '(("||\n[i]" "RET")))
+  (sp-local-pair 'web-mode "[" nil :post-handlers '(("||\n[i]" "RET")))
+  (sp-local-pair 'web-mode "(" nil :post-handlers '(("||\n[i]" "RET")))
+
 
   (add-hook 'eshell-mode-hook #'smartparens-strict-mode)
 
