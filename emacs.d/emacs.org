@@ -1565,6 +1565,7 @@ all my customization in case I want ever to switch back to it.
     (zenburn-with-color-variables
       (custom-theme-set-faces
        'zenburn
+       `(shadow ((t (:inherit fixed-pitch :foreground ,zenburn-fg-05))))
        `(helm-delete-async-message ((t (:foreground ,zenburn-yellow))))
        `(helm-ff-file-extension ((t (:foreground ,zenburn-red+2))))
        `(helm-selection ((t (:background ,zenburn-bg+1 :underline nil :distant-foreground nil))))
@@ -1572,28 +1573,28 @@ all my customization in case I want ever to switch back to it.
        ;; Button
        `(button ((t (:foreground ,zenburn-yellow :underline t))))
        ;; Flycheck posframe
-       `(flycheck-posframe-info-face ((t (:inherit 'success))))
-       `(flycheck-posframe-warning-face ((t (:inherit 'warning))))
-       `(flycheck-posframe-error-face ((t (:inherit 'error))))
+       `(flycheck-posframe-info-face ((t (:inherit success))))
+       `(flycheck-posframe-warning-face ((t (:inherit warning))))
+       `(flycheck-posframe-error-face ((t (:inherit error))))
        `(flycheck-posframe-background-face ((t (:background ,zenburn-bg+05))))
        `(flycheck-posframe-border-face ((t (:foreground ,zenburn-fg-1))))
        ;; Eyebrowse
-       `(eyebrowse-mode-line-active ((t (:inherit 'mode-line-emphasis :foreground ,zenburn-yellow))))
+       `(eyebrowse-mode-line-active ((t (:inherit mode-line-emphasis :foreground ,zenburn-yellow))))
        `(eyebrowse-mode-line-inactive ((t (:foreground ,zenburn-fg-1))))
        ;; VC state
-       `(vc-edited-state ((t :inherit 'vc-state-base :foreground ,zenburn-blue)))
-       `(vc-up-to-date-state ((t :inherit 'vc-state-base :foreground ,zenburn-green+4)))
-       `(vc-removed-state ((t :inherit 'vc-state-base :foreground ,zenburn-red)))
-       `(vc-conflict-state ((t :inherit 'vc-state-base :foreground ,zenburn-orange)))
-       `(vc-locally-added-state ((t :inherit 'vc-state-base :foreground ,zenburn-fg)))
-       `(vc-needs-update-state ((t :inherit 'vc-state-base :foreground ,zenburn-yellow)))
-       `(vc-missing-state ((t :inherit 'vc-state-base :foreground ,zenburn-fg-05)))
+       `(vc-edited-state ((t :inherit vc-state-base :foreground ,zenburn-blue)))
+       `(vc-up-to-date-state ((t :inherit vc-state-base :foreground ,zenburn-green+4)))
+       `(vc-removed-state ((t :inherit vc-state-base :foreground ,zenburn-red)))
+       `(vc-conflict-state ((t :inherit vc-state-base :foreground ,zenburn-orange)))
+       `(vc-locally-added-state ((t :inherit vc-state-base :foreground ,zenburn-fg)))
+       `(vc-needs-update-state ((t :inherit vc-state-base :foreground ,zenburn-yellow)))
+       `(vc-missing-state ((t :inherit vc-state-base :foreground ,zenburn-fg-05)))
        ;; Set fringe color the same as background
        `(fringe ((t (:background ,zenburn-bg))))
        ;; Less contrast window divider
        `(window-divider ((t (:foreground ,zenburn-fg-1))))
        ;; Mu4e
-       `(mu4e-header-highlight-face ((t (:inherit 'hl-line :weight bold))))
+       `(mu4e-header-highlight-face ((t (:inherit hl-line :weight bold))))
        ;; Some org-mode faces
        `(org-mode-line-clock ((t (:background nil))))
        `(org-headline-todo ((t (:foreground ,zenburn-red+2))))
@@ -1601,7 +1602,9 @@ all my customization in case I want ever to switch back to it.
        `(org-ellipsis ((t (:foreground ,zenburn-yellow-1))))
        `(org-checkbox ((t (:background ,zenburn-bg+2 :foreground ,zenburn-fg+1
                                        :box (:line-width 1 :color ,zenburn-fg-1)))))
-       ;; `(org-table ((t (:background ,zenburn-bg-05))))
+       `(org-table ((t (:inherit fixed-pitch :foreground ,zenburn-green+2 :background ,zenburn-bg-05))))
+       `(org-block ((t (:inherit fixed-pitch :background ,zenburn-bg+05 :extend t))))
+       `(org-verbatim ((t (:inherit shadow :background ,zenburn-bg-05))))
        ;; Make all normal weight -> semi-bold
        `(link-visited ((t (:foreground ,zenburn-yellow-2 :underline t))))
        `(w3m-arrived-anchor ((t (:foreground ,zenburn-yellow-2 :underline t))))
@@ -1803,8 +1806,8 @@ globally.
 
 Some good fonts I used to use or ready to consider:
 + [[https://slackbuilds.org/repository/14.2/system/Iosevka/][Iosevka]] :: Too narrow.
-+ [[https://github.com/mozilla/Fira][Fira Mono]] :: Can't figure out how to make italic work.
-+ [[https://github.com/adobe-fonts/source-code-pro][SourceCodeVariable]] :: Best option for me. Currently used.
++ [[https://github.com/mozilla/Fira][Fira Mono]] :: Italic doesn't work on linux
++ [[https://github.com/adobe-fonts/source-code-pro][Source Code Pro]] :: Best option for me. Currently used.
 + IBM Plex Mono :: Really good but on laptop's small screen looks a bit ugly.
 
 #+begin_src emacs-lisp
@@ -1824,7 +1827,7 @@ Some good fonts I used to use or ready to consider:
   "Set fonts HEIGHT for all base faces."
   (set-face-attribute 'default nil :family fixed-pitch-font-family :weight 'semi-bold :height height)
   (set-face-attribute 'fixed-pitch nil :family fixed-pitch-font-family :weight 'semi-bold :height height)
-  (set-face-attribute 'variable-pitch nil :family variable-pitch-font-family :weight 'semi-bold :height height))
+  (set-face-attribute 'variable-pitch nil :family variable-pitch-font-family :weight 'semi-bold :height (floor (* height 1.2))))
 
 (defun rr/select-font-size ()
   "Select font size from predefined list."
