@@ -2351,7 +2351,7 @@ documented in the comment strings.
   (setq org-adapt-indentation nil                                        ; Do not align content with headline level
         org-eldoc-breadcrumb-separator " → "                             ; Headline levels separator for ElDoc mode
         org-ellipsis "…"                                                 ; If headline has content and folded show this at the end of line
-        org-hide-leading-stars t                                         ; Hide leading stars for subheading
+        org-hide-leading-stars nil                                       ; Must be nil to `org-superstar-leading-bullet' work properly
         org-indent-mode-turns-on-hiding-stars t                          ; Enable hiding leading stars when `org-indent-mode' is active
         org-priority-faces '((?a . error) (?b . warning) (?c . success)) ; Faces for priority indicators
         org-tags-column 0                                                ; Place tags just after headline
@@ -2601,6 +2601,20 @@ org-mode related settings together. I use colors directly from the color scheme.
   ;;           ("REVIEW" . (:inherit org-todo :foreground ,yellow))
   ;;           ("CANCELED" . (:inherit org-todo :foreground ,comment)))))
   )
+#+end_src
+
+** Org superstar mode
+
+Replace asterisks with fancy unicode characters.
+
+#+begin_src emacs-lisp
+(use-package org-superstar
+  :config
+  (setq org-superstar-headline-bullets-list '(?•)
+        org-superstar-leading-bullet ?\s
+        org-superstar-prettify-item-bullets nil)
+
+  (add-hook 'org-mode-hook #'org-superstar-mode))
 #+end_src
 
 ** Extra Org-mode export packages
