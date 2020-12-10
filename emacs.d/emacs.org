@@ -4954,7 +4954,8 @@ View and navigate PDF file inside emacs.
 
 (defun jira-ticket-p (window-title)
   "Predicate to make sure WINDOW-TITLE match JIRA ticket creation page."
-  (or (string-match-p "Create issue" window-title)))
+  (or (string-match-p "Create issue" window-title)
+      (string-prefix-p "[SPARK" window-title)))
 
 (defun popup-handler (app-name window-title x y w h)
   "Set major mode based on APP-NAME and WINDOW-TITLE."
