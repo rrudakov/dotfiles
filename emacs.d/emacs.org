@@ -1827,7 +1827,7 @@ Some good fonts I used to use or ready to consider:
   "Set fonts HEIGHT for all base faces."
   (set-face-attribute 'default nil :family fixed-pitch-font-family :weight 'semi-bold :height height)
   (set-face-attribute 'fixed-pitch nil :family fixed-pitch-font-family :weight 'semi-bold :height height)
-  (set-face-attribute 'variable-pitch nil :family variable-pitch-font-family :weight 'semi-bold :height (floor (* height 1.2))))
+  (set-face-attribute 'variable-pitch nil :family variable-pitch-font-family :weight 'semi-bold :height (floor (* height 1.1))))
 
 (defun rr/select-font-size ()
   "Select font size from predefined list."
