@@ -1806,7 +1806,7 @@ globally.
 
 Some good fonts I used to use or ready to consider:
 + [[https://slackbuilds.org/repository/14.2/system/Iosevka/][Iosevka]] :: Too narrow.
-+ [[https://github.com/mozilla/Fira][Fira Mono]] :: Italic doesn't work on linux
++ [[https://github.com/mozilla/Fira][Fira Mono]] :: /Italic/ doesn't work on linux
 + [[https://github.com/adobe-fonts/source-code-pro][Source Code Pro]] :: Best option for me. Currently used.
 + IBM Plex Mono :: Really good but on laptop's small screen looks a bit ugly.
 
