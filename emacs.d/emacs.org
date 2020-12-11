@@ -4090,7 +4090,8 @@ extra settings.
         lsp-java-format-on-type-enabled nil
         lsp-java-code-generation-use-blocks t
         lsp-java-maven-download-sources t
-        lsp-java-signature-help-enabled nil)
+        lsp-java-signature-help-enabled nil
+        lsp-java-completion-filtered-types [])
 
   (setq lsp-java-format-settings-url "file:///home/rrudakov/Work/EPAM/eclipse-java-code-style.xml"
         lsp-java-format-settings-profile "GoogleStyle")
