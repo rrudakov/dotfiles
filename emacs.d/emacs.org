@@ -1903,6 +1903,14 @@ Alternative to built-in syntax highlighting.
        (identifier) @constant
        (.match? @constant "^[A-Z]")))
 
+     ;; Enum entry
+     (enum_constant
+      (identifier) @constant)
+
+     ;; Enum declaration
+     (enum_declaration
+      (identifier) @label)
+
      ;; var keyword (for java 11)
      ((type_identifier) @keyword
       (.match? @keyword "^var$"))
@@ -1939,6 +1947,16 @@ Alternative to built-in syntax highlighting.
      ;; Use keyword face for this
      ((this) @keyword)
 
+     ;; Class name in the method reference
+     (method_reference
+      (identifier) @type
+      (identifier))
+
+     ;; Static method invocation
+     (method_invocation
+      object: (identifier) @type
+      (.match? @type "^[A-Z]"))
+
      (constructor_declaration
       (identifier) @constructor)
      ])
@@ -1953,6 +1971,7 @@ Alternative to built-in syntax highlighting.
                                 ("operator" 'font-lock-constant-face)
                                 ("constant" 'font-lock-variable-name-face)
                                 ("constructor" 'font-lock-builtin-face)
+                                ("label" 'font-lock-constant-face)
                                 ("variable.parameter" 'font-lock-function-name-face)
                                 ("type.builtin" 'font-lock-keyword-face)
                                 ("function.call" 'default))))))

@@ -32,6 +32,7 @@
 (push '(background-mode. dark) default-frame-alist)
 (push '(line-spacing . 0) default-frame-alist)
 (push '(background-color . "#3F3F3F") default-frame-alist)
+(push '(foreground-color . "#DCDCCC") default-frame-alist)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
