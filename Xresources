@@ -135,6 +135,3 @@ XLock.font: -*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-1
 XLock.planfontset: -*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-1
 XLock.messagefont: -*-terminus-medium-*-*-*-12-*-*-*-*-*-iso10646-1
 !-*-terminus-*-*-*-*-10-*-*-*-*-*-iso10646-1
-
-! Emacs lucid
-Emacs.pane.menubar.background: base00

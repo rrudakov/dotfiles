@@ -3933,6 +3933,16 @@ Special mode to edit SSH configuration files.
   (autoload 'ssh-config-mode "ssh-config-mode" t))
 #+end_src
 
+*** Vimrc mode
+
+Major mode for =vimrc= files.
+
+#+begin_src emacs-lisp
+(use-package vimrc-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.vim\\(rc\\)?\\'" . vimrc-mode)))
+#+end_src
+
 *** Nginx
 
 Syntax highlighting for nginx configuration files.

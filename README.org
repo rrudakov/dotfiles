@@ -3,14 +3,22 @@
 #+EMAIL: rrudakov@pm.me
 
 * Requirements
+
 Arch linux with following packages:
 - [[https://slackbuilds.org/repository/14.2/desktop/stalonetray/][stalonetray]] :: Standalone tray for xmonad and other tiling WMs
-- [[https://slackbuilds.org/repository/14.2/desktop/nitrogen/][nitrogen]] :: Set wallpapers
 - nm-applet :: GUI for managing network connections
+- picom :: Standalone composite manager
+- hsetroot :: Small utility to set background color
+- flameshot :: Screenshot taking utility
+- protonmail-bridge :: Bridge for [[https://protonmail.com][protonmail.com]] mail service
+- mbsync :: Synchronization of email between protonmail-bridge and local mailbox
+- mu :: Email indexer and client for Emacs
 - [[https://haskell-lang.org/get-started/linux][stack]] :: Haskell build system and package management (install manually)
   #+begin_src shell
   curl -sSL https://get.haskellstack.org/ | sh
   #+end_src
+
+Font =Source Code Pro=.
 
 * Installation
 Run ~install.sh~ from this repository
