@@ -3805,7 +3805,9 @@ for work and probably it won't be helpful for anybody else).
            (port "1044")
            (current-workdir (projectile-project-root))
            ;; (project-name (file-name-nondirectory (directory-file-name current-workdir)))
-           (command (format "mvn clean -Dit.test=%s verify -Dci-stage=integration-tests -Dmaven.failsafe.debug=\"-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%s -Xnoagent\"" test-name port)))
+           (command (or (and projectile-project-test-cmd
+                             (format "%s -Dit.test=%s -Dmaven.failsafe.debug=\"-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%s -Xnoagent\"" projectile-project-test-cmd test-name port))
+                        (format "mvn clean -Dit.test=%s verify -Dci-stage=integration-tests -Dmaven.failsafe.debug=\"-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=%s -Xnoagent\"" test-name port))))
       (dap-debug
        (list :type "java"
              :request "attach"
@@ -3825,7 +3827,9 @@ for work and probably it won't be helpful for anybody else).
   (defun rr/run-test-ci-stage (test-name)
     "Run java test class or method depends on TEST-NAME with ci-stage profile."
     (let ((default-directory (projectile-project-root)))
-      (compilation-start (format "mvn clean -Dit.test=%s verify -Dci-stage=integration-tests" test-name))))
+      (compilation-start (or (and projectile-project-test-cmd
+                                  (format "%s -Dit.test=%s" projectile-project-test-cmd test-name))
+                             (format "mvn clean -Dit.test=%s verify -Dci-stage=integration-tests" test-name)))))
 
   (defun rr/run-test-method ()
     (interactive)
@@ -4284,7 +4288,8 @@ I have keybindings similar to my =lsp-mode= bindings.
   ;; aligns annotation to the right hand side
   (setq tide-sort-completions-by-kind t
         tide-completion-detailed t
-        tide-completion-show-source t)
+        tide-completion-show-source t
+        tide-server-max-response-length (* 102400 5))
 
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
   (setq tide-format-options '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t :placeOpenBraceOnNewLineForFunctions nil))
