@@ -3714,7 +3714,8 @@ default value is changed (the project's development is very active).
         lsp-diagnostic-clean-after-change t
         lsp-completion-use-last-result t
         lsp-log-max 10000
-        lsp-enable-snippet t)
+        lsp-enable-snippet t
+        lsp-headerline-breadcrumb-enable nil)
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
 
