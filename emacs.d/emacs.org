@@ -647,6 +647,21 @@ I prefer to disable it just in case.
 (setq x-gtk-use-system-tooltips nil)
 #+end_src
 
+** Enable disabled commands
+
+Emacs by default disables some commands, which behavior can be unclear or
+surprising for newcomers. When you try to use such command you'll get prompt
+with confirmation and a few options.
+
+I'm going to disable this prompt and enable all commands by default:
+
+#+begin_src emacs-lisp
+(use-package novice
+  :ensure nil
+  :config
+  (setq disabled-command-function nil))
+#+end_src
+
 ** Default input method
 
 I write in 2 languages in emacs: English and Russian. To be able to switch
