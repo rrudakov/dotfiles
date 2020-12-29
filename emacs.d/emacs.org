@@ -318,6 +318,26 @@ Saves to a temp file and puts the filename in the kill ring."
     (message filename)))
 #+end_src
 
+** Open documentation for thing at point
+
+To be consistent with other programming modes I'd like single keybinding to get
+documentation for emacs-lisp definitions:
+
+#+begin_src emacs-lisp
+(defun rr/describe-thing-at-point ()
+  "Figure out the kind of thing at point and open documentation for it."
+  (interactive)
+  (let ((s (symbol-at-point)))
+    (cond
+     ((functionp s) (describe-function s))
+     ((or (user-variable-p s)
+          (local-variable-p s)
+          (special-variable-p s)
+          (custom-variable-p s))
+      (describe-variable s))
+     (t (error "No symbol at point or type is unknown")))))
+#+end_src
+
 * Variables
 
 ** Define variables for save file and backup directory
@@ -3507,6 +3527,7 @@ and automatically expand it into function templates.
   (yas-reload-all)
   (add-hook 'prog-mode-hook #'yas-minor-mode)
   (add-hook 'tex-mode-hook #'yas-minor-mode)
+  (add-hook 'nxml-mode-hook #'yas-minor-mode)
 
   ;; Expand and navigate between items by `C-j' to prevent conflicts with `company-tng'
   (define-key yas-minor-mode-map "\C-j" 'yas-expand)
@@ -3736,6 +3757,8 @@ default value is changed (the project's development is very active).
 
   ;; Rust lsp settings
   (require 'lsp-rust)
+  (setq lsp-rust-analyzer-display-chaining-hints t
+        lsp-rust-analyzer-server-display-inlay-hints t)
   (setq lsp-rust-clippy-preference "on")
   (add-hook 'rust-mode-hook #'lsp)
 
@@ -3928,7 +3951,7 @@ spaces instead of 2 by default.
 
 **** Format XML
 
-Third party package for reformatting XML documents. The command =xmlling=
+Third party package for reformatting XML documents. The command =xmllint=
 should be available in the =PATH= (package name is =libxml2-utils=).
 
 #+begin_src emacs-lisp
@@ -4091,6 +4114,17 @@ environment variables, binaries found on your =$PATH= and fish shell functions.
 (use-package company-shell
   :config
   (add-to-list 'company-backends #'company-shell))
+#+end_src
+
+*** Emacs lisp
+
+Built-in mode to work with emacs-lisp source code.
+
+#+begin_src emacs-lisp
+(use-package elisp-mode
+  :ensure nil
+  :config
+  (define-key emacs-lisp-mode-map (kbd "C-c j d") #'rr/describe-thing-at-point))
 #+end_src
 
 *** Java
