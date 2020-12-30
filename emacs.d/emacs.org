@@ -3760,7 +3760,7 @@ default value is changed (the project's development is very active).
   (setq lsp-rust-analyzer-display-chaining-hints t
         lsp-rust-analyzer-server-display-inlay-hints t)
   (setq lsp-rust-clippy-preference "on")
-  (add-hook 'rust-mode-hook #'lsp)
+  (add-hook 'rust-mode-hook #'lsp-deferred)
 
   ;; Python lsp settings
   (require 'lsp-pyls)
@@ -3769,7 +3769,10 @@ default value is changed (the project's development is very active).
 	      lsp-pyls-plugins-jedi-completion-enabled t
 	      lsp-pyls-plugins-jedi-completion-include-params nil
 	      lsp-pyls-plugins-jedi-signature-help-enabled t)
-  (add-hook 'python-mode-hook #'lsp))
+  (add-hook 'python-mode-hook #'lsp-deferred)
+
+  ;; XML lsp settings
+  (add-hook 'nxml-mode-hook #'lsp-deferred))
 #+end_src
 
 ** DAP
@@ -3958,6 +3961,12 @@ should be available in the =PATH= (package name is =libxml2-utils=).
 (use-package xml-format
   :demand t
   :after nxml-mode)
+#+end_src
+
+To indent XML with 4 spaces we should set the following environment variable:
+
+#+begin_src emacs-lisp
+(setenv "XMLLINT_INDENT" "    ")
 #+end_src
 
 *** SSH config mode
@@ -4167,7 +4176,7 @@ extra settings.
 (use-package lsp-java
   :after lsp-mode
   :config
-  (add-hook 'java-mode-hook #'lsp)
+  (add-hook 'java-mode-hook #'lsp-deferred)
   (setq lsp-java-save-actions-organize-imports nil
         lsp-java-format-enabled nil
         lsp-java-format-on-type-enabled nil
@@ -4577,7 +4586,7 @@ I use =lsp-mode= for RUST. Here I just explicitly add =rust-mode= support.
 #+begin_src emacs-lisp
 (use-package lsp-haskell
   :config
-  (add-hook 'haskell-mode-hook #'lsp))
+  (add-hook 'haskell-mode-hook #'lsp-deferred))
 #+end_src
 
 **** Align rules
