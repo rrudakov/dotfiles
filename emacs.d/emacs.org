@@ -1605,6 +1605,14 @@ all my customization in case I want ever to switch back to it.
        `(helm-ff-file-extension ((t (:foreground ,zenburn-red+2))))
        `(helm-selection ((t (:background ,zenburn-bg+1 :underline nil :distant-foreground nil))))
        `(helm-source-header ((t (:foreground ,zenburn-yellow :weight bold))))
+       ;; Helm-rg
+       `(helm-rg-title-face ((t (:background ,zenburn-bg-1 :foreground ,zenburn-magenta :weight bold))))
+       `(helm-rg-preview-line-highlight ((t (:background ,zenburn-green+4, :foreground ,zenburn-bg-1))))
+       `(helm-rg-directory-header-face ((t (:weight bold :foreground ,zenburn-fg))))
+       `(helm-rg-error-message ((t (:inherit error))))
+       `(helm-rg-active-arg-face ((t (:foreground ,zenburn-green))))
+       `(helm-rg-line-number-match-face ((t (:foreground ,zenburn-orange :underline t))))
+       `(helm-rg-file-match-face ((t (:foreground ,zenburn-cyan :underline t))))
        ;; Button
        `(button ((t (:foreground ,zenburn-yellow :underline t))))
        ;; Flycheck posframe
@@ -1926,7 +1934,7 @@ Alternative to built-in syntax highlighting.
 
      ;; Class field
      (field_declaration
-      (modifiers)
+      (modifiers)*
       (variable_declarator
        (identifier) @property.definition
        (.match? @property.definition "^[a-z]")))
@@ -1971,6 +1979,11 @@ Alternative to built-in syntax highlighting.
 
      (marker_annotation
       (scoped_identifier) @attribute)
+
+     ;; Annotation named arguments
+     (annotation_argument_list
+      (element_value_pair
+       (identifier) @function.special))
 
      ;; class as argument
      (class_literal
