@@ -56,7 +56,9 @@ export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
 source $HOME/.local/bin/virtualenvwrapper.sh
 
 # Set default editor
-export EDITOR="emacsclient -c"
+export ALTERNATE_EDITOR=""
+export EDITOR="emacsclient -t"
+export VISUAL="emacsclient -c -a emacs"
 
 # Set xmllint default intentation size to 4 spaces
 export XMLLINT_INDENT="    "
