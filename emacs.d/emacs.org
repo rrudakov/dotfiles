@@ -4361,6 +4361,7 @@ I have keybindings similar to my =lsp-mode= bindings.
   (setq tide-sort-completions-by-kind t
         tide-completion-detailed t
         tide-completion-show-source t
+        tide-completion-ignore-case t
         tide-server-max-response-length (* 102400 5))
 
   (add-hook 'typescript-mode-hook #'setup-tide-mode)
@@ -4649,14 +4650,6 @@ I use =lsp-mode= for RUST. Here I just explicitly add =rust-mode= support.
   (global-set-key (kbd "C-c h e") #'hasky-stack-execute)
   (global-set-key (kbd "C-c h h") #'hasky-stack-package-action)
   (global-set-key (kbd "C-c h i") #'hasky-stack-new))
-#+end_src
-
-**** Ligatures support
-
-#+begin_src emacs-lisp
-(use-package hasklig-mode
-  :config
-  (add-hook 'haskell-mode-hook 'hasklig-mode))
 #+end_src
 
 *** JSON
