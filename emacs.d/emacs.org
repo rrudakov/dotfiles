@@ -2302,7 +2302,8 @@ mode (because I use tab completion for shell).
   :config
   (setq company-global-modes '(not org-mode markdown-mode shell-mode))
   (setq company-tooltip-align-annotations t
-        company-idle-delay .2)
+        company-idle-delay .2
+        company-minimum-prefix-length 1)
 
   (global-company-mode)
   (company-tng-mode))
@@ -3771,7 +3772,9 @@ default value is changed (the project's development is very active).
   ;; Rust lsp settings
   (require 'lsp-rust)
   (setq lsp-rust-analyzer-display-chaining-hints t
-        lsp-rust-analyzer-server-display-inlay-hints t)
+        lsp-rust-analyzer-server-display-inlay-hints t
+        lsp-rust-analyzer-proc-macro-enable t
+        lsp-rust-analyzer-cargo-load-out-dirs-from-check t)
   (setq lsp-rust-clippy-preference "on")
   (add-hook 'rust-mode-hook #'lsp-deferred)
 
@@ -4967,10 +4970,24 @@ And even org-babel integration:
 
 #+begin_src emacs-lisp
 (use-package ob-restclient
+  :after org
   :config
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((restclient . t))))
+#+end_src
+
+* Experimental - ob-http
+
+Looks like more popular replacement for =ob-restclient=:
+
+#+begin_src emacs-lisp
+(use-package ob-http
+  :after org
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((http . t))))
 #+end_src
 
 * PDF tools
