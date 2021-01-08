@@ -88,7 +88,7 @@ echo "Clone xmobar repo"
 git clone https://github.com/jaor/xmobar || exit 1
 echo "...done"
 echo "Creating stack project"
-stack init --resolver lts-14.27
+stack init --resolver lts-16.27
 echo "...done"
 echo "Replace flags for xmobar in stack.yaml"
 /usr/bin/sed -i "/flags: {}/c\flags:" stack.yaml || exit 1
