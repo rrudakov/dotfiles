@@ -21,7 +21,6 @@ import           XMonad.Layout.NoBorders
 import           XMonad.Layout.Renamed
 import           XMonad.Layout.Spacing
 import           XMonad.Prompt
-import           XMonad.Prompt.Shell
 import           XMonad.Prompt.Ssh
 import qualified XMonad.StackSet                 as W
 import           XMonad.Util.NamedScratchpad
@@ -123,6 +122,7 @@ myPromptConfig =
     , defaultText = []
     , autoComplete = Nothing
     , showCompletionOnTab = False
+    , complCaseSensitivity = ComplCaseSensitive False
     , searchPredicate = isPrefixOf
     , alwaysHighlight = True
     , maxComplRows = Nothing
@@ -321,8 +321,10 @@ myManageHook =
     , resource =? "desktop_window" --> doIgnore
     , resource =? "kdesktop" --> doIgnore
     , className =? "xfce4-notifyd" --> doIgnore
+    , className =? "mpv" --> doFloat
     , className =? "rdesktop" --> doFullFloat
     , title =? "Media viewer" --> doFullFloat
+    , title =? "Microsoft Teams Notification" --> doIgnore
     , className =? "Nm-openconnect-auth-dialog" --> doCenterFloat
     , isFullscreen --> doFullFloat
     , title =? "Helm" -->
@@ -342,7 +344,6 @@ myDynHook =
   [ className =? "Spotify" --> customFloating (W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
   , title =? "*Emacs Anywhere* @ Emacs" --> customFloating (W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
   -- , title =? "Microsoft Teams Notification" --> customFloating (W.RationalRect (8 / 10) (1 / 8) (2 /10) (2 /8))
-  , title =? "Microsoft Teams Notification" --> doIgnore
   , title =? "Unlock Keyring" --> doCenterFloat
   ]
 
@@ -379,7 +380,7 @@ myBar = "xmobar"
 
 myPP :: PP
 myPP =
-  namedScratchpadFilterOutWorkspacePP $
+  filterOutWsPP [scratchpadWorkspaceTag] $
   xmobarPP
     { ppCurrent = xmobarColor "#f8dec0" "#382f27" . wrap " " " "
     , ppTitle = xmobarColor "#a8a8a8" "" . shorten 60
