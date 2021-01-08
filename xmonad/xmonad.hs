@@ -3,6 +3,7 @@
 import           Data.List
 import qualified Data.Map                        as M
 import           Data.Monoid
+import           Control.Monad (liftM2)
 import           Graphics.X11.ExtraTypes.XF86
 import           System.Exit
 import           XMonad
@@ -314,28 +315,30 @@ scratchpads =
 -- | Set hooks for applications
 myManageHook :: Query (Endo WindowSet)
 myManageHook =
-  composeAll
-    [ className =? "firefox" --> doShift "2"
-    , className =? "Google-chrome" --> doShift "5"
-    , className =? "MPlayer" --> doFloat
-    , resource =? "desktop_window" --> doIgnore
-    , resource =? "kdesktop" --> doIgnore
-    , className =? "xfce4-notifyd" --> doIgnore
-    , className =? "mpv" --> doFloat
-    , className =? "rdesktop" --> doFullFloat
-    , title =? "Media viewer" --> doFullFloat
-    , title =? "Microsoft Teams Notification" --> doIgnore
-    , className =? "Nm-openconnect-auth-dialog" --> doCenterFloat
-    , isFullscreen --> doFullFloat
-    , title =? "Helm" -->
-      customFloating (W.RationalRect (1 / 5) (1 / 5) (3 / 5) (3 / 5))
-    , title =? "capture" -->
-      customFloating (W.RationalRect (1 / 5) (1 / 5) (3 / 5) (3 / 5))
-    , className =? "vlc" -->
-      customFloating (W.RationalRect (1 / 6) (1 / 6) (2 / 3) (2 / 3))
-    -- scratchpads
-    , namedScratchpadManageHook scratchpads
-    ]
+  composeAll . concat $
+    [ [(className =? "firefox" <&&> resource =? "Dialog") --> doFloat]
+    , [ className =? "firefox" --> viewShift "2"
+      , className =? "Google-chrome" --> viewShift "5"
+      , className =? "MPlayer" --> doFloat
+      , resource =? "desktop_window" --> doIgnore
+      , resource =? "kdesktop" --> doIgnore
+      , className =? "xfce4-notifyd" --> doIgnore
+      , className =? "mpv" --> doFloat
+      , className =? "rdesktop" --> doFullFloat
+      , title =? "Media viewer" --> doFullFloat
+      , title =? "Microsoft Teams Notification" --> doIgnore
+      , className =? "Nm-openconnect-auth-dialog" --> doCenterFloat
+      , isFullscreen --> doFullFloat
+      , title =? "Helm" -->
+        customFloating (W.RationalRect (1 / 5) (1 / 5) (3 / 5) (3 / 5))
+      , title =? "capture" -->
+        customFloating (W.RationalRect (1 / 5) (1 / 5) (3 / 5) (3 / 5))
+      , className =? "vlc" -->
+        customFloating (W.RationalRect (1 / 6) (1 / 6) (2 / 3) (2 / 3))
+      -- scratchpads
+      , namedScratchpadManageHook scratchpads
+      ]]
+  where viewShift = doF . liftM2 (.) W.greedyView W.shift
 
 -- | Set hooks for windows with dynamic properties
 myDynHook :: ManageHook
