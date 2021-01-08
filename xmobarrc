@@ -53,10 +53,10 @@ Config { font = "xft:Source Code Pro:bold:size=8:antialias=true"
                     , Run Com "uname" ["-s","-r"] "" 36000
     		            , Run Date "%F %T" "date" 10
 		                , Run Kbd [("us", "US"), ("ru", "RU")]
-                    , Run XMonadLog
+                    , Run StdinReader
                     ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = "%cpu% %memory% %dynnetwork% %battery% %XMonadLog% }{ <fc=#ffffff>%kbd% %date%</fc>"
+       , template = "%cpu% %memory% %dynnetwork% %battery% %StdinReader% }{ <fc=#ffffff>%kbd% %date%</fc>"
        , hideOnStart = False
        }
