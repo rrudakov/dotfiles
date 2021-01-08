@@ -1,12 +1,12 @@
 decorations none
 transparent false
 dockapp_mode none
-geometry 4x1-280+0
+geometry 4x1-260+0
 background "#000000"
 kludges force_icons_size
 grow_gravity NE
 icon_gravity NE
-icon_size 24
+icon_size 22
 slot_size 24
 sticky true
 window_type dock

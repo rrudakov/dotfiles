@@ -1,9 +1,9 @@
 #!/bin/bash
 
-DPI=166
+DPI=141
 INTERNAL=true
-TRAY_GEOMETRY="4x1-280+0"
-TRAY_ICON_SIZE=24
+TRAY_GEOMETRY="4x1-260+0"
+TRAY_ICON_SIZE=22
 TRAY_SLOT_SIZE=24
 
 function adjust_xresources () {
@@ -48,8 +48,11 @@ if [ $# -eq 0 ]; then
         echo "Connected"
         DPI=163
         INTERNAL=false
-        TRAY_GEOMETRY="4x1-280+0"
-        TRAY_ICON_SIZE=24
+        # TRAY_GEOMETRY="4x1-180+2"
+        # TRAY_ICON_SIZE=12
+        # TRAY_SLOT_SIZE=16
+        TRAY_GEOMETRY="4x1-260+0"
+        TRAY_ICON_SIZE=22
         TRAY_SLOT_SIZE=24
     fi
 else
@@ -69,7 +72,7 @@ adjust_stalonetray $TRAY_GEOMETRY $TRAY_ICON_SIZE $TRAY_SLOT_SIZE
 if [ "$INTERNAL" == true ]; then
     /usr/bin/xrandr --output eDP-1 --auto --output DP-1 --off
 else
-    /usr/bin/xrandr --output eDP-1 --off --output DP-1 --auto
+    /usr/bin/xrandr --output eDP-1-1 --off --output HDMI-1-1 --mode 3840x2160
 fi
 
 # Recompile and restart xmonad

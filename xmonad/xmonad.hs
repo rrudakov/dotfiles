@@ -372,7 +372,10 @@ myRootMask =
 
 -- | Run xmonad
 main :: IO ()
-main = launch =<< statusBar myBar myPP toggleStrutsKey myConfig
+main = do
+  dirs <- getDirs
+  config <- statusBarProp myBar myPP toggleStrutsKey myConfig
+  launch config dirs
 
 -- | Command for running status bar
 myBar :: String
@@ -439,4 +442,5 @@ myConfig =
           docksEventHook <+>
           dynamicPropertyChange "WM_NAME" myDynHook
       , startupHook = myStartupHook
+      , logHook = dynamicLogString myPP >>= xmonadPropLog
       }
