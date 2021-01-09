@@ -123,7 +123,7 @@ myPromptConfig =
     , defaultText = []
     , autoComplete = Nothing
     , showCompletionOnTab = False
-    , complCaseSensitivity = ComplCaseSensitive False
+    -- , complCaseSensitivity = ComplCaseSensitive False
     , searchPredicate = isPrefixOf
     , alwaysHighlight = True
     , maxComplRows = Nothing
@@ -376,9 +376,11 @@ myRootMask =
 -- | Run xmonad
 main :: IO ()
 main = do
-  dirs <- getDirs
-  config <- statusBarProp myBar myPP toggleStrutsKey myConfig
-  launch config dirs
+  -- dirs <- getDirs
+  -- config <- statusBarProp myBar myPP toggleStrutsKey myConfig
+  -- launch config dirs
+  config <- statusBar myBar myPP toggleStrutsKey myConfig
+  launch config
 
 -- | Command for running status bar
 myBar :: String
@@ -386,7 +388,8 @@ myBar = "xmobar"
 
 myPP :: PP
 myPP =
-  filterOutWsPP [scratchpadWorkspaceTag] $
+  namedScratchpadFilterOutWorkspacePP $
+  -- filterOutWsPP [scratchpadWorkspaceTag] $
   xmobarPP
     { ppCurrent = xmobarColor "#f8dec0" "#382f27" . wrap " " " "
     , ppTitle = xmobarColor "#a8a8a8" "" . shorten 60
@@ -416,7 +419,7 @@ myConfig ::
                    (ModifiedLayout
                       (ConfigurableBorder Ambiguity) (ModifiedLayout Rename Grid)))))))
 myConfig =
-  ewmhFullscreen $
+  -- ewmhFullscreen $
   ewmh $
   docks $
   withUrgencyHook
