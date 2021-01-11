@@ -3,7 +3,7 @@
 import           Data.List
 import qualified Data.Map                        as M
 import           Data.Monoid
-import           Control.Monad (liftM2)
+-- import           Control.Monad (liftM2)
 import           Graphics.X11.ExtraTypes.XF86
 import           System.Exit
 import           XMonad
@@ -14,7 +14,6 @@ import           XMonad.Hooks.EwmhDesktops
 import           XMonad.Hooks.ManageDocks
 import           XMonad.Hooks.ManageHelpers
 import           XMonad.Hooks.PerWindowKbdLayout
-import           XMonad.Hooks.SetWMName
 import           XMonad.Hooks.UrgencyHook
 import           XMonad.Layout.Grid
 import           XMonad.Layout.LayoutModifier
@@ -376,8 +375,8 @@ main = do
   -- dirs <- getDirs
   -- config <- statusBarProp myBar myPP toggleStrutsKey myConfig
   -- launch config dirs
-  config <- statusBar myBar myPP toggleStrutsKey myConfig
-  launch config
+  con <- statusBar myBar myPP toggleStrutsKey myConfig
+  launch con
 
 -- | Command for running status bar
 myBar :: String
