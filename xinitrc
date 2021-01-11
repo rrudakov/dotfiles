@@ -28,6 +28,7 @@ xsetroot -cursor_name left_ptr
 hsetroot -solid "#202020"
 systemctl --user import-environment DISPLAY
 picom -b
+xmobar &
 stalonetray &
 flameshot &
 protonmail-bridge --no-window &

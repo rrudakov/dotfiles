@@ -375,12 +375,12 @@ main = do
   -- dirs <- getDirs
   -- config <- statusBarProp myBar myPP toggleStrutsKey myConfig
   -- launch config dirs
-  con <- statusBar myBar myPP toggleStrutsKey myConfig
-  launch con
+  -- con <- statusBar myBar myPP toggleStrutsKey myConfig
+  launch myConfig
 
 -- | Command for running status bar
-myBar :: String
-myBar = "xmobar"
+-- myBar :: String
+-- myBar = "xmobar"
 
 myPP :: PP
 myPP =
