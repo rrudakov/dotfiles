@@ -35,6 +35,8 @@ export LESSOPEN="| /usr/bin/source-highlight-esc.sh %s"
 
 # Better fonts rendering in Java applications
 export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=lcd -Dswing.aatext=true'
+# Fix rendering java GUI on XMonad
+export _JAVA_AWT_WM_NONREPARENTING=1
 
 # Silent java options
 _SILENT_JAVA_OPTIONS="$_JAVA_OPTIONS"

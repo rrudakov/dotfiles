@@ -25,6 +25,7 @@ import           XMonad.Prompt
 import           XMonad.Prompt.Ssh
 import qualified XMonad.StackSet                 as W
 import           XMonad.Util.NamedScratchpad
+import           XMonad.Actions.UpdatePointer
 
 -- | Set default terminal emulator
 myTerminal :: String
@@ -315,30 +316,30 @@ scratchpads =
 -- | Set hooks for applications
 myManageHook :: Query (Endo WindowSet)
 myManageHook =
-  composeAll . concat $
-    [ [(className =? "firefox" <&&> resource =? "Dialog") --> doFloat]
-    , [ className =? "firefox" --> viewShift "2"
-      , className =? "Google-chrome" --> viewShift "5"
-      , className =? "MPlayer" --> doFloat
-      , resource =? "desktop_window" --> doIgnore
-      , resource =? "kdesktop" --> doIgnore
-      , className =? "xfce4-notifyd" --> doIgnore
-      , className =? "mpv" --> doFloat
-      , className =? "rdesktop" --> doFullFloat
-      , title =? "Media viewer" --> doFullFloat
-      , title =? "Microsoft Teams Notification" --> doIgnore
-      , className =? "Nm-openconnect-auth-dialog" --> doCenterFloat
-      , isFullscreen --> doFullFloat
-      , title =? "Helm" -->
-        customFloating (W.RationalRect (1 / 5) (1 / 5) (3 / 5) (3 / 5))
-      , title =? "capture" -->
-        customFloating (W.RationalRect (1 / 5) (1 / 5) (3 / 5) (3 / 5))
-      , className =? "vlc" -->
-        customFloating (W.RationalRect (1 / 6) (1 / 6) (2 / 3) (2 / 3))
-      -- scratchpads
-      , namedScratchpadManageHook scratchpads
-      ]]
-  where viewShift = doF . liftM2 (.) W.greedyView W.shift
+  composeAll
+  [ className =? "firefox" --> doShift "2"
+  , className =? "Google-chrome" --> doShift "5"
+  , className =? "MPlayer" --> doFloat
+  , resource =? "desktop_window" --> doIgnore
+  , resource =? "kdesktop" --> doIgnore
+  , className =? "xfce4-notifyd" --> doIgnore
+  , className =? "mpv" --> doFloat
+  , className =? "rdesktop" --> doFullFloat
+  , title =? "Media viewer" --> doFullFloat
+  , title =? "Microsoft Teams Notification" --> doFloat
+  , className =? "Nm-openconnect-auth-dialog" --> doCenterFloat
+  , isFullscreen --> doFullFloat
+  , isDialog --> doFloat
+  , title =? "Helm" -->
+    customFloating (W.RationalRect (1 / 5) (1 / 5) (3 / 5) (3 / 5))
+  , title =? "capture" -->
+    customFloating (W.RationalRect (1 / 5) (1 / 5) (3 / 5) (3 / 5))
+  , className =? "vlc" -->
+    customFloating (W.RationalRect (1 / 6) (1 / 6) (2 / 3) (2 / 3))
+    -- scratchpads
+  , namedScratchpadManageHook scratchpads
+  ]
+  -- where viewShift = doF . liftM2 (.) W.greedyView W.shift
 
 -- | Set hooks for windows with dynamic properties
 myDynHook :: ManageHook
@@ -349,10 +350,6 @@ myDynHook =
   -- , title =? "Microsoft Teams Notification" --> customFloating (W.RationalRect (8 / 10) (1 / 8) (2 /10) (2 /8))
   , title =? "Unlock Keyring" --> doCenterFloat
   ]
-
--- | Make java GUI working
-myStartupHook :: X ()
-myStartupHook = setWMName "LG3D"
 
 ------------------------------------------------------------------------
 -- Event Masks:
@@ -390,15 +387,14 @@ myPP :: PP
 myPP =
   namedScratchpadFilterOutWorkspacePP $
   -- filterOutWsPP [scratchpadWorkspaceTag] $
-  xmobarPP
-    { ppCurrent = xmobarColor "#f8dec0" "#382f27" . wrap " " " "
-    , ppTitle = xmobarColor "#a8a8a8" "" . shorten 60
-    , ppHidden = xmobarColor "#f8dec0" ""
-    , ppHiddenNoWindows = xmobarColor "#392a48" ""
-    , ppUrgent = xmobarColor "#000000" "#ff8059" . wrap " " " "
-    , ppSep = "  "
-    , ppLayout = xmobarColor "#ffffff" ""
-    }
+  xmobarPP { ppCurrent = xmobarColor "#f8dec0" "#382f27" . wrap " " " "
+           , ppTitle = xmobarColor "#a8a8a8" "" . shorten 60
+           , ppHidden = xmobarColor "#f8dec0" ""
+           , ppHiddenNoWindows = xmobarColor "#392a48" ""
+           , ppUrgent = xmobarColor "#000000" "#ff8059" . wrap " " " "
+           , ppSep = "  "
+           , ppLayout = xmobarColor "#ffffff" ""
+           }
 
 toggleStrutsKey :: XConfig l -> (KeyMask, KeySym)
 toggleStrutsKey XConfig {XMonad.modMask = modMask'} = (modMask', xK_b)
@@ -447,6 +443,6 @@ myConfig =
           perWindowKbdLayout <+>
           docksEventHook <+>
           dynamicPropertyChange "WM_NAME" myDynHook
-      , startupHook = myStartupHook
-      , logHook = dynamicLogString myPP >>= xmonadPropLog
+      -- , startupHook = myStartupHook
+      , logHook = dynamicLogString myPP >>= xmonadPropLog >> updatePointer (0.5, 0.5) (0, 0)
       }
