@@ -325,7 +325,8 @@ myManageHook =
   , className =? "mpv" --> doFloat
   , className =? "rdesktop" --> doFullFloat
   , title =? "Media viewer" --> doFullFloat
-  , title =? "Microsoft Teams Notification" --> doFloat
+  -- , (className =? "Microsoft Teams - Preview" <&&> stringProperty "WM_NAME" =? "Microsoft Teams Notification") --> doFloat
+  -- , resource =? "microsoft teams - preview" --> doFloat
   , className =? "Nm-openconnect-auth-dialog" --> doCenterFloat
   , isFullscreen --> doFullFloat
   , isDialog --> doFloat
@@ -346,7 +347,6 @@ myDynHook =
   composeAll
   [ className =? "Spotify" --> customFloating (W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
   , title =? "*Emacs Anywhere* @ Emacs" --> customFloating (W.RationalRect (1 / 10) (1 / 8) (4 / 5) (3 / 4))
-  -- , title =? "Microsoft Teams Notification" --> customFloating (W.RationalRect (8 / 10) (1 / 8) (2 /10) (2 /8))
   , title =? "Unlock Keyring" --> doCenterFloat
   ]
 
@@ -373,14 +373,8 @@ myRootMask =
 main :: IO ()
 main = do
   -- dirs <- getDirs
-  -- config <- statusBarProp myBar myPP toggleStrutsKey myConfig
   -- launch config dirs
-  -- con <- statusBar myBar myPP toggleStrutsKey myConfig
   launch myConfig
-
--- | Command for running status bar
--- myBar :: String
--- myBar = "xmobar"
 
 myPP :: PP
 myPP =
@@ -414,7 +408,6 @@ myConfig ::
                    (ModifiedLayout
                       (ConfigurableBorder Ambiguity) (ModifiedLayout Rename Grid)))))))
 myConfig =
-  -- ewmhFullscreen $
   ewmh $
   docks $
   withUrgencyHook

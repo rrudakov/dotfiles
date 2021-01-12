@@ -33,4 +33,11 @@ stalonetray &
 flameshot &
 protonmail-bridge --no-window &
 
-exec xmonad
+xmonad &
+
+# Wait for XMonad
+wait $!
+pkill -HUP nm-applet
+pkill -HUP protonmail-brid
+pkill stalonetray
+pkill -HUP xmobar
