@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ######################################################################
 # install.sh
@@ -28,6 +28,7 @@ files="Xresources \
   aliasrc \
   config/dunst/dunstrc \
   config/fontconfig/fonts.conf \
+  config/rofi/config.rasi \
   config/alacritty/alacritty.yml"
 
 ###############
@@ -44,7 +45,12 @@ mkdir -p ${HOME}/.xmonad ${HOME}/.emacs.d/custom ${HOME}/.config/dunst ${HOME}/.
 echo "...done"
 
 # Remove all files inside .xmonad dir
-rm -rf ${HOME}/.xmonad/*
+if [ $# -eq 0 ]; then
+    rm -rf ${HOME}/.xmonad/*
+else
+    rm ${HOME}/.xmonad/build
+    rm ${HOME}/.xmonad/xmonad.hs
+fi
 
 # Move any existing dotfiles to ~/dotfiles_old, then creating symlinks
 for file in $files; do
@@ -53,11 +59,17 @@ for file in $files; do
 done
 echo "...done"
 
-# Install switch monitor script
+# Install executable scripts
 echo "Create symlinks for executables"
 ln -sf ${dir}/switch_monitor.sh ${HOME}/.local/bin/switch_monitor
 ln -sf ${dir}/update_mail_index.sh ${HOME}/.local/bin/update_mail_index
 echo "...done"
+
+# Stop here if --configs
+if [ "$1" == "--configs" ]; then
+    echo "Skip the rest..."
+    exit 0
+fi
 
 # Install vim vundle
 echo "Installing vim vundle plugin manager"
@@ -77,9 +89,11 @@ echo "Installing xmonad"
 cd ${HOME}/.xmonad
 echo "Clone xmonad repo"
 git clone https://github.com/xmonad/xmonad || exit 1
+cd xmonad && git checkout tags/v0.15 && cd .. || exit 1
 echo "...done"
 echo "Clone xmonad-contrib repo"
 git clone https://github.com/xmonad/xmonad-contrib || exit 1
+cd xmonad-contrib && git checkout tags/v0.16 && cd .. || exit 1
 echo "...done"
 echo "Clone xmonad-extras repo"
 git clone https://github.com/xmonad/xmonad-extras.git || exit 1
@@ -97,6 +111,8 @@ echo "Replace flags for xmobar in stack.yaml"
 /usr/bin/sed -i "/with_threaded: true/a\    with_utf8: true" stack.yaml || exit 1
 /usr/bin/sed -i "/with_utf8: true/a\    with_xpm: true" stack.yaml || exit 1
 /usr/bin/sed -i "/with_xpm: true/a\    with_xft: true" stack.yaml || exit 1
+/usr/bin/sed -i "/with_xft: true/a\  xmonad-extras:" stack.yaml || exit 1
+/usr/bin/sed -i "/xmonad-extras:/a\    with_mpd: false" stack.yaml || exit 1
 echo "...done"
 echo "Build and install xmonad and dependencies"
 stack install || exit 1

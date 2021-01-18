@@ -1854,10 +1854,10 @@ Some good fonts I used to use or ready to consider:
 + IBM Plex Mono :: Really good but on laptop's small screen looks a bit ugly.
 
 #+begin_src emacs-lisp
-(defconst fixed-pitch-font-family "Source Code Pro Semibold"
+(defconst fixed-pitch-font-family "Source Code Variable"
   "Font family for default and fixed-pitch faces.")
 
-(defconst variable-pitch-font-family "Source Sans Pro"
+(defconst variable-pitch-font-family "Source Sans Variable"
   "Font family for variable-pitch face.")
 
 (defconst font-size-alist

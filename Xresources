@@ -8,7 +8,7 @@ Xft.rgba: rgb
 
 Xcursor.theme: Adwaita
 
-XTerm*faceName: xft:Source Code Pro:size=9:antialias=true
+XTerm*faceName: xft:Source Code Variable:size=9:antialias=true
 XTerm*loginShell: true
 XTerm*termName: xterm-256color
 XTerm*borderWidth: 0

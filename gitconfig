@@ -26,3 +26,5 @@
 	user = beriya
 [pull]
 	rebase = false
+[advice]
+	detachedHead = false
