@@ -2954,6 +2954,8 @@ with HTML markup.
   (define-key message-mode-map (kbd "C-c M-o") #'org-mime-htmlize)
   (define-key org-mode-map (kbd "C-c M-o") #'org-mime-org-buffer-htmlize)
 
+  (add-hook 'message-send-hook #'org-mime-confirm-when-no-multipart)
+
   (add-hook 'org-mime-html-hook
             (lambda ()
               (org-mime-change-element-style
@@ -2964,7 +2966,7 @@ with HTML markup.
   (add-hook 'org-mime-html-hook
             (lambda ()
               (org-mime-change-element-style
-               "blockquote" "border-left: 2px solid gray; padding-left: 4px;")))
+               "blockquote" "border-left: 2px solid gray; padding-left: 2px;")))
 
   (setq org-mime-export-options
         '(:section-numbers nil :with-author nil :with-toc nil)))
@@ -3761,10 +3763,11 @@ default value is changed (the project's development is very active).
         lsp-enable-on-type-formatting nil
         lsp-enable-indentation nil
         lsp-modeline-diagnostics-scope :file
-        lsp-diagnostic-clean-after-change t
+        lsp-diagnostic-clean-after-change nil
         lsp-completion-use-last-result t
         lsp-log-max 10000
         lsp-enable-snippet t
+        lsp-semantic-tokens-enable t
         lsp-headerline-breadcrumb-enable nil)
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
@@ -5093,6 +5096,16 @@ View and navigate PDF file inside emacs.
 
 #+begin_src emacs-lisp
 (use-package gif-screencast)
+#+end_src
+
+* Ledger
+
+[[https://github.com/ledger/ledger][Ledger]] is command line utility to track your finances. It works with plain text
+files in certain format. The following major mode brings support for =.ledger=
+files to emacs.
+
+#+begin_src emacs-lisp
+(use-package ledger-mode)
 #+end_src
 
 * Funny
