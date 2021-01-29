@@ -1377,6 +1377,7 @@ except the ones requested by the user at the prompt.
           eshell-highlight-prompt t
           eshell-buffer-maximum-lines 5000
           eshell-history-size 5000)
+    (push 'eshell-tramp eshell-modules-list)
     (eshell-hist-initialize)
     (eshell-cmpl-initialize))
   (add-hook 'eshell-first-time-mode-hook #'rr/eshell-init)
