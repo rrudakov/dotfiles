@@ -2675,7 +2675,7 @@ org-mode related settings together. I use colors directly from the color scheme.
   ;; Zenburn
   (zenburn-with-color-variables
     (setq org-todo-keyword-faces
-          `(("PROGRESS" . (:inherit 'org-todo :foreground ,zenburn-blue))
+          `(("PROGRESS" . (:inherit org-todo :foreground ,zenburn-blue))
             ("WAITING" . (:inherit org-todo :foreground ,zenburn-orange))
             ("REVIEW" . (:inherit org-todo :foreground ,zenburn-orange))
             ("CANCELED" .(:inherit org-todo :foreground ,zenburn-fg-1)))))
@@ -2685,7 +2685,7 @@ org-mode related settings together. I use colors directly from the color scheme.
   ;;       (yellow "#f0c674")
   ;;       (aqua "#8abeb7"))
   ;;   (setq org-todo-keyword-faces
-  ;;         `(("PROGRESS" . (:inherit 'org-todo :foreground ,aqua))
+  ;;         `(("PROGRESS" . (:inherit org-todo :foreground ,aqua))
   ;;           ("WAITING" . (:inherit org-todo :foreground ,yellow))
   ;;           ("REVIEW" . (:inherit org-todo :foreground ,yellow))
   ;;           ("CANCELED" . (:inherit org-todo :foreground ,comment)))))
