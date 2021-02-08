@@ -14,6 +14,7 @@ files="Xresources \
   emacs.d/init.el \
   emacs.d/emacs.org \
   emacs.d/custom/google-java-format.el \
+  emacs.d/custom/flycheck-posframe.el \
   emacs.d/templates/default-java.el \
   tmux.conf \
   vimrc \

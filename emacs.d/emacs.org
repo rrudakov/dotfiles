@@ -3667,11 +3667,12 @@ showing error messages.
 
 #+begin_src emacs-lisp
 (use-package flycheck-posframe
+  :ensure nil
   :config
   (with-eval-after-load 'flycheck
-    (require 'flycheck-posframe)
-    (setq flycheck-posframe-border-width 1
-          flycheck-posframe-position 'window-bottom-left-corner)
+    (setq flycheck-posframe-borderc-width 1
+          flycheck-posframe-position 'window-bottom-left-corner
+          flycheck-posframe-inhibit-functions '(lambda () (bound-and-true-p company-backend)))
     (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)))
 #+end_src
 
