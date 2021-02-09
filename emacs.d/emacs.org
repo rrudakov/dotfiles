@@ -1656,6 +1656,9 @@ all my customization in case I want ever to switch back to it.
        `(org-headline-todo ((t (:foreground ,zenburn-red+2))))
        `(org-drawer ((t (:foreground ,zenburn-blue-2))))
        `(org-ellipsis ((t (:foreground ,zenburn-yellow-1))))
+       `(org-tag ((t (:background ,zenburn-bg-05
+                                  :foreground ,zenburn-fg-05
+                                  :box (:line-width -1 :color ,zenburn-fg-05)))))
        `(org-checkbox ((t (:background ,zenburn-bg+2 :foreground ,zenburn-fg+1
                                        :box (:line-width 1 :color ,zenburn-fg-1)))))
        `(org-table ((t (:inherit fixed-pitch :foreground ,zenburn-green+2 :background ,zenburn-bg-05))))
@@ -2447,6 +2450,7 @@ documented in the comment strings.
         org-startup-indented nil                                         ; Disable `org-indent-mode' by default, I prefer to enable it file locally
         org-startup-shrink-all-tables t                                  ; Makes tables more compact by default
         org-edit-src-content-indentation 0                               ; Do not place additional indentation inside source blocks
+        org-src-preserve-indentation t                                   ; Preserve indentation of source code blocks on export and on switch to edit block
         org-cycle-separator-lines 1                                      ; How many empty lines should be between headings to keep it in folded mode
         org-startup-with-inline-images nil                               ; Do not show images in org mode buffers by default
         org-display-remote-inline-images nil                             ; Do not download remote images

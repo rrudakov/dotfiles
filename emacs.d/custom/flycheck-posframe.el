@@ -207,10 +207,10 @@ Only the `foreground' is used in this face."
 
 (defun flycheck-posframe-show-posframe (errors)
   "Display ERRORS, using posframe.el library."
-  (flycheck-posframe-hide-posframe)
   (when (and errors
              (not (run-hook-with-args-until-success 'flycheck-posframe-inhibit-functions)))
     (let ((poshandler (intern (format "posframe-poshandler-%s" flycheck-posframe-position))))
+      (flycheck-posframe-hide-posframe)
       (unless (functionp poshandler)
         (setq poshandler nil))
       (flycheck-posframe-check-position)
