@@ -1655,7 +1655,7 @@ all my customization in case I want ever to switch back to it.
        `(org-mode-line-clock ((t (:background nil))))
        `(org-headline-todo ((t (:foreground ,zenburn-red+2))))
        `(org-drawer ((t (:foreground ,zenburn-blue-2))))
-       `(org-ellipsis ((t (:foreground ,zenburn-yellow-1))))
+       `(org-ellipsis ((t (:background ,zenburn-bg :foreground ,zenburn-yellow-1 :box nil))))
        `(org-tag ((t (:background ,zenburn-bg-05
                                   :foreground ,zenburn-fg-05
                                   :box (:line-width -1 :color ,zenburn-fg-05)))))
@@ -3653,7 +3653,7 @@ Enable flycheck globally.
 (use-package flycheck
   :config
   (setq flycheck-idle-change-delay 2
-        flycheck-check-syntax-automatically '(save new-line mode-enabled))
+        flycheck-check-syntax-automatically '(save idle-change new-line mode-enabled))
   (setq flycheck-indication-mode 'left-fringe)
   (add-hook 'after-init-hook #'global-flycheck-mode))
 #+end_src

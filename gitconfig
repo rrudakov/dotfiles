@@ -23,7 +23,7 @@
 [gitlab]
 	user = rrudakov
 [github]
-	user = beriya
+	user = rrudakov
 [pull]
 	rebase = false
 [advice]
