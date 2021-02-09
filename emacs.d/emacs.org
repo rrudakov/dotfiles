@@ -3309,6 +3309,8 @@ but still can be used with plain text.
   (define-key smartparens-mode-map (kbd "C-c {") #'sp-wrap-curly)
   (define-key smartparens-mode-map (kbd "C-c [") #'sp-wrap-square)
   (define-key smartparens-mode-map (kbd "M-]") #'sp-unwrap-sexp)
+  (define-key smartparens-mode-map (kbd "M-j") #'sp-join-sexp)
+  (define-key smartparens-mode-map (kbd "M-S") #'sp-split-sexp)
 
   (define-key smartparens-mode-map (kbd "C-(") #'sp-backward-slurp-sexp)
   (define-key smartparens-mode-map (kbd "C-)") #'sp-forward-slurp-sexp)
