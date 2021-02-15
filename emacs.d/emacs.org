@@ -620,11 +620,14 @@ behavior more comfortable.
 
 #+begin_src emacs-lisp
 (setq scroll-margin 3
-      scroll-conservatively 101
+      scroll-conservatively 10000
       scroll-up-aggressively 0.01
       scroll-down-aggressively 0.01
       scroll-preserve-screen-position t
-      auto-window-vscroll nil)
+      auto-window-vscroll nil
+      next-screen-context-lines 10)
+(setq-default scroll-up-aggressively 0.01
+              scroll-down-aggressively 0.01)
 #+end_src
 
 *** Limit wait for X event timeout
@@ -665,6 +668,12 @@ I prefer to disable it just in case.
 
 #+begin_src emacs-lisp
 (setq x-gtk-use-system-tooltips nil)
+#+end_src
+
+** Some more scrolling settings
+
+#+begin_src emacs-lisp
+(setq scroll-error-top-bottom t)
 #+end_src
 
 ** Enable disabled commands
@@ -2043,6 +2052,10 @@ Alternative to built-in syntax highlighting.
   ;; TypeScript
   (tree-sitter-require 'typescript)
   (add-hook 'typescript-mode-hook #'tree-sitter-hl-mode)
+
+  ;; The following works but there are no queries yet for TSX syntax
+  ;; (tree-sitter-require 'tsx)
+  ;; (add-to-list 'tree-sitter-major-mode-language-alist '(web-mode . tsx))
 
   ;; Python
   (tree-sitter-require 'python)
@@ -3794,7 +3807,7 @@ default value is changed (the project's development is very active).
         lsp-completion-use-last-result t
         lsp-log-max 10000
         lsp-enable-snippet t
-        lsp-semantic-tokens-enable t
+        lsp-semantic-tokens-enable nil
         lsp-headerline-breadcrumb-enable nil)
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
@@ -4479,17 +4492,17 @@ engines, embedded CSS and JavaScript.
             (web-mode-set-engine "django"))))
 
   (add-hook 'web-mode-hook #'rr/django-project-hook)
+
+  (flycheck-add-mode 'javascript-eslint 'web-mode)
   (add-hook 'web-mode-hook
             (lambda ()
               (when (string-equal "tsx" (file-name-extension buffer-file-name))
                 (setup-tide-mode))))
-  (flycheck-add-mode 'javascript-eslint 'web-mode)
 
   (add-hook 'web-mode-hook
             (lambda ()
               (when (string-equal "jsx" (file-name-extension buffer-file-name))
-                (setup-tide-mode))))
-  (flycheck-add-mode 'javascript-eslint 'web-mode))
+                (setup-tide-mode)))))
 #+end_src
 
 **** COMMENT Company-web
