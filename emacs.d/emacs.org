@@ -1586,6 +1586,15 @@ strings but not in the rest of source code.
   (add-hook 'prog-mode-hook #'flyspell-prog-mode))
 #+end_src
 
+** Accept advice functions redefinition quietly
+
+#+begin_src emacs-lisp
+(use-package advice
+  :ensure nil
+  :config
+  (setq ad-redefinition-action 'accept))
+#+end_src
+
 ** Regexps
 
 Built-in regex package. I don't use regex too much so I don't really need some
@@ -3448,7 +3457,7 @@ brackets."
           (not on-fn-return)))))))
 
   (sp-with-modes 'web-mode
-    (sp-local-pair "%" "%")
+    ;; (sp-local-pair "%" "%")
     (sp-local-pair "<" ">"
                    :when '(rr/sp-web-filter-angle-brackets)
                    :skip-match 'rr/sp-web-skip-match-angle-bracket))
@@ -3489,6 +3498,15 @@ until it selects what you want.
 (use-package expand-region
   :config
   (global-set-key (kbd "C-=") #'er/expand-region))
+#+end_src
+
+** Visual regexp
+
+#+begin_src emacs-lisp
+(use-package visual-regexp-steroids
+  :config
+  (define-key global-map (kbd "C-c r") #'vr/replace)
+  (define-key global-map (kbd "C-c q") #'vr/query-replace))
 #+end_src
 
 * Search and grep utilities
@@ -3636,8 +3654,9 @@ buffer/file.
 #+begin_src emacs-lisp
 (use-package dtrt-indent
   :config
-  (setq dtrt-indent-verbosity 0)
-  (add-hook 'prog-mode-hook #'dtrt-indent-mode))
+  (setq dtrt-indent-verbosity 3)
+  (add-hook 'c-mode-common-hook #'dtrt-indent-mode 99)
+  (add-hook 'prog-mode-hook #'dtrt-indent-mode 99))
 #+end_src
 
 ** Highlight TODO item
@@ -4221,9 +4240,10 @@ automatic code reformat and set default indentation to 2 spaces.
   :after cc-mode
   :ensure nil
   :config
-  (add-hook 'java-mode-hook
-            (lambda ()
-              (setq c-basic-offset 2))))
+  ;; Attempt to fix lambda indentation
+  (add-hook 'java-mode-hook (lambda ()
+                              (c-set-offset 'statement-block-intro 0)
+                              (c-set-offset 'block-close '-))))
 #+end_src
 
 **** lsp-java
@@ -5105,7 +5125,7 @@ View and navigate PDF file inside emacs.
 (use-package dockerfile-mode)
 #+end_src
 
-* Emacs everywhere
+* Emacs anywhere
 
 #+begin_src emacs-lisp
 (defun pull-request-conversation-p (window-title)
@@ -5131,6 +5151,8 @@ View and navigate PDF file inside emacs.
 
 (add-hook 'ea-popup-hook 'popup-handler)
 #+end_src
+
+** TODO Consider switching to [[https://github.com/tecosaur/emacs-everywhere][emacs-everywhere]]
 
 * Create GIF screencasts
 
