@@ -1663,6 +1663,8 @@ all my customization in case I want ever to switch back to it.
        `(vc-locally-added-state ((t :inherit vc-state-base :foreground ,zenburn-fg)))
        `(vc-needs-update-state ((t :inherit vc-state-base :foreground ,zenburn-yellow)))
        `(vc-missing-state ((t :inherit vc-state-base :foreground ,zenburn-fg-05)))
+       ;; CIDER
+       `(cider-deprecated-face ((t (:background ,zenburn-bg+2))))
        ;; Set fringe color the same as background
        `(fringe ((t (:background ,zenburn-bg))))
        ;; Less contrast window divider
@@ -2478,8 +2480,8 @@ documented in the comment strings.
         org-display-remote-inline-images nil                             ; Do not download remote images
         org-hide-emphasis-markers nil                                    ; Show emphasis markers in org mode buffers, otherwise it will lead to align problems
         org-insert-heading-respect-content t                             ; Insert new headings after content and not after point
-        org-fontify-done-headline t                                      ; Add special face for the entire done heading and not only keyword
-        org-fontify-todo-headline t                                      ; Add special face for the entire todo heading and not only keyword
+        org-fontify-done-headline nil                                      ; Add special face for the entire done heading and not only keyword
+        org-fontify-todo-headline nil                                      ; Add special face for the entire todo heading and not only keyword
         org-src-fontify-natively t                                       ; Enable native syntax highlighting inside source code block
         org-image-actual-width 500                                       ; Limit maximum images width
         org-use-sub-superscripts '{}                                     ; Do not treat symbols after "_" as subscripts on export
@@ -3500,7 +3502,7 @@ until it selects what you want.
   (global-set-key (kbd "C-=") #'er/expand-region))
 #+end_src
 
-** Visual regexp
+** COMMENT Visual regexp
 
 #+begin_src emacs-lisp
 (use-package visual-regexp-steroids
@@ -4298,6 +4300,19 @@ many useful commands. See full list of them [[https://github.com/clojure-emacs/c
 (use-package clojure-mode
   :after flycheck-clj-kondo
   :config
+  (define-clojure-indent
+    (defroutes 'defun)
+    (GET 2)
+    (POST 2)
+    (PUT 2)
+    (DELETE 2)
+    (HEAD 2)
+    (ANY 2)
+    (OPTIONS 2)
+    (PATCH 2)
+    (rfn 2)
+    (let-routes 1)
+    (context 2))
   (require 'flycheck-clj-kondo))
 #+end_src
 
