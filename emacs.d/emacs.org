@@ -1941,15 +1941,22 @@ Alternative to built-in syntax highlighting.
   (tree-sitter-require 'java)
   (tree-sitter-hl-add-patterns 'java
     [
-     ;; import scope
-     (import_declaration
-      (identifier) @type
-      (.match? @type "^[a-z]"))
+     ;; TODO: Fix it import scope
+     ;; (import_declaration
+     ;;  (identifier) @type
+     ;;  (.match? @type "^[a-z]"))
 
      ;; import class name
      (import_declaration
-      (identifier) @attribute
-      (.match? @attribute "^[A-Z]"))
+      (scoped_identifier
+       (identifier) @type
+       (.match? @type "^[A-Z]")))
+
+     ;; import static function
+     (import_declaration
+      (scoped_identifier
+       (identifier) @property
+       (.match? @property "^[a-z]")))
 
      ;; local variable name
      (local_variable_declaration
@@ -2022,8 +2029,39 @@ Alternative to built-in syntax highlighting.
        (identifier) @function.special))
 
      ;; class as argument
-     (class_literal
-      (identifier) @type)
+     ;; Example: SomeJava in `methodInvocation(SomeJava.class);'
+     (method_invocation
+      (argument_list
+       (field_access
+        (identifier)+ @type)))
+
+     (field_access
+      (identifier) @keyword
+      (.match? @keyword "^class$"))
+
+     ;; Example: EnumClass in `EnumClass.SOME_VALUE.getValue()'
+     (method_invocation
+      (field_access
+       (identifier)+ @type))
+
+     ;; Example: State in `@EnumSource(value = State.class)'
+     (annotation_argument_list
+      (element_value_pair
+       (identifier)
+       (field_access
+        (identifier)+ @type)))
+
+     ;; Example: SoftAssertionsExtension in `@ExtendWith(SoftAssertionsExtension.class)'
+     (annotation_argument_list
+      (field_access
+       (identifier)+ @type))
+
+     ;; Example: DependencyInjectionTestExecutionListener in
+     ;; `@TestExecutionListeners({DependencyInjectionTestExecutionListener.class})'
+     (annotation_argument_list
+      (element_value_array_initializer
+       (field_access
+        (identifier)+ @type)))
 
      ;; Use keyword face for super
      ((super) @keyword)
@@ -2350,7 +2388,7 @@ mode (because I use tab completion for shell).
   (setq company-global-modes '(not org-mode markdown-mode shell-mode))
   (setq company-tooltip-align-annotations t
         company-idle-delay .2
-        company-minimum-prefix-length 1)
+        company-minimum-prefix-length 3)
 
   (global-company-mode)
   (company-tng-mode))
@@ -3832,6 +3870,9 @@ default value is changed (the project's development is very active).
         lsp-headerline-breadcrumb-enable nil)
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
+  (advice-add 'lsp :before
+              (lambda (&rest _args)
+                (eval '(setf (lsp-session-server-id->folders (lsp-session)) (ht)))))
 
   ;; Rust lsp settings
   (require 'lsp-rust)
@@ -4347,6 +4388,9 @@ interact with =refactoring-nrepl=.
 
   (setq cljr-hotload-dependencies t
         cljr-warn-on-eval nil)
+
+  (add-to-list 'cljr-libspec-whitelist "^next.jdbc.date-time$")
+
   (add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
   (add-hook 'clojurescript-mode-hook #'my-clojure-mode-hook))
 #+end_src

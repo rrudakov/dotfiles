@@ -23,6 +23,10 @@ There are two things you can do about this warning:
 (setq gc-cons-threshold (* 64 1024 1024)
       gc-cons-percentage 0.1)
 
+;; (setq comp-deferred-compilation t)
+
+(setq garbage-collection-messages t)
+
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
 (package-initialize)
