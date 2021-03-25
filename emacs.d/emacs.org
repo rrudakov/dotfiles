@@ -4278,15 +4278,6 @@ automatic code reformat and set default indentation to 2 spaces.
 
   (define-key java-mode-map (kbd "C-c C-f") #'rr/java-format-and-save)
   (define-key java-mode-map [remap newline-and-indent] #'electrify-return-if-match))
-
-(use-package cc-vars
-  :after cc-mode
-  :ensure nil
-  :config
-  ;; Attempt to fix lambda indentation
-  (add-hook 'java-mode-hook (lambda ()
-                              (c-set-offset 'statement-block-intro 0)
-                              (c-set-offset 'block-close '-))))
 #+end_src
 
 **** lsp-java
