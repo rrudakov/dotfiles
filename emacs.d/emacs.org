@@ -4841,7 +4841,6 @@ I use =lsp-mode= for RUST. Here I just explicitly add =rust-mode= support.
         mu4e-trash-folder "/Trash"
         mu4e-drafts-folder "/Drafts"
         mu4e-sent-messages-behavior 'delete
-        mu4e-view-use-gnus nil
         mu4e-hide-index-messages t
         mu4e-headers-auto-update t
         mu4e-compose-signature "Best regards.\n\nRoman Rudakov."
