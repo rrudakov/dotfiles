@@ -1680,12 +1680,16 @@ all my customization in case I want ever to switch back to it.
                                   :foreground ,zenburn-fg-05
                                   :box (:line-width -1 :color ,zenburn-fg-05)))))
        `(org-checkbox ((t (:background ,zenburn-bg+2 :foreground ,zenburn-fg+1
-                                       :box (:line-width 1 :color ,zenburn-fg-1)))))
+                                       :box (:line-width -1 :color ,zenburn-fg-1)))))
        `(org-table ((t (:inherit fixed-pitch :foreground ,zenburn-green+2 :background ,zenburn-bg-05))))
        `(org-block ((t (:inherit fixed-pitch :background ,zenburn-bg+05 :extend t))))
        `(org-verbatim ((t (:inherit shadow :background ,zenburn-bg-05))))
        ;; Markdown
        `(markdown-code-face ((t (:inherit fixed-pitch :background ,zenburn-bg+05 :extend t))))
+       ;; Emacs 28
+       `(help-key-binding ((t (:background ,zenburn-bg-1
+                                           :foreground ,zenburn-yellow
+                                           :box (:line-width -1 :style released-button)))))
        ;; Make all normal weight -> semi-bold
        `(link-visited ((t (:foreground ,zenburn-yellow-2 :underline t))))
        `(w3m-arrived-anchor ((t (:foreground ,zenburn-yellow-2 :underline t))))
