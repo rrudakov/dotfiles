@@ -1684,6 +1684,8 @@ all my customization in case I want ever to switch back to it.
        `(org-table ((t (:inherit fixed-pitch :foreground ,zenburn-green+2 :background ,zenburn-bg-05))))
        `(org-block ((t (:inherit fixed-pitch :background ,zenburn-bg+05 :extend t))))
        `(org-verbatim ((t (:inherit shadow :background ,zenburn-bg-05))))
+       ;; Markdown
+       `(markdown-code-face ((t (:inherit fixed-pitch :background ,zenburn-bg+05 :extend t))))
        ;; Make all normal weight -> semi-bold
        `(link-visited ((t (:foreground ,zenburn-yellow-2 :underline t))))
        `(w3m-arrived-anchor ((t (:foreground ,zenburn-yellow-2 :underline t))))
@@ -2391,10 +2393,11 @@ mode (because I use tab completion for shell).
         company-minimum-prefix-length 3)
 
   (global-company-mode)
+  (require 'company-tng)
   (company-tng-mode))
 #+end_src
 
-** Quick help
+** COMMENT Quick help
 
 Good addition to ~company-mode~ which automatically shows documentation for
 candidate in the separate pop-up window.
@@ -4663,7 +4666,7 @@ I use =lsp-mode= for RUST. Here I just explicitly add =rust-mode= support.
 
 #+begin_src emacs-lisp
 (use-package tex
-  :ensure nil
+  :ensure auctex
   :config
   (setq TeX-auto-save t
         TeX-parse-self t
