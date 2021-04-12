@@ -3786,6 +3786,14 @@ automatically.
                                           (point-max)))])))
 #+end_src
 
+** Jump to definition
+
+#+begin_src emacs-lisp
+(use-package dumb-jump
+  :config
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+#+end_src
+
 ** Code folding
 
 Code folding support based on =outline-mode=. I don't use it too much despite
@@ -4365,10 +4373,30 @@ found it not perfect, but alternatives even worse.
 #+begin_src emacs-lisp
 (use-package cider
   :config
+
+  (defun rr/cider-jump-to-definition (&optional arg)
+    "My fallback to `xref-find-definitions' for CIDER."
+    (interactive "P")
+    (let* ((sym (cider-symbol-at-point 'look-back)))
+      (if (string-empty-p sym)
+          (call-interactively #'xref-find-definitions)
+        (condition-case nil
+            (if (cider--open-other-window-p arg)
+                (cider--find-var-other-window sym)
+              (cider--find-var sym))
+          (error (call-interactively #'xref-find-definitions))))))
+
+  (define-key cider-mode-map [remap cider-find-var] #'rr/cider-jump-to-definition)
+
   (setq cider-prompt-for-symbol nil
         cider-repl-wrap-history t
         nrepl-hide-special-buffers t
-        cider-repl-display-help-banner nil)
+        cider-repl-display-help-banner nil
+        cider-eldoc-display-context-dependent-info t)
+
+  (setq cider-jdk-src-paths '("~/Soft/java/clojure-1.10.3-sources"
+                              "~/Soft/java/openjdk-11-src"))
+
   (add-hook 'clojure-mode-hook #'cider-mode)
   (add-hook 'clojurescript-mode-hook #'cider-mode))
 #+end_src
