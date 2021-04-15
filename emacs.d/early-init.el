@@ -27,7 +27,7 @@
 (push '(scroll-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
 (push '(horizontal-scroll-bars) default-frame-alist)
-(push '(font . "Source Code Pro Semibold-8") default-frame-alist)
+(push '(font . "Source Code Variable-8") default-frame-alist)
 (push '(font-backend . "ftcrhb") default-frame-alist)
 (push '(background-mode. dark) default-frame-alist)
 (push '(line-spacing . 0) default-frame-alist)

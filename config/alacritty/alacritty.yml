@@ -79,7 +79,7 @@ font:
     family: Source Code Variable
 
     # The `style` can be specified to pick a specific face.
-    style: Semibold
+    style: Normal
 
   # Bold font face
   bold:
@@ -372,7 +372,7 @@ cursor:
   #   - ▇ Block
   #   - _ Underline
   #   - | Beam
-  style: Underline
+  style: Block
 
   # If this is `true`, the cursor will be rendered as a hollow box when the
   # window is not focused.

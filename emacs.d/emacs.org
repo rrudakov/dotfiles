@@ -1691,24 +1691,25 @@ all my customization in case I want ever to switch back to it.
                                            :foreground ,zenburn-yellow
                                            :box (:line-width -1 :style released-button)))))
        ;; Make all normal weight -> semi-bold
-       `(link-visited ((t (:foreground ,zenburn-yellow-2 :underline t))))
-       `(w3m-arrived-anchor ((t (:foreground ,zenburn-yellow-2 :underline t))))
-       `(git-annex-dired-annexed-available ((t (:inherit success))))
-       `(git-annex-dired-annexed-unavailable ((t (:inherit error))))
-       `(helm-ff-file ((t (:foreground ,zenburn-fg :background ,zenburn-bg))))
-       `(helm-ff-executable ((t (:foreground ,zenburn-green+2 :background ,zenburn-bg))))
-       `(helm-ff-prefix ((t (:foreground ,zenburn-bg :background ,zenburn-yellow))))
-       `(ledger-font-payee-cleared-face ((t (:foreground ,zenburn-fg))))
-       `(ledger-font-payee-pending-face ((t (:foreground ,zenburn-red))))
-       `(ledger-font-auto-xact-face ((t (:foreground ,zenburn-yellow-1))))
-       `(ledger-font-periodic-xact-face ((t (:foreground ,zenburn-green))))
-       `(ledger-font-pending-face ((t (:foreground ,zenburn-orange))))
-       `(ledger-font-posting-date-face ((t (:foreground ,zenburn-orange))))
-       `(ledger-font-reconciler-cleared-face ((t (:foreground ,zenburn-fg))))
-       `(ledger-font-reconciler-pending-face ((t (:foreground ,zenburn-orange))))
-       `(ledger-font-report-clickable-face ((t (:foreground ,zenburn-orange))))
-       `(magit-popup-disabled-argument ((t (:foreground ,zenburn-fg-1))))
-       `(magit-filename ((t ())))))
+       ;; `(link-visited ((t (:foreground ,zenburn-yellow-2 :underline t))))
+       ;; `(w3m-arrived-anchor ((t (:foreground ,zenburn-yellow-2 :underline t))))
+       ;; `(git-annex-dired-annexed-available ((t (:inherit success))))
+       ;; `(git-annex-dired-annexed-unavailable ((t (:inherit error))))
+       ;; `(helm-ff-file ((t (:foreground ,zenburn-fg :background ,zenburn-bg))))
+       ;; `(helm-ff-executable ((t (:foreground ,zenburn-green+2 :background ,zenburn-bg))))
+       ;; `(helm-ff-prefix ((t (:foreground ,zenburn-bg :background ,zenburn-yellow))))
+       ;; `(ledger-font-payee-cleared-face ((t (:foreground ,zenburn-fg))))
+       ;; `(ledger-font-payee-pending-face ((t (:foreground ,zenburn-red))))
+       ;; `(ledger-font-auto-xact-face ((t (:foreground ,zenburn-yellow-1))))
+       ;; `(ledger-font-periodic-xact-face ((t (:foreground ,zenburn-green))))
+       ;; `(ledger-font-pending-face ((t (:foreground ,zenburn-orange))))
+       ;; `(ledger-font-posting-date-face ((t (:foreground ,zenburn-orange))))
+       ;; `(ledger-font-reconciler-cleared-face ((t (:foreground ,zenburn-fg))))
+       ;; `(ledger-font-reconciler-pending-face ((t (:foreground ,zenburn-orange))))
+       ;; `(ledger-font-report-clickable-face ((t (:foreground ,zenburn-orange))))
+       ;; `(magit-popup-disabled-argument ((t (:foreground ,zenburn-fg-1))))
+       ;; `(magit-filename ((t ())))
+       ))
     (enable-theme 'zenburn)
     (remove-hook 'server-after-make-frame-hook 'rr/apply-theme))
 
@@ -1910,9 +1911,9 @@ Some good fonts I used to use or ready to consider:
 
 (defun rr/set-font (height)
   "Set fonts HEIGHT for all base faces."
-  (set-face-attribute 'default nil :family fixed-pitch-font-family :weight 'semi-bold :height height)
-  (set-face-attribute 'fixed-pitch nil :family fixed-pitch-font-family :weight 'semi-bold :height height)
-  (set-face-attribute 'variable-pitch nil :family variable-pitch-font-family :weight 'semi-bold :height (floor (* height 1.1))))
+  (set-face-attribute 'default nil :family fixed-pitch-font-family :weight 'normal :height height)
+  (set-face-attribute 'fixed-pitch nil :family fixed-pitch-font-family :weight 'normal :height height)
+  (set-face-attribute 'variable-pitch nil :family variable-pitch-font-family :weight 'normal :height (floor (* height 1.1))))
 
 (defun rr/select-font-size ()
   "Select font size from predefined list."
@@ -2427,6 +2428,7 @@ I hope one day it will be good enough to replace original one.
 (use-package company-posframe
   :config
   (setq company-posframe-show-indicator nil
+        company-posframe-show-metadata nil
         company-posframe-quickhelp-show-header nil
         company-posframe-quickhelp-delay .5)
   (company-posframe-mode 1))
@@ -3786,7 +3788,7 @@ automatically.
                                           (point-max)))])))
 #+end_src
 
-** Jump to definition
+** COMMENT Jump to definition
 
 #+begin_src emacs-lisp
 (use-package dumb-jump
@@ -4374,19 +4376,19 @@ found it not perfect, but alternatives even worse.
 (use-package cider
   :config
 
-  (defun rr/cider-jump-to-definition (&optional arg)
-    "My fallback to `xref-find-definitions' for CIDER."
-    (interactive "P")
-    (let* ((sym (cider-symbol-at-point 'look-back)))
-      (if (string-empty-p sym)
-          (call-interactively #'xref-find-definitions)
-        (condition-case nil
-            (if (cider--open-other-window-p arg)
-                (cider--find-var-other-window sym)
-              (cider--find-var sym))
-          (error (call-interactively #'xref-find-definitions))))))
+  ;; (defun rr/cider-jump-to-definition (&optional arg)
+  ;;   "My fallback to `xref-find-definitions' for CIDER."
+  ;;   (interactive "P")
+  ;;   (let* ((sym (cider-symbol-at-point 'look-back)))
+  ;;     (if (string-empty-p sym)
+  ;;         (call-interactively #'xref-find-definitions)
+  ;;       (condition-case nil
+  ;;           (if (cider--open-other-window-p arg)
+  ;;               (cider--find-var-other-window sym)
+  ;;             (cider--find-var sym))
+  ;;         (error (call-interactively #'xref-find-definitions))))))
 
-  (define-key cider-mode-map [remap cider-find-var] #'rr/cider-jump-to-definition)
+  ;; (define-key cider-mode-map [remap cider-find-var] #'rr/cider-jump-to-definition)
 
   (setq cider-prompt-for-symbol nil
         cider-repl-wrap-history t
