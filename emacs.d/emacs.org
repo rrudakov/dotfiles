@@ -575,6 +575,12 @@ value for some specific modes.
 (setq-default fill-column 79)
 #+end_src
 
+Draw underscore line at very bottom.
+
+#+begin_src emacs-lisp
+(setq x-underline-at-descent-line t)
+#+end_src
+
 *** Inhibit implied resize frame
 
 I use xmonad as my window manager and it controls all window resizing
@@ -1608,6 +1614,16 @@ powerful packages like =visual-regex= or something like this.
   (global-set-key (kbd "C-c R") #'re-builder))
 #+end_src
 
+** Built-in prog-mode tweaks
+
+#+begin_src emacs-lisp
+(use-package prog-mode
+  :ensure nil
+  :config
+  (add-hook 'prog-mode-hook 'outline-minor-mode)
+  (add-hook 'prog-mode-hook 'hs-minor-mode))
+#+end_src
+
 * Appearance
 
 All tweaks for emacs look & feel. Color themes fonts modeline etc.
@@ -1634,7 +1650,7 @@ all my customization in case I want ever to switch back to it.
        `(shadow ((t (:inherit fixed-pitch :foreground ,zenburn-fg-05))))
        `(helm-delete-async-message ((t (:foreground ,zenburn-yellow))))
        `(helm-ff-file-extension ((t (:foreground ,zenburn-red+2))))
-       `(helm-selection ((t (:background ,zenburn-bg+1 :underline nil :distant-foreground nil))))
+       `(helm-selection ((t (:background ,zenburn-bg+1 :underline ,zenburn-fg-1 :distant-foreground nil))))
        `(helm-source-header ((t (:foreground ,zenburn-yellow :weight bold))))
        ;; Helm-rg
        `(helm-rg-title-face ((t (:background ,zenburn-bg-1 :foreground ,zenburn-magenta :weight bold))))
@@ -1718,6 +1734,30 @@ all my customization in case I want ever to switch back to it.
     (rr/apply-theme)))
 #+end_src
 
+*** COMMENT Solarized theme
+
+#+begin_src emacs-lisp
+(use-package solarized-theme
+  :config
+  (setq solarized-use-variable-pitch nil
+        solarized-emphasize-indicators nil
+        solarized-height-minus-1 1.0
+        solarized-height-plus-1 1.0
+        solarized-height-plus-2 1.0
+        solarized-height-plus-3 1.0
+        solarized-height-plus-4 1.0)
+
+  (defun rr/apply-solarized-theme ()
+    "Apply solarized theme."
+    (load-theme 'solarized-dark t)
+    (enable-theme 'solarized-dark)
+    (remove-hook 'server-after-make-frame-hook #'rr/apply-solarized-theme))
+
+  (if (daemonp)
+      (add-hook 'server-after-make-frame-hook #'rr/apply-solarized-theme)
+    (rr/apply-solarized-theme)))
+#+end_src
+
 *** COMMENT Gruvbox
 
 #+begin_src emacs-lisp
@@ -1787,58 +1827,6 @@ all my customization in case I want ever to switch back to it.
         modus-themes-no-mixed-fonts t)
   (load-theme 'modus-vivendi t)
   (enable-theme 'modus-vivendi))
-#+end_src
-
-*** COMMENT Modus vivendi
-
-Currently used. My favorite one and the most consistent. A lot of built-in
-customization, very actively maintained.
-
-#+begin_src emacs-lisp
-(use-package modus-vivendi-theme
-  :init
-  (setq modus-vivendi-theme-bold-constructs t
-        modus-vivendi-theme-slanted-constructs nil
-        modus-vivendi-theme-syntax nil
-        modus-vivendi-theme-org-blocks 'greyscale
-        modus-vivendi-theme-prompts 'subtle
-        modus-vivendi-theme-proportional-fonts nil)
-  :config
-  (defun rr/apply-modus-theme ()
-    "Apply custom theme."
-    (load-theme 'modus-vivendi t)
-    (modus-vivendi-theme-with-color-variables
-      (custom-theme-set-faces
-       'modus-vivendi
-       `(font-lock-type-face ((t (:foreground ,magenta-alt))))))
-    (enable-theme 'modus-vivendi)
-    (remove-hook 'server-after-make-frame-hook #'rr/apply-modus-theme))
-
-  (if (daemonp)
-      (add-hook 'server-after-make-frame-hook #'rr/apply-modus-theme)
-    (rr/apply-modus-theme)))
-#+end_src
-
-*** COMMENT Modus operandi
-
-Light variant of modus theme. I use it on demand in very rare cases.
-
-#+begin_src emacs-lisp
-(use-package modus-operandi-theme
-  :init
-  (setq modus-operandi-theme-bold-constructs t
-        modus-operandi-theme-slanted-constructs t
-        modus-operandi-theme-org-blocks 'greyscale
-        modus-operandi-theme-proportional-fonts nil)
-  :config
-  (defun rr/apply-modus-theme ()
-    "Apply custom theme."
-    (load-theme 'modus-operandi t)
-    (remove-hook 'server-after-make-frame-hook #'rr/apply-modus-theme))
-
-  (if (daemonp)
-      (add-hook 'server-after-make-frame-hook #'rr/apply-modus-theme)
-    (rr/apply-modus-theme)))
 #+end_src
 
 ** Modeline
@@ -2199,11 +2187,11 @@ settings in the comments (there is a lot of them).
         helm-grep-ag-command "rg --color=always --smart-case --no-heading --line-number %s %s %s")
 
   ;; EShell support
-  (add-hook 'eshell-mode-hook
-            (lambda ()
-              (eshell-cmpl-initialize)
-              (define-key eshell-mode-map [remap completion-at-point] 'helm-esh-pcomplete)
-              (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))
+  ;; (add-hook 'eshell-mode-hook
+  ;;           (lambda ()
+  ;;             (eshell-cmpl-initialize)
+  ;;             (define-key eshell-mode-map [remap completion-at-point] 'helm-esh-pcomplete)
+  ;;             (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))
 
   (helm-mode 1)
   (helm-adaptive-mode 1))
@@ -3788,15 +3776,7 @@ automatically.
                                           (point-max)))])))
 #+end_src
 
-** COMMENT Jump to definition
-
-#+begin_src emacs-lisp
-(use-package dumb-jump
-  :config
-  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
-#+end_src
-
-** Code folding
+** COMMENT Code folding
 
 Code folding support based on =outline-mode=. I don't use it too much despite
 it works pretty good.
@@ -3806,6 +3786,16 @@ it works pretty good.
   :config
   (add-hook 'prog-mode-hook 'origami-mode)
   (define-key origami-mode-map [C-tab] #'origami-recursively-toggle-node))
+#+end_src
+
+** Outline mode tweaks
+
+#+begin_src emacs-lisp
+(use-package bicycle
+  :after outline
+  :config
+  (define-key outline-minor-mode-map [C-tab] #'bicycle-cycle)
+  (define-key outline-minor-mode-map [S-tab] #'bicycle-cycle-global))
 #+end_src
 
 ** Google c-style

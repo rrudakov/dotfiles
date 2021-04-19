@@ -3,7 +3,8 @@ modi: "combi,window,run,ssh,drun";
 /*	width: 50;*/
 /*	lines: 15;*/
 /*	columns: 1;*/
-font: "Source Code Variable Semibold 14";
+/* font: "Source Code Variable Semibold 14"; */
+font: "Source Code Variable 14";
 /*	bw: 1;*/
 /*	location: 0;*/
 /*	padding: 5;*/
