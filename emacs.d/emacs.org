@@ -1765,8 +1765,8 @@ all my customization in case I want ever to switch back to it.
   :config
   (defun rr/apply-gruvbox-theme ()
     "Apply gruvbox theme."
-    (load-theme 'gruvbox-dark-medium t)
-    (enable-theme 'gruvbox-dark-medium)
+    (load-theme 'gruvbox-dark-soft t)
+    (enable-theme 'gruvbox-dark-soft)
     (remove-hook 'server-after-make-frame-hook #'rr/apply-gruvbox-theme))
 
   (if (daemonp)
