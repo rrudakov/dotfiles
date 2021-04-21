@@ -1687,6 +1687,11 @@ all my customization in case I want ever to switch back to it.
        `(window-divider ((t (:foreground ,zenburn-fg-1))))
        ;; Mu4e
        `(mu4e-header-highlight-face ((t (:inherit hl-line :weight bold))))
+       ;; Auto highlight symbol
+       `(ahs-face ((t (:inherit highlight :weight bold))))
+       `(ahs-plugin-defalt-face ((t (:inherit highlight :weight bold))))
+       `(ahs-plugin-whole-buffer-face ((t (:inherit highlight :weight bold))))
+       `(ahs-definition-face ((t (:inherit highlight :underline t))))
        ;; Some org-mode faces
        `(org-mode-line-clock ((t (:background nil))))
        `(org-headline-todo ((t (:foreground ,zenburn-red+2))))
@@ -1758,7 +1763,7 @@ all my customization in case I want ever to switch back to it.
     (rr/apply-solarized-theme)))
 #+end_src
 
-*** COMMENT Gruvbox
+*** COMMENT Gruvbox theme
 
 #+begin_src emacs-lisp
 (use-package gruvbox-theme
@@ -1772,6 +1777,22 @@ all my customization in case I want ever to switch back to it.
   (if (daemonp)
       (add-hook 'server-after-make-frame-hook #'rr/apply-gruvbox-theme)
     (rr/apply-gruvbox-theme)))
+#+end_src
+
+*** COMMENT Tron legacy theme
+
+#+begin_src emacs-lisp
+(use-package tron-legacy-theme
+  :config
+  (defun rr/apply-tron-theme ()
+    "Apply tron theme."
+    (load-theme 'tron-legacy t)
+    (enable-theme 'tron-legacy)
+    (remove-hook 'server-after-make-frame-hook #'rr/apply-tron-theme))
+
+  (if (daemonp)
+      (add-hook 'server-after-make-frame-hook #'rr/apply-tron-theme)
+    (rr/apply-tron-theme)))
 #+end_src
 
 *** COMMENT Tomorrow theme
@@ -2380,7 +2401,7 @@ mode (because I use tab completion for shell).
 #+begin_src emacs-lisp
 (use-package company
   :config
-  (setq company-global-modes '(not org-mode markdown-mode shell-mode))
+  (setq company-global-modes '(not org-mode markdown-mode))
   (setq company-tooltip-align-annotations t
         company-idle-delay .2
         company-minimum-prefix-length 3)
@@ -3666,7 +3687,21 @@ Navigate between symbol occurrences by pressing =M-n= and =M-p=.
 (use-package smartscan
   :config
   (setq smartscan-symbol-selector "symbol")
-  (add-hook 'prog-mode-hook #'smartscan-mode))
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (if (not (derived-mode-p 'clojure-mode))
+                  (smartscan-mode 1)))))
+#+end_src
+
+** Highlight symbol
+
+#+begin_src emacs-lisp
+(use-package auto-highlight-symbol
+  :config
+  (define-key auto-highlight-symbol-mode-map (kbd "M-n") #'ahs-forward)
+  (define-key auto-highlight-symbol-mode-map (kbd "M-p") #'ahs-backward)
+  (setq ahs-default-range 'ahs-range-whole-buffer)
+  (add-hook 'clojure-mode-hook #'auto-highlight-symbol-mode))
 #+end_src
 
 ** Rainbow mode
