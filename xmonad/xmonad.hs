@@ -142,6 +142,8 @@ myKeys conf@XConfig {XMonad.modMask = modm} =
   , ((modm, xK_p), spawn "rofi -show run")
     -- launch emacs client with new frame
   , ((modm .|. shiftMask, xK_u), spawn "emacsclient -c")
+    -- restart emacs daemon
+  , ((modm .|. shiftMask, xK_g), spawn "systemctl --user restart emacs.service && notify-send \"Emacs has been restarted\"")
     -- launch emacs anywhere command
   , ((modm, xK_f), spawn "~/.emacs_anywhere/bin/run")
     -- launch ssh prompt

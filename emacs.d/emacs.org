@@ -1536,7 +1536,7 @@ dired-like way. Can be used also as image viewer.
         image-dired-thumbs-per-row 4))
 #+end_src
 
-*** Dired plus
+*** COMMENT Dired plus
 
 Not built-in package. I have this only for one function (and probably the
 entire emacs wiki repository). I don't know why the default behavior is so
@@ -2401,10 +2401,15 @@ mode (because I use tab completion for shell).
 #+begin_src emacs-lisp
 (use-package company
   :config
-  (setq company-global-modes '(not org-mode markdown-mode))
+  ;; (setq company-global-modes '(not org-mode markdown-mode))
   (setq company-tooltip-align-annotations t
         company-idle-delay .2
         company-minimum-prefix-length 3)
+
+  ;; (define-key company-active-map (kbd "C-n") #'company-select-next)
+  ;; (define-key company-active-map (kbd "C-p") #'company-select-previous)
+  ;; (define-key company-search-map (kbd "C-n") #'company-select-next)
+  ;; (define-key company-search-map (kbd "C-p") #'company-select-previous)
 
   (global-company-mode)
   (require 'company-tng)
@@ -3402,6 +3407,8 @@ but still can be used with plain text.
   (define-key smartparens-mode-map (kbd "C-M-b") #'sp-backward-sexp)
   (define-key smartparens-mode-map (kbd "C-M-a") #'sp-beginning-of-sexp)
   (define-key smartparens-mode-map (kbd "C-M-e") #'sp-end-of-sexp)
+  (define-key smartparens-mode-map (kbd "C-M-d") #'sp-down-sexp)
+  (define-key smartparens-mode-map (kbd "C-M-u") #'sp-up-sexp)
 
   (define-key smartparens-strict-mode-map [remap c-electric-backspace] #'sp-backward-delete-char)
   (define-key smartparens-strict-mode-map [remap c-electric-delete-forward] #'sp-delete-char)
@@ -4285,7 +4292,7 @@ environment variables, binaries found on your =$PATH= and fish shell functions.
 #+begin_src emacs-lisp
 (use-package company-shell
   :config
-  (add-to-list 'company-backends #'company-shell))
+  (add-to-list 'company-backends '(company-shell company-shell-env)))
 #+end_src
 
 *** Emacs lisp
