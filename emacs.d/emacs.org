@@ -1707,30 +1707,20 @@ all my customization in case I want ever to switch back to it.
        `(org-verbatim ((t (:inherit shadow :background ,zenburn-bg-05))))
        ;; Markdown
        `(markdown-code-face ((t (:inherit fixed-pitch :background ,zenburn-bg+05 :extend t))))
+       ;; Tree sitter
+       `(tree-sitter-hl-face:function.call ((t (:inherit default))))
+       `(tree-sitter-hl-face:attribute ((t (:foreground ,zenburn-blue+1))))
+       `(tree-sitter-hl-face:operator ((t (:foreground ,zenburn-green+4))))
+       `(tree-sitter-hl-face:constant ((t (:foreground ,zenburn-orange))))
+       `(tree-sitter-hl-face:constructor ((t (:inherit font-lock-builtin-face))))
+       `(tree-sitter-hl-face:label ((t (:foreground ,zenburn-green+4))))
+       `(tree-sitter-hl-face:variable.parameter ((t (:foreground ,zenburn-cyan))))
+       `(tree-sitter-hl-face:type.builtin ((t (:inherit font-lock-builtin-face))))
+       `(tree-sitter-hl-face:property.definition ((t (:inherit font-lock-variable-name-face))))
        ;; Emacs 28
        `(help-key-binding ((t (:background ,zenburn-bg-1
                                            :foreground ,zenburn-yellow
-                                           :box (:line-width -1 :style released-button)))))
-       ;; Make all normal weight -> semi-bold
-       ;; `(link-visited ((t (:foreground ,zenburn-yellow-2 :underline t))))
-       ;; `(w3m-arrived-anchor ((t (:foreground ,zenburn-yellow-2 :underline t))))
-       ;; `(git-annex-dired-annexed-available ((t (:inherit success))))
-       ;; `(git-annex-dired-annexed-unavailable ((t (:inherit error))))
-       ;; `(helm-ff-file ((t (:foreground ,zenburn-fg :background ,zenburn-bg))))
-       ;; `(helm-ff-executable ((t (:foreground ,zenburn-green+2 :background ,zenburn-bg))))
-       ;; `(helm-ff-prefix ((t (:foreground ,zenburn-bg :background ,zenburn-yellow))))
-       ;; `(ledger-font-payee-cleared-face ((t (:foreground ,zenburn-fg))))
-       ;; `(ledger-font-payee-pending-face ((t (:foreground ,zenburn-red))))
-       ;; `(ledger-font-auto-xact-face ((t (:foreground ,zenburn-yellow-1))))
-       ;; `(ledger-font-periodic-xact-face ((t (:foreground ,zenburn-green))))
-       ;; `(ledger-font-pending-face ((t (:foreground ,zenburn-orange))))
-       ;; `(ledger-font-posting-date-face ((t (:foreground ,zenburn-orange))))
-       ;; `(ledger-font-reconciler-cleared-face ((t (:foreground ,zenburn-fg))))
-       ;; `(ledger-font-reconciler-pending-face ((t (:foreground ,zenburn-orange))))
-       ;; `(ledger-font-report-clickable-face ((t (:foreground ,zenburn-orange))))
-       ;; `(magit-popup-disabled-argument ((t (:foreground ,zenburn-fg-1))))
-       ;; `(magit-filename ((t ())))
-       ))
+                                           :box (:line-width -1 :style released-button)))))))
     (enable-theme 'zenburn)
     (remove-hook 'server-after-make-frame-hook 'rr/apply-theme))
 
@@ -1962,6 +1952,9 @@ Alternative to built-in syntax highlighting.
      ;;  (identifier) @type
      ;;  (.match? @type "^[a-z]"))
 
+     ;; void type
+     ((void_type) @keyword)
+
      ;; import class name
      (import_declaration
       (scoped_identifier
@@ -2034,10 +2027,16 @@ Alternative to built-in syntax highlighting.
 
      ;; Scoped annotations
      (annotation
-      (scoped_identifier) @attribute)
+      (scoped_identifier) @label)
+
+     (annotation
+      (identifier) @label)
 
      (marker_annotation
-      (scoped_identifier) @attribute)
+      (scoped_identifier) @label)
+
+     (marker_annotation
+      (identifier) @label)
 
      ;; Annotation named arguments
      (annotation_argument_list
@@ -2100,19 +2099,6 @@ Alternative to built-in syntax highlighting.
      ])
 
   (add-hook 'java-mode-hook #'tree-sitter-hl-mode)
-  (add-hook 'java-mode-hook
-            (lambda ()
-              (add-function :before-until (local 'tree-sitter-hl-face-mapping-function)
-                            (lambda (capture-name)
-                              (pcase capture-name
-                                ("attribute" 'font-lock-constant-face)
-                                ("operator" 'font-lock-constant-face)
-                                ("constant" 'font-lock-variable-name-face)
-                                ("constructor" 'font-lock-builtin-face)
-                                ("label" 'font-lock-constant-face)
-                                ("variable.parameter" 'font-lock-function-name-face)
-                                ("type.builtin" 'font-lock-keyword-face)
-                                ("function.call" 'default))))))
 
   ;; TypeScript
   (tree-sitter-require 'typescript)
