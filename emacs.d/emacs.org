@@ -2401,7 +2401,7 @@ mode (because I use tab completion for shell).
 #+begin_src emacs-lisp
 (use-package company
   :config
-  ;; (setq company-global-modes '(not org-mode markdown-mode))
+  (setq company-global-modes '(not org-mode markdown-mode))
   (setq company-tooltip-align-annotations t
         company-idle-delay .2
         company-minimum-prefix-length 3)
@@ -2412,6 +2412,7 @@ mode (because I use tab completion for shell).
   ;; (define-key company-search-map (kbd "C-p") #'company-select-previous)
 
   (global-company-mode)
+
   (require 'company-tng)
   (company-tng-mode))
 #+end_src
@@ -5179,6 +5180,14 @@ View and navigate PDF file inside emacs.
 (use-package pdf-tools
   :config
   (pdf-tools-install))
+#+end_src
+
+* Read EPUB books in emacs
+
+#+begin_src emacs-lisp
+(use-package nov
+  :config
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 #+end_src
 
 * Htmlize
