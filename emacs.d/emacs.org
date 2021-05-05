@@ -912,7 +912,7 @@ I disable save behavior.
   (setq auth-source-save-behavior nil))
 #+end_src
 
-** Replace selected text on input
+** Replace selected text on input, aka delete-selection-mode
 
 By default if you select some part of buffer and start typing selected part
 won't be deleted. I find this behavior not obvious and not convenient. To fix
@@ -1150,7 +1150,8 @@ Overview of settings in this section:
 (use-package simple
   :ensure nil
   :config
-  (setq save-interprogram-paste-before-kill t)
+  (setq save-interprogram-paste-before-kill t
+        kill-do-not-save-duplicates nil)
   (add-hook 'text-mode-hook #'auto-fill-mode)
   (add-hook 'prog-mode-hook (lambda () (setq truncate-lines t)))
   (add-hook 'before-save-hook #'delete-trailing-whitespace)
@@ -2136,6 +2137,7 @@ settings in the comments (there is a lot of them).
 (use-package helm
   :config
   (require 'helm)
+  (require 'helm-lib)
   (require 'helm-config)
   (require 'helm-files)
   (require 'helm-grep)
@@ -2144,7 +2146,7 @@ settings in the comments (there is a lot of them).
     (setq helm-net-prefer-curl t))
 
   ;; General settings
-  (setq helm-split-window-inside-p            nil ; open helm buffer inside current window, not occupy whole other window
+  (setq helm-split-window-inside-p          nil ; open helm buffer inside current window, not occupy whole other window
 	      helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
 	      helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
 	      helm-echo-input-in-header-line nil      ; hide duplicated echo input
@@ -2154,12 +2156,6 @@ settings in the comments (there is a lot of them).
         helm-truncate-lines t                   ; avoid line splitting in helm buffer
         helm-M-x-always-save-history t          ; preserve history for `helm-M-x' command
         helm-buffers-truncate-lines t)
-
-  ;; Remove all distracting information from helm modeline
-  (setq helm-mode-line-string "\\<helm-map>"
-        helm-top-mode-line "\\<helm-top-map>"
-        helm-comp-read-mode-line "\\<helm-comp-read-map>"
-        helm-read-file-name-mode-line-string "\\<helm-read-file-map>")
 
   ;; Helm find files custom settings
   (setq helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
@@ -2174,10 +2170,6 @@ settings in the comments (there is a lot of them).
     (define-key global-map [remap dabbrev-expand] #'helm-dabbrev)
     (define-key global-map [remap execute-extended-command] #'helm-M-x)
     (define-key global-map [remap yank-pop] #'helm-show-kill-ring)
-
-    (define-key lisp-interaction-mode-map [remap completion-at-point] #'helm-lisp-completion-at-point)
-    (define-key emacs-lisp-mode-map       [remap completion-at-point] #'helm-lisp-completion-at-point)
-
     (define-key helm-find-files-map (kbd "C-i") #'helm-ff-TAB))
 
   ;; Use `display-buffer' function to show helm windows to control where they
@@ -2192,13 +2184,6 @@ settings in the comments (there is a lot of them).
   (setq helm-grep-default-command "grep --color=never -a -d skip %e -n%cH -e %p %f"
         helm-grep-git-grep-command "git --no-pager grep -n%cH --color=never --full-name -e %p -- %f"
         helm-grep-ag-command "rg --color=always --smart-case --no-heading --line-number %s %s %s")
-
-  ;; EShell support
-  ;; (add-hook 'eshell-mode-hook
-  ;;           (lambda ()
-  ;;             (eshell-cmpl-initialize)
-  ;;             (define-key eshell-mode-map [remap completion-at-point] 'helm-esh-pcomplete)
-  ;;             (define-key eshell-mode-map (kbd "M-p") 'helm-eshell-history)))
 
   (helm-mode 1)
   (helm-adaptive-mode 1))
@@ -2390,7 +2375,8 @@ mode (because I use tab completion for shell).
   (setq company-global-modes '(not org-mode markdown-mode))
   (setq company-tooltip-align-annotations t
         company-idle-delay .2
-        company-minimum-prefix-length 3)
+        company-minimum-prefix-length 3
+        company-format-margin-function #'company-text-icons-margin)
 
   ;; (define-key company-active-map (kbd "C-n") #'company-select-next)
   ;; (define-key company-active-map (kbd "C-p") #'company-select-previous)
@@ -3889,15 +3875,13 @@ default value is changed (the project's development is very active).
   (define-key rr-lsp-keymap (kbd "r") #'lsp-rename)
   (define-key rr-lsp-keymap (kbd "d") #'lsp-describe-thing-at-point)
 
-  (setq lsp-signature-auto-activate t
-        lsp-signature-render-documentation nil
+  (setq lsp-signature-render-documentation t
         lsp-file-watch-threshold 2000
         lsp-imenu-sort-methods '(kind position)
         lsp-modeline-diagnostics-enable nil
         lsp-modeline-code-actions-enable nil
         lsp-enable-on-type-formatting nil
         lsp-enable-indentation nil
-        lsp-modeline-diagnostics-scope :file
         lsp-diagnostic-clean-after-change nil
         lsp-completion-use-last-result t
         lsp-log-max 10000
@@ -3906,18 +3890,16 @@ default value is changed (the project's development is very active).
         lsp-headerline-breadcrumb-enable nil)
 
   (add-to-list 'lsp-file-watch-ignored "[/\\\\]\\.allure$")
-  (advice-add 'lsp :before
-              (lambda (&rest _args)
-                (eval '(setf (lsp-session-server-id->folders (lsp-session)) (ht)))))
+  ;; (advice-add 'lsp :before
+  ;;             (lambda (&rest _args)
+  ;;               (eval '(setf (lsp-session-server-id->folders (lsp-session)) (ht)))))
 
   ;; Rust lsp settings
   (require 'lsp-rust)
   (setq lsp-rust-analyzer-display-chaining-hints t
         lsp-rust-analyzer-server-display-inlay-hints t
-        lsp-rust-analyzer-proc-macro-enable t
-        lsp-rust-analyzer-cargo-load-out-dirs-from-check t)
-  (setq lsp-rust-clippy-preference "on")
-  (add-hook 'rust-mode-hook #'lsp-deferred)
+        lsp-rust-analyzer-proc-macro-enable t)
+  (add-hook 'rust-mode-hook #'lsp)
 
   ;; Python lsp settings
   (require 'lsp-pyls)
@@ -3926,10 +3908,10 @@ default value is changed (the project's development is very active).
 	      lsp-pyls-plugins-jedi-completion-enabled t
 	      lsp-pyls-plugins-jedi-completion-include-params nil
 	      lsp-pyls-plugins-jedi-signature-help-enabled t)
-  (add-hook 'python-mode-hook #'lsp-deferred)
+  (add-hook 'python-mode-hook #'lsp)
 
   ;; XML lsp settings
-  (add-hook 'nxml-mode-hook #'lsp-deferred))
+  (add-hook 'nxml-mode-hook #'lsp))
 #+end_src
 
 ** DAP
@@ -4325,7 +4307,7 @@ extra settings.
 (use-package lsp-java
   :after lsp-mode
   :config
-  (add-hook 'java-mode-hook #'lsp-deferred)
+  (add-hook 'java-mode-hook #'lsp)
   (setq lsp-java-save-actions-organize-imports nil
         lsp-java-format-enabled nil
         lsp-java-format-on-type-enabled nil
@@ -4338,10 +4320,12 @@ extra settings.
         lsp-java-format-settings-profile "GoogleStyle")
 
   (setq lsp-java-vmargs '("-javaagent:/home/rrudakov/Soft/lombok/lombok.jar"
-                          "-noverify"
+                          "-XX:+UseParallelGC"
+                          "-XX:GCTimeRatio=4"
+                          "-XX:AdaptiveSizePolicyWeight=90"
+                          "-Dsun.zip.disableMemoryMapping=true"
                           "-Xmx2G"
-                          "-XX:+UseG1GC"
-                          "-XX:+UseStringDeduplication")))
+                          "-Xms100m")))
 #+end_src
 
 *** Clojure
@@ -4381,6 +4365,9 @@ many useful commands. See full list of them [[https://github.com/clojure-emacs/c
     (rfn 2)
     (let-routes 1)
     (context 2))
+
+  (setq clojure-align-forms-automatically t
+        clojure-align-separator 'entire)
   (require 'flycheck-clj-kondo))
 #+end_src
 

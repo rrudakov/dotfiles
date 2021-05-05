@@ -23,7 +23,8 @@ There are two things you can do about this warning:
 (setq gc-cons-threshold (* 64 1024 1024)
       gc-cons-percentage 0.1)
 
-(setq comp-deferred-compilation t)
+(setq comp-deferred-compilation t
+      package-native-compile t)
 
 (setq garbage-collection-messages t)
 
