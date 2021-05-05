@@ -2514,8 +2514,8 @@ documented in the comment strings.
         org-display-remote-inline-images nil                             ; Do not download remote images
         org-hide-emphasis-markers nil                                    ; Show emphasis markers in org mode buffers, otherwise it will lead to align problems
         org-insert-heading-respect-content t                             ; Insert new headings after content and not after point
-        org-fontify-done-headline nil                                      ; Add special face for the entire done heading and not only keyword
-        org-fontify-todo-headline nil                                      ; Add special face for the entire todo heading and not only keyword
+        org-fontify-done-headline nil                                    ; Add special face for the entire done heading and not only keyword
+        org-fontify-todo-headline nil                                    ; Add special face for the entire todo heading and not only keyword
         org-src-fontify-natively t                                       ; Enable native syntax highlighting inside source code block
         org-image-actual-width 500                                       ; Limit maximum images width
         org-use-sub-superscripts '{}                                     ; Do not treat symbols after "_" as subscripts on export
