@@ -2376,12 +2376,14 @@ mode (because I use tab completion for shell).
   (setq company-tooltip-align-annotations t
         company-idle-delay .2
         company-minimum-prefix-length 3
-        company-format-margin-function #'company-text-icons-margin)
+        company-format-margin-function #'company-text-icons-margin
+        company-text-icons-add-background nil)
 
-  ;; (define-key company-active-map (kbd "C-n") #'company-select-next)
-  ;; (define-key company-active-map (kbd "C-p") #'company-select-previous)
-  ;; (define-key company-search-map (kbd "C-n") #'company-select-next)
-  ;; (define-key company-search-map (kbd "C-p") #'company-select-previous)
+  (with-eval-after-load 'company
+    (define-key company-active-map (kbd "C-n") nil)
+    (define-key company-active-map (kbd "C-p") nil)
+    (define-key company-active-map (kbd "M-n") #'company-select-next)
+    (define-key company-active-map (kbd "M-p") #'company-select-previous))
 
   (global-company-mode)
 
